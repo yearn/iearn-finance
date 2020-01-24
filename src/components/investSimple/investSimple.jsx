@@ -86,6 +86,16 @@ const styles = theme => ({
       width: '450',
     }
   },
+  connectContainer: {
+    padding: '12px',
+    display: 'flex',
+    justifyContent: 'center',
+    width: '100%',
+    maxWidth: '450px',
+    [theme.breakpoints.up('md')]: {
+      width: '450',
+    }
+  },
   intro: {
     padding: '12px',
     textAlign: 'center',
@@ -172,6 +182,12 @@ class InvestSimple extends Component {
 
     dispatcher.dispatch({ type: GET_ETH_BALANCE, content: {} })
     dispatcher.dispatch({ type: GET_IETH_BALANCE, content: {} })
+
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: 'Metamask wallet succesfully connected.', snackbarType: 'Info' }
+      that.setState(snackbarObj)
+    })
   };
 
   errorReturned = (error) => {
@@ -215,7 +231,7 @@ class InvestSimple extends Component {
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
           <div className={ classes.intro }>
-            <Typography variant='h3'>Welcome to iearn.finance. We will convert your Ethereum (Eth) into Interest Bearing Ethereum (iEth). Get started by clicking on the Invest button below.</Typography>
+            <Typography variant='h3'>Welcome to iearn finance. We will convert your Ethereum (Eth) into Interest Bearing Ethereum (iEth). Get started by clicking on the Invest button below.</Typography>
           </div>
           <div className={ classes.referralLink }>
             <TextField
@@ -230,7 +246,7 @@ class InvestSimple extends Component {
               placeholder="ref"
               variant="outlined"
               onKeyDown={ this.inputKeyDown }
-              helperText='Somemthing to help the user understand what the referral link gives them'
+              helperText='Enter a referral code to help support your favourite community member'
             />
           </div>
           <div className={ classes.balancesContainer }>
@@ -243,11 +259,29 @@ class InvestSimple extends Component {
             <div className={ classes.balances }>
               <Typography variant='h1' className={ classes.title }>Current ROI: </Typography><Typography variant='h4' className={ classes.value } noWrap>{ roi ? roi.toFixed(4) : '0.0000' } %</Typography>
               </div>
-            { !account.address && <div className={ classes.overlay } onClick={ this.overlayClicked }>
+            { false && <div className={ classes.overlay } onClick={ this.overlayClicked }>
               <Typography variant='h1' >Connect wallet</Typography>
             </div>}
           </div>
-          <div className={ classes.actionsContainer }>
+
+          {!account.address &&
+            <div className={ classes.connectContainer }>
+              <div className={ classes.intro }>
+                <Typography variant='h3'>To get started, you will need to connect your wallet to iearn finance.</Typography>
+              </div>
+              <Button
+                className={ classes.actionButton }
+                variant="contained"
+                color="primary"
+                disabled={ loading }
+                onClick={ this.overlayClicked }
+                >
+                <Typography className={ classes.buttonText } variant={ 'h3'} color='secondary'>Connect Wallet</Typography>
+              </Button>
+            </div>
+          }
+
+          { account.address && <div className={ classes.actionsContainer }>
             <Button
               className={ classes.actionButton }
               variant="contained"
@@ -266,7 +300,7 @@ class InvestSimple extends Component {
               >
               <Typography className={ classes.buttonText } variant={ 'h3'} color='secondary'>Redeem</Typography>
             </Button>
-          </div>
+          </div>}
         </div>
         { modalOpen && this.renderModal() }
         { investModalOpen && this.renderInvestModal() }

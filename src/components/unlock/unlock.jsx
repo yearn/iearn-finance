@@ -95,7 +95,7 @@ class Unlock extends Component {
   }
 
   error = (err) => {
-    this.setState({ loading: false, error: err })
+    this.setState({ loading: false, error: err, metamaskLoading: false })
   };
 
   metamaskUnlocked = () => {
@@ -103,7 +103,6 @@ class Unlock extends Component {
     if(this.props.closeModal != null) {
       this.props.closeModal()
     }
-    this.navigateInvest()
   }
 
   cancelMetamask = () => {
@@ -117,7 +116,7 @@ class Unlock extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.contentContainer }>
-          <Typography variant={ 'h3'}>Connect your wallet to use iswap finance</Typography>
+          <Typography variant={ 'h3'}>Connect your wallet to use iearn finance</Typography>
           { metamaskLoading && this.renderMetamaskLoading() }
           { !metamaskLoading && this.renderOptions() }
         </div>
@@ -132,7 +131,7 @@ class Unlock extends Component {
       <div className={ classes.metamask }>
       </div>
       <Typography variant='body1' className={ classes.instruction }>
-        Click connect in the MetaMask notification window to connect your wallet to iswap finance.
+        Click connect in the MetaMask notification window to connect your wallet to iearn finance.
       </Typography>
       <Button variant='contained' color='primary' onClick={ this.cancelMetamask } fullWidth>
         Cancel

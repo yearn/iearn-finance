@@ -8,6 +8,7 @@ import UnlockModal from '../unlock/unlockModal.jsx'
 
 import {
   CONNECT_METAMASK,
+  CONNECT_METAMASK_PASSIVE,
   METAMASK_CONNECTED
 } from '../../constants'
 
@@ -119,9 +120,7 @@ class Header extends Component {
   constructor(props) {
     super();
 
-    if(props.location.pathname === '/invest') {
-      dispatcher.dispatch({ type: CONNECT_METAMASK, content: {} })
-    }
+    dispatcher.dispatch({ type: CONNECT_METAMASK_PASSIVE, content: {} })
 
     this.state = {
       address: null,
@@ -181,7 +180,7 @@ class Header extends Component {
             <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>faq</Typography></div>
             <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>what</Typography></div>
           </div>
-          { (address && location.pathname === '/invest') && <div className={ classes.addressContainer } onClick={this.onAddressClick}>
+          { address && <div className={ classes.addressContainer } onClick={this.onAddressClick}>
             <Typography variant={ 'h2' } noWrap>{ address }</Typography>
           </div>}
           { !address &&  <div className={ classes.addressContainer } onClick={this.onAddressClick}>

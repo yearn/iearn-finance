@@ -3,6 +3,7 @@ import async from 'async';
 import {
   ERROR,
   CONNECT_METAMASK,
+  CONNECT_METAMASK_PASSIVE,
   METAMASK_CONNECTED,
   GET_BALANCES,
   BALANCES_RETURNED,
@@ -76,7 +77,7 @@ class Store {
         },
         {
           erc20address: 'Ethereum',
-          iEarnContract: '0xdfF329030357Ce6a8844D774302266F9f69f90E6',
+          iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0',
           name: 'Ethereum',
           symbol: 'ETH',
           apr: 4,
@@ -102,7 +103,7 @@ class Store {
           pool_value: 0.00
         },
         {
-          iEarnContract: '0xdfF329030357Ce6a8844D774302266F9f69f90E6',
+          iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0',
           name: 'Interest Bearing Ethereum',
           symbol: 'iETH',
           apr: 4,
@@ -131,6 +132,9 @@ class Store {
         switch (payload.type) {
           case CONNECT_METAMASK:
             this.connectMetamask(payload);
+            break;
+          case CONNECT_METAMASK_PASSIVE:
+            this.connectMetamaskPassive(payload);
             break;
           case GET_BALANCES:
             this.getBalances(payload);
@@ -187,7 +191,8 @@ class Store {
           if (err != null) {
             return emitter.emit(ERROR, err);
           } else if (accounts.length === 0) {
-            return emitter.emit(ERROR, 'MetaMask is locked. Please allow access via the Metamask/Mist Extension!');
+            console.log('MetaMask is locked. Please allow access via the Metamask Extension!')
+            return emitter.emit(ERROR, 'MetaMask is locked. Please allow access via the Metamask Extension!');
           } else {
             store.setStore({ account: { address: accounts[0] }})
             store.setStore({ web3: web3 })
@@ -200,10 +205,41 @@ class Store {
         });
 
       } catch (error) {
-        return emitter.emit(ERROR, 'Access denied. Please allow access via the Metamask/Mist Extension!');
+        console.log('Access denied. Please allow access via the Metamask Extension!')
+        return emitter.emit(ERROR, 'Access denied. Please allow access via the Metamask Extension!');
       }
     } else {
+      console.log('No web3? You should consider trying MetaMask!')
       return emitter.emit(ERROR, 'No web3? You should consider trying MetaMask!');
+    }
+  }
+
+  async connectMetamaskPassive(payload) {
+    let web3 = null
+
+    if (typeof window.ethereum !== 'undefined') {
+      web3 = new Web3(window.ethereum);
+
+      try {
+        web3.eth.getAccounts(function(err, accounts){
+          if (err != null) {
+
+          } else if (accounts.length === 0) {
+
+          } else {
+            store.setStore({ account: { address: accounts[0] }})
+            store.setStore({ web3: web3 })
+
+            dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+            dispatcher.dispatch({ type: GET_INVESTED_BALANCES, content: {} })
+
+            return emitter.emit(METAMASK_CONNECTED)
+          }
+        });
+
+      } catch (error) {
+
+      }
     }
   }
 

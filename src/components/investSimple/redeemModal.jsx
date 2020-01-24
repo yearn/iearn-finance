@@ -216,7 +216,7 @@ class RedeemModal extends Component {
       return false
     }
 
-    const asset = { iEarnContract: '0xdfF329030357Ce6a8844D774302266F9f69f90E6' }
+    const asset = { iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0' }
 
     this.setState({ loading: true })
 
