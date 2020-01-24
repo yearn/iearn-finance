@@ -8,10 +8,16 @@ import {
   Button
 } from '@material-ui/core';
 
-// import Store from "../../stores";
-// const emitter = Store.emitter
-// const dispatcher = Store.dispatcher
-// const store = Store.store
+import {
+  INVESTED_BALANCES_RETURNED,
+  REDEEM,
+  REDEEM_RETURNED
+} from '../../constants'
+
+import Store from "../../stores";
+const emitter = Store.emitter
+const dispatcher = Store.dispatcher
+const store = Store.store
 
 const styles = theme => ({
   root: {
@@ -85,7 +91,8 @@ const styles = theme => ({
   },
   tableCell: {
     padding: '12px 6px',
-    width: '100px'
+    width: '100px',
+    cursor: 'pointer'
   },
   tableCell1: {
     width: 'auto',
@@ -126,9 +133,29 @@ class Invested extends Component {
     super()
 
     this.state = {
-      expandAsset: null
+      expandAsset: null,
+      assets: store.getStore('investedAssets')
     }
   }
+
+  componentWillMount() {
+    emitter.on(INVESTED_BALANCES_RETURNED, this.balancesReturned);
+    emitter.on(REDEEM_RETURNED, this.redeemReturned);
+  };
+
+  componentWillUnmount() {
+    emitter.removeListener(INVESTED_BALANCES_RETURNED, this.balancesReturned);
+    emitter.removeListener(REDEEM_RETURNED, this.redeemReturned);
+  };
+
+  balancesReturned = (balances) => {
+    this.setState({ assets: store.getStore('investedAssets') })
+  };
+
+  redeemReturned = (txHash) => {
+    console.log(txHash)
+    //something, probably show snackbar
+  };
 
   render() {
     const { classes } = this.props;
@@ -143,7 +170,7 @@ class Invested extends Component {
           </div>
         </Card>
         <Card className={ classes.assetsCard }>
-          <Typography variant='h3' className={ classes.assetCardHeading }>Your Assets</Typography>
+          <Typography variant='h3' className={ classes.assetCardHeading }>I am earning interest on</Typography>
           {this.renderAssetTable()}
         </Card>
       </div>
@@ -156,30 +183,9 @@ class Invested extends Component {
       expandAsset,
       amount,
       amountError,
-      loading
+      loading,
+      assets
     } = this.state;
-
-
-    const assets = [
-      {
-        name: 'Interest Bearing USD',
-        symbol: 'iUSD',
-        apr: 0.6,
-        balance: 0.00
-      },
-      {
-        name: 'Interest Bearing Ethereum',
-        symbol: 'iETH',
-        apr: 0.6,
-        balance: 15.02
-      },
-      {
-        name: 'Interest Bearing Fantom',
-        symbol: 'iFTM',
-        apr: 0.6,
-        balance: 0.00
-      },
-    ]
 
     return (
       <div className={ classes.tableRoot }>
@@ -196,17 +202,19 @@ class Invested extends Component {
         </div>
         { assets.map((asset) => {
 
-          if(expandAsset === asset.symbol) {
+          console.log(asset.balance)
+
+          if(expandAsset && expandAsset.symbol === asset.symbol) {
             return (
               <div key={asset.symbol} className={ classes.tableRowExpanded } >
-                <div className={ `${classes.tableCell} ${classes.tableCell1}` }>
+                <div className={ `${classes.tableCell} ${classes.tableCell1}` } onClick={ (e) => { this.clickRow(e, asset) } }>
                   <Typography variant='body1' noWrap>{ asset.name }</Typography>
                 </div>
-                <div className={ classes.tableCell }>
+                <div className={ classes.tableCell } onClick={ (e) => { this.clickRow(e, asset) } }>
                   <Typography variant='body1' align='right' noWrap>{ asset.apr }%</Typography>
                 </div>
-                <div className={ `${classes.tableCell} ${classes.tableCellLast}` }>
-                  <Typography variant='body1' align='right' noWrap>{ asset.balance } { asset.symbol }</Typography>
+                <div className={ `${classes.tableCell} ${classes.tableCellLast}` } onClick={ (e) => { this.clickRow(e, asset) } }>
+                  <Typography variant='body1' align='right' noWrap>{ asset.balance ? asset.balance.toFixed(4) : '0.00' } { asset.symbol }</Typography>
                 </div>
                 <div className={ classes.action }>
                   <div className={ classes.actionInputContainer }>
@@ -230,7 +238,7 @@ class Invested extends Component {
                     disabled={ loading }
                     onClick={ this.onCollateralize }
                     >
-                    <Typography className={ classes.buttonText } variant={ 'h3'}>Withdraw</Typography>
+                    <Typography className={ classes.buttonText } variant={ 'h3'}>Redeem</Typography>
                   </Button>
                 </div>
               </div>
@@ -246,7 +254,7 @@ class Invested extends Component {
                 <Typography variant='body1' align='right' noWrap>{ asset.apr }%</Typography>
               </div>
               <div className={ `${classes.tableCell} ${classes.tableCellLast}` }>
-                <Typography variant='body1' align='right' noWrap>{ asset.balance } { asset.symbol }</Typography>
+                <Typography variant='body1' align='right' noWrap>{ asset.balance ? asset.balance.toFixed(4) : '0.00' } { asset.symbol }</Typography>
               </div>
             </div>
           )
@@ -256,7 +264,15 @@ class Invested extends Component {
   }
 
   clickRow = (event, asset) => {
-    this.setState({ expandAsset: asset.symbol })
+
+    if(!this.state.expandAsset) {
+      this.setState({ expandAsset: asset })
+    } else if(this.state.expandAsset.symbol === asset.symbol) {
+      this.setState({ expandAsset: null })
+    } else {
+      this.setState({ expandAsset: asset })
+    }
+
   }
 
   collapseRow = () => {

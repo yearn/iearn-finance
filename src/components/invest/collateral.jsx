@@ -9,12 +9,14 @@ import {
 } from '@material-ui/core';
 
 import {
-  BALANCES_RETURNED
+  BALANCES_RETURNED,
+  INVEST,
+  INVEST_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
 const emitter = Store.emitter
-// const dispatcher = Store.dispatcher
+const dispatcher = Store.dispatcher
 const store = Store.store
 
 const styles = theme => ({
@@ -89,7 +91,8 @@ const styles = theme => ({
   },
   tableCell: {
     padding: '12px 6px',
-    width: '100px'
+    width: '100px',
+    cursor: 'pointer'
   },
   tableCell1: {
     width: 'auto',
@@ -131,22 +134,31 @@ class Collateral extends Component {
     super()
 
     this.state = {
+      assets: store.getStore('assets'),
       expandAsset: null,
-      assetBalances: []
+      amount: ''
     }
   }
 
   componentWillMount() {
     emitter.on(BALANCES_RETURNED, this.balancesReturned);
+    emitter.on(INVEST_RETURNED, this.investReturned);
   };
 
   componentWillUnmount() {
     emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
+    emitter.removeListener(INVEST_RETURNED, this.investReturned);
   };
 
   balancesReturned = (balances) => {
-    this.setState({ assetBalances: balances })
+    this.setState({ assets: store.getStore('assets') })
   };
+
+  investReturned = (txHash) => {
+
+    console.log(txHash)
+    //something, probably show snackbar
+  }
 
   render() {
     const { classes } = this.props;
@@ -161,7 +173,7 @@ class Collateral extends Component {
           </div>
         </Card>
         <Card className={ classes.assetsCard }>
-          <Typography variant='h3' className={ classes.assetCardHeading }>Add Investment</Typography>
+          <Typography variant='h3' className={ classes.assetCardHeading }>I want to earn interest on</Typography>
           {this.renderAssetTable()}
         </Card>
       </div>
@@ -175,10 +187,8 @@ class Collateral extends Component {
       amount,
       amountError,
       loading,
-      assetBalances
+      assets
     } = this.state;
-
-    const assets = store.getStore('assets')
 
     return (
       <div className={ classes.tableRoot }>
@@ -194,31 +204,17 @@ class Collateral extends Component {
           </div>
         </div>
         { assets.map((asset) => {
-
-          let balance = 0
-
-          const balanceArr = assetBalances.filter((balance) => {
-            if(!balance || !asset) {
-              return false
-            }
-            return balance.symbol === asset.symbol
-          })
-
-          if(balanceArr.length > 0) {
-            balance = balanceArr[0].balance
-          }
-
-          if(expandAsset === asset.symbol) {
+          if(expandAsset && expandAsset.symbol === asset.symbol) {
             return (
               <div key={asset.symbol} className={ classes.tableRowExpanded } >
-                <div className={ `${classes.tableCell} ${classes.tableCell1}` }>
+                <div className={ `${classes.tableCell} ${classes.tableCell1}` } onClick={ (e) => { this.clickRow(e, asset) } }>
                   <Typography variant='body1' noWrap>{ asset.name }</Typography>
                 </div>
-                <div className={ classes.tableCell }>
+                <div className={ classes.tableCell } onClick={ (e) => { this.clickRow(e, asset) } }>
                   <Typography variant='body1' align='right' noWrap>{ asset.apr }%</Typography>
                 </div>
-                <div className={ `${classes.tableCell} ${classes.tableCellLast}` }>
-                  <Typography variant='body1' align='right' noWrap>{ balance } { asset.symbol }</Typography>
+                <div className={ `${classes.tableCell} ${classes.tableCellLast}` } onClick={ (e) => { this.clickRow(e, asset) } }>
+                  <Typography variant='body1' align='right' noWrap>{ asset.balance ? asset.balance.toFixed(4) : '0.00' } { asset.symbol }</Typography>
                 </div>
                 <div className={ classes.action }>
                   <div className={ classes.actionInputContainer }>
@@ -233,6 +229,7 @@ class Collateral extends Component {
                       label="Amount"
                       placeholder="0.00"
                       variant="outlined"
+                      onKeyDown={ this.inputKeyDown }
                     />
                   </div>
                   <Button
@@ -240,7 +237,7 @@ class Collateral extends Component {
                     variant="contained"
                     color="secondary"
                     disabled={ loading }
-                    onClick={ this.onCollateralize }
+                    onClick={ this.onInvest }
                     >
                     <Typography className={ classes.buttonText } variant={ 'h3'}>Invest</Typography>
                   </Button>
@@ -258,7 +255,7 @@ class Collateral extends Component {
                 <Typography variant='body1' align='right' noWrap>{ asset.apr }%</Typography>
               </div>
               <div className={ `${classes.tableCell} ${classes.tableCellLast}` }>
-                <Typography variant='body1' align='right' noWrap>{ balance ? balance.toFixed(4) : '0.00' } { asset.symbol }</Typography>
+                <Typography variant='body1' align='right' noWrap>{ asset.balance ? asset.balance.toFixed(4) : '0.00' } { asset.symbol }</Typography>
               </div>
             </div>
           )
@@ -268,7 +265,15 @@ class Collateral extends Component {
   }
 
   clickRow = (event, asset) => {
-    this.setState({ expandAsset: asset.symbol })
+
+    if(!this.state.expandAsset) {
+      this.setState({ expandAsset: asset })
+    } else if(this.state.expandAsset.symbol === asset.symbol) {
+      this.setState({ expandAsset: null })
+    } else {
+      this.setState({ expandAsset: asset })
+    }
+
   }
 
   collapseRow = () => {
@@ -281,8 +286,23 @@ class Collateral extends Component {
     this.setState(val)
   }
 
-  onCollateralize = () => {
-    //do something
+  inputKeyDown = (event) => {
+    if (event.which === 13) {
+      this.onInvest();
+    }
+  }
+
+  onInvest = () => {
+    this.setState({ amountError: false })
+
+    const { amount, expandAsset, assets } = this.state
+
+    if(!amount || isNaN(amount) || amount <= 0 || amount > expandAsset.balance) {
+      this.setState({ amountError: true })
+      return false
+    }
+
+    dispatcher.dispatch({ type: INVEST, content: { amount: amount, asset: expandAsset } })
   }
 }
 

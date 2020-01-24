@@ -11,12 +11,13 @@ import {
 import interestTheme from './theme';
 
 import Header from './components/header';
-import Unlock from './components/unlock';
-import Invest from './components/invest';
+// import Unlock from './components/unlock';
+import InvestSimple from './components/investSimple';
 
 class App extends Component {
 
   render() {
+
     return (
       <MuiThemeProvider theme={ createMuiTheme(interestTheme) }>
         <CssBaseline />
@@ -26,15 +27,15 @@ class App extends Component {
             flexDirection: 'column',
             minHeight: '100vh',
             alignItems: 'center',
-            background: "#f9fafb"   
+            background: "#f9fafb"
           }}>
             <Header />
             <Switch>
               <Route path="/invest">
-                <Invest />
+                <InvestSimple />
               </Route>
               <Route path="/">
-                <Unlock />
+                <InvestSimple />
               </Route>
             </Switch>
           </div>

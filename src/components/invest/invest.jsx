@@ -5,16 +5,21 @@ import { withStyles } from '@material-ui/core/styles';
 import Collateral from './collateral'
 import Invested from './invested'
 
-// import Store from "../../stores";
+import {
+  GET_PRICES,
+  GET_POOL_VALUES
+} from '../../constants'
+
+import Store from "../../stores";
 // const emitter = Store.emitter
-// const dispatcher = Store.dispatcher
+const dispatcher = Store.dispatcher
 // const store = Store.store
 
 const styles = theme => ({
   root: {
     flex: 1,
     display: 'flex',
-    maxWidth: '1280px',
+    maxWidth: '1200px',
     width: '100%'
   },
   collateralContainer: {
@@ -32,6 +37,11 @@ const styles = theme => ({
 });
 
 class Invest extends Component {
+
+  componentWillMount() {
+    dispatcher.dispatch({ type: GET_PRICES, content: {} })
+    dispatcher.dispatch({ type: GET_POOL_VALUES, content: {} })
+  }
 
   render() {
     const { classes } = this.props;

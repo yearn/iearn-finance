@@ -14,9 +14,11 @@ function Transition(props) {
 class UnlockModal extends Component {
   render() {
     const { closeModal } = this.props;
+    
+    const fullScreen = window.innerWidth < 450;
 
     return (
-      <Dialog open={ true } onClose={ closeModal } fullWidth={ true } maxWidth={ 'sm' } TransitionComponent={ Transition }>
+      <Dialog open={ true } onClose={ closeModal } fullWidth={ true } maxWidth={ 'sm' } TransitionComponent={ Transition } fullScreen={ fullScreen }>
         <DialogContent>
           <Unlock closeModal={ closeModal } />
         </DialogContent>

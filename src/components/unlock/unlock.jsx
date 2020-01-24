@@ -31,7 +31,7 @@ const styles = theme => ({
   },
   cardContainer: {
     marginTop: '60px',
-    minHeight: '200px',
+    minHeight: '260px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-around',
@@ -141,7 +141,7 @@ class Unlock extends Component {
   };
 
   renderOptions() {
-    const { classes } = this.props;
+    const { classes, closeModal } = this.props;
 
     return (
       <div className={ classes.cardContainer }>
@@ -153,6 +153,9 @@ class Unlock extends Component {
           <div className={ classes.ledgerIcon }></div>
           <Typography className={ classes.buttonText } variant={ 'h3'}>Unlock using Ledger</Typography>
         </Button>
+        { closeModal != null && <Button className={ classes.unlockCard } variant='text' color='secondary' onClick={ closeModal } fullWidth>
+          <Typography className={ classes.buttonText } variant={ 'h3'}>Close</Typography>
+        </Button>}
       </div>
     )
   };
