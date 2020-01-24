@@ -11,6 +11,8 @@ import {
   METAMASK_CONNECTED
 } from '../../constants'
 
+import { colors } from '../../theme'
+
 import Store from "../../stores";
 const dispatcher = Store.dispatcher
 const emitter = Store.emitter
@@ -20,7 +22,7 @@ const styles = theme => ({
   root: {
     display: 'flex',
     justifyContent: 'space-around',
-    background: '#fff',
+    background: colors.blue,
     borderBottom: '1px solid #aaa',
     boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
     width: '100%',
@@ -45,7 +47,7 @@ const styles = theme => ({
     cursor: 'pointer'
   },
   brandingIcon: {
-    border: '1px solid #222',
+    border: '1px solid '+colors.white,
     cursor: 'pointer'
   },
   linksContainer: {
@@ -62,7 +64,7 @@ const styles = theme => ({
   },
   linksContainerMobile: {
     position: 'absolute',
-    top: '50px',
+    top: '66px',
     left: '0px',
     right: '0px',
     backgroundColor: '#fff',
@@ -85,11 +87,13 @@ const styles = theme => ({
     }
   },
   link_active: {
-    borderBottom: '2px solid #aaa'
+    borderBottom: '2px solid '+colors.blue,
+    [theme.breakpoints.up('md')]: {
+      borderBottom: '2px solid '+colors.white,
+    }
   },
   addressContainer: {
     maxWidth: '100px',
-    border: '1px solid #aaa',
     padding: '6px 12px',
     background: '#fbfbfb',
     cursor: 'pointer',
@@ -97,7 +101,7 @@ const styles = theme => ({
       maxWidth: '300px',
     }
   },
-  menuIcon: {
+  menuIconContainer: {
     padding: '0px 0px 0px 6px',
     display: 'flex',
     cursor: 'pointer',
@@ -105,6 +109,9 @@ const styles = theme => ({
       display: 'none',
       padding: '0px 20px'
     }
+  },
+  menuIcon: {
+    color: colors.white
   }
 });
 
@@ -127,6 +134,7 @@ class Header extends Component {
     emitter.on(METAMASK_CONNECTED, this.metamaskUnlocked);
 
     this.menuRef = React.createRef();
+    this.menuOpenRef = React.createRef();
     document.addEventListener("mousedown", this.clickListener);
   };
 
@@ -135,11 +143,10 @@ class Header extends Component {
   };
 
   clickListener = (event) => {
-
-    if (!this.menuRef.current || this.menuRef.current.contains(event.target)) {
+    if (!this.menuRef.current || this.menuRef.current.contains(event.target) || this.menuOpenRef.current.contains(event.target)) {
       return;
     } else {
-      this.toggleMenu()
+      this.closeMenu()
     }
   };
 
@@ -160,19 +167,19 @@ class Header extends Component {
       <div className={ classes.root }>
         <div className={ classes.header }>
           <div className={ classes.brandingContainer }>
-            <div className={ classes.brandingIcon } onClick={ this.navigateHome }>icon</div>
+            <div className={ classes.brandingIcon } onClick={ this.navigateHome }><Typography variant={ 'body1' } color='secondary'>icon</Typography></div>
             <div className={ classes.brandingName } onClick={ this.navigateHome }>
-              <Typography variant={ 'h1' }>iearn finance</Typography>
+              <Typography variant={ 'h1' } color='secondary'>iearn finance</Typography>
             </div>
           </div>
           <div className={ classes.linksContainer }>
-            <div className={ classes.link }><Typography variant={ 'body1' }>iswap</Typography></div>
-            <div className={ `${classes.link} ${classes.link_active}` }><Typography variant={ 'body1' }>iearn</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' }>ireward</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' }>iam</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' }>irefer</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' }>faq</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' }>what</Typography></div>
+            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>iswap</Typography></div>
+            <div className={ `${classes.link} ${classes.link_active}` }><Typography variant={ 'body1' } color='secondary'>iearn</Typography></div>
+            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>ireward</Typography></div>
+            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>iam</Typography></div>
+            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>irefer</Typography></div>
+            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>faq</Typography></div>
+            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>what</Typography></div>
           </div>
           { (address && location.pathname === '/invest') && <div className={ classes.addressContainer } onClick={this.onAddressClick}>
             <Typography variant={ 'h2' } noWrap>{ address }</Typography>
@@ -180,8 +187,8 @@ class Header extends Component {
           { !address &&  <div className={ classes.addressContainer } onClick={this.onAddressClick}>
             <Typography variant={ 'h2' } noWrap>Connect Wallet</Typography>
           </div> }
-          <div className={ classes.menuIcon }>
-            <MenuIcon onClick={ this.toggleMenu } />
+          <div className={ classes.menuIconContainer } ref={this.menuOpenRef}>
+            <MenuIcon onClick={ !menuOpen ? this.toggleMenu : this.closeMenu } className={ classes.menuIcon } />
           </div>
           {
             menuOpen && (<div className={ classes.linksContainerMobile } ref={this.menuRef} >
@@ -219,8 +226,14 @@ class Header extends Component {
     )
   }
 
+  closeMenu = () => {
+    console.log('closing menu')
+    this.setState({ menuOpen: false })
+  }
+
   toggleMenu = () => {
-    this.setState({ menuOpen: !this.state.menuOpen })
+    console.log('opening menu')
+    this.setState({ menuOpen: true })
   }
 }
 

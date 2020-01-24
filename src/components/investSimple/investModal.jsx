@@ -65,12 +65,6 @@ const styles = theme => ({
   scale: {
     padding: '6px 12px',
     margin: '6px',
-    cursor: 'pointer',
-    background: '#aaa',
-    boxShadow: '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)',
-    '&:hover': {
-      boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)'
-    },
     [theme.breakpoints.up('sm')]: {
       padding: '12px 24px',
       margin: '12px',
@@ -144,10 +138,38 @@ class InvestModal extends Component {
             />
           </div>
           <div className={ classes.scaleContainer }>
-            <div className={ classes.scale } onClick={ () => { this.setAmount(25) } }><Typography>25%</Typography></div>
-            <div className={ classes.scale } onClick={ () => { this.setAmount(50) } }><Typography>50%</Typography></div>
-            <div className={ classes.scale } onClick={ () => { this.setAmount(75) } }><Typography>75%</Typography></div>
-            <div className={ classes.scale } onClick={ () => { this.setAmount(100) } }><Typography>MAX</Typography></div>
+            <Button
+              className={ classes.scale }
+              variant='contained'
+              disabled={ loading }
+              color="primary"
+              onClick={ () => { this.setAmount(25) } }>
+              <Typography color='secondary'>25%</Typography>
+            </Button>
+            <Button
+              className={ classes.scale }
+              variant='contained'
+              disabled={ loading }
+              color="primary"
+              onClick={ () => { this.setAmount(50) } }>
+              <Typography color='secondary'>50%</Typography>
+            </Button>
+            <Button
+              className={ classes.scale }
+              variant='contained'
+              disabled={ loading }
+              color="primary"
+              onClick={ () => { this.setAmount(75) } }>
+              <Typography color='secondary'>75%</Typography>
+            </Button>
+            <Button
+              className={ classes.scale }
+              variant='contained'
+              disabled={ loading }
+              color="primary"
+              onClick={ () => { this.setAmount(100) } }>
+              <Typography color='secondary'>100%</Typography>
+            </Button>
           </div>
           <div className={ classes.actionsContainer }>
             <Button
@@ -162,11 +184,11 @@ class InvestModal extends Component {
             <Button
               className={ classes.actionButton }
               variant="contained"
-              color="secondary"
+              color="primary"
               disabled={ loading }
               onClick={ this.onInvest }
               >
-              <Typography className={ classes.buttonText } variant={ 'h3'}>Submit</Typography>
+              <Typography className={ classes.buttonText } variant={ 'h3'} color='secondary'>Submit</Typography>
             </Button>
           </div>
         </DialogContent>

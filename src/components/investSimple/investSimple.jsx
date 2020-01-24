@@ -37,8 +37,12 @@ const styles = theme => ({
     display: 'flex',
     maxWidth: '1200px',
     width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginTop: '60px',
+    [theme.breakpoints.up('md')]: {
+      alignItems: 'center',
+      marginTop: '0px',
+    }
   },
   investedContainer: {
     display: 'flex',
@@ -60,7 +64,7 @@ const styles = theme => ({
     alignItems: 'center',
     flexWrap: 'wrap',
     justifyContent: 'flex-end',
-    padding: '12px',
+    padding: '36px 12px',
     position: 'relative',
     [theme.breakpoints.up('md')]: {
       minWidth: '450px'
@@ -247,20 +251,20 @@ class InvestSimple extends Component {
             <Button
               className={ classes.actionButton }
               variant="contained"
-              color="secondary"
+              color="primary"
               disabled={ loading || !account.address }
               onClick={ this.investClicked }
               >
-              <Typography className={ classes.buttonText } variant={ 'h3'}>Invest</Typography>
+              <Typography className={ classes.buttonText } variant={ 'h3'} color='secondary'>Invest</Typography>
             </Button>
             <Button
               className={ classes.actionButton }
               variant="contained"
-              color="secondary"
+              color="primary"
               disabled={ loading || !account.address }
               onClick={ this.redeemClicked }
               >
-              <Typography className={ classes.buttonText } variant={ 'h3'}>Redeem</Typography>
+              <Typography className={ classes.buttonText } variant={ 'h3'} color='secondary'>Redeem</Typography>
             </Button>
           </div>
         </div>

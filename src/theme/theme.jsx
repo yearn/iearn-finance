@@ -159,7 +159,8 @@ const iswapTheme =  {
   },
   palette: {
     primary: {
-      main: colors.blue
+      main: colors.blue,
+      contrastText: colors.white
     },
     secondary: {
       main: colors.white
@@ -169,7 +170,7 @@ const iswapTheme =  {
       default: colors.white
     },
     text: {
-      primary: colors.lightBlack,
+      primary: colors.lightBlack
     }
   },
   breakpoints: breakpoints
