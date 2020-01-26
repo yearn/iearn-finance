@@ -168,7 +168,7 @@ class Header extends Component {
           <div className={ classes.brandingContainer }>
             <div className={ classes.brandingIcon } onClick={ this.navigateHome }><Typography variant={ 'body1' } color='secondary'>icon</Typography></div>
             <div className={ classes.brandingName } onClick={ this.navigateHome }>
-              <Typography variant={ 'h1' } color='secondary'>iearn finance</Typography>
+              <Typography variant={ 'h1' } color='secondary'>iearn</Typography>
             </div>
           </div>
           <div className={ classes.linksContainer }>

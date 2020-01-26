@@ -29,7 +29,6 @@ class App extends Component {
             alignItems: 'center',
             background: "#f9fafb"
           }}>
-            <Header />
             <Switch>
               <Route path="/invest">
                 <InvestSimple />

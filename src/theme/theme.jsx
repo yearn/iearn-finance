@@ -4,14 +4,15 @@ export const colors = {
   white: "#fff",
   black: '#000',
   darkBlue: "#2c3b57",
-  blue: "#426ed5",
+  blue: "#2F80ED",
   gray: "#e1e1e1",
-  lightGray: "#fafafa",
+  lightGray: "#737373",
   lightBlack: "#6a6a6a",
   darkBlack: "#141414",
   green: '#1abc9c',
   red: '#ed4337',
   orange: 'orange',
+  pink: '#DC6BE5',
 };
 
 const breakpoints = createBreakpoints({
@@ -27,8 +28,9 @@ const breakpoints = createBreakpoints({
 
 const iswapTheme =  {
   typography: {
-    fontFamily: ['Lato', 'Roboto', 'Open Sans', 'sans-serif'].join(","),
-    lineHeight: 1.45,
+    fontFamily: ['Open Sans', 'sans-serif'].join(","),
+    lineHeight: '1rem',
+    fontWeight: '700',
     useNextVariants: true,
     h1: {
       fontSize: '1.0rem',
@@ -38,29 +40,20 @@ const iswapTheme =  {
       }
     },
     h2: {
-      fontSize: '0.7rem',
-      [breakpoints.up('md')]: {
-        fontSize: '1rem',
-      }
+      fontSize: '1rem',
+      fontWeight: '700',
     },
     h3: {
-      fontSize: '0.9rem',
-      [breakpoints.up('md')]: {
-        fontSize: '1.3rem',
-      }
+      fontSize: '1rem',
+      fontWeight: '700',
     },
     h4: {
-      fontSize: '1.8rem',
-      fontWeight: 'bold',
-      [breakpoints.up('md')]: {
-        fontSize: '2.4rem',
-      }
+      fontSize: '0.75rem',
+      fontWeight: '700',
     },
     h5: {
-      fontSize: '0.7rem',
-      [breakpoints.up('md')]: {
-        fontSize: '1rem',
-      }
+      fontSize: '1rem',
+      fontWeight: '700',
     }
   },
   type: 'light',
@@ -76,12 +69,15 @@ const iswapTheme =  {
     },
     MuiInputBase: {
       root: {
-        fontSize: '1.1rem',
+        color: '#010101',
+        fontSize: '1.5rem',
         background: 'none',
         paddingRight: '10px',
         fontWeight: '600',
+        borderRadius: '1.25rem',
+        backgroundColor: '#FFFFFF',
         [breakpoints.up('md')]: {
-          fontSize: '1.3rem',
+          fontSize: '1.5rem',
         }
       }
     },
@@ -103,13 +99,13 @@ const iswapTheme =  {
     },
     MuiOutlinedInput: {
       input: {
-        padding: '18px',
+        padding: '20px',
         [breakpoints.up('md')]: {
-          padding: '27px',
+          padding: '20px',
         }
       },
       notchedOutline: {
-        borderRadius: '10px'
+        borderRadius: '1.25rem',
       }
     },
     MuiPrivateNotchedOutline: {
@@ -118,8 +114,14 @@ const iswapTheme =  {
     },
     MuiButton: {
       label: {
-        fontSize: '0.7rem',
+        fontSize: '1rem',
+        fontWeight: '700',
         textTransform: 'none'
+      },
+      outlined: {
+        fontWeight: '700',
+        fontSize: '1rem',
+        minWidth: '250px'
       }
     },
     MuiSnackbar : {
@@ -163,14 +165,14 @@ const iswapTheme =  {
       contrastText: colors.white
     },
     secondary: {
-      main: colors.white
+      main: colors.blue
     },
     background:{
       paper: colors.white,
       default: colors.white
     },
     text: {
-      primary: colors.lightBlack
+      primary: colors.pink
     }
   },
   breakpoints: breakpoints

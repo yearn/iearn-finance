@@ -125,6 +125,7 @@ class Store {
       web3: null,
       ethBalance: 0,
       iEthBalance: 0,
+      pricePerFullShare: 0,
     }
 
     dispatcher.register(
@@ -461,9 +462,8 @@ class Store {
     }
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
-
     const balance = web3.utils.fromWei(await iEarnContract.methods.getPricePerFullShare().call({ from: account.address }), 'ether');
-
+    store.setStore({ pricePerFullShare: balance })
     asset.price = parseFloat(balance)
 
     callback(null, asset)
@@ -496,7 +496,8 @@ class Store {
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
 
     const balance = web3.utils.fromWei(await iEarnContract.methods.balanceOf(account.address).call({ from: account.address }), 'ether');
-
+    const price = web3.utils.fromWei(await iEarnContract.methods.getPricePerFullShare().call({ from: account.address }), 'ether');
+    store.setStore({ pricePerFullShare: price })
     asset.balance = parseFloat(balance)
 
     callback(null, asset)

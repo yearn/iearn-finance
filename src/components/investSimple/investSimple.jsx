@@ -23,6 +23,7 @@ import {
   INVEST_RETURNED,
   REDEEM,
   REDEEM_RETURNED,
+  CONNECT_METAMASK,
   METAMASK_CONNECTED
 } from '../../constants'
 
@@ -44,6 +45,9 @@ const styles = theme => ({
       marginTop: '0px',
     }
   },
+  value: {
+    cursor: 'pointer'
+  },
   investedContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -56,7 +60,8 @@ const styles = theme => ({
     }
   },
   actionInput: {
-
+    padding: '0px 0px 12px 0px',
+    fontSize: '0.5rem'
   },
   balancesContainer: {
     display: 'flex',
@@ -66,11 +71,11 @@ const styles = theme => ({
     justifyContent: 'flex-end',
     padding: '36px 12px',
     position: 'relative',
-    [theme.breakpoints.up('md')]: {
-      minWidth: '450px'
-    }
   },
   balances: {
+    marginBottom: '-25px',
+    marginRight: '30px',
+    zIndex: '900',
     display: 'flex',
     alignItems: 'center',
     width: '100%',
@@ -81,9 +86,9 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     width: '100%',
-    maxWidth: '450px',
+    maxWidth: '900px',
     [theme.breakpoints.up('md')]: {
-      width: '450',
+      width: '750px',
     }
   },
   connectContainer: {
@@ -106,11 +111,31 @@ const styles = theme => ({
   },
   actionButton: {
     padding: '12px',
-    minWidth: '120px',
+    backgroundColor: 'white',
+    borderRadius: '3rem',
+    border: '1px solid #E1E1E1',
+    fontWeight: 500,
     [theme.breakpoints.up('md')]: {
       padding: '15px',
-      minWidth: '150px',
     }
+  },
+  tradeContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '0px 0px 12px 0px',
+    minWidth: '350px',
+    alignItems: 'center',
+    [theme.breakpoints.up('sm')]: {
+      padding: '0px 12px 24px 12px',
+      minWidth: '350px',
+    }
+  },
+  scaleContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '0px 0px 12px 0px',
+    alignItems: 'center',
+    flexWrap: 'wrap',
   },
   overlay: {
     position: 'absolute',
@@ -143,6 +168,7 @@ class InvestSimple extends Component {
     this.state = {
       ethBalance: store.getStore('ethBalance'),
       iEthBalance: store.getStore('iEthBalance'),
+      pricePerFullShare: store.getStore('pricePerFullShare'),
       referralLink: '',
       roi: 4,
       account: store.getStore('account'),
@@ -150,7 +176,11 @@ class InvestSimple extends Component {
       investModalOpen: false,
       redeemModalOpen: false,
       snackbarType: null,
-      snackbarMessage: null
+      snackbarMessage: null,
+      amount: '',
+      amountError: false,
+      redeemAmount: '',
+      redeemAmountError: false,
     }
   }
 
@@ -175,6 +205,7 @@ class InvestSimple extends Component {
   balancesReturned = (balances) => {
     this.setState({ ethBalance: store.getStore('ethBalance') })
     this.setState({ iEthBalance: store.getStore('iEthBalance') })
+    this.setState({ pricePerFullShare: store.getStore('pricePerFullShare') })
   };
 
   metamaskConnected = () => {
@@ -193,7 +224,7 @@ class InvestSimple extends Component {
   errorReturned = (error) => {
     const snackbarObj = { snackbarMessage: null, snackbarType: null }
     this.setState(snackbarObj)
-
+    this.setState({ loading: false })
     const that = this
     setTimeout(() => {
       const snackbarObj = { snackbarMessage: error.toString(), snackbarType: 'Error' }
@@ -214,11 +245,16 @@ class InvestSimple extends Component {
   render() {
     const { classes } = this.props;
     const {
+      amount,
+      amountError,
+      redeemAmount,
+      redeemAmountError,
       referralLink,
       referralLinkError,
       loading,
       ethBalance,
       iEthBalance,
+      pricePerFullShare,
       roi,
       account,
       modalOpen,
@@ -226,39 +262,16 @@ class InvestSimple extends Component {
       redeemModalOpen,
       snackbarMessage
     } = this.state
-
+    console.log(pricePerFullShare);
+    console.log(parseFloat(iEthBalance))
+    console.log(parseFloat(pricePerFullShare))
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
           <div className={ classes.intro }>
-            <Typography variant='h3'>Welcome to iearn finance. We will convert your Ethereum (Eth) into Interest Bearing Ethereum (iEth). Get started by clicking on the Invest button below.</Typography>
-          </div>
-          <div className={ classes.referralLink }>
-            <TextField
-              fullWidth
-              className={ classes.actionInput }
-              id='referralLink'
-              value={ referralLink }
-              error={ referralLinkError }
-              onChange={ this.onChange }
-              disabled={ loading }
-              label="Referral Link"
-              placeholder="ref"
-              variant="outlined"
-              onKeyDown={ this.inputKeyDown }
-              helperText='Enter a referral code to help support your favourite community member'
-            />
+            <Typography variant='h2'>Earn interest. Simple.</Typography>
           </div>
           <div className={ classes.balancesContainer }>
-            <div className={ classes.balances }>
-              <Typography variant='h1' className={ classes.title }>Eth not earning interest: </Typography><Typography variant='h4' className={ classes.value } noWrap>{ ethBalance ? ethBalance.toFixed(4) : '0.0000' } Eth</Typography>
-            </div>
-            <div className={ classes.balances }>
-              <Typography variant='h1' className={ classes.title }>Eth earning interest: </Typography><Typography variant='h4' className={ classes.value } noWrap>{ iEthBalance ? iEthBalance.toFixed(4) : '0.0000' } Eth</Typography>
-            </div>
-            <div className={ classes.balances }>
-              <Typography variant='h1' className={ classes.title }>Current ROI: </Typography><Typography variant='h4' className={ classes.value } noWrap>{ roi ? roi.toFixed(4) : '0.0000' } %</Typography>
-              </div>
             { false && <div className={ classes.overlay } onClick={ this.overlayClicked }>
               <Typography variant='h1' >Connect wallet</Typography>
             </div>}
@@ -266,40 +279,146 @@ class InvestSimple extends Component {
 
           {!account.address &&
             <div className={ classes.connectContainer }>
-              <div className={ classes.intro }>
-                <Typography variant='h3'>To get started, you will need to connect your wallet to iearn finance.</Typography>
-              </div>
               <Button
                 className={ classes.actionButton }
-                variant="contained"
+                variant="outlined"
                 color="primary"
                 disabled={ loading }
-                onClick={ this.overlayClicked }
+                onClick={ this.unlockMetamask }
                 >
-                <Typography className={ classes.buttonText } variant={ 'h3'} color='secondary'>Connect Wallet</Typography>
+                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Connect Wallet</Typography>
               </Button>
             </div>
           }
 
-          { account.address && <div className={ classes.actionsContainer }>
-            <Button
-              className={ classes.actionButton }
-              variant="contained"
-              color="primary"
-              disabled={ loading || !account.address }
-              onClick={ this.investClicked }
-              >
-              <Typography className={ classes.buttonText } variant={ 'h3'} color='secondary'>Invest</Typography>
-            </Button>
-            <Button
-              className={ classes.actionButton }
-              variant="contained"
-              color="primary"
-              disabled={ loading || !account.address }
-              onClick={ this.redeemClicked }
-              >
-              <Typography className={ classes.buttonText } variant={ 'h3'} color='secondary'>Redeem</Typography>
-            </Button>
+          {account.address && <div className={ classes.actionsContainer }>
+            <div className={ classes.tradeContainer }>
+              <div className={ classes.balances }>
+                  <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ ethBalance ? ethBalance.toFixed(4) : '0.0000' } ETH</Typography>
+              </div>
+              <div className={ classes.amountContainer }>
+                <TextField
+                  fullWidth
+                  className={ classes.actionInput }
+                  id='amount'
+                  value={ amount }
+                  error={ amountError }
+                  onChange={ this.onChange }
+                  disabled={ loading }
+                  label=""
+                  size="small"
+                  placeholder="0.00"
+                  variant="outlined"
+                  onKeyDown={ this.inputKeyDown }
+                />
+              </div>
+              <div className={ classes.scaleContainer }>
+                <Button
+                  className={ classes.scale }
+                  variant='text'
+                  disabled={ loading }
+                  color="primary"
+                  onClick={ () => { this.setAmount(25) } }>
+                  <Typography color='secondary'>25%</Typography>
+                </Button>
+                <Button
+                  className={ classes.scale }
+                  variant='text'
+                  disabled={ loading }
+                  color="primary"
+                  onClick={ () => { this.setAmount(50) } }>
+                  <Typography color='secondary'>50%</Typography>
+                </Button>
+                <Button
+                  className={ classes.scale }
+                  variant='text'
+                  disabled={ loading }
+                  color="primary"
+                  onClick={ () => { this.setAmount(75) } }>
+                  <Typography color='secondary'>75%</Typography>
+                </Button>
+                <Button
+                  className={ classes.scale }
+                  variant='text'
+                  disabled={ loading }
+                  color="primary"
+                  onClick={ () => { this.setAmount(100) } }>
+                  <Typography color='secondary'>100%</Typography>
+                </Button>
+              </div>
+              <Button
+                className={ classes.actionButton }
+                variant="outlined"
+                color="primary"
+                disabled={ loading || !account.address }
+                onClick={ this.onInvest }
+                >
+                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Earn</Typography>
+              </Button>
+            </div>
+            <div className={classes.tradeContainer}>
+              <div className={ classes.balances }>
+                <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ iEthBalance ? iEthBalance.toFixed(4) : '0.0000' } iETH ({ iEthBalance ? (parseFloat(iEthBalance)*parseFloat(pricePerFullShare)).toFixed(4) : '0' } ETH)</Typography>
+              </div>
+              <div className={ classes.amountContainer }>
+                <TextField
+                  fullWidth
+                  className={ classes.actionInput }
+                  id='redeemAmount'
+                  value={ redeemAmount }
+                  error={ redeemAmountError }
+                  onChange={ this.onChange }
+                  disabled={ loading }
+                  label=""
+                  placeholder="0.00"
+                  variant="outlined"
+                  onKeyDown={ this.inputRedeemKeyDown }
+                />
+              </div>
+              <div className={ classes.scaleContainer }>
+                <Button
+                  className={ classes.scale }
+                  variant='text'
+                  disabled={ loading }
+                  color="primary"
+                  onClick={ () => { this.setRedeemAmount(25) } }>
+                  <Typography color='secondary'>25%</Typography>
+                </Button>
+                <Button
+                  className={ classes.scale }
+                  variant='text'
+                  disabled={ loading }
+                  color="primary"
+                  onClick={ () => { this.setRedeemAmount(50) } }>
+                  <Typography color='secondary'>50%</Typography>
+                </Button>
+                <Button
+                  className={ classes.scale }
+                  variant='text'
+                  disabled={ loading }
+                  color="primary"
+                  onClick={ () => { this.setRedeemAmount(75) } }>
+                  <Typography color='secondary'>75%</Typography>
+                </Button>
+                <Button
+                  className={ classes.scale }
+                  variant='text'
+                  disabled={ loading }
+                  color="primary"
+                  onClick={ () => { this.setRedeemAmount(100) } }>
+                  <Typography color='secondary'>100%</Typography>
+                </Button>
+              </div>
+              <Button
+                className={ classes.actionButton }
+                variant="outlined"
+                color="primary"
+                disabled={ loading || !account.address }
+                onClick={ this.onRedeem }
+                >
+                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Claim</Typography>
+              </Button>
+            </div>
           </div>}
         </div>
         { modalOpen && this.renderModal() }
@@ -319,6 +438,60 @@ class InvestSimple extends Component {
     return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true} />
   };
 
+  setAmount = (percent) => {
+
+    if(this.state.loading) {
+      return
+    }
+
+    const balance = store.getStore('ethBalance')
+    let amount = balance*percent/100
+
+    if(percent === 100) {
+        amount = amount - 0.009
+    }
+
+    this.setState({ amount: amount.toFixed(8) })
+  }
+
+  setRedeemAmount = (percent) => {
+
+    if(this.state.loading) {
+      return
+    }
+
+    const balance = store.getStore('iEthBalance')
+    let amount = balance*percent/100
+
+    if(percent === 100) {
+        amount = amount - 0.009
+    }
+
+    this.setState({ redeemAmount: amount.toFixed(8) })
+  }
+
+  onInvest = () => {
+    this.setState({ amountError: false })
+
+    const { amount, ethBalance } = this.state
+
+    if(!amount || isNaN(amount) || amount <= 0 || amount > ethBalance) {
+      this.setState({ amountError: true })
+      return false
+    }
+
+    const asset = { iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0' }
+
+    this.setState({ loading: true })
+
+    dispatcher.dispatch({ type: INVEST, content: { amount: amount, asset: asset } })
+  }
+
+  unlockMetamask = () => {
+    this.setState({ metamaskLoading: true })
+    dispatcher.dispatch({ type: CONNECT_METAMASK, content: {} })
+  }
+
   onChange = (event) => {
     let val = []
     val[event.target.id] = event.target.value
@@ -328,6 +501,12 @@ class InvestSimple extends Component {
   inputKeyDown = (event) => {
     if (event.which === 13) {
       this.onInvest();
+    }
+  }
+
+  inputRedeemKeyDown = (event) => {
+    if (event.which === 13) {
+      this.onRedeem();
     }
   }
 
@@ -365,12 +544,24 @@ class InvestSimple extends Component {
     )
   }
 
-  redeemClicked = () => {
-    this.setState({ redeemModalOpen: true })
-  }
+  onRedeem = () => {
+    this.setState({ redeemAmountError: false })
 
-  closeRedeemModal = () => {
-    this.setState({ redeemModalOpen: false })
+    const { redeemAmount, iEthBalance } = this.state
+
+    console.log(iEthBalance);
+    console.log(redeemAmount);
+
+    if(!redeemAmount || isNaN(redeemAmount) || redeemAmount <= 0 || redeemAmount > iEthBalance) {
+      this.setState({ redeemAmountError: true })
+      return false
+    }
+
+    const asset = { iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0' }
+
+    this.setState({ loading: true })
+
+    dispatcher.dispatch({ type: REDEEM, content: { amount: redeemAmount, asset: asset } })
   }
 }
 
