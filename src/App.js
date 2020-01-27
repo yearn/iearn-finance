@@ -10,8 +10,8 @@ import {
 
 import interestTheme from './theme';
 
-import Header from './components/header';
-// import Unlock from './components/unlock';
+// import Header from './components/header';
+import APR from './components/apr';
 import InvestSimple from './components/investSimple';
 
 class App extends Component {
@@ -30,6 +30,9 @@ class App extends Component {
             background: "#f9fafb"
           }}>
             <Switch>
+              <Route path="/apr">
+                <APR />
+              </Route>
               <Route path="/invest">
                 <InvestSimple />
               </Route>

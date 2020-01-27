@@ -21,6 +21,8 @@ import {
   ETH_BALANCE_RETURNED,
   GET_IETH_BALANCE,
   IETH_BALANCE_RETURNED,
+  GET_YIELD,
+  GET_YIELD_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 
@@ -126,6 +128,7 @@ class Store {
       ethBalance: 0,
       iEthBalance: 0,
       pricePerFullShare: 0,
+      yields: []
     }
 
     dispatcher.register(
@@ -160,6 +163,9 @@ class Store {
             break;
           case GET_IETH_BALANCE:
             this.getIEthBalance(payload)
+            break;
+          case GET_YIELD:
+            this.getYield(payload);
             break;
           default: {
           }
@@ -501,6 +507,85 @@ class Store {
     asset.balance = parseFloat(balance)
 
     callback(null, asset)
+  }
+
+  getYield = (payload) => {
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+
+    const getCalls = config.APROracleABI.filter((call) => {
+      if(!call.name || ['getPrice', 'getLiquidity', 'getAaveCore'].includes(call.name)) {
+        return false
+      }
+      return call.name.includes("get") && !call.name.includes("All")
+    }).filter((call) => {
+      if(call.inputs.length > 0) {
+        console.log(call)
+      }
+      return call.inputs.length === 0
+    })
+
+    async.map(getCalls, (calls, callback) => {
+      this._getYield(web3, calls, callback)
+    }, (err, yields) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+
+      const ret = yields.flat(1)
+
+      store.setStore({ yields: ret })
+      return emitter.emit(GET_YIELD_RETURNED, ret)
+    })
+  }
+
+  _getYield = async (web3, call, callback) => {
+    let iEarnContract = new web3.eth.Contract(config.APROracleABI, config.APROracleAddress)
+
+    try {
+      let val = 0
+      let apr = 0
+      let returnObj = {}
+
+      val = await iEarnContract.methods[call.name]().call()
+
+      let name = call.name.replace('get', '').replace('APR', '')
+
+      if(name.startsWith('All')) {
+        name = name.replace('All', '')
+      }
+
+      if(call.outputs.length === 1) {
+        apr = web3.utils.fromWei(val.toString(), 'ether');
+        const obj = {}
+        obj[name] = apr
+
+        apr = [obj]
+
+        returnObj = apr
+
+      } else {
+        const keys = Object.keys(val)
+
+        const vals = keys.filter((key) => {
+          return isNaN(key)
+        }).map((key) => {
+          const obj = {}
+          obj[name+'-'+key] = web3.utils.fromWei(val[key].toString(), 'ether');
+          return obj
+        })
+
+        apr = vals
+
+        returnObj = apr
+      }
+
+      callback(null, returnObj)
+    } catch(ex) {
+      console.log(ex)
+      return callback(ex)
+    }
+
   }
 }
 
