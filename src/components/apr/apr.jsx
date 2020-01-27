@@ -68,6 +68,18 @@ const styles = theme => ({
     paddingLeft: '12px',
     width: '200px',
     paddingBottom: '6px'
+  },
+  footer: {
+    position: 'fixed',
+    bottom: '30px',
+    left: '30px',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  footerText: {
+    padding: '10px',
+    cursor: 'pointer'
   }
 });
 
@@ -104,15 +116,19 @@ class APR extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
-          <div className={ classes.intro }>
-            <Typography variant='h2'>APR. Simple.</Typography>
-          </div>
           <div className={ classes.pairs }>
             { this.renderHeader() }
           </div>
           <div className={ classes.pairs }>
             { this.renderYields() }
           </div>
+        </div>
+        <div className={classes.footer}>
+          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>about</Typography>
+          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>docs</Typography>
+          <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>code</Typography>
+          <Typography onClick={()=> window.open("https://t.me/iearnfinance", "_blank")} className={ classes.footerText } variant={ 'h6'}>telegram</Typography>
+          <Typography onClick={()=> window.open("/apr", "_blank")} className={ classes.footerText } variant={ 'h6'}>yield</Typography>
         </div>
       </div>
     )
@@ -124,13 +140,25 @@ class APR extends Component {
     return (
       <div key={ 'name' } className={ classes.pair }>
         <div className={ classes.headerName }>
-          <Typography align='right' variant={'h3'}>Name</Typography>
+          <Typography align='right' variant={'h3'}>name</Typography>
         </div>
         <div className={ classes.headerApr }>
-          <Typography variant={'h3'}>Yield</Typography>
+          <Typography variant={'h3'}>yield</Typography>
         </div>
       </div>
     )
+  };
+
+  mapNames = (name) => {
+    if (name.startsWith('A')) {
+      return 'Aave '+name;
+    } else if (name.startsWith('I')) {
+      return 'Fulcrum '+name;
+    } else if (name.startsWith('C')) {
+      return 'Compound '+name;
+    } else {
+      return name;
+    }
   }
 
   renderYields = () => {
@@ -146,15 +174,15 @@ class APR extends Component {
       return (
         <div key={ y.name } className={ classes.pair }>
           <div className={ classes.name }>
-            <Typography align='right'>{ keys[0] }</Typography>
+            <Typography color='secondary' align='right'>{ this.mapNames(keys[0]) }</Typography>
           </div>
           <div className={ classes.apr }>
-            <Typography>{ (y[keys[0]]*100).toFixed(4) + ' %' }</Typography>
+            <Typography color='secondary'>{ (y[keys[0]]*100).toFixed(4) + ' %' }</Typography>
           </div>
         </div>
       )
     })
-  }
+  };
 }
 
 export default withRouter(withStyles(styles)(APR));
