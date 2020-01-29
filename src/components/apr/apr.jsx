@@ -83,11 +83,10 @@ const styles = theme => ({
     paddingBottom: '12px'
   },
   aggregatedHeader: {
-    textTransform: 'uppercase'
   },
   tablesContainer: {
     display: 'flex'
-  }
+  },
   footer: {
     position: 'fixed',
     bottom: '30px',
@@ -152,7 +151,6 @@ class APR extends Component {
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
           <div className={ classes.pairs }>
-            { this.renderHeader() }
           </div>
           <div className={ classes.tablesContainer }>
             {/*<Card className={ classes.pairs } style={{ marginRight: '12px'}}>
@@ -187,7 +185,7 @@ class APR extends Component {
         </div>
         { aggregatedHeaders.map((header) => {
           return (<div key={ header }  className={ classes.headerValue }>
-            <Typography  align='right' variant={'h3'} className={classes.aggregatedHeader}>{ header }</Typography>
+            <Typography  align='right' variant={'h3'} className={classes.aggregatedHeader}>{ this.renderTableHeader(header) }</Typography>
           </div>)
         })}
       </div>
@@ -211,7 +209,7 @@ class APR extends Component {
             { keys.map((key) => {
 
                 let val = parseFloat(y.apr[key])
-                if(key === 'uniapr' && val != 0) {
+                if((key === 'uniapr' || key === 'unicapr') && val != 0) {
                   val = val*100 - 100
                 } else {
                   val = val*100
@@ -225,6 +223,30 @@ class APR extends Component {
           </div>)
       })
     )
+  }
+
+  renderTableHeader = (name) => {
+    if (name === 'uniapr') {
+      return 'Uni';
+    } else if (name.startsWith('capr')) {
+      return 'Compound';
+    } else if (name.startsWith('unicapr')) {
+      return 'cUni';
+    } else if (name.startsWith('iapr')) {
+      return 'Fulcrum';
+    } else if (name.startsWith('iapr')) {
+      return 'Fulcrum';
+    } else if (name.startsWith('uniiapr')) {
+      return 'iUni';
+    } else if (name.startsWith('aapr')) {
+      return 'Aave';
+    } else if (name.startsWith('uniaapr')) {
+      return 'aUni';
+    } else if (name.startsWith('dapr')) {
+      return 'dYdX';
+    } else {
+      return name;
+    }
   }
 
   renderHeader = () => {
@@ -268,10 +290,6 @@ class APR extends Component {
           </div>
           <div className={ classes.apr }>
             <Typography color='secondary'>{ parseFloat(y.apr).toFixed(4) + ' %' }</Typography>
-            <Typography color='secondary' align='right'>{ this.mapNames(keys[0]) }</Typography>
-          </div>
-          <div className={ classes.apr }>
-            <Typography color='secondary'>{ (y[keys[0]]*100).toFixed(4) + ' %' }</Typography>
           </div>
         </div>
       )
