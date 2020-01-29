@@ -1,5 +1,6 @@
 const config = {
   infuraProvider: 'https://mainnet.infura.io/v3/bd80ce1ca1f94da48e151bb6868bb150',
+  iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0',
   erc20ABI: [
   	{
   		"constant": false,

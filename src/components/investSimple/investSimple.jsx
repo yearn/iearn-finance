@@ -27,6 +27,8 @@ import {
   METAMASK_CONNECTED
 } from '../../constants'
 
+import config from '../../config'
+
 import Store from "../../stores";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
@@ -480,7 +482,7 @@ class InvestSimple extends Component {
       return false
     }
 
-    const asset = { iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0' }
+    const asset = { iEarnContract: config.iEarnContract }
 
     this.setState({ loading: true })
 
