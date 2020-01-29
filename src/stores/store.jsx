@@ -22,7 +22,13 @@ import {
   GET_IETH_BALANCE,
   IETH_BALANCE_RETURNED,
   GET_YIELD,
-  GET_YIELD_RETURNED
+  GET_YIELD_RETURNED,
+  GET_UNISWAP_YIELD,
+  GET_UNISWAP_YIELD_RETURNED,
+  GET_AGGREGATED_YIELD,
+  GET_AGGREGATED_YIELD_RETURNED,
+  GET_UNISWAP_COMPARRISONS,
+  GET_UNISWAP_COMPARRISONS_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 
@@ -128,7 +134,11 @@ class Store {
       ethBalance: 0,
       iEthBalance: 0,
       pricePerFullShare: 0,
-      yields: []
+      yields: [],
+      aggregatedYields: [],
+      aggregatedHeaders: [],
+      uniswapYields: [],
+      uniswapLiquidity: []
     }
 
     dispatcher.register(
@@ -166,6 +176,15 @@ class Store {
             break;
           case GET_YIELD:
             this.getYield(payload);
+            break;
+          case GET_UNISWAP_YIELD:
+            this.getUniswapYield(payload)
+            break;
+          case GET_AGGREGATED_YIELD:
+            this.getAggregatedYield(payload)
+            break;
+          case GET_UNISWAP_COMPARRISONS:
+            this.getUniswapComparrisons(payload)
             break;
           default: {
           }
@@ -519,9 +538,6 @@ class Store {
       }
       return call.name.includes("get") && !call.name.includes("All")
     }).filter((call) => {
-      if(call.inputs.length > 0) {
-        console.log(call)
-      }
       return call.inputs.length === 0
     })
 
@@ -532,60 +548,193 @@ class Store {
         return emitter.emit(ERROR, err)
       }
 
-      const ret = yields.flat(1)
-
-      store.setStore({ yields: ret })
-      return emitter.emit(GET_YIELD_RETURNED, ret)
+      store.setStore({ yields: yields })
+      return emitter.emit(GET_YIELD_RETURNED, yields)
     })
   }
 
   _getYield = async (web3, call, callback) => {
-    let iEarnContract = new web3.eth.Contract(config.APROracleABI, config.APROracleAddress)
+    let aprContract = new web3.eth.Contract(config.APROracleABI, config.APROracleAddress)
 
     try {
-      let val = 0
-      let apr = 0
-      let returnObj = {}
+      const val = await aprContract.methods[call.name]().call()
 
-      val = await iEarnContract.methods[call.name]().call()
+      const name = call.name.replace('get', '').replace('APR', '')
 
-      let name = call.name.replace('get', '').replace('APR', '')
+      const apr = web3.utils.fromWei(val.toString(), 'ether');
 
-      if(name.startsWith('All')) {
-        name = name.replace('All', '')
-      }
+      call.token = name
+      call.apr = (apr*100).toFixed(4)
 
-      if(call.outputs.length === 1) {
-        apr = web3.utils.fromWei(val.toString(), 'ether');
-        const obj = {}
-        obj[name] = apr
-
-        apr = [obj]
-
-        returnObj = apr
-
-      } else {
-        const keys = Object.keys(val)
-
-        const vals = keys.filter((key) => {
-          return isNaN(key)
-        }).map((key) => {
-          const obj = {}
-          obj[name+'-'+key] = web3.utils.fromWei(val[key].toString(), 'ether');
-          return obj
-        })
-
-        apr = vals
-
-        returnObj = apr
-      }
-
-      callback(null, returnObj)
+      callback(null, call)
     } catch(ex) {
       console.log(ex)
       return callback(ex)
     }
+  }
 
+  getUniswapComparrisons = (payload) => {
+    this.getYield(payload)
+    this.getUniswapLiquidity(payload, () => {
+      this.getUniswapYield(payload)
+    })
+  }
+
+  getUniswapLiquidity = (payload, cb) => {
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const limit = 50;
+
+    const getCalls = config.uniswapLiquidityABI.filter((call) => {
+      if(!call.name || call.inputs.length > 0) {
+        return false
+      }
+      return call.name.includes("get")
+    })
+
+    async.map(getCalls, (calls, callback) => {
+      this._getUniswapLiquidity(web3, calls, callback)
+    }, (err, liquidity) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+
+      const liq = liquidity.filter((call) => {
+        //remove < 50 liquidity
+        return call.liquidity >= limit
+      })
+
+      console.log(liq)
+
+      store.setStore({ uniswapLiquidity: liq })
+
+      cb()
+    })
+  }
+
+  _getUniswapLiquidity = async (web3, call, callback) => {
+    let uniswapContract = new web3.eth.Contract(config.uniswapLiquidityABI, config.uniswapLiquidityAddress)
+
+    const name = call.name.replace('get', '').replace('UniROI', '')
+
+    try {
+      let val = await uniswapContract.methods[call.name]().call()
+
+      call.token = name
+      call.liquidity = web3.utils.fromWei(val['1'].toString(), 'ether');
+      call.something = val['0'];
+
+      callback(null, call)
+    } catch(ex) {
+      //We are going to ignore these for now. They are returning an Error: Returned values aren't valid, did it run Out of Gas? You might also see this error if you are not using the correct ABI for the contract you are retrieving data from, requesting data from a block number that does not exist, or querying a node which is not fully synced.
+      // console.log(call.name)
+      // console.log(ex)
+      // return callback(ex)
+      call.token = name
+      call.liquidity = 0
+      callback(null, call)
+    }
+  }
+
+  getUniswapYield = (payload) => {
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+
+    const getCalls = config.uniswapAPRABI.filter((call) => {
+      if(!call.name || call.inputs.length > 0) {
+        return false
+      }
+      return call.name.includes("calc")
+    })
+
+    async.map(getCalls, (calls, callback) => {
+      this._getUniswapYield(web3, calls, callback)
+    }, (err, yields) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+
+      store.setStore({ uniswapYields: yields })
+      return emitter.emit(GET_UNISWAP_YIELD_RETURNED, yields)
+    })
+  }
+
+  _getUniswapYield = async (web3, call, callback) => {
+    let uniswapContract = new web3.eth.Contract(config.uniswapAPRABI, config.uniswapAPRAddress)
+
+    try {
+      const name = call.name.replace('calcUniswapAPR', '')
+      const val = await uniswapContract.methods[call.name]().call()
+      const apr = web3.utils.fromWei(val['0'].toString(), 'ether')
+
+      call.token = name
+      call.apr = apr
+
+      callback(null, call)
+    } catch(ex) {
+      //We are going to ignore these for now. They are returning an Error: Returned values aren't valid, did it run Out of Gas? You might also see this error if you are not using the correct ABI for the contract you are retrieving data from, requesting data from a block number that does not exist, or querying a node which is not fully synced.
+      // console.log(call.name)
+      // console.log(ex)
+      // return callback(ex)
+      callback(null, false)
+    }
+  }
+
+  getAggregatedYield = (payload) => {
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+
+    const getCalls = config.aggregatedContractABI.filter((call) => {
+      if(!call.name ||  call.name === 'getAPROptions') {
+        return false
+      }
+      return call.name.includes("get")
+    })
+
+    async.map(getCalls, (calls, callback) => {
+      this._getAggregatedYield(web3, calls, callback)
+    }, (err, yields) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+
+      //get all headers
+      const headers = Object.keys(yields[0].apr)
+      store.setStore({ aggregatedYields: yields, aggregatedHeaders: headers })
+      return emitter.emit(GET_AGGREGATED_YIELD_RETURNED, yields)
+    })
+  }
+
+  _getAggregatedYield = async (web3, call, callback) => {
+    let uniswapContract = new web3.eth.Contract(config.aggregatedContractABI, config.aggregatedContractAddress)
+
+    try {
+
+      const val = await uniswapContract.methods[call.name]().call()
+
+      const keys = Object.keys(val)
+
+      const vals = keys.filter((key) => {
+        return isNaN(key)
+      }).map((key) => {
+        const obj = {}
+        obj[key] = web3.utils.fromWei(val[key].toString(), 'ether');
+        return obj
+      })
+
+      let output = {}
+
+      for(let i = 0; i < vals.length; i++) {
+        const keys = Object.keys(vals[i])
+        output[keys[0]] = vals[i][keys[0]]
+      }
+
+      call.token = call.name.replace('get', '')
+      call.apr = output
+
+      callback(null, call)
+    } catch(ex) {
+      // console.log(ex)
+      // return callback(ex)
+      callback(null, false)
+    }
   }
 }
 
