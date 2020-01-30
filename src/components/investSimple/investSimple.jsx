@@ -340,14 +340,14 @@ class InvestSimple extends Component {
 
     return assets.map((asset) => {
       return (
-        <ExpansionPanel key={ asset.symbol+"_expand" } expanded={ expanded === asset.symbol} onChange={ () => { this.handleChange(asset.symbol) } }>
+        <ExpansionPanel square key={ asset.symbol+"_expand" } expanded={ expanded === asset.symbol} onChange={ () => { this.handleChange(asset.symbol) } }>
           <ExpansionPanelSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
             id="panel1bh-header"
           >
-            <Typography className={classes.heading} variant={ 'h3' }>{asset.name}</Typography>
-            <Typography className={classes.secondaryHeading} variant={ 'h4' }>{asset.symbol + ' : ' + asset.investSymbol}</Typography>
+            <Typography className={classes.heading} variant={ 'h5' }>{asset.name}</Typography>
+            <Typography className={classes.secondaryHeading} variant={ 'h5' }>{(asset.balance).toFixed(4)+' '+asset.symbol + ' : ' + (asset.investedBalance).toFixed(4)+' '+asset.investSymbol}</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Asset asset={ asset } startLoading={ this.startLoading } />

@@ -52,13 +52,14 @@ const iswapTheme =  {
       fontWeight: '700',
     },
     h5: {
-      fontSize: '1rem',
-      fontWeight: '700',
+      fontSize: '0.8rem',
+      fontWeight: '500',
+      color: 'rgb(115, 115, 115);',
     },
     h6: {
       fontSize: '0.825rem',
       color: '#DC6BE5',
-    }
+    },
   },
   type: 'light',
   overrides: {
@@ -83,6 +84,20 @@ const iswapTheme =  {
         [breakpoints.up('md')]: {
           fontSize: '1.5rem',
         }
+      }
+    },
+    MuiExpansionPanel: {
+      root: {
+        padding: '10px',
+        marginTop: '10px',
+        '&:before': {
+          display: 'none',
+        },
+        borderRadius: '20px',
+        backgroundColor: 'white',
+      },
+      rounded: {
+        //borderRadius: '20px',
       }
     },
     MuiInputLabel: {
