@@ -182,6 +182,21 @@ const styles = theme => ({
   footerText: {
     padding: '10px',
     cursor: 'pointer'
+  },
+  assetSummary: {
+    display: 'flex',
+    alignItems: 'center',
+    flex: 1
+  },
+  assetIcon: {
+    display: 'inline-block',
+    verticalAlign: 'middle',
+    borderRadius: '20px',
+    height: '40px',
+    width: '40px',
+    textAlign: 'center',
+    cursor: 'pointer',
+    marginRight: '24px'
   }
 });
 
@@ -346,9 +361,18 @@ class InvestSimple extends Component {
             aria-controls="panel1bh-content"
             id="panel1bh-header"
           >
-            <Typography className={classes.heading} variant={ 'h3' }>{ asset.name }</Typography>
-            <Typography className={classes.heading} variant={ 'h4' }>{ 'APR: '+(asset.maxApr*100).toFixed(4) + ' %' }</Typography>
-            <Typography className={classes.heading} variant={ 'h5' }>{(asset.balance).toFixed(4)+' '+asset.symbol + ' : ' + (asset.investedBalance).toFixed(4)+' '+asset.investSymbol}</Typography>
+            <div className={ classes.assetSummary }>
+              <div className={ classes.assetIcon }>
+                <img
+                  alt=""
+                  src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                  height="40px"
+                />
+              </div>
+              <Typography className={classes.heading} variant={ 'h3' }>{ asset.name }</Typography>
+              <Typography className={classes.heading} variant={ 'h4' }>{ 'APR: '+(asset.maxApr*100).toFixed(4) + ' %' }</Typography>
+              <Typography className={classes.heading} variant={ 'h5' }>{(asset.balance).toFixed(4)+' '+asset.symbol + ' : ' + (asset.investedBalance).toFixed(4)+' '+asset.investSymbol}</Typography>
+            </div>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Asset asset={ asset } startLoading={ this.startLoading } />
