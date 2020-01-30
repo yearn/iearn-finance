@@ -346,8 +346,9 @@ class InvestSimple extends Component {
             aria-controls="panel1bh-content"
             id="panel1bh-header"
           >
-            <Typography className={classes.heading} variant={ 'h3' }>{asset.name}</Typography>
-            <Typography className={classes.secondaryHeading} variant={ 'h4' }>{asset.symbol + ' : ' + asset.investSymbol}</Typography>
+            <Typography className={classes.heading} variant={ 'h3' }>{ asset.name }</Typography>
+            <Typography className={classes.heading} variant={ 'h4' }>{ asset.symbol + ' : ' + asset.investSymbol }</Typography>
+            <Typography className={classes.heading} variant={ 'h4' }>{ 'APR: '+(asset.maxApr*100).toFixed(4) + ' %' }</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Asset asset={ asset } startLoading={ this.startLoading } />
