@@ -422,7 +422,7 @@ class InvestSimple extends Component {
   }
 
   handleChange = (symbol) => {
-    this.setState({ expanded: symbol })
+    this.setState({ expanded: this.state.expanded === symbol ? null : symbol })
   }
   setRedeemAmount = (percent) => {
 
