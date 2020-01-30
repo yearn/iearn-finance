@@ -12,6 +12,7 @@ import {
   TextField,
   Button
 } from '@material-ui/core';
+import config from '../../config'
 
 import {
   ERROR,
@@ -219,7 +220,7 @@ class InvestModal extends Component {
       return false
     }
 
-    const asset = { iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0' }
+    const asset = { iEarnContract: config.iEarnContract }
 
     this.setState({ loading: true })
 
