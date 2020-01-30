@@ -7,20 +7,10 @@ import {
   METAMASK_CONNECTED,
   GET_BALANCES,
   BALANCES_RETURNED,
-  GET_PRICES,
-  PRICES_RETURNED,
-  GET_INVESTED_BALANCES,
-  INVESTED_BALANCES_RETURNED,
-  GET_POOL_VALUES,
-  POOL_VALUES_RETURNED,
   INVEST,
   INVEST_RETURNED,
   REDEEM,
   REDEEM_RETURNED,
-  GET_ETH_BALANCE,
-  ETH_BALANCE_RETURNED,
-  GET_IETH_BALANCE,
-  IETH_BALANCE_RETURNED,
   GET_YIELD,
   GET_YIELD_RETURNED,
   GET_UNISWAP_YIELD,
@@ -46,95 +36,47 @@ class Store {
     this.store = {
       assets: [
         {
-          erc20address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-          iEarnContract: null,
-          name: 'USD Tether',
-          symbol: 'USDT',
-          apr: 8,
-          balance: 0.00
+          name: 'Dai Stablecoin',
+          symbol: 'DAI',
+          investSymbol: 'yDAI',
+          erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          iEarnContract: '0x9D25057e62939D3408406975aD75Ffe834DA4cDd',
+          apr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          poolValue: 0,
+          abi: config.IEarnERC20ABI
         },
         {
-          erc20address: '0x39aa39c021dfbae8fac545936693ac917d5e7563',
-          iEarnContract: null,
-          name: 'Compound USD',
-          symbol: 'USDC',
-          apr: 8,
-          balance: 0.00
-        },
-        {
-          erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
-          iEarnContract: null,
-          name: 'True USD',
-          symbol: 'TUSD',
-          apr: 8,
-          balance: 0.00
-        },
-        {
-          erc20address: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
-          iEarnContract: null,
-          name: 'SAI',
-          symbol: 'SAI',
-          apr: 8,
-          balance: 0.00
-        },
-        {
-          erc20address: '0x8e870d67f660d95d5be530380d0ec0bd388289e1',
-          iEarnContract: null,
-          name: 'Paxos Standard',
-          symbol: 'PAX',
-          apr: 8,
-          balance: 0.00
-        },
-        {
-          erc20address: 'Ethereum',
-          iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0',
           name: 'Ethereum',
           symbol: 'ETH',
-          apr: 4,
-          balance: 0.00
-        },
-        {
-          erc20address: '0x4e15361fd6b4bb609fa63c81a2be19d873717870',
-          iEarnContract: null,
-          name: 'Fantom',
-          symbol: 'FTM',
-          apr: 4,
-          balance: 0.00
-        },
-      ],
-      investedAssets: [
-        {
-          iEarnContract: null,
-          name: 'Interest Bearing USD',
-          symbol: 'iUSD',
-          apr: 8,
-          balance: 0.00,
-          price: 0.00,
-          pool_value: 0.00
-        },
-        {
+          investSymbol: 'iETH',
+          erc20address: 'Ethereum',
           iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0',
-          name: 'Interest Bearing Ethereum',
-          symbol: 'iETH',
-          apr: 4,
-          balance: 0.00,
-          price: 0.00,
-          pool_value: 0.00
+          apr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          poolValue: 0,
+          abi: config.IEarnABI
         },
         {
-          iEarnContract: null,
-          name: 'Interest Bearing Fantom',
-          symbol: 'iFTM',
-          apr: 4,
-          balance: 0.00,
-          price: 0.00,
-          pool_value: 0.00
-        },
+          name: 'USD Coin',
+          symbol: 'USDC',
+          investSymbol: 'yUSDC',
+          erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          iEarnContract: '0xa2609b2b43ac0f5ebe27deb944d2a399c201e3da',
+          apr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          poolValue: 0,
+          abi: config.IEarnERC20ABI
+        }
       ],
       account: {},
       web3: null,
-      ethBalance: 0,
-      iEthBalance: 0,
       pricePerFullShare: 0,
       yields: [],
       aggregatedYields: [],
@@ -156,26 +98,11 @@ class Store {
           case GET_BALANCES:
             this.getBalances(payload);
             break;
-          case GET_PRICES:
-            this.getPrices(payload);
-            break;
-          case GET_INVESTED_BALANCES:
-            this.getInvestedBalances(payload);
-            break;
-          case GET_POOL_VALUES:
-            this.getPoolValues(payload);
-            break;
           case INVEST:
             this.invest(payload)
             break;
           case REDEEM:
             this.redeem(payload)
-            break;
-          case GET_ETH_BALANCE:
-            this.getEthBalance(payload)
-            break;
-          case GET_IETH_BALANCE:
-            this.getIEthBalance(payload)
             break;
           case GET_YIELD:
             this.getYield(payload);
@@ -230,7 +157,6 @@ class Store {
             store.setStore({ web3: web3 })
 
             dispatcher.dispatch({ type: GET_BALANCES, content: {} })
-            dispatcher.dispatch({ type: GET_INVESTED_BALANCES, content: {} })
 
             return emitter.emit(METAMASK_CONNECTED)
           }
@@ -263,7 +189,6 @@ class Store {
             store.setStore({ web3: web3 })
 
             dispatcher.dispatch({ type: GET_BALANCES, content: {} })
-            dispatcher.dispatch({ type: GET_INVESTED_BALANCES, content: {} })
 
             return emitter.emit(METAMASK_CONNECTED)
           }
@@ -279,37 +204,126 @@ class Store {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
 
-    this._callInvest(asset, account, amount, (err, investResult) => {
-      if(err) {
-        return emitter.emit(ERROR, err);
-      }
+    if(asset.erc20address !== 'Ethereum') {
+      this._checkApproval(asset, account, amount, (err) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
 
-      return emitter.emit(INVEST_RETURNED, investResult)
-    })
+        this._callInvest(asset, account, amount, (err, investResult) => {
+          if(err) {
+            return emitter.emit(ERROR, err);
+          }
+
+          return emitter.emit(INVEST_RETURNED, investResult)
+        })
+      })
+    } else {
+      this._callInvest(asset, account, amount, (err, investResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(INVEST_RETURNED, investResult)
+      })
+    }
+  }
+
+  _checkApproval = async (asset, account, amount, callback) => {
+    const web3 = store.getStore('web3')
+    let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
+
+    try {
+      const allowance = await erc20Contract.methods.allowance(account.address, asset.iEarnContract).call({ from: account.address })
+
+      if(parseFloat(allowance) < parseFloat(amount)) {
+        const allowanceSet = await erc20Contract.methods.approve(asset.iEarnContract, web3.utils.toWei(amount, "ether")).send({ from: account.address })
+
+        erc20Contract.methods.approve(asset.iEarnContract, web3.utils.toWei(amount, "ether")).send({ from: account.address })
+          .on('transactionHash', function(hash){
+            console.log(hash)
+            callback(null, hash)
+          })
+          .on('confirmation', function(confirmationNumber, receipt){
+            console.log(confirmationNumber, receipt);
+          })
+          .on('receipt', function(receipt){
+            console.log(receipt);
+          })
+          .on('error', function(error) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
+          })
+          .catch((e) => {
+            callback(e)
+          })
+      } else {
+        callback()
+      }
+    } catch(error) {
+      if(error.message) {
+        return callback(error.message)
+      }
+      callback(error)
+    }
   }
 
   _callInvest = async (asset, account, amount, callback) => {
     const web3 = store.getStore('web3')
 
-    let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
+    let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
 
-    iEarnContract.methods.invest().send({ from: account.address, value: web3.utils.toWei(amount, "ether") })
-    .on('transactionHash', function(hash){
-      console.log(hash)
-      callback(null, hash)
-    })
-    .on('confirmation', function(confirmationNumber, receipt){
-      console.log(confirmationNumber, receipt);
-    })
-    .on('receipt', function(receipt){
-      console.log(receipt);
-    })
-    .on('error', function(error) {
-      if(error.message) {
-        return callback(error.message)
-      }
-      callback(error)
-    })
+    if(asset.erc20address === 'Ethereum') {
+      iEarnContract.methods.invest().send({ from: account.address, value: web3.utils.toWei(amount, "ether") })
+        .on('transactionHash', function(hash){
+          console.log(hash)
+          callback(null, hash)
+        })
+        .on('confirmation', function(confirmationNumber, receipt){
+          console.log(confirmationNumber, receipt);
+        })
+        .on('receipt', function(receipt){
+          console.log(receipt);
+        })
+        .on('error', function(error) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        })
+        .catch((error) => {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        })
+    } else {
+      iEarnContract.methods.invest(web3.utils.toWei(amount, "ether")).send({ from: account.address })
+        .on('transactionHash', function(hash){
+          console.log(hash)
+          callback(null, hash)
+        })
+        .on('confirmation', function(confirmationNumber, receipt){
+          console.log(confirmationNumber, receipt);
+        })
+        .on('receipt', function(receipt){
+          console.log(receipt);
+        })
+        .on('error', function(error) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        })
+        .catch((error) => {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        })
+    }
   }
 
   redeem = (payload) => {
@@ -356,7 +370,19 @@ class Store {
     const assets = store.getStore('assets')
 
     async.map(assets, (asset, callback) => {
-      this._getERC20Balance(asset, account, callback)
+      async.parallel([
+        (callbackInner) => { this._getERC20Balance(asset, account, callbackInner) },
+        (callbackInner) => { this._getInvestedBalance(asset, account, callbackInner) },
+        (callbackInner) => { this._getPoolPrice(asset, account, callbackInner) },
+        // (callbackInner) => { this._getPoolValue(asset, account, callbackInner) },
+      ], (err, data) => {
+        asset.balance = data[0]
+        asset.investedBalance = data[1]
+        asset.price = data[2]
+        // asset.poolValue = data[3]
+
+        callback(null, asset)
+      })
     }, (err, assets) => {
       if(err) {
         return emitter.emit(ERROR, err)
@@ -367,67 +393,25 @@ class Store {
     })
   }
 
-  getEthBalance = async () => {
-    const account = store.getStore('account')
-    const assets = store.getStore('assets')
-
-    let asset = assets.filter((asset) => {
-      return asset.symbol == 'ETH'
-    })
-
-    if(asset.length > 0) {
-      asset = asset[0]
-      this._getERC20Balance(asset, account, (err, asset) => {
-        store.setStore({ ethBalance: asset.balance })
-        return emitter.emit(ETH_BALANCE_RETURNED, asset.balance)
-      })
-    } else {
-      return emitter.emit(ERROR, 'Cannot find the asset')
-    }
-  }
-
-  getIEthBalance = async () => {
-    const account = store.getStore('account')
-    const assets = store.getStore('investedAssets')
-
-    let asset = assets.filter((asset) => {
-      return asset.symbol == 'iETH'
-    })
-
-    if(asset.length > 0) {
-      asset = asset[0]
-      this._getInvestedBalance(asset, account, (err, asset) => {
-        store.setStore({ iEthBalance: asset.balance })
-        return emitter.emit(IETH_BALANCE_RETURNED, asset.balance)
-      })
-    } else {
-      return emitter.emit(ERROR, 'Cannot find the asset')
-    }
-  }
-
   _getERC20Balance = async (asset, account, callback) => {
-    const web3 = store.getStore('web3')
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
 
     if(asset.erc20address === 'Ethereum') {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
-
-        asset.balance = parseFloat(eth_balance)
-
-        callback(null, asset)
+        // asset.balance = parseFloat(eth_balance)
+        callback(null, parseFloat(eth_balance))
       } catch(ex) {
         console.log(ex)
         return callback(ex)
       }
     } else {
-      let iEarnContract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
+      let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
 
       try {
-        const balance = web3.utils.fromWei(await iEarnContract.methods.balanceOf(account.address).call({ from: account.address }), 'ether');
-
-        asset.balance = parseFloat(balance)
-
-        callback(null, asset)
+        const balance = web3.utils.fromWei(await erc20Contract.methods.balanceOf(account.address).call({ from: account.address }), 'ether');
+        // asset.balance = parseFloat(balance)
+        callback(null, parseFloat(balance))
       } catch(ex) {
         console.log(ex)
         return callback(ex)
@@ -435,85 +419,36 @@ class Store {
     }
   }
 
-  getPoolValues = () => {
-    const account = store.getStore('account')
-    const assets = store.getStore('investedAssets')
-
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
-
-    async.map(assets, (asset, callback) => {
-      this._getPoolValue(web3, asset, account, callback)
-    }, (err, valuedAssets) => {
-      if(err) {
-        return emitter.emit(ERROR, err)
-      }
-
-      store.setStore({ investedAssets: valuedAssets })
-      return emitter.emit(POOL_VALUES_RETURNED, valuedAssets)
-    })
-  }
-
-  _getPoolValue = async (web3, asset, account, callback) => {
+  _getPoolValue = async (asset, account, callback) => {
 
     if(asset.iEarnContract === null) {
       return callback(null, asset)
     }
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
-
     const value = web3.utils.fromWei(await iEarnContract.methods.calcPoolValueInETH().call({ from: account.address }), 'ether');
 
-    asset.pool_value = parseFloat(value)
+    // asset.pool_value = parseFloat(value)
 
-    callback(null, asset)
+    callback(null, parseFloat(value))
   }
 
-  getPrices = () => {
-    const account = store.getStore('account')
-    const assets = store.getStore('investedAssets')
-
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
-
-    async.map(assets, (asset, callback) => {
-      this._getPoolPrice(web3, asset, account, callback)
-    }, (err, pricedAssets) => {
-      if(err) {
-        return emitter.emit(ERROR, err)
-      }
-
-      store.setStore({ investedAssets: pricedAssets })
-      return emitter.emit(PRICES_RETURNED, pricedAssets)
-    })
-  }
-
-  _getPoolPrice = async (web3, asset, account, callback) => {
+  _getPoolPrice = async (asset, account, callback) => {
 
     if(asset.iEarnContract === null) {
       return callback(null, asset)
     }
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
     const balance = web3.utils.fromWei(await iEarnContract.methods.getPricePerFullShare().call({ from: account.address }), 'ether');
-    store.setStore({ pricePerFullShare: balance })
-    asset.price = parseFloat(balance)
+    // store.setStore({ pricePerFullShare: balance })
+    // asset.price = parseFloat(balance)
 
-    callback(null, asset)
-  }
-
-  getInvestedBalances = () => {
-    const account = store.getStore('account')
-    const assets = store.getStore('investedAssets')
-
-    async.map(assets, (asset, callback) => {
-      this._getInvestedBalance(asset, account, callback)
-    }, (err, investedAssets) => {
-      if(err) {
-        return emitter.emit(ERROR, err)
-      }
-
-      store.setStore({ investedAssets: investedAssets })
-      return emitter.emit(INVESTED_BALANCES_RETURNED, investedAssets)
-    })
+    callback(null, parseFloat(balance))
   }
 
   _getInvestedBalance = async (asset, account, callback) => {
@@ -522,16 +457,14 @@ class Store {
       return callback(null, asset)
     }
 
-    const web3 = store.getStore('web3')
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
 
     const balance = web3.utils.fromWei(await iEarnContract.methods.balanceOf(account.address).call({ from: account.address }), 'ether');
-    const price = web3.utils.fromWei(await iEarnContract.methods.getPricePerFullShare().call({ from: account.address }), 'ether');
-    store.setStore({ pricePerFullShare: price })
-    asset.balance = parseFloat(balance)
+    // asset.balance = parseFloat(balance)
 
-    callback(null, asset)
+    callback(null, parseFloat(balance))
   }
 
   getYield = (payload) => {

@@ -137,7 +137,7 @@ class MySnackbar extends Component {
             {icon}
             <div style={{ display: 'inline-block', verticalAlign: 'middle', maxWidth: '400px' }}>
               <Typography variant='body1' style={{ fontSize: '12px', color: color }}>{type}</Typography>
-              <Typography variant='body1' style={{ fontSize: '10px', color: colors.darkGray }} noWrap>{message}</Typography>
+              <Typography variant='body1' style={{ fontSize: '10px', color: colors.lightBlack }} noWrap>{ message }</Typography>
             </div>
           </div>
         }
@@ -145,7 +145,6 @@ class MySnackbar extends Component {
           <IconButton
             key="close"
             aria-label="Close"
-            color={colors.darkGray}
             onClick={this.handleClose}
           >
             <CloseIcon />

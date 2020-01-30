@@ -5,25 +5,32 @@ import {
   Typography,
   Card,
   TextField,
-  Button
+  Button,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
 } from '@material-ui/core';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import UnlockModal from '../unlock/unlockModal.jsx'
 import InvestModal from './investModal.jsx'
 import RedeemModal from './redeemModal.jsx'
 import Snackbar from '../snackbar'
+import Asset from './asset'
+import Loader from '../loader'
 
 import {
   ERROR,
-  GET_ETH_BALANCE,
-  GET_IETH_BALANCE,
-  ETH_BALANCE_RETURNED,
-  IETH_BALANCE_RETURNED,
+  GET_BALANCES,
+  BALANCES_RETURNED,
+  GET_INVESTED_BALANCES,
+  INVESTED_BALANCES_RETURNED,
   INVEST,
   INVEST_RETURNED,
   REDEEM,
   REDEEM_RETURNED,
   CONNECT_METAMASK,
+  CONNECT_METAMASK_PASSIVE,
   METAMASK_CONNECTED
 } from '../../constants'
 
@@ -159,7 +166,11 @@ const styles = theme => ({
       height: '90px',
       width: '210px',
     }
-  }
+  },
+  heading: {
+    flexBasis: '33.33%',
+    flexShrink: 0,
+  },
 });
 
 class InvestSimple extends Component {
@@ -167,10 +178,10 @@ class InvestSimple extends Component {
   constructor() {
     super()
 
+    dispatcher.dispatch({ type: CONNECT_METAMASK_PASSIVE, content: {} })
+
     this.state = {
-      ethBalance: store.getStore('ethBalance'),
-      iEthBalance: store.getStore('iEthBalance'),
-      pricePerFullShare: store.getStore('pricePerFullShare'),
+      assets: store.getStore('assets'),
       referralLink: '',
       roi: 4,
       account: store.getStore('account'),
@@ -182,39 +193,34 @@ class InvestSimple extends Component {
       amount: '',
       amountError: false,
       redeemAmount: '',
-      redeemAmountError: false,
+      redeemAmountError: false
     }
   }
 
   componentWillMount() {
-    emitter.on(ETH_BALANCE_RETURNED, this.balancesReturned);
-    emitter.on(IETH_BALANCE_RETURNED, this.balancesReturned);
     emitter.on(METAMASK_CONNECTED, this.metamaskConnected);
     emitter.on(INVEST_RETURNED, this.investReturned);
     emitter.on(REDEEM_RETURNED, this.redeemReturned);
     emitter.on(ERROR, this.errorReturned);
+
+    emitter.on(BALANCES_RETURNED, this.balancesReturned);
   }
 
   componentWillUnmount() {
-    emitter.removeListener(ETH_BALANCE_RETURNED, this.balancesReturned);
-    emitter.removeListener(IETH_BALANCE_RETURNED, this.balancesReturned);
     emitter.removeListener(METAMASK_CONNECTED, this.metamaskConnected);
     emitter.removeListener(INVEST_RETURNED, this.investReturned);
     emitter.removeListener(REDEEM_RETURNED, this.redeemReturned);
     emitter.removeListener(ERROR, this.errorReturned);
+
+    emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
   };
 
   balancesReturned = (balances) => {
-    this.setState({ ethBalance: store.getStore('ethBalance') })
-    this.setState({ iEthBalance: store.getStore('iEthBalance') })
-    this.setState({ pricePerFullShare: store.getStore('pricePerFullShare') })
+    this.setState({ assets: store.getStore('assets') })
   };
 
   metamaskConnected = () => {
     this.setState({ account: store.getStore('account') })
-
-    dispatcher.dispatch({ type: GET_ETH_BALANCE, content: {} })
-    dispatcher.dispatch({ type: GET_IETH_BALANCE, content: {} })
 
     const that = this
     setTimeout(() => {
@@ -235,13 +241,25 @@ class InvestSimple extends Component {
   };
 
   investReturned = (txHash) => {
-    const snackbarObj = { snackbarMessage: 'TX: ' + txHash, snackbarType: 'Success' }
+    const snackbarObj = { snackbarMessage: null, snackbarType: null }
     this.setState(snackbarObj)
+    this.setState({ loading: false })
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Success' }
+      that.setState(snackbarObj)
+    })
   };
 
   redeemReturned = (txHash) => {
-    const snackbarObj = { snackbarMessage: 'TX: ' + txHash, snackbarType: 'Success' }
+    const snackbarObj = { snackbarMessage: null, snackbarType: null }
     this.setState(snackbarObj)
+    this.setState({ loading: false })
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Success' }
+      that.setState(snackbarObj)
+    })
   };
 
   render() {
@@ -254,9 +272,6 @@ class InvestSimple extends Component {
       referralLink,
       referralLinkError,
       loading,
-      ethBalance,
-      iEthBalance,
-      pricePerFullShare,
       roi,
       account,
       modalOpen,
@@ -264,9 +279,6 @@ class InvestSimple extends Component {
       redeemModalOpen,
       snackbarMessage
     } = this.state
-    console.log(pricePerFullShare);
-    console.log(parseFloat(iEthBalance))
-    console.log(parseFloat(pricePerFullShare))
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
@@ -293,145 +305,48 @@ class InvestSimple extends Component {
             </div>
           }
 
-          {account.address && <div className={ classes.actionsContainer }>
-            <div className={ classes.tradeContainer }>
-              <div className={ classes.balances }>
-                  <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ ethBalance ? ethBalance.toFixed(4) : '0.0000' } ETH</Typography>
-              </div>
-              <div className={ classes.amountContainer }>
-                <TextField
-                  fullWidth
-                  className={ classes.actionInput }
-                  id='amount'
-                  value={ amount }
-                  error={ amountError }
-                  onChange={ this.onChange }
-                  disabled={ loading }
-                  label=""
-                  size="small"
-                  placeholder="0.00"
-                  variant="outlined"
-                  onKeyDown={ this.inputKeyDown }
-                />
-              </div>
-              <div className={ classes.scaleContainer }>
-                <Button
-                  className={ classes.scale }
-                  variant='text'
-                  disabled={ loading }
-                  color="primary"
-                  onClick={ () => { this.setAmount(25) } }>
-                  <Typography color='secondary'>25%</Typography>
-                </Button>
-                <Button
-                  className={ classes.scale }
-                  variant='text'
-                  disabled={ loading }
-                  color="primary"
-                  onClick={ () => { this.setAmount(50) } }>
-                  <Typography color='secondary'>50%</Typography>
-                </Button>
-                <Button
-                  className={ classes.scale }
-                  variant='text'
-                  disabled={ loading }
-                  color="primary"
-                  onClick={ () => { this.setAmount(75) } }>
-                  <Typography color='secondary'>75%</Typography>
-                </Button>
-                <Button
-                  className={ classes.scale }
-                  variant='text'
-                  disabled={ loading }
-                  color="primary"
-                  onClick={ () => { this.setAmount(100) } }>
-                  <Typography color='secondary'>100%</Typography>
-                </Button>
-              </div>
-              <Button
-                className={ classes.actionButton }
-                variant="outlined"
-                color="primary"
-                disabled={ loading || !account.address }
-                onClick={ this.onInvest }
-                >
-                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Earn</Typography>
-              </Button>
-            </div>
-            <div className={classes.tradeContainer}>
-              <div className={ classes.balances }>
-                <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ iEthBalance ? iEthBalance.toFixed(4) : '0.0000' } iETH ({ iEthBalance ? (parseFloat(iEthBalance)*parseFloat(pricePerFullShare)).toFixed(4) : '0' } ETH)</Typography>
-              </div>
-              <div className={ classes.amountContainer }>
-                <TextField
-                  fullWidth
-                  className={ classes.actionInput }
-                  id='redeemAmount'
-                  value={ redeemAmount }
-                  error={ redeemAmountError }
-                  onChange={ this.onChange }
-                  disabled={ loading }
-                  label=""
-                  placeholder="0.00"
-                  variant="outlined"
-                  onKeyDown={ this.inputRedeemKeyDown }
-                />
-              </div>
-              <div className={ classes.scaleContainer }>
-                <Button
-                  className={ classes.scale }
-                  variant='text'
-                  disabled={ loading }
-                  color="primary"
-                  onClick={ () => { this.setRedeemAmount(25) } }>
-                  <Typography color='secondary'>25%</Typography>
-                </Button>
-                <Button
-                  className={ classes.scale }
-                  variant='text'
-                  disabled={ loading }
-                  color="primary"
-                  onClick={ () => { this.setRedeemAmount(50) } }>
-                  <Typography color='secondary'>50%</Typography>
-                </Button>
-                <Button
-                  className={ classes.scale }
-                  variant='text'
-                  disabled={ loading }
-                  color="primary"
-                  onClick={ () => { this.setRedeemAmount(75) } }>
-                  <Typography color='secondary'>75%</Typography>
-                </Button>
-                <Button
-                  className={ classes.scale }
-                  variant='text'
-                  disabled={ loading }
-                  color="primary"
-                  onClick={ () => { this.setRedeemAmount(100) } }>
-                  <Typography color='secondary'>100%</Typography>
-                </Button>
-              </div>
-              <Button
-                className={ classes.actionButton }
-                variant="outlined"
-                color="primary"
-                disabled={ loading || !account.address }
-                onClick={ this.onRedeem }
-                >
-                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Claim</Typography>
-              </Button>
-            </div>
-          </div>}
+          { account.address && this.renderAssetBlocks() }
         </div>
+        { loading && <Loader /> }
         { modalOpen && this.renderModal() }
-        { investModalOpen && this.renderInvestModal() }
-        { redeemModalOpen && this.renderRedeemModal() }
         { snackbarMessage && this.renderSnackbar() }
       </div>
     )
   };
 
-  renderSnackbar() {
+  renderAssetBlocks = () => {
+    const { assets, expanded } = this.state
+    const { classes } = this.props
+
+    return assets.map((asset) => {
+      return (
+        <ExpansionPanel key={ asset.symbol+"_expand" } expanded={ expanded === asset.symbol} onChange={ () => { this.handleChange(asset.symbol) } }>
+          <ExpansionPanelSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1bh-content"
+            id="panel1bh-header"
+          >
+            <Typography className={classes.heading} variant={ 'h3' }>{asset.name}</Typography>
+            <Typography className={classes.secondaryHeading} variant={ 'h4' }>{asset.symbol + ' : ' + asset.investSymbol}</Typography>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <Asset asset={ asset } startLoading={ this.startLoading } />
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+      )
+    })
+
+  }
+
+  handleChange = (symbol) => {
+    this.setState({ expanded: symbol })
+  }
+
+  startLoading = () => {
+    this.setState({ loading: true })
+  }
+
+  renderSnackbar = () => {
     const {
       snackbarType,
       snackbarMessage
@@ -440,76 +355,9 @@ class InvestSimple extends Component {
     return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true} />
   };
 
-  setAmount = (percent) => {
-
-    if(this.state.loading) {
-      return
-    }
-
-    const balance = store.getStore('ethBalance')
-    let amount = balance*percent/100
-
-    if(percent === 100) {
-        amount = amount - 0.009
-    }
-
-    this.setState({ amount: amount.toFixed(8) })
-  }
-
-  setRedeemAmount = (percent) => {
-
-    if(this.state.loading) {
-      return
-    }
-
-    const balance = store.getStore('iEthBalance')
-    let amount = balance*percent/100
-
-    if(percent === 100) {
-        amount = amount - 0.009
-    }
-
-    this.setState({ redeemAmount: amount.toFixed(8) })
-  }
-
-  onInvest = () => {
-    this.setState({ amountError: false })
-
-    const { amount, ethBalance } = this.state
-
-    if(!amount || isNaN(amount) || amount <= 0 || amount > ethBalance) {
-      this.setState({ amountError: true })
-      return false
-    }
-
-    const asset = { iEarnContract: config.iEarnContract }
-
-    this.setState({ loading: true })
-
-    dispatcher.dispatch({ type: INVEST, content: { amount: amount, asset: asset } })
-  }
-
   unlockMetamask = () => {
     this.setState({ metamaskLoading: true })
     dispatcher.dispatch({ type: CONNECT_METAMASK, content: {} })
-  }
-
-  onChange = (event) => {
-    let val = []
-    val[event.target.id] = event.target.value
-    this.setState(val)
-  }
-
-  inputKeyDown = (event) => {
-    if (event.which === 13) {
-      this.onInvest();
-    }
-  }
-
-  inputRedeemKeyDown = (event) => {
-    if (event.which === 13) {
-      this.onRedeem();
-    }
   }
 
   renderModal = () => {
@@ -524,46 +372,6 @@ class InvestSimple extends Component {
 
   closeModal = () => {
     this.setState({ modalOpen: false })
-  }
-
-  renderInvestModal = () => {
-    return (
-      <InvestModal closeModal={ this.closeInvestModal } />
-    )
-  }
-
-  investClicked = () => {
-    this.setState({ investModalOpen: true })
-  }
-
-  closeInvestModal = () => {
-    this.setState({ investModalOpen: false })
-  }
-
-  renderRedeemModal = () => {
-    return (
-      <RedeemModal closeModal={ this.closeRedeemModal } />
-    )
-  }
-
-  onRedeem = () => {
-    this.setState({ redeemAmountError: false })
-
-    const { redeemAmount, iEthBalance } = this.state
-
-    console.log(iEthBalance);
-    console.log(redeemAmount);
-
-    if(!redeemAmount || isNaN(redeemAmount) || redeemAmount <= 0 || redeemAmount > iEthBalance) {
-      this.setState({ redeemAmountError: true })
-      return false
-    }
-
-    const asset = { iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0' }
-
-    this.setState({ loading: true })
-
-    dispatcher.dispatch({ type: REDEEM, content: { amount: redeemAmount, asset: asset } })
   }
 }
 

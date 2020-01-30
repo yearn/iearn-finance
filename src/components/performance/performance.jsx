@@ -93,7 +93,7 @@ const styles = theme => ({
   }
 });
 
-class Events extends Component {
+class Performance extends Component {
 
   constructor() {
     super()
@@ -127,7 +127,7 @@ class Events extends Component {
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
           <div className={ classes.intro }>
-            <Typography variant='h2'>Contract Events.</Typography>
+            <Typography variant='h2'>Contract Performance.</Typography>
           </div>
           <div className={ classes.tablesContainer }>
             <Card className={ classes.pairs } style={{ marginRight: '24px' }}>
@@ -219,4 +219,4 @@ class Events extends Component {
   }
 }
 
-export default withRouter(withStyles(styles)(Events));
+export default withRouter(withStyles(styles)(Performance));
