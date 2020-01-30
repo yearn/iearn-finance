@@ -52,14 +52,18 @@ const styles = theme => ({
     justifyContent: 'space-between'
   },
   name: {
-    flex: '1',
-    padding: '6px 12px',
-    width: '100px'
+    width: '100px',
+    display: 'flex',
+    alignItems: 'center',
+    padding: '6px'
   },
   apr: {
     flex: '1',
     padding: '6px 12px',
-    width: '100px'
+    width: '100px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end'
   },
   headerName: {
     flex: '1',
@@ -98,6 +102,16 @@ const styles = theme => ({
   footerText: {
     padding: '10px',
     cursor: 'pointer'
+  },
+  assetIcon: {
+    display: 'inline-block',
+    verticalAlign: 'middle',
+    borderRadius: '20px',
+    height: '30px',
+    width: '30px',
+    textAlign: 'center',
+    cursor: 'pointer',
+    marginRight: '12px'
   }
 });
 
@@ -204,6 +218,13 @@ class APR extends Component {
         return (
           <div key={ y.token } className={ classes.pair }>
             <div className={ classes.name }>
+              <div className={ classes.assetIcon }>
+                <img
+                  alt=""
+                  src={ require('../../assets/'+y.token+'-logo.png') }
+                  height="30px"
+                />
+              </div>
               <Typography variant={'h3'} className={classes.aggregatedHeader}>{ y.token }</Typography>
             </div>
             { keys.map((key) => {
