@@ -44,6 +44,7 @@ const styles = theme => ({
     width: '100%',
   },
   pairs: {
+    borderRadius: '20px',
     padding: '24px',
     height: 'max-content'
   },
@@ -87,6 +88,7 @@ const styles = theme => ({
     paddingBottom: '12px'
   },
   aggregatedHeader: {
+    textAlign: 'center',
   },
   tablesContainer: {
     display: 'flex'
@@ -199,7 +201,7 @@ class APR extends Component {
         </div>
         { aggregatedHeaders.map((header) => {
           return (<div key={ header }  className={ classes.headerValue }>
-            <Typography  align='right' variant={'h3'} className={classes.aggregatedHeader}>{ this.renderTableHeader(header) }</Typography>
+            <Typography  align='right' variant={'h4'} className={classes.aggregatedHeader}>{ this.renderTableHeader(header) }</Typography>
           </div>)
         })}
       </div>
@@ -225,7 +227,7 @@ class APR extends Component {
                   height="30px"
                 />
               </div>
-              <Typography variant={'h3'} className={classes.aggregatedHeader}>{ y.token }</Typography>
+              <Typography variant={'h4'} className={classes.aggregatedHeader}>{ y.token }</Typography>
             </div>
             { keys.map((key) => {
 
