@@ -171,6 +171,18 @@ const styles = theme => ({
     flexBasis: '33.33%',
     flexShrink: 0,
   },
+  footer: {
+    position: 'fixed',
+    bottom: '30px',
+    left: '30px',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  footerText: {
+    padding: '10px',
+    cursor: 'pointer'
+  }
 });
 
 class InvestSimple extends Component {
@@ -308,11 +320,19 @@ class InvestSimple extends Component {
           { account.address && this.renderAssetBlocks() }
         </div>
         { loading && <Loader /> }
+        <div className={classes.footer}>
+          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>about</Typography>
+          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>docs</Typography>
+          <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>code</Typography>
+          <Typography onClick={()=> window.open("https://t.me/iearnfinance", "_blank")} className={ classes.footerText } variant={ 'h6'}>telegram</Typography>
+          <Typography onClick={()=> window.open("/apr", "_blank")} className={ classes.footerText } variant={ 'h6'}>yield</Typography>
+        </div>
         { modalOpen && this.renderModal() }
         { snackbarMessage && this.renderSnackbar() }
       </div>
     )
   };
+
 
   renderAssetBlocks = () => {
     const { assets, expanded } = this.state
@@ -335,11 +355,48 @@ class InvestSimple extends Component {
         </ExpansionPanel>
       )
     })
+  }
+  renderSnackbar() {
+    const {
+      snackbarType,
+      snackbarMessage
+    } = this.state
+
+    return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true} />
+  };
+
+  setAmount = (percent) => {
+
+    if(this.state.loading) {
+      return
+    }
+
+    const balance = store.getStore('ethBalance')
+    let amount = balance*percent/100
+
+    if(percent === 100 && amount > 0.009) {
+        amount = amount - 0.009
+    }
 
   }
 
   handleChange = (symbol) => {
     this.setState({ expanded: symbol })
+  }
+  setRedeemAmount = (percent) => {
+
+    if(this.state.loading) {
+      return
+    }
+
+    const balance = store.getStore('iEthBalance')
+    let amount = balance*percent/100
+
+    if(percent === 100 && amount > 0.009) {
+        amount = amount - 0.009
+    }
+
+    this.setState({ redeemAmount: amount.toFixed(8) })
   }
 
   startLoading = () => {

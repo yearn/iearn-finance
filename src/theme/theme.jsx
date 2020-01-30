@@ -54,6 +54,10 @@ const iswapTheme =  {
     h5: {
       fontSize: '1rem',
       fontWeight: '700',
+    },
+    h6: {
+      fontSize: '0.825rem',
+      color: '#DC6BE5',
     }
   },
   type: 'light',

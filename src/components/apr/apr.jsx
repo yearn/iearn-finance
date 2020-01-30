@@ -83,10 +83,21 @@ const styles = theme => ({
     paddingBottom: '12px'
   },
   aggregatedHeader: {
-    textTransform: 'uppercase'
   },
   tablesContainer: {
     display: 'flex'
+  },
+  footer: {
+    position: 'fixed',
+    bottom: '30px',
+    left: '30px',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  footerText: {
+    padding: '10px',
+    cursor: 'pointer'
   }
 });
 
@@ -139,8 +150,7 @@ class APR extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
-          <div className={ classes.intro }>
-            <Typography variant='h2'>APR Stats.</Typography>
+          <div className={ classes.pairs }>
           </div>
           <div className={ classes.tablesContainer }>
             {/*<Card className={ classes.pairs } style={{ marginRight: '12px'}}>
@@ -152,6 +162,13 @@ class APR extends Component {
               { this.renderAggregatedYields() }
             </Card>
           </div>
+        </div>
+        <div className={classes.footer}>
+          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>about</Typography>
+          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>docs</Typography>
+          <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>code</Typography>
+          <Typography onClick={()=> window.open("https://t.me/iearnfinance", "_blank")} className={ classes.footerText } variant={ 'h6'}>telegram</Typography>
+          <Typography onClick={()=> window.open("/apr", "_blank")} className={ classes.footerText } variant={ 'h6'}>yield</Typography>
         </div>
       </div>
     )
@@ -168,7 +185,7 @@ class APR extends Component {
         </div>
         { aggregatedHeaders.map((header) => {
           return (<div key={ header }  className={ classes.headerValue }>
-            <Typography  align='right' variant={'h3'} className={classes.aggregatedHeader}>{ header }</Typography>
+            <Typography  align='right' variant={'h3'} className={classes.aggregatedHeader}>{ this.renderTableHeader(header) }</Typography>
           </div>)
         })}
       </div>
@@ -192,7 +209,7 @@ class APR extends Component {
             { keys.map((key) => {
 
                 let val = parseFloat(y.apr[key])
-                if(key === 'uniapr' && val != 0) {
+                if((key === 'uniapr' || key === 'unicapr') && val != 0) {
                   val = val*100 - 100
                 } else {
                   val = val*100
@@ -208,19 +225,55 @@ class APR extends Component {
     )
   }
 
+  renderTableHeader = (name) => {
+    if (name === 'uniapr') {
+      return 'Uni';
+    } else if (name.startsWith('capr')) {
+      return 'Compound';
+    } else if (name.startsWith('unicapr')) {
+      return 'cUni';
+    } else if (name.startsWith('iapr')) {
+      return 'Fulcrum';
+    } else if (name.startsWith('iapr')) {
+      return 'Fulcrum';
+    } else if (name.startsWith('uniiapr')) {
+      return 'iUni';
+    } else if (name.startsWith('aapr')) {
+      return 'Aave';
+    } else if (name.startsWith('uniaapr')) {
+      return 'aUni';
+    } else if (name.startsWith('dapr')) {
+      return 'dYdX';
+    } else {
+      return name;
+    }
+  }
+
   renderHeader = () => {
     const { classes } = this.props
 
     return (
       <div key={ 'name' } className={ classes.pair }>
         <div className={ classes.headerName }>
-          <Typography align='right' variant={'h3'}>Name</Typography>
+          <Typography align='right' variant={'h3'}>name</Typography>
         </div>
         <div className={ classes.headerApr }>
-          <Typography variant={'h3'}>Yield</Typography>
+          <Typography variant={'h3'}>yield</Typography>
         </div>
       </div>
     )
+  };
+
+  mapNames = (name) => {
+    if (name.startsWith('A')) {
+      return 'Aave '+name;
+    } else if (name.startsWith('I')) {
+      return 'Fulcrum '+name;
+    } else if (name.startsWith('C')) {
+      return 'Compound '+name;
+    } else {
+      return name;
+    }
   }
 
   renderYields = () => {
@@ -241,7 +294,7 @@ class APR extends Component {
         </div>
       )
     })
-  }
+  };
 }
 
 export default withRouter(withStyles(styles)(APR));
