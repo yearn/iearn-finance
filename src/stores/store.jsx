@@ -36,7 +36,7 @@ class Store {
     this.store = {
       assets: [
         {
-          name: 'Dai Stablecoin',
+          name: 'DAI',
           symbol: 'DAI',
           investSymbol: 'yDAI',
           erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -44,36 +44,41 @@ class Store {
           maxApr: 0,
           balance: 0,
           investedBalance: 0,
+          decimals: 18,
           price: 0,
           poolValue: 0,
           abi: config.IEarnERC20ABI
-        },
-        {
-          name: 'Ethereum',
-          symbol: 'ETH',
-          investSymbol: 'iETH',
-          erc20address: 'Ethereum',
-          iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0',
-          maxApr: 0,
-          balance: 0,
-          investedBalance: 0,
-          price: 0,
-          poolValue: 0,
-          abi: config.IEarnABI
         },
         {
           name: 'USD Coin',
           symbol: 'USDC',
           investSymbol: 'yUSDC',
           erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-          iEarnContract: '0xa2609b2b43ac0f5ebe27deb944d2a399c201e3da',
+          iEarnContract: '0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA',
+          apr: 0,
           maxApr: 0,
           balance: 0,
           investedBalance: 0,
           price: 0,
+          decimals: 6,
           poolValue: 0,
           abi: config.IEarnERC20ABI
-        }
+        },
+        {
+          name: 'ETH',
+          symbol: 'ETH',
+          investSymbol: 'iETH',
+          erc20address: 'Ethereum',
+          iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0',
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          decimals: 18,
+          investedBalance: 0,
+          price: 0,
+          poolValue: 0,
+          abi: config.IEarnABI
+        },
       ],
       account: {},
       web3: null,
@@ -411,7 +416,8 @@ class Store {
       let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
 
       try {
-        const balance = web3.utils.fromWei(await erc20Contract.methods.balanceOf(account.address).call({ from: account.address }), 'ether');
+        var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
+        balance = parseFloat(balance)/10**asset.decimals
         callback(null, parseFloat(balance))
       } catch(ex) {
         console.log(ex)
@@ -469,17 +475,12 @@ class Store {
       return isNaN(key)
     })
 
-    console.log(call)
-    console.log(aprs)
-
     const maxApr = Math.max.apply(Math, workKeys.map(function(o) {
       if(o === 'uniapr' || o === 'unicapr') {
         return aprs[o]-100000000000000000000
       }
       return aprs[o];
     }))
-
-
 
     callback(null, web3.utils.fromWei(maxApr.toFixed(0), 'ether'))
   }
