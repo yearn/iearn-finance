@@ -41,7 +41,7 @@ class Store {
           investSymbol: 'yDAI',
           erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
           iEarnContract: '0x9D25057e62939D3408406975aD75Ffe834DA4cDd',
-          apr: 0,
+          maxApr: 0,
           balance: 0,
           investedBalance: 0,
           decimals: 18,
@@ -56,6 +56,7 @@ class Store {
           erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
           iEarnContract: '0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA',
           apr: 0,
+          maxApr: 0,
           balance: 0,
           investedBalance: 0,
           price: 0,
@@ -70,6 +71,7 @@ class Store {
           erc20address: 'Ethereum',
           iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0',
           apr: 0,
+          maxApr: 0,
           balance: 0,
           decimals: 18,
           investedBalance: 0,
@@ -372,16 +374,20 @@ class Store {
     const account = store.getStore('account')
     const assets = store.getStore('assets')
 
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+
     async.map(assets, (asset, callback) => {
       async.parallel([
-        (callbackInner) => { this._getERC20Balance(asset, account, callbackInner) },
-        (callbackInner) => { this._getInvestedBalance(asset, account, callbackInner) },
-        (callbackInner) => { this._getPoolPrice(asset, account, callbackInner) },
-        // (callbackInner) => { this._getPoolValue(asset, account, callbackInner) },
+        (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getInvestedBalance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getPoolPrice(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getMaxAPR(web3, asset, account, callbackInner) },
+        // (callbackInner) => { this._getPoolValue(web3, asset, account, callbackInner) },
       ], (err, data) => {
         asset.balance = data[0]
         asset.investedBalance = data[1]
         asset.price = data[2]
+        asset.maxApr = data[3]
         // asset.poolValue = data[3]
 
         callback(null, asset)
@@ -396,13 +402,11 @@ class Store {
     })
   }
 
-  _getERC20Balance = async (asset, account, callback) => {
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+  _getERC20Balance = async (web3, asset, account, callback) => {
 
     if(asset.erc20address === 'Ethereum') {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
-        // asset.balance = parseFloat(eth_balance)
         callback(null, parseFloat(eth_balance))
       } catch(ex) {
         console.log(ex)
@@ -422,52 +426,63 @@ class Store {
     }
   }
 
-  _getPoolValue = async (asset, account, callback) => {
+  _getPoolValue = async (web3, asset, account, callback) => {
 
     if(asset.iEarnContract === null) {
       return callback(null, asset)
     }
-
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
     const value = web3.utils.fromWei(await iEarnContract.methods.calcPoolValueInETH().call({ from: account.address }), 'ether');
-
-    // asset.pool_value = parseFloat(value)
-
     callback(null, parseFloat(value))
   }
 
-  _getPoolPrice = async (asset, account, callback) => {
+  _getPoolPrice = async (web3, asset, account, callback) => {
 
     if(asset.iEarnContract === null) {
       return callback(null, asset)
     }
-
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
     const balance = web3.utils.fromWei(await iEarnContract.methods.getPricePerFullShare().call({ from: account.address }), 'ether');
-    // store.setStore({ pricePerFullShare: balance })
-    // asset.price = parseFloat(balance)
-
     callback(null, parseFloat(balance))
   }
 
-  _getInvestedBalance = async (asset, account, callback) => {
+  _getInvestedBalance = async (web3, asset, account, callback) => {
 
     if(asset.iEarnContract === null) {
       return callback(null, asset)
     }
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
-
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
-
-    var balance = await iEarnContract.methods.balanceOf(account.address).call({ from: account.address });
-    balance = parseFloat(balance)/10**asset.decimals
-
+    const balance = web3.utils.fromWei(await iEarnContract.methods.balanceOf(account.address).call({ from: account.address }), 'ether');
     callback(null, parseFloat(balance))
+  }
+
+  _getMaxAPR = async (web3, asset, account, callback) => {
+
+    if(asset.iEarnContract === null) {
+      return callback(null, asset)
+    }
+
+    let aprContract = new web3.eth.Contract(config.aggregatedContractABI, config.aggregatedContractAddress)
+
+    const call = 'get'+asset.symbol
+    const aprs = await aprContract.methods[call]().call();
+
+    const keys = Object.keys(aprs)
+    const workKeys = keys.filter((key) => {
+      return isNaN(key)
+    })
+
+    const maxApr = Math.max.apply(Math, workKeys.map(function(o) {
+      if(o === 'uniapr' || o === 'unicapr') {
+        return aprs[o]-100000000000000000000
+      }
+      return aprs[o];
+    }))
+
+    callback(null, web3.utils.fromWei(maxApr.toFixed(0), 'ether'))
   }
 
   getYield = (payload) => {
