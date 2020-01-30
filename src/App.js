@@ -13,6 +13,7 @@ import interestTheme from './theme';
 // import Header from './components/header';
 import APR from './components/apr';
 import InvestSimple from './components/investSimple';
+import Events from './components/events';
 
 class App extends Component {
 
@@ -35,6 +36,9 @@ class App extends Component {
               </Route>
               <Route path="/invest">
                 <InvestSimple />
+              </Route>
+              <Route path="/events"> 
+                <Events />
               </Route>
               <Route path="/">
                 <InvestSimple />

@@ -28,7 +28,9 @@ import {
   GET_AGGREGATED_YIELD,
   GET_AGGREGATED_YIELD_RETURNED,
   GET_UNISWAP_COMPARRISONS,
-  GET_UNISWAP_COMPARRISONS_RETURNED
+  GET_UNISWAP_COMPARRISONS_RETURNED,
+  GET_CONTRACT_EVENTS,
+  GET_CONTRACT_EVENTS_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 
@@ -138,7 +140,8 @@ class Store {
       aggregatedYields: [],
       aggregatedHeaders: [],
       uniswapYields: [],
-      uniswapLiquidity: []
+      uniswapLiquidity: [],
+      events: []
     }
 
     dispatcher.register(
@@ -185,6 +188,9 @@ class Store {
             break;
           case GET_UNISWAP_COMPARRISONS:
             this.getUniswapComparrisons(payload)
+            break;
+          case GET_CONTRACT_EVENTS:
+            this.getContractEvents(payload)
             break;
           default: {
           }
@@ -735,6 +741,79 @@ class Store {
       // return callback(ex)
       callback(null, false)
     }
+  }
+
+  getContractEvents = (payload) => {
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    let iEarnContract = new web3.eth.Contract(config.IEarnABI, config.iEarnContract)
+
+    iEarnContract.getPastEvents('allEvents', { fromBlock: 1, toBlock: 'latest' })
+      .then((res) => {
+
+        const sorted = res.sort((a, b) => {
+          return parseFloat(a.blockNumber) - parseFloat(b.blockNumber)
+        }).filter((tx) => {
+          if(tx.event !== 'Transfer') {
+            return false
+          }
+
+          if(!tx.returnValues.value || tx.returnValues.value == 0) {
+            return false
+          }
+
+          if(tx.returnValues.from != '0x0000000000000000000000000000000000000000') {
+            return false
+          }
+
+          return true
+        }).map(async (tx) => {
+          const rawTx = await this._getTransaction(web3, tx.transactionHash)
+
+          return {
+            blockNumber: tx.blockNumber,
+            transactionHash: tx.transactionHash,
+            eth: web3.utils.fromWei(rawTx.value, 'ether'),
+            iEth: web3.utils.fromWei(tx.returnValues.value, 'ether'),
+            ethRatio: tx.returnValues.value*100/rawTx.value,
+            address: rawTx.from
+          }
+        })
+
+        Promise.all(sorted).then(async (transactions) => {
+          const pricePerFullShare = await this._getPricePerFullShare(web3, iEarnContract)
+
+          const trxs = transactions.map(async (tx) => {
+            //console.log(tx.address)
+            //TODO: Figure out how to merge the values into 1
+
+            const balance = await this._getIEthBalance(web3, iEarnContract, tx.address)
+
+            tx.ethRedeem = (parseFloat(pricePerFullShare)*parseFloat(balance))
+            tx.growth = (parseFloat(tx.ethRedeem)*100/parseFloat(tx.eth))
+            return tx
+          })
+
+          Promise.all(trxs).then(async (txs) => {
+            store.setStore({ events: txs })
+            return emitter.emit(GET_CONTRACT_EVENTS_RETURNED, txs)
+          })
+        })
+      })
+  }
+
+  _getTransaction = async (web3, hash) => {
+    const rawTx = await web3.eth.getTransaction(hash)
+    return rawTx
+  }
+
+  _getPricePerFullShare = async (web3, iEarnContract) => {
+    const balance = web3.utils.fromWei(await iEarnContract.methods.getPricePerFullShare().call({ }), 'ether');
+    return balance
+  }
+
+  _getIEthBalance = async (web3, iEarnContract, address) => {
+    const balance = web3.utils.fromWei(await iEarnContract.methods.balanceOf(address).call({ }), 'ether');
+    return balance
   }
 }
 
