@@ -168,6 +168,7 @@ const styles = theme => ({
     }
   },
   heading: {
+    paddingTop: '5px',
     flexBasis: '33.33%',
     flexShrink: 0,
   },
@@ -182,6 +183,9 @@ const styles = theme => ({
   footerText: {
     padding: '10px',
     cursor: 'pointer'
+  },
+  buttonText: {
+    fontWeight: '700',
   },
   assetSummary: {
     display: 'flex',
@@ -229,7 +233,6 @@ class InvestSimple extends Component {
     emitter.on(INVEST_RETURNED, this.investReturned);
     emitter.on(REDEEM_RETURNED, this.redeemReturned);
     emitter.on(ERROR, this.errorReturned);
-
     emitter.on(BALANCES_RETURNED, this.balancesReturned);
   }
 
@@ -241,6 +244,10 @@ class InvestSimple extends Component {
 
     emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
   };
+
+  refresh() {
+    dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+  }
 
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('assets') })
@@ -369,9 +376,18 @@ class InvestSimple extends Component {
                   height="40px"
                 />
               </div>
-              <Typography className={classes.heading} variant={ 'h3' }>{ asset.name }</Typography>
-              <Typography className={classes.heading} variant={ 'h4' }>{ 'APR: '+(asset.maxApr*100).toFixed(4) + ' %' }</Typography>
-              <Typography className={classes.heading} variant={ 'h5' }>{(asset.balance).toFixed(4)+' '+asset.symbol + ' : ' + (asset.investedBalance).toFixed(4)+' '+asset.investSymbol}</Typography>
+              <div className={classes.heading}>
+                <Typography className={classes.heading} variant={ 'h3' }>{ asset.name }</Typography>
+                <Typography className={classes.heading} variant={ 'h5' }>{ asset.description }</Typography>
+              </div>
+              <div className={classes.heading}>
+                <Typography className={classes.heading} variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
+                <Typography className={classes.heading} variant={ 'h5' }>{'Interest Rate'}</Typography>
+              </div>
+              <div className={classes.heading}>
+                <Typography className={classes.heading} variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+asset.symbol}</Typography>
+                <Typography className={classes.heading} variant={ 'h5' }>{'Available Balance'}</Typography>
+              </div>
             </div>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>

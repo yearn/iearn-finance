@@ -38,6 +38,7 @@ class Store {
         {
           name: 'DAI',
           symbol: 'DAI',
+          description: 'DAI Stablecoin',
           investSymbol: 'yDAI',
           erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
           iEarnContract: '0x9D25057e62939D3408406975aD75Ffe834DA4cDd',
@@ -52,6 +53,7 @@ class Store {
         {
           name: 'USD Coin',
           symbol: 'USDC',
+          description: 'USD//C',
           investSymbol: 'yUSDC',
           erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
           iEarnContract: '0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA',
@@ -67,6 +69,7 @@ class Store {
         {
           name: 'ETH',
           symbol: 'ETH',
+          description: 'Ethereum',
           investSymbol: 'iETH',
           erc20address: 'Ethereum',
           iEarnContract: '0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0',
@@ -305,7 +308,11 @@ class Store {
           callback(error)
         })
     } else {
-      iEarnContract.methods.invest(web3.utils.toWei(amount, "ether")).send({ from: account.address })
+      var amountToSend = web3.utils.toWei(amount, "ether")
+      if (asset.decimals != 18) {
+        amountToSend = amount*10**asset.decimals;
+      }
+      iEarnContract.methods.invest(amountToSend).send({ from: account.address })
         .on('transactionHash', function(hash){
           console.log(hash)
           callback(null, hash)
@@ -349,7 +356,10 @@ class Store {
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
 
-    const amountSend = web3.utils.toWei(amount, "ether")
+    var amountSend = web3.utils.toWei(amount, "ether")
+    if (asset.decimals != 18) {
+      amountSend = amount*10**asset.decimals;
+    }
 
     iEarnContract.methods.redeem(amountSend).send({ from: account.address })
     .on('transactionHash', function(hash){
@@ -455,7 +465,8 @@ class Store {
     }
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
-    const balance = web3.utils.fromWei(await iEarnContract.methods.balanceOf(account.address).call({ from: account.address }), 'ether');
+    var  balance = await iEarnContract.methods.balanceOf(account.address).call({ from: account.address });
+    balance = parseFloat(balance)/10**asset.decimals
     callback(null, parseFloat(balance))
   }
 
