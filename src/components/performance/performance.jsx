@@ -127,7 +127,7 @@ class Performance extends Component {
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
           <div className={ classes.intro }>
-            <Typography variant='h2'>Contract Performance.</Typography>
+            <Typography variant='h2'>ROI</Typography>
           </div>
           <div className={ classes.tablesContainer }>
             <Card className={ classes.pairs } style={{ marginRight: '24px' }}>

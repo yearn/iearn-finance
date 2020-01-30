@@ -41,20 +41,22 @@ const iswapTheme =  {
     },
     h2: {
       fontSize: '1rem',
-      fontWeight: '700',
+      fontWeight: '500',
     },
     h3: {
       fontSize: '1rem',
-      fontWeight: '700',
+      fontWeight: '500',
+      color: 'rgb(1, 1, 1)',
     },
     h4: {
       fontSize: '0.75rem',
-      fontWeight: '700',
+      fontWeight: '500',
+      color: '#DC6BE5',
     },
     h5: {
       fontSize: '0.8rem',
       fontWeight: '500',
-      color: 'rgb(115, 115, 115);',
+      color: 'rgb(174, 174, 174)',
     },
     h6: {
       fontSize: '0.825rem',

@@ -139,6 +139,9 @@ const styles = theme => ({
     alignItems: 'center',
     flexWrap: 'wrap',
   },
+  buttonText: {
+    fontWeight: '700',
+  },
   overlay: {
     position: 'absolute',
     borderRadius: '10px',
@@ -215,7 +218,7 @@ class Asset extends Component {
     return (<div className={ classes.actionsContainer }>
       <div className={ classes.tradeContainer }>
         <div className={ classes.balances }>
-            <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ asset.balance ? asset.balance.toFixed(4) : '0.0000' } { asset.symbol }</Typography>
+            <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.symbol }</Typography>
         </div>
         <div className={ classes.amountContainer }>
           <TextField
@@ -240,7 +243,7 @@ class Asset extends Component {
             disabled={ loading }
             color="primary"
             onClick={ () => { this.setAmount(25) } }>
-            <Typography color='secondary'>25%</Typography>
+            <Typography variant={'h5'}>25%</Typography>
           </Button>
           <Button
             className={ classes.scale }
@@ -248,7 +251,7 @@ class Asset extends Component {
             disabled={ loading }
             color="primary"
             onClick={ () => { this.setAmount(50) } }>
-            <Typography color='secondary'>50%</Typography>
+            <Typography variant={'h5'}>50%</Typography>
           </Button>
           <Button
             className={ classes.scale }
@@ -256,7 +259,7 @@ class Asset extends Component {
             disabled={ loading }
             color="primary"
             onClick={ () => { this.setAmount(75) } }>
-            <Typography color='secondary'>75%</Typography>
+            <Typography variant={'h5'}>75%</Typography>
           </Button>
           <Button
             className={ classes.scale }
@@ -264,7 +267,7 @@ class Asset extends Component {
             disabled={ loading }
             color="primary"
             onClick={ () => { this.setAmount(100) } }>
-            <Typography color='secondary'>100%</Typography>
+            <Typography variant={'h5'}>100%</Typography>
           </Button>
         </div>
         <Button
@@ -303,7 +306,7 @@ class Asset extends Component {
             disabled={ loading }
             color="primary"
             onClick={ () => { this.setRedeemAmount(25) } }>
-            <Typography color='secondary'>25%</Typography>
+            <Typography variant={'h5'}>25%</Typography>
           </Button>
           <Button
             className={ classes.scale }
@@ -311,7 +314,7 @@ class Asset extends Component {
             disabled={ loading }
             color="primary"
             onClick={ () => { this.setRedeemAmount(50) } }>
-            <Typography color='secondary'>50%</Typography>
+            <Typography variant={'h5'}>50%</Typography>
           </Button>
           <Button
             className={ classes.scale }
@@ -319,7 +322,7 @@ class Asset extends Component {
             disabled={ loading }
             color="primary"
             onClick={ () => { this.setRedeemAmount(75) } }>
-            <Typography color='secondary'>75%</Typography>
+            <Typography variant={'h5'}>75%</Typography>
           </Button>
           <Button
             className={ classes.scale }
@@ -327,7 +330,7 @@ class Asset extends Component {
             disabled={ loading }
             color="primary"
             onClick={ () => { this.setRedeemAmount(100) } }>
-            <Typography color='secondary'>100%</Typography>
+            <Typography variant={'h5'}>100%</Typography>
           </Button>
         </div>
         <Button
@@ -368,7 +371,6 @@ class Asset extends Component {
 
     this.setState({ loading: true })
     startLoading()
-
     dispatcher.dispatch({ type: INVEST, content: { amount: amount, asset: asset } })
   }
 
