@@ -149,8 +149,20 @@ class APR extends Component {
     console.log(store.getStore('yields'))
   };
 
+  dispatch() {
+    dispatcher.dispatch({ type: GET_AGGREGATED_YIELD, content: {  } })
+  }
+
   aggregatedYieldReturned = (balances) => {
     this.setState({ aggregatedYields: store.getStore('aggregatedYields'), aggregatedHeaders: store.getStore('aggregatedHeaders') })
+    //setTimeout(this.dispatch(), 1000000);
+    setTimeout(
+      function() {
+            this.dispatch();
+        }
+        .bind(this),
+        3000
+    );
   };
 
   uniswapcommparrisonReturned = (balances) => {

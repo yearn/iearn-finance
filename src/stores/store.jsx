@@ -67,6 +67,38 @@ class Store {
           abi: config.IEarnERC20ABI
         },
         {
+          name: 'USDT',
+          symbol: 'USDT',
+          description: 'Tether USD',
+          investSymbol: 'yUSDC',
+          erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+          iEarnContract: '0xa1787206d5b1bE0f432C4c4f96Dc4D1257A1Dd14',
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 6,
+          poolValue: 0,
+          abi: config.IEarnERC20ABI
+        },
+        {
+          name: 'SUSD',
+          symbol: 'SUSD',
+          description: 'Synth sUSD',
+          investSymbol: 'ySUSD',
+          erc20address: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
+          iEarnContract: '0x36324b8168f960A12a8fD01406C9C78143d41380',
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 18,
+          poolValue: 0,
+          abi: config.IEarnERC20ABI
+        },
+        {
           name: 'ETH',
           symbol: 'ETH',
           description: 'Ethereum',
