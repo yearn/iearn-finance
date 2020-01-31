@@ -278,27 +278,7 @@ class Store {
 
       if(parseFloat(allowance) < parseFloat(amount)) {
         const allowanceSet = await erc20Contract.methods.approve(asset.iEarnContract, web3.utils.toWei(amount, "ether")).send({ from: account.address })
-
-        erc20Contract.methods.approve(asset.iEarnContract, web3.utils.toWei(amount, "ether")).send({ from: account.address })
-          .on('transactionHash', function(hash){
-            console.log(hash)
-            callback(null, hash)
-          })
-          .on('confirmation', function(confirmationNumber, receipt){
-            console.log(confirmationNumber, receipt);
-          })
-          .on('receipt', function(receipt){
-            console.log(receipt);
-          })
-          .on('error', function(error) {
-            if(error.message) {
-              return callback(error.message)
-            }
-            callback(error)
-          })
-          .catch((e) => {
-            callback(e)
-          })
+        callback()
       } else {
         callback()
       }
@@ -424,13 +404,13 @@ class Store {
         (callbackInner) => { this._getInvestedBalance(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getPoolPrice(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getMaxAPR(web3, asset, account, callbackInner) },
-        // (callbackInner) => { this._getPoolValue(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getPoolValue(web3, asset, account, callbackInner) },
       ], (err, data) => {
         asset.balance = data[0]
         asset.investedBalance = data[1]
         asset.price = data[2]
         asset.maxApr = data[3]
-        // asset.poolValue = data[3]
+        asset.poolValue = data[4]
 
         callback(null, asset)
       })
@@ -474,9 +454,21 @@ class Store {
       return callback(null, asset)
     }
 
-    let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
-    const value = web3.utils.fromWei(await iEarnContract.methods.calcPoolValueInETH().call({ from: account.address }), 'ether');
-    callback(null, parseFloat(value))
+    try {
+      let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
+      let value = 0
+
+      if(asset.erc20address === 'Ethereum') {
+        value = web3.utils.fromWei(await iEarnContract.methods.calcPoolValueInETH().call({ from: account.address }), 'ether');
+      } else {
+        value = web3.utils.fromWei(await iEarnContract.methods.calcPoolValueInToken().call({ from: account.address }), 'ether');
+      }
+      callback(null, parseFloat(value))
+    } catch (e) {
+      console.log(e)
+      callback(null, 0)
+    }
+
   }
 
   _getPoolPrice = async (web3, asset, account, callback) => {
