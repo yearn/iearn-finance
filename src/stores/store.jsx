@@ -99,6 +99,23 @@ class Store {
           abi: config.IEarnERC20ABI
         },
         {
+          name: 'cDAI/cUSDC',
+          symbol: 'CRV',
+          tokenSymbol: 'DAI',
+          description: 'Curve.fi cDAI/cUSDC',
+          investSymbol: 'yCRV',
+          erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          iEarnContract: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 18,
+          poolValue: 0,
+          abi: config.IEarnERC20ABI
+        },
+        {
           name: 'ETH',
           symbol: 'ETH',
           description: 'Ethereum',
@@ -498,6 +515,13 @@ class Store {
 
     if(asset.iEarnContract === null) {
       return callback(null, asset)
+    }
+    if (asset.symbol == 'CRV') {
+      let aprContract = new web3.eth.Contract(config.crvContractABI, config.crvAddress)
+      const call = 'crvapr'
+      const aprs = await aprContract.methods[call]().call();
+      console.log(aprs)
+      return callback(null, web3.utils.fromWei(parseFloat(aprs).toFixed(0), 'ether'))
     }
 
     let aprContract = new web3.eth.Contract(config.aggregatedContractABI, config.aggregatedContractAddress)

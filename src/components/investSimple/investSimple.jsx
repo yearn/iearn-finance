@@ -385,7 +385,7 @@ class InvestSimple extends Component {
                 <Typography className={classes.heading} variant={ 'h5' }>{'Interest Rate'}</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography className={classes.heading} variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+asset.symbol}</Typography>
+                <Typography className={classes.heading} variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
                 <Typography className={classes.heading} variant={ 'h5' }>{'Available Balance'}</Typography>
               </div>
             </div>
