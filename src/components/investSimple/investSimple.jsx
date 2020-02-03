@@ -3,8 +3,6 @@ import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
-  Card,
-  TextField,
   Button,
   ExpansionPanel,
   ExpansionPanelDetails,
@@ -13,8 +11,6 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import UnlockModal from '../unlock/unlockModal.jsx'
-import InvestModal from './investModal.jsx'
-import RedeemModal from './redeemModal.jsx'
 import Snackbar from '../snackbar'
 import Asset from './asset'
 import Loader from '../loader'
@@ -23,18 +19,12 @@ import {
   ERROR,
   GET_BALANCES,
   BALANCES_RETURNED,
-  GET_INVESTED_BALANCES,
-  INVESTED_BALANCES_RETURNED,
-  INVEST,
   INVEST_RETURNED,
-  REDEEM,
   REDEEM_RETURNED,
   CONNECT_METAMASK,
   CONNECT_METAMASK_PASSIVE,
   METAMASK_CONNECTED
 } from '../../constants'
-
-import config from '../../config'
 
 import Store from "../../stores";
 const emitter = Store.emitter
@@ -213,18 +203,10 @@ class InvestSimple extends Component {
 
     this.state = {
       assets: store.getStore('assets'),
-      referralLink: '',
-      roi: 4,
       account: store.getStore('account'),
       modalOpen: false,
-      investModalOpen: false,
-      redeemModalOpen: false,
       snackbarType: null,
       snackbarMessage: null,
-      amount: '',
-      amountError: false,
-      redeemAmount: '',
-      redeemAmountError: false
     }
   }
 
@@ -299,18 +281,9 @@ class InvestSimple extends Component {
   render() {
     const { classes } = this.props;
     const {
-      amount,
-      amountError,
-      redeemAmount,
-      redeemAmountError,
-      referralLink,
-      referralLinkError,
       loading,
-      roi,
       account,
       modalOpen,
-      investModalOpen,
-      redeemModalOpen,
       snackbarMessage
     } = this.state
     return (
@@ -332,7 +305,7 @@ class InvestSimple extends Component {
                 variant="outlined"
                 color="primary"
                 disabled={ loading }
-                onClick={ this.unlockMetamask }
+                onClick={ this.overlayClicked }
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Connect Wallet</Typography>
               </Button>
@@ -406,38 +379,8 @@ class InvestSimple extends Component {
     return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true} />
   };
 
-  setAmount = (percent) => {
-
-    if(this.state.loading) {
-      return
-    }
-
-    const balance = store.getStore('ethBalance')
-    let amount = balance*percent/100
-
-    if(percent === 100 && amount > 0.009) {
-        amount = amount - 0.009
-    }
-
-  }
-
   handleChange = (symbol) => {
     this.setState({ expanded: this.state.expanded === symbol ? null : symbol })
-  }
-  setRedeemAmount = (percent) => {
-
-    if(this.state.loading) {
-      return
-    }
-
-    const balance = store.getStore('iEthBalance')
-    let amount = balance*percent/100
-
-    if(percent === 100 && amount > 0.009) {
-        amount = amount - 0.009
-    }
-
-    this.setState({ redeemAmount: amount.toFixed(8) })
   }
 
   startLoading = () => {

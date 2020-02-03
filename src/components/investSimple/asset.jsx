@@ -1,18 +1,12 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
-import { useTheme } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 import {
-  DialogContent,
-  Dialog,
   Slide,
   Typography,
-  Card,
   TextField,
   Button
 } from '@material-ui/core';
-import config from '../../config'
 
 import {
   ERROR,
@@ -22,17 +16,11 @@ import {
   REDEEM_RETURNED,
 } from '../../constants'
 
-import Loader from '../loader'
-
 import Store from "../../stores";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
 
-
-function Transition(props) {
-  return <Slide direction="up" {...props} />;
-}
 
 const styles = theme => ({
   root: {
@@ -205,7 +193,7 @@ class Asset extends Component {
   };
 
   render() {
-    const { classes, theme, asset } = this.props;
+    const { classes, asset } = this.props;
     const {
       account,
       amount,

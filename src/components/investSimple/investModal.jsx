@@ -1,14 +1,12 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
-import { useTheme } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import {  } from '@material-ui/core/styles';
 import {
   DialogContent,
   Dialog,
   Slide,
   Typography,
-  Card,
   TextField,
   Button
 } from '@material-ui/core';
@@ -107,7 +105,7 @@ class InvestModal extends Component {
   };
 
   render() {
-    const { classes, theme, closeModal } = this.props;
+    const { classes, closeModal } = this.props;
     const {
       amount,
       amountError,

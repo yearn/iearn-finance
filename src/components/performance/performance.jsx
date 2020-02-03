@@ -119,9 +119,6 @@ class Performance extends Component {
 
   render() {
     const { classes } = this.props;
-    const {
-      snackbarMessage
-    } = this.state
 
     return (
       <div className={ classes.root }>
@@ -144,7 +141,6 @@ class Performance extends Component {
   };
 
   renderGraph() {
-    const { classes } = this.props
     const { events } = this.state
 
     return (
