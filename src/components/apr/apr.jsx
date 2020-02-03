@@ -7,12 +7,8 @@ import {
 } from '@material-ui/core';
 
 import {
-  GET_YIELD,
-  GET_YIELD_RETURNED,
   GET_AGGREGATED_YIELD,
   GET_AGGREGATED_YIELD_RETURNED,
-  GET_UNISWAP_COMPARRISONS,
-  GET_UNISWAP_COMPARRISONS_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -171,9 +167,6 @@ class APR extends Component {
 
   render() {
     const { classes } = this.props;
-    const {
-      snackbarMessage
-    } = this.state
 
     return (
       <div className={ classes.root }>
@@ -222,7 +215,7 @@ class APR extends Component {
 
   renderAggregatedYields = () => {
     const { classes } = this.props
-    const { aggregatedYields, aggregatedHeaders } = this.state
+    const { aggregatedYields } = this.state
 
     return (
       aggregatedYields.map((y) => {

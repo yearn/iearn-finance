@@ -2,6 +2,8 @@ import config from "../config";
 import async from 'async';
 import {
   ERROR,
+  CONNECT_LEDGER,
+  LEDGER_CONNECTED,
   CONNECT_METAMASK,
   CONNECT_METAMASK_PASSIVE,
   METAMASK_CONNECTED,
@@ -23,6 +25,10 @@ import {
   GET_CONTRACT_EVENTS_RETURNED
 } from '../constants';
 import Web3 from 'web3';
+import createLedgerSubprovider from "@ledgerhq/web3-subprovider";
+import TransportU2F from "@ledgerhq/hw-transport-u2f";
+import ProviderEngine from "web3-provider-engine";
+import RpcSubprovider from "web3-provider-engine/subproviders/rpc";
 
 const Dispatcher = require('flux').Dispatcher;
 const Emitter = require('events').EventEmitter;
@@ -163,6 +169,9 @@ class Store {
     dispatcher.register(
       function (payload) {
         switch (payload.type) {
+          case CONNECT_LEDGER:
+            this.connectLedger(payload);
+            break;
           case CONNECT_METAMASK:
             this.connectMetamask(payload);
             break;
@@ -209,6 +218,49 @@ class Store {
     console.log(this.store)
     return emitter.emit('StoreUpdated');
   };
+
+  connectLedger(payload) {
+    const engine = new ProviderEngine();
+    const getTransport = () => TransportU2F.create();
+    const ledger = createLedgerSubprovider(getTransport, {
+      accountsLength: 5
+    });
+    engine.addProvider(ledger);
+    engine.addProvider(new RpcSubprovider({ rpcUrl: config.infuraProvider }));
+    engine.start();
+    const web3 = new Web3(engine);
+
+    console.log(`Web3 connected using infura provider: ${config.infuraProvider}`)
+
+
+    // console.log(this.isU2FSupported())
+
+    try {
+
+      console.log(`Getting accounts from ledger`)
+
+      web3.eth.getAccounts(function(err, accounts){
+        if (err != null) {
+          return emitter.emit(ERROR, err);
+        } else if (accounts.length === 0) {
+          console.log('No accounts found via Ledger!')
+          return emitter.emit(ERROR, 'No accounts found via Ledger!');
+        } else {
+          console.log(`Found accounts, storing address and web3: ${accounts[0]}`)
+          store.setStore({ account: { address: accounts[0] }})
+          store.setStore({ web3: web3 })
+
+          console.log(`Getting balances`)
+          dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+
+          return emitter.emit(LEDGER_CONNECTED)
+        }
+      });
+    } catch (e) {
+      console.log('Access denied. Please allow access via your Ledger device!')
+      return emitter.emit(ERROR, 'Access denied. Please allow access via your Ledger device!');
+    }
+  }
 
   async connectMetamask(payload) {
     let web3 = null
@@ -311,7 +363,7 @@ class Store {
       const allowance = await erc20Contract.methods.allowance(account.address, asset.iEarnContract).call({ from: account.address })
 
       if(parseFloat(allowance) < parseFloat(amount)) {
-        const allowanceSet = await erc20Contract.methods.approve(asset.iEarnContract, web3.utils.toWei(amount, "ether")).send({ from: account.address })
+        const allowanceSet = await erc20Contract.methods.approve(asset.iEarnContract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         callback()
       } else {
         callback()
@@ -328,9 +380,8 @@ class Store {
     const web3 = store.getStore('web3')
 
     let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
-
     if(asset.erc20address === 'Ethereum') {
-      iEarnContract.methods.invest().send({ from: account.address, value: web3.utils.toWei(amount, "ether") })
+      iEarnContract.methods.invest().send({ from: account.address, value: web3.utils.toWei(amount, "ether"), gasPrice: web3.utils.toWei('6', 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
           callback(null, hash)
@@ -342,23 +393,27 @@ class Store {
           console.log(receipt);
         })
         .on('error', function(error) {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
         .catch((error) => {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
     } else {
       var amountToSend = web3.utils.toWei(amount, "ether")
       if (asset.decimals != 18) {
         amountToSend = amount*10**asset.decimals;
       }
-      iEarnContract.methods.invest(amountToSend).send({ from: account.address })
+      iEarnContract.methods.invest(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
           callback(null, hash)
@@ -370,16 +425,20 @@ class Store {
           console.log(receipt);
         })
         .on('error', function(error) {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
         .catch((error) => {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
     }
   }
@@ -407,7 +466,7 @@ class Store {
       amountSend = amount*10**asset.decimals;
     }
 
-    iEarnContract.methods.redeem(amountSend).send({ from: account.address })
+    iEarnContract.methods.redeem(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
     .on('transactionHash', function(hash){
       console.log(hash)
       callback(null, hash)
@@ -419,10 +478,13 @@ class Store {
       console.log(receipt);
     })
     .on('error', function(error) {
-      if(error.message) {
-        return callback(error.message)
+      console.log(error);
+      if (!error.toString().includes("-32601")) {
+        if(error.message) {
+          return callback(error.message)
+        }
+        callback(error)
       }
-      callback(error)
     })
   }
 

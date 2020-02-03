@@ -6,7 +6,6 @@ import {
   Dialog,
   Slide,
   Typography,
-  Card,
   TextField,
   Button
 } from '@material-ui/core';
@@ -17,8 +16,6 @@ import {
   REDEEM_RETURNED,
 } from '../../constants'
 import config from '../../config'
-
-import { colors } from '../../theme'
 
 import Store from "../../stores";
 const emitter = Store.emitter

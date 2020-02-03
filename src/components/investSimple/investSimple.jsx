@@ -3,8 +3,6 @@ import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
-  Card,
-  TextField,
   Button,
   ExpansionPanel,
   ExpansionPanelDetails,
@@ -13,8 +11,6 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import UnlockModal from '../unlock/unlockModal.jsx'
-import InvestModal from './investModal.jsx'
-import RedeemModal from './redeemModal.jsx'
 import Snackbar from '../snackbar'
 import Asset from './asset'
 import Loader from '../loader'
@@ -23,18 +19,13 @@ import {
   ERROR,
   GET_BALANCES,
   BALANCES_RETURNED,
-  GET_INVESTED_BALANCES,
-  INVESTED_BALANCES_RETURNED,
-  INVEST,
   INVEST_RETURNED,
-  REDEEM,
   REDEEM_RETURNED,
   CONNECT_METAMASK,
+  LEDGER_CONNECTED,
   CONNECT_METAMASK_PASSIVE,
   METAMASK_CONNECTED
 } from '../../constants'
-
-import config from '../../config'
 
 import Store from "../../stores";
 const emitter = Store.emitter
@@ -213,23 +204,15 @@ class InvestSimple extends Component {
 
     this.state = {
       assets: store.getStore('assets'),
-      referralLink: '',
-      roi: 4,
       account: store.getStore('account'),
       modalOpen: false,
-      investModalOpen: false,
-      redeemModalOpen: false,
       snackbarType: null,
       snackbarMessage: null,
-      amount: '',
-      amountError: false,
-      redeemAmount: '',
-      redeemAmountError: false
     }
   }
-
   componentWillMount() {
     emitter.on(METAMASK_CONNECTED, this.metamaskConnected);
+    emitter.on(LEDGER_CONNECTED, this.ledgerConnected);
     emitter.on(INVEST_RETURNED, this.investReturned);
     emitter.on(REDEEM_RETURNED, this.redeemReturned);
     emitter.on(ERROR, this.errorReturned);
@@ -238,6 +221,7 @@ class InvestSimple extends Component {
 
   componentWillUnmount() {
     emitter.removeListener(METAMASK_CONNECTED, this.metamaskConnected);
+    emitter.removeListener(LEDGER_CONNECTED, this.ledgerConnected);
     emitter.removeListener(INVEST_RETURNED, this.investReturned);
     emitter.removeListener(REDEEM_RETURNED, this.redeemReturned);
     emitter.removeListener(ERROR, this.errorReturned);
@@ -263,6 +247,16 @@ class InvestSimple extends Component {
     })
   };
 
+  ledgerConnected = () => {
+    this.setState({ account: store.getStore('account') })
+
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: 'Ledger succesfully connected.', snackbarType: 'Info' }
+      that.setState(snackbarObj)
+    })
+  };
+
   errorReturned = (error) => {
     const snackbarObj = { snackbarMessage: null, snackbarType: null }
     this.setState(snackbarObj)
@@ -280,7 +274,7 @@ class InvestSimple extends Component {
     this.setState({ loading: false })
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Success' }
+      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
       that.setState(snackbarObj)
     })
   };
@@ -291,7 +285,7 @@ class InvestSimple extends Component {
     this.setState({ loading: false })
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Success' }
+      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
       that.setState(snackbarObj)
     })
   };
@@ -299,18 +293,9 @@ class InvestSimple extends Component {
   render() {
     const { classes } = this.props;
     const {
-      amount,
-      amountError,
-      redeemAmount,
-      redeemAmountError,
-      referralLink,
-      referralLinkError,
       loading,
-      roi,
       account,
       modalOpen,
-      investModalOpen,
-      redeemModalOpen,
       snackbarMessage
     } = this.state
     return (
@@ -332,7 +317,7 @@ class InvestSimple extends Component {
                 variant="outlined"
                 color="primary"
                 disabled={ loading }
-                onClick={ this.unlockMetamask }
+                onClick={ this.overlayClicked }
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Connect Wallet</Typography>
               </Button>
@@ -397,47 +382,9 @@ class InvestSimple extends Component {
       )
     })
   }
-  renderSnackbar() {
-    const {
-      snackbarType,
-      snackbarMessage
-    } = this.state
-
-    return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true} />
-  };
-
-  setAmount = (percent) => {
-
-    if(this.state.loading) {
-      return
-    }
-
-    const balance = store.getStore('ethBalance')
-    let amount = balance*percent/100
-
-    if(percent === 100 && amount > 0.009) {
-        amount = amount - 0.009
-    }
-
-  }
 
   handleChange = (symbol) => {
     this.setState({ expanded: this.state.expanded === symbol ? null : symbol })
-  }
-  setRedeemAmount = (percent) => {
-
-    if(this.state.loading) {
-      return
-    }
-
-    const balance = store.getStore('iEthBalance')
-    let amount = balance*percent/100
-
-    if(percent === 100 && amount > 0.009) {
-        amount = amount - 0.009
-    }
-
-    this.setState({ redeemAmount: amount.toFixed(8) })
   }
 
   startLoading = () => {
@@ -445,12 +392,11 @@ class InvestSimple extends Component {
   }
 
   renderSnackbar = () => {
-    const {
+    var {
       snackbarType,
       snackbarMessage
     } = this.state
-
-    return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true} />
+    return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true}/>
   };
 
   unlockMetamask = () => {
