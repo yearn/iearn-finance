@@ -363,7 +363,7 @@ class Store {
       const allowance = await erc20Contract.methods.allowance(account.address, asset.iEarnContract).call({ from: account.address })
 
       if(parseFloat(allowance) < parseFloat(amount)) {
-        const allowanceSet = await erc20Contract.methods.approve(asset.iEarnContract, web3.utils.toWei(amount, "ether")).send({ from: account.address })
+        const allowanceSet = await erc20Contract.methods.approve(asset.iEarnContract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         callback()
       } else {
         callback()
@@ -380,9 +380,8 @@ class Store {
     const web3 = store.getStore('web3')
 
     let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
-
     if(asset.erc20address === 'Ethereum') {
-      iEarnContract.methods.invest().send({ from: account.address, value: web3.utils.toWei(amount, "ether") })
+      iEarnContract.methods.invest().send({ from: account.address, value: web3.utils.toWei(amount, "ether"), gasPrice: web3.utils.toWei('6', 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
           callback(null, hash)
@@ -394,23 +393,27 @@ class Store {
           console.log(receipt);
         })
         .on('error', function(error) {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
         .catch((error) => {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
     } else {
       var amountToSend = web3.utils.toWei(amount, "ether")
       if (asset.decimals != 18) {
         amountToSend = amount*10**asset.decimals;
       }
-      iEarnContract.methods.invest(amountToSend).send({ from: account.address })
+      iEarnContract.methods.invest(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
           callback(null, hash)
@@ -422,16 +425,20 @@ class Store {
           console.log(receipt);
         })
         .on('error', function(error) {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
         .catch((error) => {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
     }
   }
@@ -459,7 +466,7 @@ class Store {
       amountSend = amount*10**asset.decimals;
     }
 
-    iEarnContract.methods.redeem(amountSend).send({ from: account.address })
+    iEarnContract.methods.redeem(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
     .on('transactionHash', function(hash){
       console.log(hash)
       callback(null, hash)
@@ -471,10 +478,13 @@ class Store {
       console.log(receipt);
     })
     .on('error', function(error) {
-      if(error.message) {
-        return callback(error.message)
+      console.log(error);
+      if (!error.toString().includes("-32601")) {
+        if(error.message) {
+          return callback(error.message)
+        }
+        callback(error)
       }
-      callback(error)
     })
   }
 
