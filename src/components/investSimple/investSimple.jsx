@@ -62,12 +62,6 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems: 'center'
   },
-  referralLink: {
-    padding: '12px',
-    [theme.breakpoints.up('md')]: {
-      minWidth: '450px'
-    }
-  },
   actionInput: {
     padding: '0px 0px 12px 0px',
     fontSize: '0.5rem'
@@ -173,7 +167,7 @@ const styles = theme => ({
     flexShrink: 0,
   },
   footer: {
-    position: 'fixed',
+    position: 'absolute',
     bottom: '30px',
     left: '30px',
     display: 'flex',

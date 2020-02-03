@@ -228,6 +228,9 @@ class APR extends Component {
       aggregatedYields.map((y) => {
 
         const keys = Object.keys(y.apr)
+        if (y.token == 'WBTC') {
+          y.token = 'wBTC';
+        }
 
         return (
           <div key={ y.token } className={ classes.pair }>
