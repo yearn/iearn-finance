@@ -116,6 +116,23 @@ class Store {
           abi: config.IEarnERC20ABI
         },
         {
+          name: 'wBTC',
+          symbol: 'wBTC',
+          tokenSymbol: 'wBTC',
+          description: 'Wrapped BTC',
+          investSymbol: 'yBTC',
+          erc20address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+          iEarnContract: '0x04EF8121aD039ff41d10029c91EA1694432514e9',
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 8,
+          poolValue: 0,
+          abi: config.IEarnERC20ABI
+        },
+        {
           name: 'ETH',
           symbol: 'ETH',
           description: 'Ethereum',
@@ -526,8 +543,16 @@ class Store {
 
     let aprContract = new web3.eth.Contract(config.aggregatedContractABI, config.aggregatedContractAddress)
 
-    const call = 'get'+asset.symbol
-    const aprs = await aprContract.methods[call]().call();
+    var call = 'getAPROptions';//+asset.symbol
+    var address = asset.erc20address
+    var aprs = 0;
+    if (asset.erc20address == 'Ethereum') {
+      call = 'getETH';
+      aprs = await aprContract.methods[call]().call();
+    } else {
+      aprs = await aprContract.methods[call](address).call();
+    }
+
 
     const keys = Object.keys(aprs)
     const workKeys = keys.filter((key) => {
