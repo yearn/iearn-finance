@@ -9,7 +9,9 @@ import {
 import {
   ERROR,
   CONNECT_METAMASK,
-  METAMASK_CONNECTED
+  METAMASK_CONNECTED,
+  CONNECT_LEDGER,
+  LEDGER_CONNECTED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -51,17 +53,35 @@ const styles = theme => ({
     height: '30px'
   },
   buttonText: {
-    marginLeft: '12px'
+    marginLeft: '12px',
+    fontWeight: '700',
   },
   instruction: {
     maxWidth: '400px',
-    marginBottom: '32px'
+    marginBottom: '32px',
+    marginTop: '32px'
   },
   metamask: {
     backgroundImage: 'url('+require('../../assets/metamask.svg')+')',
     width: '200px',
     height: '200px'
-  }
+  },
+  ledger: {
+    backgroundImage: 'url('+require('../../assets/icn-ledger.svg')+')',
+    backgroundSize: '100%',
+    width: '200px',
+    height: '200px'
+  },
+  actionButton: {
+    padding: '12px',
+    backgroundColor: 'white',
+    borderRadius: '3rem',
+    border: '1px solid #E1E1E1',
+    fontWeight: 500,
+    [theme.breakpoints.up('md')]: {
+      padding: '15px',
+    }
+  },
 });
 
 class Unlock extends Component {
@@ -71,17 +91,20 @@ class Unlock extends Component {
 
     this.state = {
       error: null,
-      metamaskLoading: false
+      metamaskLoading: false,
+      ledgerLoading: false
     }
   }
 
   componentWillMount() {
     emitter.on(METAMASK_CONNECTED, this.metamaskUnlocked);
+    emitter.on(LEDGER_CONNECTED, this.ledgerUnlocked);
     emitter.on(ERROR, this.error);
   };
 
   componentWillUnmount() {
     emitter.removeListener(METAMASK_CONNECTED, this.metamaskUnlocked);
+    emitter.removeListener(LEDGER_CONNECTED, this.ledgerUnlocked);
     emitter.removeListener(ERROR, this.error);
   };
 
@@ -94,8 +117,13 @@ class Unlock extends Component {
     dispatcher.dispatch({ type: CONNECT_METAMASK, content: {} })
   }
 
+  unlockLedger = () => {
+    this.setState({ ledgerLoading: true })
+    dispatcher.dispatch({ type: CONNECT_LEDGER, content: {} })
+  }
+
   error = (err) => {
-    this.setState({ loading: false, error: err, metamaskLoading: false })
+    this.setState({ loading: false, error: err, metamaskLoading: false, ledgerLoading: false })
   };
 
   metamaskUnlocked = () => {
@@ -105,55 +133,82 @@ class Unlock extends Component {
     }
   }
 
+  ledgerUnlocked = () => {
+    this.setState({ ledgerLoading: false })
+    if(this.props.closeModal != null) {
+      this.props.closeModal()
+    }
+  }
+
+  cancelLedger = () => {
+    this.setState({ ledgerLoading: false })
+  }
+
   cancelMetamask = () => {
     this.setState({ metamaskLoading: false })
   }
 
   render() {
     const { classes } = this.props;
-    const { metamaskLoading } = this.state;
+    const { metamaskLoading, ledgerLoading } = this.state;
 
     return (
       <div className={ classes.root }>
         <div className={ classes.contentContainer }>
           <Typography variant={ 'h3'}>Connect your wallet to use iearn finance</Typography>
           { metamaskLoading && this.renderMetamaskLoading() }
-          { !metamaskLoading && this.renderOptions() }
+          { ledgerLoading && this.renderLedgerLoading() }
+          { (!metamaskLoading && !ledgerLoading) && this.renderOptions() }
         </div>
       </div>
     )
   };
 
-  renderMetamaskLoading() {
+  renderMetamaskLoading = () => {
     const { classes } = this.props;
 
     return (<div className={ classes.cardContainer }>
       <div className={ classes.metamask }>
       </div>
-      <Typography variant='body1' className={ classes.instruction }>
+      <Typography variant={ 'h3'} className={ classes.instruction }>
         Click connect in the MetaMask notification window to connect your wallet to iearn finance.
       </Typography>
-      <Button variant='contained' color='primary' onClick={ this.cancelMetamask } fullWidth>
-        Cancel
+      <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.cancelMetamask } fullWidth>
+        <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Cancel</Typography>
       </Button>
     </div>)
   };
 
-  renderOptions() {
+  renderLedgerLoading = () => {
+    const { classes } = this.props;
+
+    return (<div className={ classes.cardContainer }>
+      <div className={ classes.ledger }>
+      </div>
+      <Typography variant={ 'h3'} className={ classes.instruction }>
+        Insert yout ledger device and authorize iEarn.
+      </Typography>
+      <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.cancelLedger } fullWidth>
+        <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Cancel</Typography>
+      </Button>
+    </div>)
+  }
+
+  renderOptions = () => {
     const { classes, closeModal } = this.props;
 
     return (
       <div className={ classes.cardContainer }>
-        <Button className={ classes.unlockCard } variant='contained' color='secondary' onClick={ this.unlockMetamask } fullWidth>
+        <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.unlockMetamask } fullWidth>
           <div className={ classes.metamaskIcon }></div>
-          <Typography className={ classes.buttonText } variant={ 'h3'}>Unlock using Metamask</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Unlock using Metamask</Typography>
         </Button>
-        <Button className={ classes.unlockCard } variant='contained' color='secondary' fullWidth>
+        <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.unlockLedger } fullWidth>
           <div className={ classes.ledgerIcon }></div>
-          <Typography className={ classes.buttonText } variant={ 'h3'}>Unlock using Ledger</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Unlock using Ledger</Typography>
         </Button>
-        { closeModal != null && <Button className={ classes.unlockCard } variant='text' color='secondary' onClick={ closeModal } fullWidth>
-          <Typography className={ classes.buttonText } variant={ 'h3'}>Close</Typography>
+        { closeModal != null && <Button className={ classes.actionButton } variant='outlined' color='secondary' onClick={ closeModal } fullWidth>
+          <Typography className={ classes.buttonText } variant={ 'h5'}>Close</Typography>
         </Button>}
       </div>
     )

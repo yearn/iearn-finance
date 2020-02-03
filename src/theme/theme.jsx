@@ -159,9 +159,9 @@ const iswapTheme =  {
       root: {
         backgroundColor: colors.white,
         padding: '0px',
-        minWidth: '450px',
+        minWidth: '500px',
         '@media (min-width: 960px)': {
-          minWidth: '450px',
+          minWidth: '500px',
         }
       },
       message: {
