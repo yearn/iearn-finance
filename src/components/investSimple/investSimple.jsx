@@ -199,7 +199,7 @@ class InvestSimple extends Component {
   constructor() {
     super()
 
-    dispatcher.dispatch({ type: CONNECT_METAMASK_PASSIVE, content: {} })
+    // dispatcher.dispatch({ type: CONNECT_METAMASK_PASSIVE, content: {} })
 
     this.state = {
       assets: store.getStore('assets'),
@@ -237,6 +237,8 @@ class InvestSimple extends Component {
 
   metamaskConnected = () => {
     this.setState({ account: store.getStore('account') })
+
+    dispatcher.dispatch({ type: GET_BALANCES, content: {} })
 
     const that = this
     setTimeout(() => {

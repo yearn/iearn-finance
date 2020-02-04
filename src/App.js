@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-
 import {
   BrowserRouter as Router,
   Switch,
@@ -10,10 +9,10 @@ import {
 
 import interestTheme from './theme';
 
-// import Header from './components/header';
 import APR from './components/apr';
 import InvestSimple from './components/investSimple';
 import Performance from './components/performance';
+
 
 class App extends Component {
 

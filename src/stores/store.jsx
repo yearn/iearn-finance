@@ -30,11 +30,28 @@ import TransportU2F from "@ledgerhq/hw-transport-u2f";
 import ProviderEngine from "web3-provider-engine";
 import RpcSubprovider from "web3-provider-engine/subproviders/rpc";
 
+import {
+  injected,
+  network,
+  walletconnect,
+  walletlink,
+  ledger,
+  trezor,
+  frame,
+  fortmatic,
+  portis,
+  squarelink,
+  torus,
+  authereum
+} from "./connectors";
+
+
 const Dispatcher = require('flux').Dispatcher;
 const Emitter = require('events').EventEmitter;
 
 const dispatcher = new Dispatcher();
 const emitter = new Emitter();
+
 
 class Store {
   constructor() {
@@ -163,7 +180,21 @@ class Store {
       aggregatedHeaders: [],
       uniswapYields: [],
       uniswapLiquidity: [],
-      events: []
+      events: [],
+      connectorsByName: {
+        Injected: injected,
+        Network: network,
+        WalletConnect: walletconnect,
+        WalletLink: walletlink,
+        Ledger: ledger,
+        Trezor: trezor,
+        Frame: frame,
+        Fortmatic: fortmatic,
+        Portis: portis,
+        Squarelink: squarelink,
+        Torus: torus,
+        Authereum: authereum
+      }
     }
 
     dispatcher.register(
@@ -219,6 +250,12 @@ class Store {
     return emitter.emit('StoreUpdated');
   };
 
+  getWeb3 = () => {
+    const { ethereum } = window;
+    const web3 = new Web3(ethereum);
+    return web3
+  }
+
   connectLedger(payload) {
     const engine = new ProviderEngine();
     const getTransport = () => TransportU2F.create();
@@ -232,11 +269,7 @@ class Store {
 
     console.log(`Web3 connected using infura provider: ${config.infuraProvider}`)
 
-
-    // console.log(this.isU2FSupported())
-
     try {
-
       console.log(`Getting accounts from ledger`)
 
       web3.eth.getAccounts(function(err, accounts){
@@ -281,8 +314,6 @@ class Store {
           } else {
             store.setStore({ account: { address: accounts[0] }})
             store.setStore({ web3: web3 })
-
-            dispatcher.dispatch({ type: GET_BALANCES, content: {} })
 
             return emitter.emit(METAMASK_CONNECTED)
           }
@@ -356,7 +387,7 @@ class Store {
   }
 
   _checkApproval = async (asset, account, amount, callback) => {
-    const web3 = store.getStore('web3')
+    const web3 = this.getWeb3()
     let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
 
     try {
@@ -377,7 +408,7 @@ class Store {
   }
 
   _callInvest = async (asset, account, amount, callback) => {
-    const web3 = store.getStore('web3')
+    const web3 = this.getWeb3()
 
     let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
 
@@ -450,7 +481,7 @@ class Store {
   }
 
   _callRedeem = async (asset, account, amount, callback) => {
-    const web3 = store.getStore('web3')
+    const web3 = this.getWeb3()
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
 
