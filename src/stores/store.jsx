@@ -57,6 +57,70 @@ class Store {
   constructor() {
 
     this.store = {
+      aprs: [{
+          token: 'DAI',
+          address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+          decimals: 18
+        },{
+          token: 'TUSD',
+          address: '0x0000000000085d4780B73119b644AE5ecd22b376',
+          decimals: 18
+        },{
+          token: 'USDC',
+          address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          decimals: 6
+        },{
+          token: 'USDT',
+          address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+          decimals: 6
+        },{
+          token: 'SUSD',
+          address: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
+          decimals: 18
+        },/*{
+          token: 'LEND',
+          address: '0x80fB784B7eD66730e8b1DBd9820aFD29931aab03'
+        },*/{
+          token: 'BAT',
+          address: '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
+          decimals: 18
+        },{
+          token: 'ETH',
+          address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+          decimals: 18
+        },{
+          token: 'LINK',
+          address: '0x514910771AF9Ca656af840dff83E8264EcF986CA',
+          decimals: 18
+        },{
+          token: 'KNC',
+          address: '0xdd974D5C2e2928deA5F71b9825b8b646686BD200',
+          decimals: 18
+        },{
+          token: 'REP',
+          address: '0x1985365e9f78359a9B6AD760e32412f4a445E862',
+          decimals: 18
+        },{
+          token: 'MKR',
+          address: '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2',
+          decimals: 18
+        },/*{
+          token: 'MANA',
+          address: '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942'
+        },*/{
+          token: 'ZRX',
+          address: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
+          decimals: 18
+        },{
+          token: 'SNX',
+          address: '0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F',
+          decimals: 18
+        },{
+          token: 'wBTC',
+          address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+          decimals: 18
+        },
+      ],
       assets: [
         {
           name: 'DAI',
@@ -225,7 +289,7 @@ class Store {
             this.getUniswapYield(payload)
             break;
           case GET_AGGREGATED_YIELD:
-            this.getAggregatedYield(payload)
+            this.getAPR(payload)
             break;
           case GET_UNISWAP_COMPARRISONS:
             this.getUniswapComparrisons(payload)
@@ -394,7 +458,7 @@ class Store {
       const allowance = await erc20Contract.methods.allowance(account.address, asset.iEarnContract).call({ from: account.address })
 
       if(parseFloat(allowance) < parseFloat(amount)) {
-        const allowanceSet = await erc20Contract.methods.approve(asset.iEarnContract, web3.utils.toWei(amount, "ether")).send({ from: account.address })
+        const allowanceSet = await erc20Contract.methods.approve(asset.iEarnContract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         callback()
       } else {
         callback()
@@ -411,9 +475,8 @@ class Store {
     const web3 = this.getWeb3()
 
     let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
-
     if(asset.erc20address === 'Ethereum') {
-      iEarnContract.methods.invest().send({ from: account.address, value: web3.utils.toWei(amount, "ether") })
+      iEarnContract.methods.invest().send({ from: account.address, value: web3.utils.toWei(amount, "ether"), gasPrice: web3.utils.toWei('6', 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
           callback(null, hash)
@@ -425,23 +488,27 @@ class Store {
           console.log(receipt);
         })
         .on('error', function(error) {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
         .catch((error) => {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
     } else {
       var amountToSend = web3.utils.toWei(amount, "ether")
       if (asset.decimals != 18) {
         amountToSend = amount*10**asset.decimals;
       }
-      iEarnContract.methods.invest(amountToSend).send({ from: account.address })
+      iEarnContract.methods.invest(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
           callback(null, hash)
@@ -453,16 +520,20 @@ class Store {
           console.log(receipt);
         })
         .on('error', function(error) {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
         .catch((error) => {
-          if(error.message) {
-            return callback(error.message)
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
         })
     }
   }
@@ -490,7 +561,7 @@ class Store {
       amountSend = amount*10**asset.decimals;
     }
 
-    iEarnContract.methods.redeem(amountSend).send({ from: account.address })
+    iEarnContract.methods.redeem(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
     .on('transactionHash', function(hash){
       console.log(hash)
       callback(null, hash)
@@ -502,10 +573,13 @@ class Store {
       console.log(receipt);
     })
     .on('error', function(error) {
-      if(error.message) {
-        return callback(error.message)
+      console.log(error);
+      if (!error.toString().includes("-32601")) {
+        if(error.message) {
+          return callback(error.message)
+        }
+        callback(error)
       }
-      callback(error)
     })
   }
 
@@ -821,9 +895,72 @@ class Store {
 
       //get all headers
       const headers = Object.keys(yields[0].apr)
+      console.log(yields);
       store.setStore({ aggregatedYields: yields, aggregatedHeaders: headers })
       return emitter.emit(GET_AGGREGATED_YIELD_RETURNED, yields)
     })
+  }
+
+  getAPR = (payload) => {
+    var value = 0;
+    if (payload.content&&payload.content.amount) {
+      value = payload.content.amount;
+    }
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+
+    async.map(store.getStore('aprs'), (apr, callback) => {
+      apr.value = value.toString();
+      this._getAPR(web3, apr, callback)
+    }, (err, yields) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+      //get all headers
+      const headers = Object.keys(yields[0].apr)
+      store.setStore({ aggregatedYields: yields, aggregatedHeaders: headers })
+      return emitter.emit(GET_AGGREGATED_YIELD_RETURNED, yields)
+    })
+  }
+
+  _getAPR = async (web3, apr, callback) => {
+    let contract = new web3.eth.Contract(config.aprContractABI, config.aprContractAddress)
+    var value = apr.value;
+    if (apr.decimals == 6) {
+      value = web3.utils.toWei(apr.value, 'picoether');
+    } else {
+      value = web3.utils.toWei(apr.value, 'ether');
+    }
+    try {
+      const val = await contract.methods['getAPROptionsAdjusted'](apr.address, value).call()
+
+      const keys = Object.keys(val)
+
+      const vals = keys.filter((key) => {
+        return isNaN(key)
+      }).map((key) => {
+        const obj = {}
+        obj[key] = web3.utils.fromWei(val[key].toString(), 'ether');
+        return obj
+      })
+
+      let output = {}
+
+      for(let i = 0; i < vals.length; i++) {
+        const keys = Object.keys(vals[i])
+        if (keys == '_unifulcrum'||keys =='_uniaave'||keys=='_unicompound') {
+          // skip
+        } else {
+          output[keys[0]] = vals[i][keys[0]]
+        }
+      }
+      apr.apr = output
+
+      callback(null, apr)
+    } catch(ex) {
+      console.log(ex);
+      // return callback(ex)
+      callback(null, false)
+    }
   }
 
   _getAggregatedYield = async (web3, call, callback) => {

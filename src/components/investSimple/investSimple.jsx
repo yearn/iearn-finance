@@ -22,6 +22,7 @@ import {
   INVEST_RETURNED,
   REDEEM_RETURNED,
   CONNECT_METAMASK,
+  LEDGER_CONNECTED,
   CONNECT_METAMASK_PASSIVE,
   METAMASK_CONNECTED
 } from '../../constants'
@@ -51,12 +52,6 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center'
-  },
-  referralLink: {
-    padding: '12px',
-    [theme.breakpoints.up('md')]: {
-      minWidth: '450px'
-    }
   },
   actionInput: {
     padding: '0px 0px 12px 0px',
@@ -163,7 +158,7 @@ const styles = theme => ({
     flexShrink: 0,
   },
   footer: {
-    position: 'fixed',
+    position: 'absolute',
     bottom: '30px',
     left: '30px',
     display: 'flex',
@@ -209,9 +204,9 @@ class InvestSimple extends Component {
       snackbarMessage: null,
     }
   }
-
   componentWillMount() {
     emitter.on(METAMASK_CONNECTED, this.metamaskConnected);
+    emitter.on(LEDGER_CONNECTED, this.ledgerConnected);
     emitter.on(INVEST_RETURNED, this.investReturned);
     emitter.on(REDEEM_RETURNED, this.redeemReturned);
     emitter.on(ERROR, this.errorReturned);
@@ -220,6 +215,7 @@ class InvestSimple extends Component {
 
   componentWillUnmount() {
     emitter.removeListener(METAMASK_CONNECTED, this.metamaskConnected);
+    emitter.removeListener(LEDGER_CONNECTED, this.ledgerConnected);
     emitter.removeListener(INVEST_RETURNED, this.investReturned);
     emitter.removeListener(REDEEM_RETURNED, this.redeemReturned);
     emitter.removeListener(ERROR, this.errorReturned);
@@ -247,6 +243,16 @@ class InvestSimple extends Component {
     })
   };
 
+  ledgerConnected = () => {
+    this.setState({ account: store.getStore('account') })
+
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: 'Ledger succesfully connected.', snackbarType: 'Info' }
+      that.setState(snackbarObj)
+    })
+  };
+
   errorReturned = (error) => {
     const snackbarObj = { snackbarMessage: null, snackbarType: null }
     this.setState(snackbarObj)
@@ -264,7 +270,7 @@ class InvestSimple extends Component {
     this.setState({ loading: false })
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Success' }
+      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
       that.setState(snackbarObj)
     })
   };
@@ -275,7 +281,7 @@ class InvestSimple extends Component {
     this.setState({ loading: false })
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Success' }
+      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
       that.setState(snackbarObj)
     })
   };
@@ -372,14 +378,6 @@ class InvestSimple extends Component {
       )
     })
   }
-  renderSnackbar() {
-    const {
-      snackbarType,
-      snackbarMessage
-    } = this.state
-
-    return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true} />
-  };
 
   handleChange = (symbol) => {
     this.setState({ expanded: this.state.expanded === symbol ? null : symbol })
@@ -390,12 +388,11 @@ class InvestSimple extends Component {
   }
 
   renderSnackbar = () => {
-    const {
+    var {
       snackbarType,
       snackbarMessage
     } = this.state
-
-    return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true} />
+    return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true}/>
   };
 
   unlockMetamask = () => {

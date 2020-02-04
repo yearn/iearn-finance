@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import {
   Snackbar,
   IconButton,
+  Button,
   Typography,
   SvgIcon
 } from '@material-ui/core';
@@ -99,6 +100,15 @@ class MySnackbar extends Component {
 
     let icon = <SuccessIcon color={colors.blue} />
     let color = colors.blue
+    let actions = [
+      <IconButton
+        key="close"
+        aria-label="Close"
+        onClick={this.handleClose}
+      >
+        <CloseIcon />
+      </IconButton>,
+    ]
 
     switch (type) {
       case 'Error':
@@ -117,6 +127,23 @@ class MySnackbar extends Component {
         icon = <InfoIcon color={colors.blue} />
         color = colors.blue
         break;
+      case 'Hash':
+        icon = <SuccessIcon color={colors.blue} />
+        color = colors.blue
+
+        let snackbarMessage = 'https://etherscan.io/tx/'+message;
+        actions = [<Button variant="text" size="small" onClick={()=> window.open(snackbarMessage, "_blank")}>
+          View
+        </Button>,
+          <IconButton
+            key="close"
+            aria-label="Close"
+            onClick={this.handleClose}
+          >
+            <CloseIcon />
+          </IconButton>,
+        ]
+        break;
       default:
         icon = <SuccessIcon color={colors.blue} />
         color = colors.blue
@@ -133,7 +160,7 @@ class MySnackbar extends Component {
         autoHideDuration={6000}
         onClose={this.handleClose}
         message={
-          <div style={{ padding: '12px 24px', borderLeft: '5px solid '+color, borderRadius: '4px'}}>
+          <div style={{ padding: '12px', borderLeft: '5px solid '+color, borderRadius: '4px'}}>
             {icon}
             <div style={{ display: 'inline-block', verticalAlign: 'middle', maxWidth: '400px' }}>
               <Typography variant='body1' style={{ fontSize: '12px', color: color }}>{type}</Typography>
@@ -141,15 +168,7 @@ class MySnackbar extends Component {
             </div>
           </div>
         }
-        action={[
-          <IconButton
-            key="close"
-            aria-label="Close"
-            onClick={this.handleClose}
-          >
-            <CloseIcon />
-          </IconButton>,
-        ]}
+        action={actions}
       />
     );
   }
