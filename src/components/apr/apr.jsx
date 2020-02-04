@@ -3,6 +3,7 @@ import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
+  TextField,
   Card
 } from '@material-ui/core';
 
@@ -28,6 +29,10 @@ const styles = theme => ({
       alignItems: 'center',
       marginTop: '0px',
     }
+  },
+  actionInput: {
+    padding: '0px 0px 12px 0px',
+    fontSize: '0.5rem'
   },
   investedContainer: {
     display: 'flex',
@@ -123,7 +128,10 @@ class APR extends Component {
       uniswapYields: store.getStore('uniswapYields'),
       uniswapYieldsV2: store.getStore('uniswapYieldsV2'),
       aggregatedYields: store.getStore('aggregatedYields'),
-      aggregatedHeaders: store.getStore('aggregatedHeaders')
+      aggregatedHeaders: store.getStore('aggregatedHeaders'),
+      amount: '',
+      amountError: false,
+      loading: false
     }
   }
 
@@ -132,7 +140,7 @@ class APR extends Component {
     emitter.on(GET_AGGREGATED_YIELD_RETURNED, this.aggregatedYieldReturned);
 
     // dispatcher.dispatch({ type: GET_YIELD, content: {  } })
-    dispatcher.dispatch({ type: GET_AGGREGATED_YIELD, content: {  } })
+    dispatcher.dispatch({ type: GET_AGGREGATED_YIELD, content: { amount: 0 } })
   }
 
   componentWillUnmount() {
@@ -145,20 +153,12 @@ class APR extends Component {
     console.log(store.getStore('yields'))
   };
 
-  dispatch() {
-    dispatcher.dispatch({ type: GET_AGGREGATED_YIELD, content: {  } })
+  dispatch(val) {
+    dispatcher.dispatch({ type: GET_AGGREGATED_YIELD, content: { amount: val } })
   }
 
   aggregatedYieldReturned = (balances) => {
     this.setState({ aggregatedYields: store.getStore('aggregatedYields'), aggregatedHeaders: store.getStore('aggregatedHeaders') })
-    //setTimeout(this.dispatch(), 1000000);
-    setTimeout(
-      function() {
-            this.dispatch();
-        }
-        .bind(this),
-        3000
-    );
   };
 
   uniswapcommparrisonReturned = (balances) => {
@@ -167,18 +167,38 @@ class APR extends Component {
 
   render() {
     const { classes } = this.props;
+    const {
+      amountError,
+      amount,
+      loading
+    } = this.state
 
     return (
       <div className={ classes.root }>
-        <div className={ classes.investedContainer }>
           <div className={ classes.pairs }>
           </div>
           <div className={ classes.tablesContainer }>
+          <div className={ classes.investedContainer }>
             {/*<Card className={ classes.pairs } style={{ marginRight: '12px'}}>
               { this.renderHeader() }
               { this.renderYields() }
             </Card>*/}
             <Card className={ classes.pairs }>
+              <TextField
+                fullWidth
+                className={ classes.actionInput }
+                id='amount'
+                value={ amount }
+                error={ amountError }
+                onChange={ this.onChange }
+                disabled={ loading }
+                label=""
+                size="small"
+                helperText="How much do you want to invest?"
+                placeholder="0.00"
+                variant="outlined"
+                onKeyDown={ this.inputKeyDown }
+              />
               { this.renderAggregatedHeader() }
               { this.renderAggregatedYields() }
             </Card>
@@ -240,7 +260,7 @@ class APR extends Component {
             { keys.map((key) => {
 
                 let val = parseFloat(y.apr[key])
-                if((key === 'uniapr' || key === 'unicapr') && val != 0) {
+                if((key === '_uniswap' || key === 'unicapr') && val != 0) {
                   val = val*100 - 100
                 } else {
                   val = val*100
@@ -256,25 +276,34 @@ class APR extends Component {
     )
   }
 
+  onChange = (event) => {
+    let val = []
+    val[event.target.id] = event.target.value
+    this.setState(val)
+    setTimeout(this.dispatch(event.target.value));
+  }
+
+  inputKeyDown = (event) => {
+    if (event.which === 13) {
+      this.onInvest();
+    }
+  }
+
   renderTableHeader = (name) => {
-    if (name === 'uniapr') {
-      return 'Uni';
-    } else if (name.startsWith('capr')) {
+    if (name === '_uniswap') {
+      return 'Uniswap';
+    } else if (name.startsWith('_compound')) {
       return 'Compound';
-    } else if (name.startsWith('unicapr')) {
-      return 'cUni';
-    } else if (name.startsWith('iapr')) {
+    } else if (name.startsWith('_fulcrum')) {
       return 'Fulcrum';
-    } else if (name.startsWith('iapr')) {
-      return 'Fulcrum';
-    } else if (name.startsWith('uniiapr')) {
-      return 'iUni';
-    } else if (name.startsWith('aapr')) {
+    } else if (name.startsWith('_aave')) {
       return 'Aave';
-    } else if (name.startsWith('uniaapr')) {
-      return 'aUni';
-    } else if (name.startsWith('dapr')) {
+    } else if (name.startsWith('_dydx')) {
       return 'dYdX';
+    } else if (name.startsWith('_ddex')) {
+      return 'ddex';
+    } else if (name.startsWith('_lendf')) {
+      return 'Lendf';
     } else {
       return name;
     }
