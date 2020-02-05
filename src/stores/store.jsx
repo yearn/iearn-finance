@@ -43,22 +43,37 @@ class Store {
       aprs: [{
           token: 'DAI',
           address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+          earnAddress: '0x9D25057e62939D3408406975aD75Ffe834DA4cDd',
+          created: 9381203,
+          mod: 1,
           decimals: 18
         },{
           token: 'TUSD',
           address: '0x0000000000085d4780B73119b644AE5ecd22b376',
+          earnAddress: '',
+          created: 0,
+          mod: 1,
           decimals: 18
         },{
           token: 'USDC',
           address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          earnAddress: '0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA',
+          created: 9381851,
+          mod: 1,
           decimals: 6
         },{
           token: 'USDT',
           address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+          earnAddress: '0xa1787206d5b1bE0f432C4c4f96Dc4D1257A1Dd14',
+          created: 9384129,
+          mod: 1,
           decimals: 6
         },{
           token: 'SUSD',
           address: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
+          earnAddress: '0x36324b8168f960A12a8fD01406C9C78143d41380',
+          created: 9387937,
+          mod: 1,
           decimals: 18
         },/*{
           token: 'LEND',
@@ -66,26 +81,44 @@ class Store {
         },*/{
           token: 'BAT',
           address: '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
           decimals: 18
         },{
           token: 'ETH',
           address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
           decimals: 18
         },{
           token: 'LINK',
           address: '0x514910771AF9Ca656af840dff83E8264EcF986CA',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
           decimals: 18
         },{
           token: 'KNC',
           address: '0xdd974D5C2e2928deA5F71b9825b8b646686BD200',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
           decimals: 18
         },{
           token: 'REP',
           address: '0x1985365e9f78359a9B6AD760e32412f4a445E862',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
           decimals: 18
         },{
           token: 'MKR',
           address: '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
           decimals: 18
         },/*{
           token: 'MANA',
@@ -93,14 +126,23 @@ class Store {
         },*/{
           token: 'ZRX',
           address: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
           decimals: 18
         },{
           token: 'SNX',
           address: '0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
           decimals: 18
         },{
           token: 'wBTC',
           address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+          created: 9396412,
+          mod: 1,
+          earnAddress: '',
           decimals: 18
         },
       ],
@@ -922,6 +964,20 @@ class Store {
           output[keys[0]] = vals[i][keys[0]]
         }
       }
+
+      let iearn = 0;
+      if (apr.earnAddress !== '') {
+        let block = await web3.eth.getBlockNumber();
+        let earn = new web3.eth.Contract(config.IEarnABI, apr.earnAddress);
+        const val = await earn.methods.getPricePerFullShare().call();
+        let balance = web3.utils.fromWei(await earn.methods.getPricePerFullShare().call(), 'ether');
+        balance = balance - 1;
+        let diff = block - apr.created;
+        balance = balance / diff;
+        balance = balance * 2102400;
+        iearn = balance;
+      }
+      output['iearn'] = iearn;
       apr.apr = output
 
       callback(null, apr)
