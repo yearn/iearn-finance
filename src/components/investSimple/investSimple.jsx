@@ -104,7 +104,7 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingLeft: '98px'
+    paddingLeft: '38%'
   },
   introCenter: {
     maxWidth: '500px',
@@ -115,9 +115,12 @@ const styles = theme => ({
     paddingRight: '24px'
   },
   actionButton: {
+    '&:hover': {
+      backgroundColor: "#2F80ED",
+    },
     padding: '12px',
-    backgroundColor: 'white',
-    borderRadius: '3rem',
+    backgroundColor: "#2F80ED",
+    borderRadius: '1rem',
     border: '1px solid #E1E1E1',
     fontWeight: 500,
     [theme.breakpoints.up('md')]: {
@@ -182,6 +185,7 @@ const styles = theme => ({
   },
   buttonText: {
     fontWeight: '700',
+    color: 'white',
   },
   assetSummary: {
     display: 'flex',
@@ -199,12 +203,19 @@ const styles = theme => ({
     marginRight: '24px'
   },
   addressContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
     maxWidth: '100px',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    fontSize: '0.83rem',
+    margin: "0px 0.5rem 0px 0.25rem",
+    textOverflow:'ellipsis',
     cursor: 'pointer',
-    padding: '20px',
-    borderRadius: '20px',
+    padding: '10px',
+    borderRadius: '0.75rem',
     [theme.breakpoints.up('md')]: {
-      maxWidth: '300px',
+      maxWidth: '150px',
     }
   },
 });
@@ -335,6 +346,10 @@ class InvestSimple extends Component {
       modalOpen,
       snackbarMessage
     } = this.state
+    var address = null;
+    if (account.address) {
+      address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
+    }
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
@@ -342,7 +357,8 @@ class InvestSimple extends Component {
             <div className={ classes.intro }>
               <Typography variant='h2'>Earn interest. Simple.</Typography>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-                <Typography variant={ 'h5'} noWrap>{ account.address }</Typography>
+                <Typography variant={ 'h5'} noWrap>{ address }</Typography>
+                <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
               </Card>
             </div>
           }
@@ -366,7 +382,7 @@ class InvestSimple extends Component {
                 disabled={ loading }
                 onClick={ this.overlayClicked }
                 >
-                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Connect Wallet</Typography>
+                <Typography className={ classes.buttonText } variant={ 'h5'}>Connect Wallet</Typography>
               </Button>
             </div>
           }

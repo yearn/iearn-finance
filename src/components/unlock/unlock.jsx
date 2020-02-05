@@ -133,11 +133,13 @@ class Unlock extends Component {
 
   componentWillMount() {
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
+    emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(ERROR, this.error);
   };
 
   componentWillUnmount() {
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
+    emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(ERROR, this.error);
   };
 
@@ -161,14 +163,20 @@ class Unlock extends Component {
 
   connectionConnected = () => {
     if(this.props.closeModal != null) {
-      // this.props.closeModal()
+      this.props.closeModal()
+    }
+  }
+
+  connectionDisconnected = () => {
+    if(this.props.closeModal != null) {
+      this.props.closeModal()
     }
   }
 
   metamaskUnlocked = () => {
     this.setState({ metamaskLoading: false })
     if(this.props.closeModal != null) {
-      // this.props.closeModal()
+      this.props.closeModal()
     }
   }
 
@@ -194,7 +202,6 @@ class Unlock extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.contentContainer }>
-          <Typography variant={ 'h6'} className={ classes.connect }>Connect your wallet to use iearn finance</Typography>
           { /* metamaskLoading && this.renderMetamaskLoading() */ }
           { /* ledgerLoading && this.renderLedgerLoading() */ }
           { /* (!metamaskLoading && !ledgerLoading) && this.renderOptions() */ }
@@ -247,7 +254,6 @@ class Unlock extends Component {
 
     return Object.keys(connectorsByName).map((name) => {
       return (<Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ () => { this.unlockConnector(name) } } fullWidth>
-        <div className={ classes.metamaskIcon }></div>
         <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Unlock using {name}</Typography>
       </Button>)
     })
@@ -312,8 +318,13 @@ function onDeactivateClicked(deactivate, connector) {
 }
 
 function MyComponent(props) {
-  const context = useWeb3React();
 
+  const context = useWeb3React();
+  const localContext = store.getStore('web3context');
+  var localConnector = null;
+  if (localContext) {
+    localConnector = localContext.connector
+  }
   const {
     connector,
     library,
@@ -325,6 +336,8 @@ function MyComponent(props) {
     error
   } = context;
   const connectorsByName = store.getStore('connectorsByName')
+
+  console.log(localContext);
 
   const { closeModal } = props
 
@@ -357,22 +370,50 @@ function MyComponent(props) {
   useInactiveListener(!triedEager || !!activatingConnector);
 
   return (
-    <div style={{ paddingTop: '12px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
       {Object.keys(connectorsByName).map(name => {
         const currentConnector = connectorsByName[name];
         const activating = currentConnector === activatingConnector;
-        const connected = currentConnector === connector;
+        const connected = (currentConnector === connector||currentConnector === localConnector);
         const disabled =
           !triedEager || !!activatingConnector || !!error;
 
+        var url;
+        var display = name;
+        if (name == 'Injected') {
+          display = 'MetaMask';
+          url = require('../../assets/icn-metamask.svg')
+        } else if (name == 'WalletConnect') {
+          url = require('../../assets/walletConnectIcon.svg')
+        } else if (name == 'Portis') {
+          url = require('../../assets/portisIcon.png')
+        } else if (name == 'Fortmatic') {
+          url = require('../../assets/fortmaticIcon.png')
+        } else if (name == 'Ledger') {
+          url = require('../../assets/icn-ledger.svg')
+        } else if (name == 'Squarelink') {
+          url = require('../../assets/squarelink.png')
+        } else if (name == 'Trezor') {
+          url = require('../../assets/trezor.png')
+        } else if (name == 'Torus') {
+          url = require('../../assets/torus.jpg')
+        } else if (name == 'WalletLink') {
+          display = 'Coinbase Wallet'
+          url = require('../../assets/coinbaseWalletIcon.svg')
+        } else if (name == 'Frame'||name == 'Authereum') {
+          return ''
+        }
         return (
-          <div style={{ width: '252px', margin: '12px 0px'  }}>
+          <div style={{ padding: '12px 0px', display: 'flex', justifyContent: 'space-between'  }}>
             <Button style={ {
-                padding: '12px',
+                padding: '16px',
                 backgroundColor: 'white',
-                borderRadius: '20px',
+                borderRadius: '1rem',
+
                 border: '1px solid #E1E1E1',
-                fontWeight: 500
+                fontWeight: 500,
+                display: 'flex',
+                justifyContent:' space-between'
               } }
               variant='outlined'
               color='primary'
@@ -382,15 +423,25 @@ function MyComponent(props) {
               disabled={ disabled }>
               <Typography style={ {
                   margin: '0px 12px',
-                  fontWeight: '700'
+                  color: 'rgb(1, 1, 1)',
+                  fontWeight: 500,
+                  fontSize: '1rem',
                 } }
-                variant={ 'h5'}
-                color='secondary'>
-                { name }
+                variant={ 'h3'}>
+                { display }
               </Typography>
-              { (!activating && !connected) && <div style={{ wdith: '20px', height: '10px' }}></div> }
-              { activating && <CircularProgress size={ 15 } /> }
-              { (!activating && connected) && <div style={{ background: '#4caf50', borderRadius: '10px', width: '10px', height: '10px' }}></div> }
+
+              { (!activating && !connected) && <img style={
+                {
+                  position: 'absolute',
+                  right: '20px',
+
+                  width: '30px',
+                  height: '30px'
+                }
+              } src={url}/> }
+              { activating && <CircularProgress size={ 15 } style={{marginRight: '10px'}} /> }
+              { (!activating && connected) && <div style={{ background: '#4caf50', borderRadius: '10px', width: '10px', height: '10px', marginRight: '10px' }}></div> }
             </Button>
           </div>
         )
