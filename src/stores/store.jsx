@@ -32,7 +32,6 @@ import RpcSubprovider from "web3-provider-engine/subproviders/rpc";
 
 import {
   injected,
-  network,
   walletconnect,
   walletlink,
   ledger,
@@ -247,7 +246,6 @@ class Store {
       events: [],
       connectorsByName: {
         Injected: injected,
-        Network: network,
         WalletConnect: walletconnect,
         WalletLink: walletlink,
         Ledger: ledger,
@@ -258,7 +256,8 @@ class Store {
         Squarelink: squarelink,
         Torus: torus,
         Authereum: authereum
-      }
+      },
+      web3context: null
     }
 
     dispatcher.register(
@@ -445,7 +444,7 @@ class Store {
   }
 
   _checkApproval = async (asset, account, amount, callback) => {
-    const web3 = new Web3(store.getStore('library').provider);
+    const web3 = new Web3(store.getStore('web3context').library.provider);
     let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
 
     try {
@@ -466,7 +465,7 @@ class Store {
   }
 
   _callInvest = async (asset, account, amount, callback) => {
-    const web3 = new Web3(store.getStore('library').provider);
+    const web3 = new Web3(store.getStore('web3context').library.provider);
 
     let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
     if(asset.erc20address === 'Ethereum') {
@@ -546,7 +545,7 @@ class Store {
   }
 
   _callRedeem = async (asset, account, amount, callback) => {
-    const web3 = new Web3(store.getStore('library').provider);
+    const web3 = new Web3(store.getStore('web3context').library.provider);
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
 

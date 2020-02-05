@@ -8,20 +8,6 @@ import {
 
 import Web3 from 'web3'
 import {
-  injected,
-  network,
-  walletconnect,
-  walletlink,
-  ledger,
-  trezor,
-  frame,
-  fortmatic,
-  portis,
-  squarelink,
-  torus,
-  authereum
-} from "../../stores/connectors";
-import {
   Web3ReactProvider,
   useWeb3React,
   UnsupportedChainIdError
@@ -40,11 +26,20 @@ import { formatEther } from "@ethersproject/units";
 import { useEagerConnect, useInactiveListener } from "./hooks";
 
 import {
+  walletconnect,
+  fortmatic,
+  portis,
+  torus,
+} from "../../stores/connectors";
+
+import {
   ERROR,
-  CONNECT_METAMASK,
-  METAMASK_CONNECTED,
-  CONNECT_LEDGER,
-  LEDGER_CONNECTED
+  // CONNECT_METAMASK,
+  // METAMASK_CONNECTED,
+  // CONNECT_LEDGER,
+  // LEDGER_CONNECTED,
+  CONNECTION_DISCONNECTED,
+  CONNECTION_CONNECTED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -62,9 +57,10 @@ const styles = theme => ({
   },
   contentContainer: {
     margin: 'auto',
-    maxWidth: '900px',
     textAlign: 'center',
-    padding: '24px'
+    padding: '12px',
+    display: 'flex',
+    flexWrap: 'wrap'
   },
   cardContainer: {
     marginTop: '60px',
@@ -117,6 +113,9 @@ const styles = theme => ({
       padding: '15px',
     }
   },
+  connect: {
+    width: '100%'
+  }
 });
 
 class Unlock extends Component {
@@ -132,14 +131,12 @@ class Unlock extends Component {
   }
 
   componentWillMount() {
-    emitter.on(METAMASK_CONNECTED, this.metamaskUnlocked);
-    emitter.on(LEDGER_CONNECTED, this.ledgerUnlocked);
+    emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(ERROR, this.error);
   };
 
   componentWillUnmount() {
-    emitter.removeListener(METAMASK_CONNECTED, this.metamaskUnlocked);
-    emitter.removeListener(LEDGER_CONNECTED, this.ledgerUnlocked);
+    emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(ERROR, this.error);
   };
 
@@ -147,24 +144,30 @@ class Unlock extends Component {
     this.props.history.push('/invest')
   }
 
-  unlockMetamask = () => {
-    this.setState({ metamaskLoading: true })
-    dispatcher.dispatch({ type: CONNECT_METAMASK, content: {} })
-  }
-
-  unlockLedger = () => {
-    this.setState({ ledgerLoading: true })
-    dispatcher.dispatch({ type: CONNECT_LEDGER, content: {} })
-  }
+  // unlockMetamask = () => {
+  //   this.setState({ metamaskLoading: true })
+  //   dispatcher.dispatch({ type: CONNECT_METAMASK, content: {} })
+  // }
+  //
+  // unlockLedger = () => {
+  //   this.setState({ ledgerLoading: true })
+  //   dispatcher.dispatch({ type: CONNECT_LEDGER, content: {} })
+  // }
 
   error = (err) => {
     this.setState({ loading: false, error: err, metamaskLoading: false, ledgerLoading: false })
   };
 
+  connectionConnected = () => {
+    if(this.props.closeModal != null) {
+      // this.props.closeModal()
+    }
+  }
+
   metamaskUnlocked = () => {
     this.setState({ metamaskLoading: false })
     if(this.props.closeModal != null) {
-      this.props.closeModal()
+      // this.props.closeModal()
     }
   }
 
@@ -190,7 +193,7 @@ class Unlock extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.contentContainer }>
-          <Typography variant={ 'h3'}>Connect your wallet to use iearn finance</Typography>
+          <Typography variant={ 'h6'} className={ classes.connect }>Connect your wallet to use iearn finance</Typography>
           { /* metamaskLoading && this.renderMetamaskLoading() */ }
           { /* ledgerLoading && this.renderLedgerLoading() */ }
           { /* (!metamaskLoading && !ledgerLoading) && this.renderOptions() */ }
@@ -266,22 +269,6 @@ class Unlock extends Component {
   };
 }
 
-
-const connectorsByName = {
-  Injected: injected,
-  Network: network,
-  WalletConnect: walletconnect,
-  WalletLink: walletlink,
-  Ledger: ledger,
-  Trezor: trezor,
-  Frame: frame,
-  Fortmatic: fortmatic,
-  Portis: portis,
-  Squarelink: squarelink,
-  Torus: torus,
-  Authereum: authereum
-};
-
 function getErrorMessage(error) {
   if (error instanceof NoEthereumProviderError) {
     return "No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.";
@@ -300,14 +287,27 @@ function getErrorMessage(error) {
 }
 
 function getLibrary(provider) {
+
   const library = new Web3Provider(provider);
   library.pollingInterval = 8000;
   return library;
 }
 
 function onConnectionClicked(currentConnector, name, setActivatingConnector, activate) {
+  const connectorsByName = store.getStore('connectorsByName')
   setActivatingConnector(currentConnector);
   activate(connectorsByName[name]);
+}
+
+function onDeactivateClicked(deactivate, connector) {
+  if(deactivate) {
+    deactivate()
+  }
+  if(connector && connector.close) {
+    connector.close()
+  }
+  store.setStore({ account: { }, web3context: null })
+  emitter.emit(CONNECTION_DISCONNECTED)
 }
 
 function MyComponent(props) {
@@ -323,6 +323,7 @@ function MyComponent(props) {
     active,
     error
   } = context;
+  const connectorsByName = store.getStore('connectorsByName')
 
   const { closeModal } = props
 
@@ -336,14 +337,17 @@ function MyComponent(props) {
   React.useEffect(() => {
     if (account && active && library) {
       console.log("we are active: "+account)
-      store.setStore({ account: { address: account }, library: library})
-
-      if(closeModal) {
-        closeModal()
-        emitter.emit(METAMASK_CONNECTED)
-      }
+      store.setStore({ account: { address: account }, web3context: context })
+      emitter.emit(CONNECTION_CONNECTED)
     }
   }, [account, active, closeModal]);
+
+  // React.useEffect(() => {
+  //   if (storeContext && storeContext.active && !active) {
+  //     console.log("we are deactive: "+storeContext.account)
+  //     store.setStore({ account: {}, web3context: null })
+  //   }
+  // }, [active, storeContext]);
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   const triedEager = useEagerConnect();
@@ -352,193 +356,63 @@ function MyComponent(props) {
   useInactiveListener(!triedEager || !!activatingConnector);
 
   return (
-    <div style={{ padding: "1rem" }}>
-      <div
-        style={{
-          display: "grid",
-          gridGap: "1rem",
-          gridTemplateColumns: "1fr 1fr",
-          maxWidth: "20rem",
-          margin: "auto"
-        }}
-      >
-        {Object.keys(connectorsByName).map(name => {
-          const currentConnector = connectorsByName[name];
-          const activating = currentConnector === activatingConnector;
-          const connected = currentConnector === connector;
-          const disabled =
-            !triedEager || !!activatingConnector || connected || !!error;
+    <div style={{ paddingTop: '12px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
+      {Object.keys(connectorsByName).map(name => {
+        const currentConnector = connectorsByName[name];
+        const activating = currentConnector === activatingConnector;
+        const connected = currentConnector === connector;
+        const disabled =
+          !triedEager || !!activatingConnector || connected || !!error;
 
-          return (
-            <button
-              style={{
-                height: "3rem",
-                borderRadius: "1rem",
-                borderColor: activating
-                  ? "orange"
-                  : connected
-                  ? "green"
-                  : "unset",
-                cursor: disabled ? "unset" : "pointer",
-                position: "relative"
-              }}
-              disabled={disabled}
-              key={name}
+        return (
+          <div style={{ width: '252px', margin: '12px 0px'  }}>
+            <Button style={ {
+                padding: '12px',
+                backgroundColor: 'white',
+                borderRadius: '20px',
+                border: '1px solid #E1E1E1',
+                fontWeight: 500
+              } }
+              variant='outlined'
+              color='primary'
               onClick={() => {
                 onConnectionClicked(currentConnector, name, setActivatingConnector, activate)
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  top: "0",
-                  left: "0",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  color: "black",
-                  margin: "0 0 0 1rem"
-                }}
-              >
-                {connected && (
-                  <span role="img" aria-label="check">
-                    ✅
-                  </span>
-                )}
-              </div>
-              {name}
-            </button>
-          );
-        })}
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center"
-        }}
-      >
-        {(active || error) && (
-          <button
-            style={{
-              height: "3rem",
-              marginTop: "2rem",
-              borderRadius: "1rem",
-              borderColor: "red",
-              cursor: "pointer"
-            }}
-            onClick={() => {
-              deactivate();
-            }}
-          >
+              }}>
+              <Typography style={ {
+                  margin: '0px 12px',
+                  fontWeight: '700'
+                } }
+                variant={ 'h5'}
+                color='secondary'>
+                { name }
+              </Typography>
+              { connected && <div style={{ background: '#4caf50', borderRadius: '10px', width: '10px', height: '10px' }}></div> }
+            </Button>
+          </div>
+        )
+      }) }
+
+      <div style={{ width: '252px', margin: '12px 0px'  }}>
+        <Button style={ {
+            padding: '12px',
+            backgroundColor: 'white',
+            borderRadius: '20px',
+            border: '1px solid #E1E1E1',
+            fontWeight: 500
+          } }
+          variant='outlined'
+          color='primary'
+          onClick={() => { onDeactivateClicked(deactivate, connector); }} >
+          <Typography style={ {
+              marginLeft: '12px',
+              fontWeight: '700',
+              color: '#DC6BE5'
+            } }
+            variant={ 'h5'}
+            color='primary'>
             Deactivate
-          </button>
-        )}
-
-        {!!error && (
-          <h4 style={{ marginTop: "1rem", marginBottom: "0" }}>
-            {getErrorMessage(error)}
-          </h4>
-        )}
-      </div>
-
-      <hr style={{ margin: "2rem" }} />
-
-      <div
-        style={{
-          display: "grid",
-          gridGap: "1rem",
-          gridTemplateColumns: "fit-content",
-          maxWidth: "20rem",
-          margin: "auto"
-        }}
-      >
-        {!!(connector === network && chainId) && (
-          <button
-            style={{
-              height: "3rem",
-              borderRadius: "1rem",
-              cursor: "pointer"
-            }}
-            onClick={() => {
-              connector.changeChainId(chainId === 1 ? 4 : 1);
-            }}
-          >
-            Switch Networks
-          </button>
-        )}
-        {connector === walletconnect && (
-          <button
-            style={{
-              height: "3rem",
-              borderRadius: "1rem",
-              cursor: "pointer"
-            }}
-            onClick={() => {
-              connector.close();
-            }}
-          >
-            Kill WalletConnect Session
-          </button>
-        )}
-        {connector === fortmatic && (
-          <button
-            style={{
-              height: "3rem",
-              borderRadius: "1rem",
-              cursor: "pointer"
-            }}
-            onClick={() => {
-              connector.close();
-            }}
-          >
-            Kill Fortmatic Session
-          </button>
-        )}
-        {connector === portis && (
-          <>
-            {chainId !== undefined && (
-              <button
-                style={{
-                  height: "3rem",
-                  borderRadius: "1rem",
-                  cursor: "pointer"
-                }}
-                onClick={() => {
-                  connector.changeNetwork(chainId === 1 ? 100 : 1);
-                }}
-              >
-                Switch Networks
-              </button>
-            )}
-            <button
-              style={{
-                height: "3rem",
-                borderRadius: "1rem",
-                cursor: "pointer"
-              }}
-              onClick={() => {
-                connector.close();
-              }}
-            >
-              Kill Portis Session
-            </button>
-          </>
-        )}
-        {connector === torus && (
-          <button
-            style={{
-              height: "3rem",
-              borderRadius: "1rem",
-              cursor: "pointer"
-            }}
-            onClick={() => {
-              connector.close();
-            }}
-          >
-            Kill Torus Session
-          </button>
-        )}
+          </Typography>
+        </Button>
       </div>
     </div>
   )

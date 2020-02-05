@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
+  Card,
   Typography,
   Button,
   ExpansionPanel,
@@ -24,7 +25,9 @@ import {
   CONNECT_METAMASK,
   LEDGER_CONNECTED,
   CONNECT_METAMASK_PASSIVE,
-  METAMASK_CONNECTED
+  METAMASK_CONNECTED,
+  CONNECTION_CONNECTED,
+  CONNECTION_DISCONNECTED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -63,7 +66,7 @@ const styles = theme => ({
     alignItems: 'center',
     flexWrap: 'wrap',
     justifyContent: 'flex-end',
-    padding: '36px 12px',
+    padding: '12px 12px',
     position: 'relative',
   },
   balances: {
@@ -96,9 +99,17 @@ const styles = theme => ({
     }
   },
   intro: {
-    padding: '12px',
+    width: '100%',
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingLeft: '98px'
+  },
+  introCenter: {
+    maxWidth: '500px',
     textAlign: 'center',
-    maxWidth: '500px'
+    display: 'flex',
   },
   title: {
     paddingRight: '24px'
@@ -186,7 +197,16 @@ const styles = theme => ({
     textAlign: 'center',
     cursor: 'pointer',
     marginRight: '24px'
-  }
+  },
+  addressContainer: {
+    maxWidth: '100px',
+    cursor: 'pointer',
+    padding: '20px',
+    borderRadius: '20px',
+    [theme.breakpoints.up('md')]: {
+      maxWidth: '300px',
+    }
+  },
 });
 
 class InvestSimple extends Component {
@@ -205,20 +225,25 @@ class InvestSimple extends Component {
     }
   }
   componentWillMount() {
-    emitter.on(METAMASK_CONNECTED, this.metamaskConnected);
-    emitter.on(LEDGER_CONNECTED, this.ledgerConnected);
+    // emitter.on(METAMASK_CONNECTED, this.metamaskConnected);
+    // emitter.on(LEDGER_CONNECTED, this.ledgerConnected);
     emitter.on(INVEST_RETURNED, this.investReturned);
     emitter.on(REDEEM_RETURNED, this.redeemReturned);
     emitter.on(ERROR, this.errorReturned);
     emitter.on(BALANCES_RETURNED, this.balancesReturned);
+    emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
+    emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
+
   }
 
   componentWillUnmount() {
-    emitter.removeListener(METAMASK_CONNECTED, this.metamaskConnected);
-    emitter.removeListener(LEDGER_CONNECTED, this.ledgerConnected);
+    // emitter.removeListener(METAMASK_CONNECTED, this.metamaskConnected);
+    // emitter.removeListener(LEDGER_CONNECTED, this.ledgerConnected);
     emitter.removeListener(INVEST_RETURNED, this.investReturned);
     emitter.removeListener(REDEEM_RETURNED, this.redeemReturned);
     emitter.removeListener(ERROR, this.errorReturned);
+    emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
+    emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
 
     emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
   };
@@ -230,6 +255,22 @@ class InvestSimple extends Component {
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('assets') })
   };
+
+  connectionConnected = () => {
+    this.setState({ account: store.getStore('account') })
+
+    dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: 'Wallet succesfully connected.', snackbarType: 'Info' }
+      that.setState(snackbarObj)
+    })
+  };
+
+  connectionDisconnected = () => {
+    this.setState({ account: store.getStore('account') })
+  }
 
   metamaskConnected = () => {
     this.setState({ account: store.getStore('account') })
@@ -297,9 +338,19 @@ class InvestSimple extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
-          <div className={ classes.intro }>
-            <Typography variant='h2'>Earn interest. Simple.</Typography>
-          </div>
+          { account.address &&
+            <div className={ classes.intro }>
+              <Typography variant='h2'>Earn interest. Simple.</Typography>
+              <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
+                <Typography variant={ 'h5'} noWrap>{ account.address }</Typography>
+              </Card>
+            </div>
+          }
+          { !account.address &&
+            <div className={ classes.introCenter }>
+              <Typography variant='h2'>Earn interest. Simple.</Typography>
+            </div>
+          }
           <div className={ classes.balancesContainer }>
             { false && <div className={ classes.overlay } onClick={ this.overlayClicked }>
               <Typography variant='h1' >Connect wallet</Typography>
@@ -402,7 +453,7 @@ class InvestSimple extends Component {
 
   renderModal = () => {
     return (
-      <UnlockModal closeModal={ this.closeModal } />
+      <UnlockModal closeModal={ this.closeModal } modalOpen={ this.state.modalOpen } />
     )
   }
 
