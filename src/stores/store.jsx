@@ -314,12 +314,6 @@ class Store {
     return emitter.emit('StoreUpdated');
   };
 
-  getWeb3 = () => {
-    const { ethereum } = window;
-    const web3 = new Web3(ethereum);
-    return web3
-  }
-
   connectLedger(payload) {
     const engine = new ProviderEngine();
     const getTransport = () => TransportU2F.create();
@@ -451,7 +445,7 @@ class Store {
   }
 
   _checkApproval = async (asset, account, amount, callback) => {
-    const web3 = this.getWeb3()
+    const web3 = new Web3(store.getStore('library').provider);
     let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
 
     try {
@@ -472,7 +466,7 @@ class Store {
   }
 
   _callInvest = async (asset, account, amount, callback) => {
-    const web3 = this.getWeb3()
+    const web3 = new Web3(store.getStore('library').provider);
 
     let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
     if(asset.erc20address === 'Ethereum') {
@@ -552,7 +546,7 @@ class Store {
   }
 
   _callRedeem = async (asset, account, amount, callback) => {
-    const web3 = this.getWeb3()
+    const web3 = new Web3(store.getStore('library').provider);
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
 

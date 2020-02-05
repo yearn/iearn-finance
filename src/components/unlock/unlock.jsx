@@ -334,9 +334,9 @@ function MyComponent(props) {
   }, [activatingConnector, connector]);
 
   React.useEffect(() => {
-    if (account && active) {
+    if (account && active && library) {
       console.log("we are active: "+account)
-      store.setStore({ account: { address: account }})
+      store.setStore({ account: { address: account }, library: library})
 
       if(closeModal) {
         closeModal()
@@ -400,11 +400,6 @@ function MyComponent(props) {
                   margin: "0 0 0 1rem"
                 }}
               >
-                {activating && (
-                  <span>
-                    activating
-                  </span>
-                )}
                 {connected && (
                   <span role="img" aria-label="check">
                     ✅
