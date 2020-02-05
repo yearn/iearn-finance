@@ -3,7 +3,8 @@ import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
-  Button
+  Button,
+  CircularProgress
 } from '@material-ui/core';
 
 import Web3 from 'web3'
@@ -362,7 +363,7 @@ function MyComponent(props) {
         const activating = currentConnector === activatingConnector;
         const connected = currentConnector === connector;
         const disabled =
-          !triedEager || !!activatingConnector || connected || !!error;
+          !triedEager || !!activatingConnector || !!error;
 
         return (
           <div style={{ width: '252px', margin: '12px 0px'  }}>
@@ -377,7 +378,8 @@ function MyComponent(props) {
               color='primary'
               onClick={() => {
                 onConnectionClicked(currentConnector, name, setActivatingConnector, activate)
-              }}>
+              }}
+              disabled={ disabled }>
               <Typography style={ {
                   margin: '0px 12px',
                   fontWeight: '700'
@@ -386,7 +388,9 @@ function MyComponent(props) {
                 color='secondary'>
                 { name }
               </Typography>
-              { connected && <div style={{ background: '#4caf50', borderRadius: '10px', width: '10px', height: '10px' }}></div> }
+              { (!activating && !connected) && <div style={{ wdith: '20px', height: '10px' }}></div> }
+              { activating && <CircularProgress size={ 15 } /> }
+              { (!activating && connected) && <div style={{ background: '#4caf50', borderRadius: '10px', width: '10px', height: '10px' }}></div> }
             </Button>
           </div>
         )
@@ -402,7 +406,7 @@ function MyComponent(props) {
           } }
           variant='outlined'
           color='primary'
-          onClick={() => { onDeactivateClicked(deactivate, connector); }} >
+          onClick={() => { onDeactivateClicked(deactivate, connector); }}>
           <Typography style={ {
               marginLeft: '12px',
               fontWeight: '700',
