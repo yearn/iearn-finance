@@ -39,26 +39,19 @@ const styles = theme => ({
   root: {
     flex: 1,
     display: 'flex',
+    flexDirection: 'column',
     maxWidth: '1200px',
     width: '100%',
     justifyContent: 'center',
-    marginTop: '60px',
-    [theme.breakpoints.up('md')]: {
-      alignItems: 'center',
-      marginTop: '0px',
-    }
-  },
-  value: {
-    cursor: 'pointer'
+    alignItems: 'center'
   },
   investedContainer: {
     display: 'flex',
+    flex: 1,
     flexDirection: 'column',
-    alignItems: 'center'
-  },
-  actionInput: {
-    padding: '0px 0px 12px 0px',
-    fontSize: '0.5rem'
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '12px',
   },
   balancesContainer: {
     display: 'flex',
@@ -68,25 +61,6 @@ const styles = theme => ({
     justifyContent: 'flex-end',
     padding: '12px 12px',
     position: 'relative',
-  },
-  balances: {
-    marginBottom: '-25px',
-    marginRight: '30px',
-    zIndex: '900',
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
-    justifyContent: 'space-between'
-  },
-  actionsContainer: {
-    padding: '12px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    width: '100%',
-    maxWidth: '900px',
-    [theme.breakpoints.up('md')]: {
-      width: '750px',
-    }
   },
   connectContainer: {
     padding: '12px',
@@ -104,15 +78,17 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingLeft: '38%'
+    [theme.breakpoints.up('md')]: {
+      paddingLeft: '38%',
+    }
   },
   introCenter: {
     maxWidth: '500px',
     textAlign: 'center',
     display: 'flex',
   },
-  title: {
-    paddingRight: '24px'
+  introText: {
+    paddingLeft: '20px'
   },
   actionButton: {
     '&:hover': {
@@ -126,24 +102,6 @@ const styles = theme => ({
     [theme.breakpoints.up('md')]: {
       padding: '15px',
     }
-  },
-  tradeContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '0px 0px 12px 0px',
-    minWidth: '350px',
-    alignItems: 'center',
-    [theme.breakpoints.up('sm')]: {
-      padding: '0px 12px 24px 12px',
-      minWidth: '350px',
-    }
-  },
-  scaleContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '0px 0px 12px 0px',
-    alignItems: 'center',
-    flexWrap: 'wrap',
   },
   overlay: {
     position: 'absolute',
@@ -167,14 +125,28 @@ const styles = theme => ({
     }
   },
   heading: {
-    paddingTop: '5px',
-    flexBasis: '33.33%',
+    display: 'none',
+    paddingTop: '12px',
+    flex: 1,
     flexShrink: 0,
+    [theme.breakpoints.up('sm')]: {
+      paddingTop: '5px',
+      display: 'block'
+    }
+  },
+  headingName: {
+    paddingTop: '5px',
+    flex: 2,
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+    minWidth: '100%',
+    [theme.breakpoints.up('sm')]: {
+      minWidth: 'auto',
+    }
   },
   footer: {
-    position: 'absolute',
-    bottom: '30px',
-    left: '30px',
+    padding: '24px',
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between'
@@ -190,17 +162,27 @@ const styles = theme => ({
   assetSummary: {
     display: 'flex',
     alignItems: 'center',
-    flex: 1
+    flex: 1,
+    flexWrap: 'wrap',
+    [theme.breakpoints.up('sm')]: {
+      flexWrap: 'nowrap'
+    }
   },
   assetIcon: {
-    display: 'inline-block',
+    display: 'flex',
+    alignItems: 'center',
     verticalAlign: 'middle',
     borderRadius: '20px',
-    height: '40px',
-    width: '40px',
+    height: '30px',
+    width: '30px',
     textAlign: 'center',
     cursor: 'pointer',
-    marginRight: '24px'
+    marginRight: '20px',
+    [theme.breakpoints.up('sm')]: {
+      height: '40px',
+      width: '40px',
+      marginRight: '24px',
+    }
   },
   addressContainer: {
     display: 'flex',
@@ -218,6 +200,9 @@ const styles = theme => ({
       maxWidth: '150px',
     }
   },
+  expansionPanel: {
+    maxWidth: 'calc(100vw - 24px)'
+  }
 });
 
 class InvestSimple extends Component {
@@ -355,7 +340,7 @@ class InvestSimple extends Component {
         <div className={ classes.investedContainer }>
           { account.address &&
             <div className={ classes.intro }>
-              <Typography variant='h2'>Earn interest. Simple.</Typography>
+              <Typography variant='h2' className={ classes.introText }>Earn interest. Simple.</Typography>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
                 <Typography variant={ 'h5'} noWrap>{ address }</Typography>
                 <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
@@ -407,34 +392,37 @@ class InvestSimple extends Component {
   renderAssetBlocks = () => {
     const { assets, expanded } = this.state
     const { classes } = this.props
+    const width = window.innerWidth
 
     return assets.map((asset) => {
       return (
-        <ExpansionPanel square key={ asset.symbol+"_expand" } expanded={ expanded === asset.symbol} onChange={ () => { this.handleChange(asset.symbol) } }>
+        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.symbol+"_expand" } expanded={ expanded === asset.symbol} onChange={ () => { this.handleChange(asset.symbol) } }>
           <ExpansionPanelSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
             id="panel1bh-header"
           >
             <div className={ classes.assetSummary }>
-              <div className={ classes.assetIcon }>
-                <img
-                  alt=""
-                  src={ require('../../assets/'+asset.symbol+'-logo.png') }
-                  height="40px"
-                />
+              <div className={classes.headingName}>
+                <div className={ classes.assetIcon }>
+                  <img
+                    alt=""
+                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                    height={ width > 600 ? '40px' : '30px'}
+                  />
+                </div>
+                <div>
+                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
+                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                </div>
               </div>
               <div className={classes.heading}>
-                <Typography className={classes.heading} variant={ 'h3' }>{ asset.name }</Typography>
-                <Typography className={classes.heading} variant={ 'h5' }>{ asset.description }</Typography>
+                <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
+                <Typography variant={ 'h5' }>{'Interest Rate'}</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography className={classes.heading} variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
-                <Typography className={classes.heading} variant={ 'h5' }>{'Interest Rate'}</Typography>
-              </div>
-              <div className={classes.heading}>
-                <Typography className={classes.heading} variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
-                <Typography className={classes.heading} variant={ 'h5' }>{'Available Balance'}</Typography>
+                <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
+                <Typography variant={ 'h5' }>{'Available Balance'}</Typography>
               </div>
             </div>
           </ExpansionPanelSummary>
