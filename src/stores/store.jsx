@@ -218,7 +218,7 @@ class Store {
           name: 'USDT',
           symbol: 'USDT',
           description: 'Tether USD',
-          investSymbol: 'yUSDC',
+          investSymbol: 'yUSDT',
           erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
           iEarnContract: '0xa1787206d5b1bE0f432C4c4f96Dc4D1257A1Dd14',
           lastMeasurement: 9400732,
