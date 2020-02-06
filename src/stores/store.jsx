@@ -65,7 +65,7 @@ class Store {
           address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
           earnAddress: '0x9D25057e62939D3408406975aD75Ffe834DA4cDd',
           lastMeasurement: 9400732,
-          measurement: 848185112260412,
+          measurement: 1000848185112260412,
           mod: 1,
           decimals: 18
         },{
@@ -73,7 +73,7 @@ class Store {
           address: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
           earnAddress: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
           lastMeasurement: 9414437,
-          measurement: 8192205495361668,
+          measurement: 1008192205495361668,
           mod: 1,
           decimals: 18
         },{
@@ -88,7 +88,7 @@ class Store {
           address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
           earnAddress: '0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA',
           lastMeasurement: 9400732,
-          measurement: 1761741440856097,
+          measurement: 1001761741440856097,
           mod: 1,
           decimals: 6
         },{
@@ -96,7 +96,7 @@ class Store {
           address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
           earnAddress: '0xa1787206d5b1bE0f432C4c4f96Dc4D1257A1Dd14',
           lastMeasurement: 9400732,
-          measurement: 85531657202472310,
+          measurement: 1085531657202472310,
           mod: 1,
           decimals: 6
         },{
@@ -104,7 +104,7 @@ class Store {
           address: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
           earnAddress: '0x36324b8168f960A12a8fD01406C9C78143d41380',
           lastMeasurement: 9400732,
-          measurement: 29186724259834543,
+          measurement: 1029186724259834543,
           mod: 1,
           decimals: 18
         },/*{
@@ -172,9 +172,10 @@ class Store {
         },{
           token: 'wBTC',
           address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
-          created: 9396412,
+          earnAddress: '0x04EF8121aD039ff41d10029c91EA1694432514e9',
+          lastMeasurement: 9427488,
+          measurement: 2000175540087812685,
           mod: 1,
-          earnAddress: '',
           decimals: 18
         },
       ],
@@ -187,7 +188,7 @@ class Store {
           erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
           iEarnContract: '0x9D25057e62939D3408406975aD75Ffe834DA4cDd',
           lastMeasurement: 9400732,
-          measurement: 848185112260412,
+          measurement: 1000848185112260412,
           maxApr: 0,
           balance: 0,
           investedBalance: 0,
@@ -204,7 +205,7 @@ class Store {
           erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
           iEarnContract: '0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA',
           lastMeasurement: 9400732,
-          measurement: 1761741440856097,
+          measurement: 1001761741440856097,
           apr: 0,
           maxApr: 0,
           balance: 0,
@@ -222,7 +223,7 @@ class Store {
           erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
           iEarnContract: '0xa1787206d5b1bE0f432C4c4f96Dc4D1257A1Dd14',
           lastMeasurement: 9400732,
-          measurement: 85531657202472310,
+          measurement: 1085531657202472310,
           apr: 0,
           maxApr: 0,
           balance: 0,
@@ -240,7 +241,7 @@ class Store {
           erc20address: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
           iEarnContract: '0x36324b8168f960A12a8fD01406C9C78143d41380',
           lastMeasurement: 9400732,
-          measurement: 29186724259834543,
+          measurement: 1029186724259834543,
           apr: 0,
           maxApr: 0,
           balance: 0,
@@ -259,7 +260,7 @@ class Store {
           erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
           iEarnContract: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
           lastMeasurement: 9414437,
-          measurement: 8192205495361668,
+          measurement: 1008192205495361668,
           apr: 0,
           maxApr: 0,
           balance: 0,
@@ -277,6 +278,8 @@ class Store {
           investSymbol: 'yBTC',
           erc20address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
           iEarnContract: '0x04EF8121aD039ff41d10029c91EA1694432514e9',
+          lastMeasurement: 9427488,
+          measurement: 2000175540087812685,
           apr: 0,
           maxApr: 0,
           balance: 0,
@@ -810,7 +813,6 @@ class Store {
       let earn = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract);
       let balance = await earn.methods.getPricePerFullShare().call();
 
-      balance = balance - 1e18;
       balance = balance - asset.measurement;
       balance = balance / 1e18;
       let diff = block - asset.lastMeasurement;
@@ -1193,7 +1195,7 @@ class Store {
         let earn = new web3.eth.Contract(config.IEarnABI, apr.earnAddress);
         let balance = await earn.methods.getPricePerFullShare().call();
 
-        balance = balance - 1e18;
+        console.log(apr);
         balance = balance - apr.measurement;
         balance = balance / 1e18;
         let diff = block - apr.lastMeasurement;

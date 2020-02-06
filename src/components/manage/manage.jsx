@@ -172,7 +172,7 @@ const styles = theme => ({
   },
   heading: {
     paddingTop: '5px',
-    flexBasis: '33.33%',
+    flexBasis: '25%',
     flexShrink: 0,
   },
   footer: {
@@ -433,6 +433,10 @@ class Manage extends Component {
               <div className={classes.heading}>
                 <Typography className={classes.heading} variant={ 'h3' }>{ asset.name }</Typography>
                 <Typography className={classes.heading} variant={ 'h5' }>{ asset.description }</Typography>
+              </div>
+              <div className={classes.heading}>
+                <Typography className={classes.heading} variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
+                <Typography className={classes.heading} variant={ 'h5' }>{'Interest Rate'}</Typography>
               </div>
               <div className={classes.heading}>
                 <Typography className={classes.heading} variant={ 'h3' }>{ (asset.apy*100).toFixed(4) + ' %' }</Typography>
