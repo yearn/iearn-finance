@@ -291,7 +291,7 @@ class APR extends Component {
 
   renderTableHeader = (name) => {
     if (name === '_uniswap') {
-      return 'Uniswap';
+      return 'Uniswap (APY)';
     } else if (name.startsWith('_compound')) {
       return 'Compound';
     } else if (name.startsWith('_fulcrum')) {

@@ -11,6 +11,7 @@ import interestTheme from './theme';
 
 import APR from './components/apr';
 import InvestSimple from './components/investSimple';
+import Manage from './components/manage';
 import Performance from './components/performance';
 
 
@@ -38,6 +39,9 @@ class App extends Component {
               </Route>
               <Route path="/performance">
                 <Performance />
+              </Route>
+              <Route path="/manage">
+                <Manage />
               </Route>
               <Route path="/">
                 <InvestSimple />

@@ -14,6 +14,12 @@ export const INVEST_RETURNED = 'INVEST_RETURNED'
 export const REDEEM = 'REDEEM'
 export const REDEEM_RETURNED = 'REDEEM_RETURNED'
 
+export const DONATE = 'DONATE'
+export const DONATE_RETURNED = 'DONATE_RETURNED'
+
+export const REBALANCE = 'REBALANCE'
+export const REBALANCE_RETURNED = 'REBALANCE_RETURNED'
+
 export const ERROR = 'ERROR'
 
 
