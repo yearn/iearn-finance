@@ -6,6 +6,7 @@ import {
   Button,
   CircularProgress
 } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 
 import Web3 from 'web3'
 import {
@@ -54,7 +55,8 @@ const styles = theme => ({
   root: {
     flex: 1,
     height: 'auto',
-    display: 'flex'
+    display: 'flex',
+    position: 'relative'
   },
   contentContainer: {
     margin: 'auto',
@@ -116,6 +118,12 @@ const styles = theme => ({
   },
   connect: {
     width: '100%'
+  },
+  closeIcon: {
+    position: 'fixed',
+    right: '12px',
+    top: '12px',
+    cursor: 'pointer'
   }
 });
 
@@ -201,6 +209,7 @@ class Unlock extends Component {
 
     return (
       <div className={ classes.root }>
+        <div className={ classes.closeIcon } onClick={ closeModal }><CloseIcon /></div>
         <div className={ classes.contentContainer }>
           { /* metamaskLoading && this.renderMetamaskLoading() */ }
           { /* ledgerLoading && this.renderLedgerLoading() */ }
@@ -368,9 +377,10 @@ function MyComponent(props) {
 
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
   useInactiveListener(!triedEager || !!activatingConnector);
+  const width = window.innerWidth
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: (width > 650 ? 'space-between' : 'center'), alignItems: 'center' }}>
       {Object.keys(connectorsByName).map(name => {
         const currentConnector = connectorsByName[name];
         const activating = currentConnector === activatingConnector;
@@ -403,6 +413,7 @@ function MyComponent(props) {
         } else if (name == 'Frame'||name == 'Authereum') {
           return ''
         }
+
         return (
           <div style={{ padding: '12px 0px', display: 'flex', justifyContent: 'space-between'  }}>
             <Button style={ {
@@ -413,7 +424,7 @@ function MyComponent(props) {
                 border: '1px solid #E1E1E1',
                 fontWeight: 500,
                 display: 'flex',
-                justifyContent:' space-between'
+                justifyContent: 'space-between'
               } }
               variant='outlined'
               color='primary'

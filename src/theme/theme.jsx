@@ -146,9 +146,12 @@ const iswapTheme =  {
       }
     },
     MuiSnackbar : {
+      root: {
+        maxWidth: 'calc(100vw - 24px)'
+      },
       anchorOriginBottomLeft: {
-        bottom: '50px',
-        left: '80px',
+        bottom: '12px',
+        left: '12px',
         '@media (min-width: 960px)': {
           bottom: '50px',
           left: '80px'
@@ -159,7 +162,7 @@ const iswapTheme =  {
       root: {
         backgroundColor: colors.white,
         padding: '0px',
-        minWidth: '500px',
+        minWidth: 'auto',
         '@media (min-width: 960px)': {
           minWidth: '500px',
         }
@@ -176,6 +179,22 @@ const iswapTheme =  {
         padding: '0 12px 12px',
         '@media (min-width: 960px)': {
           padding: '0 24px 24px',
+        }
+      }
+    },
+    MuiExpansionPanelSummary: {
+      root: {
+        padding: '0 12px 0 12px',
+        '@media (min-width: 960px)': {
+          padding: '0 24px 0 24px',
+        }
+      }
+    },
+    MuiExpansionPanelDetails: {
+      root: {
+        padding: '0 12px 0 12px',
+        '@media (min-width: 960px)': {
+          padding: '0 24px 0 24px',
         }
       }
     }

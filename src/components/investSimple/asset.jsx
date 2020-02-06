@@ -23,44 +23,12 @@ const store = Store.store
 
 
 const styles = theme => ({
-  root: {
-    flex: 1,
-    display: 'flex',
-    maxWidth: '1200px',
-    width: '100%',
-    justifyContent: 'center',
-    marginTop: '60px',
-    [theme.breakpoints.up('md')]: {
-      alignItems: 'center',
-      marginTop: '0px',
-    }
-  },
   value: {
     cursor: 'pointer'
-  },
-  investedContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
-  },
-  referralLink: {
-    padding: '12px',
-    [theme.breakpoints.up('md')]: {
-      minWidth: '450px'
-    }
   },
   actionInput: {
     padding: '0px 0px 12px 0px',
     fontSize: '0.5rem'
-  },
-  balancesContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end',
-    padding: '36px 12px',
-    position: 'relative',
   },
   balances: {
     marginBottom: '-25px',
@@ -72,29 +40,18 @@ const styles = theme => ({
     justifyContent: 'space-between'
   },
   actionsContainer: {
-    padding: '12px',
+    paddingBottom: '12px',
     display: 'flex',
     justifyContent: 'space-between',
-    width: '100%',
-    maxWidth: '900px',
-    [theme.breakpoints.up('md')]: {
+    maxWidth: '100%',
+    flexWrap: 'wrap',
+    flexDirection: 'column',
+    [theme.breakpoints.up('sm')]: {
       width: '750px',
+      padding: '12px',
+      flexWrap: 'nowrap',
+      flexDirection: 'row',
     }
-  },
-  connectContainer: {
-    padding: '12px',
-    display: 'flex',
-    justifyContent: 'center',
-    width: '100%',
-    maxWidth: '450px',
-    [theme.breakpoints.up('md')]: {
-      width: '450',
-    }
-  },
-  intro: {
-    padding: '12px',
-    textAlign: 'center',
-    maxWidth: '500px'
   },
   title: {
     paddingRight: '24px'
@@ -105,52 +62,58 @@ const styles = theme => ({
     borderRadius: '1rem',
     border: '1px solid #E1E1E1',
     fontWeight: 500,
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('sm')]: {
       padding: '15px',
     }
   },
   tradeContainer: {
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    padding: '0px 0px 12px 0px',
-    minWidth: '350px',
+    padding: '24px 12px 24px 12px',
     alignItems: 'center',
     [theme.breakpoints.up('sm')]: {
       padding: '0px 12px 24px 12px',
-      minWidth: '350px',
+    }
+  },
+  sepperator: {
+    borderBottom: '1px solid #E1E1E1',
+    [theme.breakpoints.up('sm')]: {
+      display: 'none'
     }
   },
   scaleContainer: {
+    width: '250px',
     display: 'flex',
     justifyContent: 'space-between',
     padding: '0px 0px 12px 0px',
     alignItems: 'center',
     flexWrap: 'wrap',
   },
+  scale: {
+    minWidth: '10px'
+  },
   buttonText: {
     fontWeight: '700',
   },
-  overlay: {
-    position: 'absolute',
-    borderRadius: '10px',
-    background: 'RGBA(200, 200, 200, 1)',
+  headingContainer: {
+    width: '100%',
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    border: '1px solid #aaa',
-    cursor: 'pointer',
-
-    right: '0px',
-    top: '10px',
-    height: '70px',
-    width: '160px',
-    [theme.breakpoints.up('md')]: {
-      right: '0px',
-      top: '10px',
-      height: '90px',
-      width: '210px',
+    [theme.breakpoints.up('sm')]: {
+      display: 'none',
     }
   },
+  heading: {
+    paddingBottom: '12px',
+    flex: 1,
+    flexShrink: 0,
+    [theme.breakpoints.up('sm')]: {
+      display: 'none',
+    }
+  },
+  right: {
+    textAlign: 'right'
+  }
 });
 
 
@@ -204,6 +167,16 @@ class Asset extends Component {
     } = this.state
 
     return (<div className={ classes.actionsContainer }>
+      <div className={ classes.headingContainer }>
+        <div className={classes.heading}>
+          <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
+          <Typography variant={ 'h5' }>{'Interest Rate'}</Typography>
+        </div>
+        <div className={ `${classes.heading} ${classes.right}`}>
+          <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
+          <Typography variant={ 'h5' }>{'Available Balance'}</Typography>
+        </div>
+      </div>
       <div className={ classes.tradeContainer }>
         <div className={ classes.balances }>
             <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
@@ -268,6 +241,7 @@ class Asset extends Component {
           <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Earn</Typography>
         </Button>
       </div>
+      <div className={ classes.sepperator }></div>
       <div className={classes.tradeContainer}>
         <div className={ classes.balances }>
           <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ asset.investedBalance ? asset.investedBalance.toFixed(4) : '0.0000' } { asset.investSymbol } ({ asset.investedBalance ? (parseFloat(asset.investedBalance)*parseFloat(asset.price)).toFixed(4) : '0' }  { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol } )</Typography>

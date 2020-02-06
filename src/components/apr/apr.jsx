@@ -21,9 +21,11 @@ const styles = theme => ({
   root: {
     flex: 1,
     display: 'flex',
-    maxWidth: '1200px',
+    flexDirection: 'column',
+    maxWidth: '1000px',
     width: '100%',
     justifyContent: 'center',
+    alignItems: 'center',
     marginTop: '60px',
     [theme.breakpoints.up('md')]: {
       alignItems: 'center',
@@ -54,10 +56,16 @@ const styles = theme => ({
     justifyContent: 'space-between'
   },
   name: {
-    width: '100px',
+    width: '60px',
     display: 'flex',
     alignItems: 'center',
-    padding: '6px'
+    padding: '6px',
+    position: 'absolute',
+    top: 'auto',
+    background: '#fff',
+    [theme.breakpoints.up('md')]: {
+      width: '100px',
+    }
   },
   apr: {
     flex: '1',
@@ -65,14 +73,26 @@ const styles = theme => ({
     width: '100px',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
+    height: '42px',
+    '&:nth-child(2)': {
+      marginLeft: '60px'
+    },
+    [theme.breakpoints.up('md')]: {
+      '&:nth-child(2)': {
+        marginLeft: '100px'
+      }
+    }
   },
   headerName: {
     flex: '1',
     fontWeight: 'bold',
     padding: '6px 12px',
-    width: '100px',
-    paddingBottom: '6px'
+    width: '60px',
+    paddingBottom: '6px',
+    [theme.breakpoints.up('md')]: {
+      width: '100px',
+    }
   },
   headerApr: {
     fontWeight: 'bold',
@@ -86,18 +106,50 @@ const styles = theme => ({
     flex: '1',
     width: '100px',
     padding: '6px 12px',
-    paddingBottom: '12px'
+    paddingBottom: '12px',
+    '&:nth-child(2)': {
+      marginLeft: '60px'
+    },
+    [theme.breakpoints.up('md')]: {
+      '&:nth-child(2)': {
+        marginLeft: '100px'
+      }
+    }
+  },
+  headerValueName: {
+    fontWeight: 'bold',
+    width: '60px',
+    padding: '6px 12px',
+    paddingBottom: '12px',
+    position: 'absolute',
+    top: 'auto',
+    background: '#fff',
+    height: '42px',
+    [theme.breakpoints.up('md')]: {
+      width: '100px',
+    }
   },
   aggregatedHeader: {
     textAlign: 'center',
   },
+  aggregatedHeaderVal: {
+    textAlign: 'center',
+    display: 'none',
+    [theme.breakpoints.up('md')]: {
+      display: 'block',
+    }
+  },
   tablesContainer: {
     display: 'flex'
   },
+  tableContainer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    maxWidth: 'calc(100vw - 68px)',
+    overflowX: 'auto'
+  },
   footer: {
-    position: 'fixed',
-    bottom: '30px',
-    left: '30px',
+    padding: '24px',
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between'
@@ -175,14 +227,8 @@ class APR extends Component {
 
     return (
       <div className={ classes.root }>
-          <div className={ classes.pairs }>
-          </div>
-          <div className={ classes.tablesContainer }>
+        <div className={ classes.tablesContainer }>
           <div className={ classes.investedContainer }>
-            {/*<Card className={ classes.pairs } style={{ marginRight: '12px'}}>
-              { this.renderHeader() }
-              { this.renderYields() }
-            </Card>*/}
             <Card className={ classes.pairs }>
               <TextField
                 fullWidth
@@ -199,8 +245,10 @@ class APR extends Component {
                 variant="outlined"
                 onKeyDown={ this.inputKeyDown }
               />
-              { this.renderAggregatedHeader() }
-              { this.renderAggregatedYields() }
+              <table className={ classes.tableContainer }>
+                { this.renderAggregatedHeader() }
+                { this.renderAggregatedYields() }
+              </table>
             </Card>
           </div>
         </div>
@@ -220,16 +268,16 @@ class APR extends Component {
     const { aggregatedHeaders } = this.state
 
     return (
-      <div className={ classes.pair }>
-        <div key={ 'token' } className={ classes.headerValue }>
+      <tr className={ classes.pair }>
+        <th key={ 'token' } className={ classes.headerValueName }>
           <Typography variant={'h3'} className={classes.aggregatedHeader}></Typography>
-        </div>
+        </th>
         { aggregatedHeaders.map((header) => {
-          return (<div key={ header }  className={ classes.headerValue }>
+          return (<th key={ header }  className={ classes.headerValue }>
             <Typography  align='right' variant={'h4'} className={classes.aggregatedHeader}>{ this.renderTableHeader(header) }</Typography>
-          </div>)
+          </th>)
         })}
-      </div>
+      </tr>
     )
   }
 
@@ -246,8 +294,8 @@ class APR extends Component {
         }
 
         return (
-          <div key={ y.token } className={ classes.pair }>
-            <div className={ classes.name }>
+          <tr key={ y.token } className={ classes.pair }>
+            <td className={ classes.name }>
               <div className={ classes.assetIcon }>
                 <img
                   alt=""
@@ -255,8 +303,8 @@ class APR extends Component {
                   height="30px"
                 />
               </div>
-              <Typography variant={'h4'} className={classes.aggregatedHeader}>{ y.token }</Typography>
-            </div>
+              <Typography variant={'h4'} className={classes.aggregatedHeaderVal}>{ y.token }</Typography>
+            </td>
             { keys.map((key) => {
 
                 let val = parseFloat(y.apr[key])
@@ -266,12 +314,12 @@ class APR extends Component {
                   val = val*100
                 }
 
-                return (<div key={ key } className={ classes.apr }>
+                return (<td key={ key } className={ classes.apr }>
                   <Typography align='right' color='secondary'>{ val == 0 ? '' : ((val).toFixed(4) + ' %') }</Typography>
-                </div>)
+                </td>)
               })
             }
-          </div>)
+          </tr>)
       })
     )
   }
