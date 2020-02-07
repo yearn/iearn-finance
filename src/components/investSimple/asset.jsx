@@ -368,7 +368,7 @@ class Asset extends Component {
         amount = amount - 0.009
     }
 
-    this.setState({ amount: amount.toFixed(8) })
+    this.setState({ amount: (Math.floor(amount * 10e7)/10e7).toFixed(8) })
   }
 
   setRedeemAmount = (percent) => {
@@ -380,7 +380,7 @@ class Asset extends Component {
     const balance = this.props.asset.investedBalance
     let amount = balance*percent/100
 
-    this.setState({ redeemAmount: amount.toFixed(8) })
+    this.setState({ redeemAmount: (Math.floor(amount * 10e7)/10e7).toFixed(8) })
   }
 }
 
