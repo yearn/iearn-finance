@@ -316,7 +316,8 @@ class Store {
       uniswapLiquidity: [],
       events: [],
       connectorsByName: {
-        Injected: injected,
+        MetaMask: injected,
+        TrustWallet: injected,
         WalletConnect: walletconnect,
         WalletLink: walletlink,
         Ledger: ledger,
@@ -328,6 +329,88 @@ class Store {
         Torus: torus,
         Authereum: authereum
       },
+      builtWith: [
+        {
+          website: 'https://DeFiZap.com',
+          logo: 'defizap.png',
+          name: 'DeFi Zap'
+        },
+        {
+          website: 'https://1inch.exchange',
+          logo: 'oneinch.svg',
+          name: '1inch'
+        },
+        {
+          website: 'https://www.defisnap.io',
+          logo: 'defisnap.svg',
+          name: 'DefiSnap'
+        },
+        {
+          website: 'https://www.curve.fi',
+          logo: 'curvefi.jpg',
+          name: 'Curve'
+        },
+        {
+          website: 'https://bzx.network',
+          logo: 'bzx.png',
+          name: 'bZx'
+        },
+        {
+          website: 'http://aave.com',
+          logo: 'aave.png',
+          name: 'Aave'
+        },
+        {
+          website: 'https://compound.finance',
+          logo: 'compound.png',
+          name: 'Compound'
+        },
+        {
+          website: 'http://dydx.exchange',
+          logo: 'dydx.jpg',
+          name: 'dYdX'
+        },
+        {
+          website: 'https://ddex.io',
+          logo: 'ddex.jpg',
+          name: 'HydroProtocol'
+        },
+        {
+          website: 'https://lendf.me',
+          logo: 'lendf.png',
+          name: 'LendfMe'
+        },
+        {
+          website: 'https://uniswap.io',
+          logo: 'uniswap.png',
+          name: 'Uniswap'
+        },
+        {
+          website: 'http://kyber.network',
+          logo: 'kybernetwork.png',
+          name: 'KyberNetwork'
+        },
+        {
+          website: 'https://synthetix.io',
+          logo: 'synthetix.png',
+          name: 'Synthetix'
+        },
+        {
+          website: 'https://www.ethereum.org',
+          logo: 'ethereum.png',
+          name: 'ethereum'
+        },
+        {
+          website: 'https://trufflesuite.com',
+          logo: 'truffle.png',
+          name: 'Truffle Suite'
+        },
+        {
+          website: 'https://etherscan.io',
+          logo: 'etherscan.png',
+          name: 'Etherscan'
+        },
+      ],
       web3context: null
     }
 

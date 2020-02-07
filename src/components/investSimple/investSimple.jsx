@@ -11,6 +11,7 @@ import {
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
+import BuiltWithModal from '../builtwith/builtwithModal.jsx'
 import UnlockModal from '../unlock/unlockModal.jsx'
 import Snackbar from '../snackbar'
 import Asset from './asset'
@@ -216,6 +217,7 @@ class InvestSimple extends Component {
       assets: store.getStore('assets'),
       account: store.getStore('account'),
       modalOpen: false,
+      modalBuiltWithOpen: false,
       snackbarType: null,
       snackbarMessage: null,
     }
@@ -329,6 +331,7 @@ class InvestSimple extends Component {
       loading,
       account,
       modalOpen,
+      modalBuiltWithOpen,
       snackbarMessage
     } = this.state
     var address = null;
@@ -381,8 +384,10 @@ class InvestSimple extends Component {
           <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>code</Typography>
           <Typography onClick={()=> window.open("https://t.me/iearnfinance", "_blank")} className={ classes.footerText } variant={ 'h6'}>telegram</Typography>
           <Typography onClick={()=> window.open("/apr", "_blank")} className={ classes.footerText } variant={ 'h6'}>yield</Typography>
+          <Typography onClick={ this.builtWithOverlayClicked } className={ classes.footerText } variant={ 'h6'}>builtwith</Typography>
         </div>
         { modalOpen && this.renderModal() }
+        { modalBuiltWithOpen && this.renderBuiltWithModal() }
         { snackbarMessage && this.renderSnackbar() }
       </div>
     )
@@ -461,12 +466,26 @@ class InvestSimple extends Component {
     )
   }
 
+  renderBuiltWithModal = () => {
+    return (
+      <BuiltWithModal closeModal={ this.closeBuiltWithModal } modalOpen={ this.state.modalBuiltWithOpen } />
+    )
+  }
+
   overlayClicked = () => {
     this.setState({ modalOpen: true })
   }
 
   closeModal = () => {
     this.setState({ modalOpen: false })
+  }
+
+  builtWithOverlayClicked = () => {
+    this.setState({ modalBuiltWithOpen: true })
+  }
+
+  closeBuiltWithModal = () => {
+    this.setState({ modalBuiltWithOpen: false })
   }
 }
 

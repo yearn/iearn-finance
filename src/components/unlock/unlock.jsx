@@ -344,7 +344,7 @@ function MyComponent(props) {
     active,
     error
   } = context;
-  const connectorsByName = store.getStore('connectorsByName')
+  var connectorsByName = store.getStore('connectorsByName')
 
   console.log(localContext);
 
@@ -390,11 +390,12 @@ function MyComponent(props) {
 
         var url;
         var display = name;
-        if (name == 'Injected') {
-          display = 'MetaMask';
+        if (name == 'MetaMask') {
           url = require('../../assets/icn-metamask.svg')
         } else if (name == 'WalletConnect') {
           url = require('../../assets/walletConnectIcon.svg')
+        } else if (name == 'TrustWallet') {
+          url = require('../../assets/trustWallet.png')
         } else if (name == 'Portis') {
           url = require('../../assets/portisIcon.png')
         } else if (name == 'Fortmatic') {
@@ -407,10 +408,12 @@ function MyComponent(props) {
           url = require('../../assets/trezor.png')
         } else if (name == 'Torus') {
           url = require('../../assets/torus.jpg')
+        } else if (name == 'Authereum') {
+          url = require('../../assets/icn-aethereum.svg')
         } else if (name == 'WalletLink') {
           display = 'Coinbase Wallet'
           url = require('../../assets/coinbaseWalletIcon.svg')
-        } else if (name == 'Frame'||name == 'Authereum') {
+        } else if (name == 'Frame') {
           return ''
         }
 
