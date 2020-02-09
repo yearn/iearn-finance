@@ -901,7 +901,7 @@ class Store {
       let diff = block - asset.lastMeasurement;
 
       balance = balance / diff;
-      balance = balance * 2102400;
+      balance = balance * 2425846;
 
       callback(null, parseFloat(balance))
     } catch (e) {
@@ -1265,7 +1265,7 @@ class Store {
 
       for(let i = 0; i < vals.length; i++) {
         const keys = Object.keys(vals[i])
-        if (keys == '_unifulcrum'||keys =='_uniaave'||keys=='_unicompound') {
+        if (keys == '_unifulcrum'||keys =='_uniaave'||keys=='_unicompound'||keys=='_lendf') {
           // skip
         } else {
           output[keys[0]] = vals[i][keys[0]]
@@ -1284,7 +1284,7 @@ class Store {
         let diff = block - apr.lastMeasurement;
 
         balance = balance / diff;
-        balance = balance * 2102400;
+        balance = balance * 2425846;
         iearn = balance;
       }
       output["iearn.finance \n(APY)"] = iearn;

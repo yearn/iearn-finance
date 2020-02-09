@@ -166,6 +166,12 @@ class Asset extends Component {
       loading
     } = this.state
 
+    var disabled = false;
+    console.log(asset);
+    if (asset.symbol == 'ETH') {
+      disabled = true;
+    }
+
     return (<div className={ classes.actionsContainer }>
       <div className={ classes.headingContainer }>
         <div className={classes.heading}>
@@ -235,10 +241,10 @@ class Asset extends Component {
           className={ classes.actionButton }
           variant="outlined"
           color="primary"
-          disabled={ loading || !account.address }
+          disabled={ loading || !account.address || disabled }
           onClick={ this.onInvest }
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Earn</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color={disabled?'':'secondary'}>{disabled?'Disabled':'Earn'}</Typography>
         </Button>
       </div>
       <div className={ classes.sepperator }></div>

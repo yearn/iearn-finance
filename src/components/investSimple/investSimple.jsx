@@ -417,7 +417,7 @@ class InvestSimple extends Component {
                   />
                 </div>
                 <div>
-                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
+                  <Typography variant={ 'h3' }>{ asset.name == 'ETH' ? 'Deprecated' : asset.name }</Typography>
                   <Typography variant={ 'h5' }>{ asset.description }</Typography>
                 </div>
               </div>
