@@ -178,15 +178,15 @@ class Asset extends Component {
           <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
           <Typography variant={ 'h5' }>{'Interest Rate'}</Typography>
         </div>
-        <div className={ `${classes.heading} ${classes.right}`}>
+        {<div className={ `${classes.heading} ${classes.right}`}>
           <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
           <Typography variant={ 'h5' }>{'Available Balance'}</Typography>
-        </div>
+        </div>}
       </div>
       <div className={ classes.tradeContainer }>
-        <div className={ classes.balances }>
+        {!disabled && <div className={ classes.balances }>
             <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
-        </div>
+        </div>}
         <div className={ classes.amountContainer }>
           <TextField
             fullWidth
@@ -195,7 +195,7 @@ class Asset extends Component {
             value={ amount }
             error={ amountError }
             onChange={ this.onChange }
-            disabled={ loading }
+            disabled={ loading || disabled }
             label=""
             size="small"
             placeholder="0.00"
@@ -207,7 +207,7 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading }
+            disabled={ loading || disabled }
             color="primary"
             onClick={ () => { this.setAmount(25) } }>
             <Typography variant={'h5'}>25%</Typography>
@@ -215,7 +215,7 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading }
+            disabled={ loading || disabled }
             color="primary"
             onClick={ () => { this.setAmount(50) } }>
             <Typography variant={'h5'}>50%</Typography>
@@ -223,7 +223,7 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading }
+            disabled={ loading || disabled }
             color="primary"
             onClick={ () => { this.setAmount(75) } }>
             <Typography variant={'h5'}>75%</Typography>
@@ -231,7 +231,7 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading }
+            disabled={ loading || disabled }
             color="primary"
             onClick={ () => { this.setAmount(100) } }>
             <Typography variant={'h5'}>100%</Typography>
