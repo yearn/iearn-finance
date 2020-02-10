@@ -7,6 +7,7 @@ import {
   CircularProgress
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
+import { withNamespaces } from 'react-i18next';
 
 import Web3 from 'web3'
 import {
@@ -204,84 +205,19 @@ class Unlock extends Component {
   }
 
   render() {
-    const { classes, closeModal } = this.props;
+    const { classes, closeModal, t } = this.props;
     const { metamaskLoading, ledgerLoading } = this.state;
 
     return (
       <div className={ classes.root }>
         <div className={ classes.closeIcon } onClick={ closeModal }><CloseIcon /></div>
         <div className={ classes.contentContainer }>
-          { /* metamaskLoading && this.renderMetamaskLoading() */ }
-          { /* ledgerLoading && this.renderLedgerLoading() */ }
-          { /* (!metamaskLoading && !ledgerLoading) && this.renderOptions() */ }
-          { /* (!metamaskLoading && !ledgerLoading && closeModal != null) && <Button className={ classes.actionButton } variant='outlined' color='secondary' onClick={ closeModal } fullWidth>
-            <Typography className={ classes.buttonText } variant={ 'h5'}>Close</Typography>
-          </Button> */ }
-
-
           <Web3ReactProvider getLibrary={getLibrary}>
-            <MyComponent closeModal={ closeModal} />
+            <MyComponent closeModal={ closeModal} t={t} />
           </Web3ReactProvider>
         </div>
       </div>
     )
-  };
-
-  renderMetamaskLoading = () => {
-    const { classes } = this.props;
-
-    return (<div className={ classes.cardContainer }>
-      <div className={ classes.metamask }>
-      </div>
-      <Typography variant={ 'h3'} className={ classes.instruction }>
-        Click connect in the MetaMask notification window to connect your wallet to iearn finance.
-      </Typography>
-      <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.cancelMetamask } fullWidth>
-        <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Cancel</Typography>
-      </Button>
-    </div>)
-  };
-
-  renderLedgerLoading = () => {
-    const { classes } = this.props;
-
-    return (<div className={ classes.cardContainer }>
-      <div className={ classes.ledger }>
-      </div>
-      <Typography variant={ 'h3'} className={ classes.instruction }>
-        Insert yout ledger device and authorize iEarn.
-      </Typography>
-      <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.cancelLedger } fullWidth>
-        <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Cancel</Typography>
-      </Button>
-    </div>)
-  }
-
-  renderOptions = () => {
-    const { classes, closeModal } = this.props;
-    const connectorsByName = store.getStore('connectorsByName')
-
-    return Object.keys(connectorsByName).map((name) => {
-      return (<Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ () => { this.unlockConnector(name) } } fullWidth>
-        <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Unlock using {name}</Typography>
-      </Button>)
-    })
-
-    // return (
-    //   <div className={ classes.cardContainer }>
-    //     <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.unlockMetamask } fullWidth>
-    //       <div className={ classes.metamaskIcon }></div>
-    //       <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Unlock using Metamask</Typography>
-    //     </Button>
-    //     <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.unlockLedger } fullWidth>
-    //       <div className={ classes.ledgerIcon }></div>
-    //       <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Unlock using Ledger</Typography>
-    //     </Button>
-    //     { closeModal != null && <Button className={ classes.actionButton } variant='outlined' color='secondary' onClick={ closeModal } fullWidth>
-    //       <Typography className={ classes.buttonText } variant={ 'h5'}>Close</Typography>
-    //     </Button> }
-    //   </div>
-    // )
   };
 }
 
@@ -346,7 +282,7 @@ function MyComponent(props) {
   } = context;
   var connectorsByName = store.getStore('connectorsByName')
 
-  const { closeModal } = props
+  const { closeModal, t } = props
 
   const [activatingConnector, setActivatingConnector] = React.useState();
   React.useEffect(() => {
@@ -476,7 +412,7 @@ function MyComponent(props) {
             } }
             variant={ 'h5'}
             color='primary'>
-            Deactivate
+            { t('Unlock.Deactivate') }
           </Typography>
         </Button>
       </div>
@@ -485,6 +421,4 @@ function MyComponent(props) {
 
 }
 
-
-
-export default withRouter(withStyles(styles)(Unlock));
+export default withNamespaces()(withRouter(withStyles(styles)(Unlock)));

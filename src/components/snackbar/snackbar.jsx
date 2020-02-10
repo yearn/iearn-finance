@@ -8,6 +8,7 @@ import {
 } from '@material-ui/core';
 
 import { colors } from "../../theme";
+import { withNamespaces } from 'react-i18next';
 
 
 const iconStyle = {
@@ -96,10 +97,11 @@ class MySnackbar extends Component {
 
   render() {
 
-    const { type, message } = this.props
+    const { type, message, t } = this.props
 
     let icon = <SuccessIcon color={colors.blue} />
     let color = colors.blue
+    let messageType = ''
     let actions = [
       <IconButton
         key="close"
@@ -114,22 +116,27 @@ class MySnackbar extends Component {
       case 'Error':
         icon = <ErrorIcon color={colors.red} />
         color = colors.red
+        messageType = t("Snackbar.Error")
         break;
       case 'Success':
         icon = <SuccessIcon color={colors.blue} />
         color = colors.blue
+        messageType = t("Snackbar.Success")
         break;
       case 'Warning':
         icon = <WarningIcon color={colors.orange} />
         color = colors.orange
+        messageType = t("Snackbar.Warning")
         break;
       case 'Info':
         icon = <InfoIcon color={colors.blue} />
         color = colors.blue
+        messageType = t("Snackbar.Info")
         break;
       case 'Hash':
         icon = <SuccessIcon color={colors.blue} />
         color = colors.blue
+        messageType = t("Snackbar.Hash")
 
         let snackbarMessage = 'https://etherscan.io/tx/'+message;
         actions = [<Button variant="text" size="small" onClick={()=> window.open(snackbarMessage, "_blank")}>
@@ -147,6 +154,7 @@ class MySnackbar extends Component {
       default:
         icon = <SuccessIcon color={colors.blue} />
         color = colors.blue
+        messageType = t("Snackbar.Success")
         break;
     }
 
@@ -163,7 +171,7 @@ class MySnackbar extends Component {
           <div style={{ padding: '12px', borderLeft: '5px solid '+color, borderRadius: '4px'}}>
             {icon}
             <div style={{ display: 'inline-block', verticalAlign: 'middle', maxWidth: '400px' }}>
-              <Typography variant='body1' style={{ fontSize: '12px', color: color }}>{type}</Typography>
+              <Typography variant='body1' style={{ fontSize: '12px', color: color }}>{ messageType }</Typography>
               <Typography variant='body1' style={{ fontSize: '10px', color: colors.lightBlack }}>{ message }</Typography>
             </div>
           </div>
@@ -174,4 +182,4 @@ class MySnackbar extends Component {
   }
 }
 
-export default MySnackbar;
+export default withNamespaces()(MySnackbar);

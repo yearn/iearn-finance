@@ -7,6 +7,7 @@ import {
   TextField,
   Button
 } from '@material-ui/core';
+import { withNamespaces } from 'react-i18next';
 
 import {
   ERROR,
@@ -156,7 +157,7 @@ class Asset extends Component {
   };
 
   render() {
-    const { classes, asset } = this.props;
+    const { classes, asset, t } = this.props;
     const {
       account,
       amount,
@@ -175,11 +176,11 @@ class Asset extends Component {
       <div className={ classes.headingContainer }>
         <div className={classes.heading}>
           <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
-          <Typography variant={ 'h5' }>{'Interest Rate'}</Typography>
+          <Typography variant={ 'h5' }>{ t('Asset.InterestRate') }</Typography>
         </div>
         {<div className={ `${classes.heading} ${classes.right}`}>
           <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
-          <Typography variant={ 'h5' }>{'Available Balance'}</Typography>
+          <Typography variant={ 'h5' }>{ t('Asset.AvailableBalance') }</Typography>
         </div>}
       </div>
       <div className={ classes.tradeContainer }>
@@ -243,7 +244,7 @@ class Asset extends Component {
           disabled={ loading || !account.address || disabled }
           onClick={ this.onInvest }
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={disabled?'':'secondary'}>{disabled?'Disabled':'Earn'}</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color={disabled?'':'secondary'}>{disabled? t('Asset.Disabled'):t('Asset.Earn')}</Typography>
         </Button>
       </div>
       <div className={ classes.sepperator }></div>
@@ -307,7 +308,7 @@ class Asset extends Component {
           disabled={ loading || !account.address }
           onClick={ this.onRedeem }
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Claim</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.Claim') }</Typography>
         </Button>
       </div>
     </div>)
@@ -389,4 +390,4 @@ class Asset extends Component {
   }
 }
 
-export default withRouter(withStyles(styles, { withTheme: true })(Asset));
+export default withNamespaces()(withRouter(withStyles(styles, { withTheme: true })(Asset)));
