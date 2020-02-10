@@ -195,7 +195,8 @@ class Store {
           decimals: 18,
           price: 0,
           poolValue: 0,
-          abi: config.IEarnERC20ABI
+          abi: config.IEarnERC20ABI,
+          version: 1
         },
         {
           name: 'USD Coin',
@@ -213,7 +214,8 @@ class Store {
           price: 0,
           decimals: 6,
           poolValue: 0,
-          abi: config.IEarnERC20ABI
+          abi: config.IEarnERC20ABI,
+          version: 1
         },
         {
           name: 'USDT',
@@ -231,7 +233,8 @@ class Store {
           price: 0,
           decimals: 6,
           poolValue: 0,
-          abi: config.IEarnERC20ABI
+          abi: config.IEarnERC20ABI,
+          version: 1
         },
         {
           name: 'SUSD',
@@ -249,7 +252,8 @@ class Store {
           price: 0,
           decimals: 18,
           poolValue: 0,
-          abi: config.IEarnERC20ABI
+          abi: config.IEarnERC20ABI,
+          version: 1
         },
         {
           name: 'cDAI/cUSDC',
@@ -268,7 +272,8 @@ class Store {
           price: 0,
           decimals: 18,
           poolValue: 0,
-          abi: config.IEarnERC20ABI
+          abi: config.IEarnERC20ABI,
+          version: 1
         },
         {
           name: 'wBTC',
@@ -287,7 +292,8 @@ class Store {
           price: 0,
           decimals: 8,
           poolValue: 0,
-          abi: config.IEarnERC20ABI
+          abi: config.IEarnERC20ABI,
+          version: 1
         },
         {
           name: 'ETH',
@@ -303,7 +309,8 @@ class Store {
           investedBalance: 0,
           price: 0,
           poolValue: 0,
-          abi: config.IEarnABI
+          abi: config.IEarnABI,
+          version: 1
         },
       ],
       account: {},
@@ -317,7 +324,7 @@ class Store {
       events: [],
       connectorsByName: {
         MetaMask: injected,
-        TrustWallet: injected,
+        TrustWallet: walletconnect,
         WalletConnect: walletconnect,
         WalletLink: walletlink,
         Ledger: ledger,
@@ -1012,7 +1019,6 @@ class Store {
       let aprContract = new web3.eth.Contract(config.crvContractABI, config.crvAddress)
       const call = 'crvapr'
       const aprs = await aprContract.methods[call]().call();
-      console.log(aprs)
       return callback(null, web3.utils.fromWei(parseFloat(aprs).toFixed(0), 'ether'))
     }
 

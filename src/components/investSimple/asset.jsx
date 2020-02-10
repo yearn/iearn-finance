@@ -167,7 +167,6 @@ class Asset extends Component {
     } = this.state
 
     var disabled = false;
-    console.log(asset);
     if (asset.symbol == 'ETH') {
       disabled = true;
     }
