@@ -68,7 +68,7 @@ class Store {
           measurement: 1000848185112260412,
           mod: 1,
           decimals: 18
-        },{
+        },/*{
           token: 'CRV',
           address: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
           earnAddress: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
@@ -76,7 +76,7 @@ class Store {
           measurement: 1008192205495361668,
           mod: 1,
           decimals: 18
-        },{
+        },*/{
           token: 'TUSD',
           address: '0x0000000000085d4780B73119b644AE5ecd22b376',
           earnAddress: '',
@@ -252,25 +252,6 @@ class Store {
           abi: config.IEarnERC20ABI
         },
         {
-          name: 'cDAI/cUSDC',
-          symbol: 'CRV',
-          tokenSymbol: 'DAI',
-          description: 'Curve.fi cDAI/cUSDC',
-          investSymbol: 'yCRV',
-          erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-          iEarnContract: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
-          lastMeasurement: 9414437,
-          measurement: 1008192205495361668,
-          apr: 0,
-          maxApr: 0,
-          balance: 0,
-          investedBalance: 0,
-          price: 0,
-          decimals: 18,
-          poolValue: 0,
-          abi: config.IEarnERC20ABI
-        },
-        {
           name: 'wBTC',
           symbol: 'wBTC',
           tokenSymbol: 'wBTC',
@@ -286,6 +267,25 @@ class Store {
           investedBalance: 0,
           price: 0,
           decimals: 8,
+          poolValue: 0,
+          abi: config.IEarnERC20ABI
+        },
+        {
+          name: 'cDAI/cUSDC',
+          symbol: 'CRV',
+          tokenSymbol: 'DAI',
+          description: 'Curve.fi cDAI/cUSDC',
+          investSymbol: 'yCRV',
+          erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          iEarnContract: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
+          lastMeasurement: 9414437,
+          measurement: 1008192205495361668,
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 18,
           poolValue: 0,
           abi: config.IEarnERC20ABI
         },
