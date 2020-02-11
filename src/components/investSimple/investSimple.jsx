@@ -8,6 +8,7 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
+  Switch
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
@@ -53,6 +54,10 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     padding: '12px',
+    minWidth: '100%',
+    [theme.breakpoints.up('md')]: {
+      minWidth: '800px',
+    }
   },
   balancesContainer: {
     display: 'flex',
@@ -150,10 +155,11 @@ const styles = theme => ({
     padding: '24px',
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    width: '100%',
+    maxWidth: '400px'
   },
   footerText: {
-    padding: '10px',
     cursor: 'pointer'
   },
   buttonText: {
@@ -203,6 +209,12 @@ const styles = theme => ({
   },
   expansionPanel: {
     maxWidth: 'calc(100vw - 24px)'
+  },
+  versionToggle: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    width: '100%'
   }
 });
 
@@ -332,7 +344,8 @@ class InvestSimple extends Component {
       account,
       modalOpen,
       modalBuiltWithOpen,
-      snackbarMessage
+      snackbarMessage,
+      hideV1
     } = this.state
     var address = null;
     if (account.address) {
@@ -375,6 +388,15 @@ class InvestSimple extends Component {
             </div>
           }
 
+          { account.address && <div className={ classes.versionToggle }>
+            <Typography variant={ 'h6'}>Hide V1</Typography>
+            <Switch
+              id='hideV1'
+              checked={ hideV1 }
+              onChange={ this.onChange }
+              value={ 'hideV1' } />
+            <Typography variant={ 'h6'}>Show V1</Typography>
+          </div> }
           { account.address && this.renderAssetBlocks() }
         </div>
         { loading && <Loader /> }
@@ -393,13 +415,20 @@ class InvestSimple extends Component {
     )
   };
 
+  onChange = (event) => {
+    let val = []
+    val[event.target.id] = event.target.checked
+    this.setState(val)
+  };
 
   renderAssetBlocks = () => {
-    const { assets, expanded } = this.state
+    const { assets, expanded, hideV1 } = this.state
     const { classes } = this.props
     const width = window.innerWidth
 
-    return assets.map((asset) => {
+    return assets.filter((asset) => {
+      return (hideV1 !== true || asset.version !== 1)
+    }).map((asset) => {
       return (
         <ExpansionPanel className={ classes.expansionPanel } square key={ asset.symbol+"_expand" } expanded={ expanded === asset.symbol} onChange={ () => { this.handleChange(asset.symbol) } }>
           <ExpansionPanelSummary
