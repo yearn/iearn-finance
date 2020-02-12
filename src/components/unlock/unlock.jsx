@@ -346,8 +346,6 @@ function MyComponent(props) {
   } = context;
   var connectorsByName = store.getStore('connectorsByName')
 
-  console.log(localContext);
-
   const { closeModal } = props
 
   const [activatingConnector, setActivatingConnector] = React.useState();
@@ -359,7 +357,6 @@ function MyComponent(props) {
 
   React.useEffect(() => {
     if (account && active && library) {
-      console.log("we are active: "+account)
       store.setStore({ account: { address: account }, web3context: context })
       emitter.emit(CONNECTION_CONNECTED)
     }
