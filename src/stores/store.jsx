@@ -285,6 +285,27 @@ class Store {
           redeem: 'withdraw'
         },
         {
+          id: 'wBTCv2',
+          name: 'wBTC',
+          symbol: 'wBTC',
+          description: 'Wrapped BTC',
+          investSymbol: 'yWBTC',
+          erc20address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+          iEarnContract: '0x04Aa51bbcB46541455cCF1B8bef2ebc5d3787EC9',
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 8,
+          poolValue: 0,
+          abi: config.IEarnErc20ABIv2,
+          version: 2,
+          disabled: false,
+          invest: 'deposit',
+          redeem: 'withdraw'
+        },
+        {
           id: 'DAIv1',
           name: 'DAI',
           symbol: 'DAI',

@@ -260,6 +260,7 @@ class InvestSimple extends Component {
 
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('assets') })
+    setTimeout(this.refresh,5000);
   };
 
   connectionConnected = () => {
@@ -423,7 +424,7 @@ class InvestSimple extends Component {
     return assets.filter((asset) => {
       return (hideV1 !== true || asset.version !== 1)
     }).filter((asset) => {
-      return asset.version == 2 || (asset.version == 1 && asset.investedBalance > 0)
+      return asset.version == 2 || (asset.version == 1 && (asset.investedBalance).toFixed(4) > 0)
     }).map((asset) => {
       return (
         <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
@@ -444,7 +445,7 @@ class InvestSimple extends Component {
                 </div>
                 <div>
                   <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                  <Typography variant={ 'h5' }>{ asset.version == 1?asset.description+' - v'+asset.version+'':asset.description }</Typography>
                 </div>
               </div>
               <div className={classes.heading}>
