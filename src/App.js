@@ -7,6 +7,7 @@ import {
   Route
 } from "react-router-dom";
 
+import './i18n';
 import interestTheme from './theme';
 
 import APR from './components/apr';

@@ -477,7 +477,7 @@ class Store {
       events: [],
       connectorsByName: {
         MetaMask: injected,
-        TrustWallet: walletconnect,
+        TrustWallet: injected,
         WalletConnect: walletconnect,
         WalletLink: walletlink,
         Ledger: ledger,
@@ -571,7 +571,21 @@ class Store {
           name: 'Etherscan'
         },
       ],
-      web3context: null
+      web3context: null,
+      languages: [
+        {
+          language: 'English',
+          code: 'en'
+        },
+        {
+          language: 'Japanese',
+          code: 'ja'
+        },
+        {
+          language: 'Chinese',
+          code: 'zh'
+        }
+      ]
     }
 
     dispatcher.register(
@@ -629,7 +643,7 @@ class Store {
 
   setStore(obj) {
     this.store = {...this.store, ...obj}
-    console.log(this.store)
+    // console.log(this.store)
     return emitter.emit('StoreUpdated');
   };
 
@@ -644,30 +658,23 @@ class Store {
     engine.start();
     const web3 = new Web3(engine);
 
-    console.log(`Web3 connected using infura provider: ${config.infuraProvider}`)
-
     try {
-      console.log(`Getting accounts from ledger`)
 
       web3.eth.getAccounts(function(err, accounts){
         if (err != null) {
           return emitter.emit(ERROR, err);
         } else if (accounts.length === 0) {
-          console.log('No accounts found via Ledger!')
           return emitter.emit(ERROR, 'No accounts found via Ledger!');
         } else {
-          console.log(`Found accounts, storing address and web3: ${accounts[0]}`)
           store.setStore({ account: { address: accounts[0] }})
           store.setStore({ web3: web3 })
 
-          console.log(`Getting balances`)
           dispatcher.dispatch({ type: GET_BALANCES, content: {} })
 
           return emitter.emit(LEDGER_CONNECTED)
         }
       });
     } catch (e) {
-      console.log('Access denied. Please allow access via your Ledger device!')
       return emitter.emit(ERROR, 'Access denied. Please allow access via your Ledger device!');
     }
   }
@@ -686,7 +693,6 @@ class Store {
           if (err != null) {
             return emitter.emit(ERROR, err);
           } else if (accounts.length === 0) {
-            console.log('MetaMask is locked. Please allow access via the Metamask Extension!')
             return emitter.emit(ERROR, 'MetaMask is locked. Please allow access via the Metamask Extension!');
           } else {
             store.setStore({ account: { address: accounts[0] }})
@@ -697,11 +703,9 @@ class Store {
         });
 
       } catch (error) {
-        console.log('Access denied. Please allow access via the Metamask Extension!')
         return emitter.emit(ERROR, 'Access denied. Please allow access via the Metamask Extension!');
       }
     } else {
-      console.log('No web3? You should consider trying MetaMask!')
       return emitter.emit(ERROR, 'No web3? You should consider trying MetaMask!');
     }
   }
@@ -1278,8 +1282,6 @@ class Store {
         return call.liquidity >= limit
       })
 
-      console.log(liq)
-
       store.setStore({ uniswapLiquidity: liq })
 
       cb()
@@ -1372,7 +1374,6 @@ class Store {
 
       //get all headers
       const headers = Object.keys(yields[0].apr)
-      console.log(yields);
       store.setStore({ aggregatedYields: yields, aggregatedHeaders: headers })
       return emitter.emit(GET_AGGREGATED_YIELD_RETURNED, yields)
     })
@@ -1437,7 +1438,6 @@ class Store {
         let earn = new web3.eth.Contract(config.IEarnABI, apr.earnAddress);
         let balance = await earn.methods.getPricePerFullShare().call();
 
-        console.log(apr);
         balance = balance - apr.measurement;
         balance = balance / 1e18;
         let diff = block - apr.lastMeasurement;
