@@ -253,6 +253,7 @@ class APR extends Component {
           </div>
         </div>
         <div className={classes.footer}>
+          <Typography onClick={()=> window.open("https://iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>home</Typography>
           <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>about</Typography>
           <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>docs</Typography>
           <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>code</Typography>

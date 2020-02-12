@@ -166,11 +166,6 @@ class Asset extends Component {
       loading
     } = this.state
 
-    var disabled = false;
-    if (asset.symbol == 'ETH'||asset.tokenSymbol == 'DAI') {
-      disabled = true;
-    }
-
     return (<div className={ classes.actionsContainer }>
       <div className={ classes.headingContainer }>
         <div className={classes.heading}>
@@ -183,7 +178,7 @@ class Asset extends Component {
         </div>}
       </div>
       <div className={ classes.tradeContainer }>
-        {!disabled && <div className={ classes.balances }>
+        {!asset.disabled && <div className={ classes.balances }>
             <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
         </div>}
         <div className={ classes.amountContainer }>
@@ -194,7 +189,7 @@ class Asset extends Component {
             value={ amount }
             error={ amountError }
             onChange={ this.onChange }
-            disabled={ loading || disabled }
+            disabled={ loading || asset.disabled }
             label=""
             size="small"
             placeholder="0.00"
@@ -206,7 +201,7 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading || disabled }
+            disabled={ loading || asset.disabled }
             color="primary"
             onClick={ () => { this.setAmount(25) } }>
             <Typography variant={'h5'}>25%</Typography>
@@ -214,7 +209,7 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading || disabled }
+            disabled={ loading || asset.disabled }
             color="primary"
             onClick={ () => { this.setAmount(50) } }>
             <Typography variant={'h5'}>50%</Typography>
@@ -222,7 +217,7 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading || disabled }
+            disabled={ loading || asset.disabled }
             color="primary"
             onClick={ () => { this.setAmount(75) } }>
             <Typography variant={'h5'}>75%</Typography>
@@ -230,7 +225,7 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading || disabled }
+            disabled={ loading || asset.disabled }
             color="primary"
             onClick={ () => { this.setAmount(100) } }>
             <Typography variant={'h5'}>100%</Typography>
@@ -240,10 +235,10 @@ class Asset extends Component {
           className={ classes.actionButton }
           variant="outlined"
           color="primary"
-          disabled={ loading || !account.address || disabled }
+          disabled={ loading || !account.address || asset.disabled }
           onClick={ this.onInvest }
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={disabled?'':'secondary'}>{disabled?'Disabled':'Earn'}</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled?'Disabled':'Earn'}</Typography>
         </Button>
       </div>
       <div className={ classes.sepperator }></div>
@@ -372,8 +367,9 @@ class Asset extends Component {
     if(percent === 100 && asset.symbol === 'ETH') {
         amount = amount - 0.009
     }
+    amount = Math.floor(amount*10000)/10000;
 
-    this.setState({ amount: amount.toFixed(8) })
+    this.setState({ amount: amount.toFixed(4) })
   }
 
   setRedeemAmount = (percent) => {
@@ -384,8 +380,9 @@ class Asset extends Component {
 
     const balance = this.props.asset.investedBalance
     let amount = balance*percent/100
+    amount = Math.floor(amount*10000)/10000;
 
-    this.setState({ redeemAmount: amount.toFixed(8) })
+    this.setState({ redeemAmount: amount.toFixed(4) })
   }
 }
 

@@ -8,6 +8,7 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
+  Switch
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
@@ -53,6 +54,10 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     padding: '12px',
+    minWidth: '100%',
+    [theme.breakpoints.up('md')]: {
+      minWidth: '800px',
+    }
   },
   balancesContainer: {
     display: 'flex',
@@ -79,9 +84,6 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    [theme.breakpoints.up('md')]: {
-      paddingLeft: '38%',
-    }
   },
   introCenter: {
     maxWidth: '500px',
@@ -150,10 +152,11 @@ const styles = theme => ({
     padding: '24px',
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    width: '100%',
+    maxWidth: '400px'
   },
   footerText: {
-    padding: '10px',
     cursor: 'pointer'
   },
   buttonText: {
@@ -203,6 +206,11 @@ const styles = theme => ({
   },
   expansionPanel: {
     maxWidth: 'calc(100vw - 24px)'
+  },
+  versionToggle: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   }
 });
 
@@ -332,7 +340,8 @@ class InvestSimple extends Component {
       account,
       modalOpen,
       modalBuiltWithOpen,
-      snackbarMessage
+      snackbarMessage,
+      hideV1
     } = this.state
     var address = null;
     if (account.address) {
@@ -343,6 +352,14 @@ class InvestSimple extends Component {
         <div className={ classes.investedContainer }>
           { account.address &&
             <div className={ classes.intro }>
+              { account.address && <div className={ classes.versionToggle }>
+                <Switch
+                  id='hideV1'
+                  checked={ hideV1 }
+                  onChange={ this.onChange }
+                  value={ 'hideV1' } />
+                <Typography variant={ 'h6'}>Show v1</Typography>
+              </div> }
               <Typography variant='h2' className={ classes.introText }>Earn interest. Simple.</Typography>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
                 <Typography variant={ 'h5'} noWrap>{ address }</Typography>
@@ -374,7 +391,6 @@ class InvestSimple extends Component {
               </Button>
             </div>
           }
-
           { account.address && this.renderAssetBlocks() }
         </div>
         { loading && <Loader /> }
@@ -393,15 +409,24 @@ class InvestSimple extends Component {
     )
   };
 
+  onChange = (event) => {
+    let val = []
+    val[event.target.id] = event.target.checked
+    this.setState(val)
+  };
 
   renderAssetBlocks = () => {
-    const { assets, expanded } = this.state
+    const { assets, expanded, hideV1 } = this.state
     const { classes } = this.props
     const width = window.innerWidth
 
-    return assets.map((asset) => {
+    return assets.filter((asset) => {
+      return (hideV1 !== true || asset.version !== 1)
+    }).filter((asset) => {
+      return asset.version == 2 || (asset.version == 1 && asset.investedBalance > 0)
+    }).map((asset) => {
       return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.symbol+"_expand" } expanded={ expanded === asset.symbol} onChange={ () => { this.handleChange(asset.symbol) } }>
+        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
           <ExpansionPanelSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
@@ -414,10 +439,11 @@ class InvestSimple extends Component {
                     alt=""
                     src={ require('../../assets/'+asset.symbol+'-logo.png') }
                     height={ width > 600 ? '40px' : '30px'}
+                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
                 </div>
                 <div>
-                  <Typography variant={ 'h3' }>{ asset.name == 'ETH'||asset.name == 'cDAI/cUSDC' ? 'Deprecated' : asset.name }</Typography>
+                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
                   <Typography variant={ 'h5' }>{ asset.description }</Typography>
                 </div>
               </div>
@@ -439,8 +465,8 @@ class InvestSimple extends Component {
     })
   }
 
-  handleChange = (symbol) => {
-    this.setState({ expanded: this.state.expanded === symbol ? null : symbol })
+  handleChange = (id) => {
+    this.setState({ expanded: this.state.expanded === id ? null : id })
   }
 
   startLoading = () => {
