@@ -68,7 +68,7 @@ class Store {
           measurement: 1000848185112260412,
           mod: 1,
           decimals: 18
-        },{
+        },/*{
           token: 'CRV',
           address: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
           earnAddress: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
@@ -76,7 +76,7 @@ class Store {
           measurement: 1008192205495361668,
           mod: 1,
           decimals: 18
-        },{
+        },*/{
           token: 'TUSD',
           address: '0x0000000000085d4780B73119b644AE5ecd22b376',
           earnAddress: '',
@@ -181,6 +181,132 @@ class Store {
       ],
       assets: [
         {
+          id: 'DAIv2',
+          name: 'DAI',
+          symbol: 'DAI',
+          description: 'DAI Stablecoin',
+          investSymbol: 'yDAI',
+          erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          iEarnContract: '0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01',
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          decimals: 18,
+          price: 0,
+          poolValue: 0,
+          abi: config.IEarnErc20ABIv2,
+          version: 2,
+          disabled: false,
+          invest: 'deposit',
+          redeem: 'withdraw'
+        },
+        {
+          id: 'USDCv2',
+          name: 'USD Coin',
+          symbol: 'USDC',
+          description: 'USD//C',
+          investSymbol: 'yUSDC',
+          erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          iEarnContract: '0xd6aD7a6750A7593E092a9B218d66C0A814a3436e',
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 6,
+          poolValue: 0,
+          abi: config.IEarnErc20ABIv2,
+          version: 2,
+          disabled: false,
+          invest: 'deposit',
+          redeem: 'withdraw'
+        },
+        {
+          id: 'USDTv2',
+          name: 'USDT',
+          symbol: 'USDT',
+          description: 'Tether USD',
+          investSymbol: 'yUSDT',
+          erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+          iEarnContract: '0x83f798e925BcD4017Eb265844FDDAbb448f1707D',
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 6,
+          poolValue: 0,
+          abi: config.IEarnErc20ABIv2,
+          version: 2,
+          disabled: false,
+          invest: 'deposit',
+          redeem: 'withdraw'
+        },
+        {
+          id: 'SUSDv2',
+          name: 'SUSD',
+          symbol: 'SUSD',
+          description: 'Synth sUSD',
+          investSymbol: 'ySUSD',
+          erc20address: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
+          iEarnContract: '0xF61718057901F84C4eEC4339EF8f0D86D2B45600',
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 18,
+          poolValue: 0,
+          abi: config.IEarnErc20ABIv2,
+          version: 2,
+          disabled: false,
+          invest: 'deposit',
+          redeem: 'withdraw'
+        },
+        {
+          id: 'TUSDv2',
+          name: 'TUSD',
+          symbol: 'TUSD',
+          description: 'TrueUSD',
+          investSymbol: 'yTUSD',
+          erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
+          iEarnContract: '0x73a052500105205d34Daf004eAb301916DA8190f',
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 18,
+          poolValue: 0,
+          abi: config.IEarnErc20ABIv2,
+          version: 2,
+          disabled: false,
+          invest: 'deposit',
+          redeem: 'withdraw'
+        },
+        {
+          id: 'wBTCv2',
+          name: 'wBTC',
+          symbol: 'wBTC',
+          description: 'Wrapped BTC',
+          investSymbol: 'yWBTC',
+          erc20address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+          iEarnContract: '0x04Aa51bbcB46541455cCF1B8bef2ebc5d3787EC9',
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 8,
+          poolValue: 0,
+          abi: config.IEarnErc20ABIv2,
+          version: 2,
+          disabled: false,
+          invest: 'deposit',
+          redeem: 'withdraw'
+        },
+        {
+          id: 'DAIv1',
           name: 'DAI',
           symbol: 'DAI',
           description: 'DAI Stablecoin',
@@ -196,9 +322,13 @@ class Store {
           price: 0,
           poolValue: 0,
           abi: config.IEarnERC20ABI,
-          version: 1
+          version: 1,
+          disabled: true,
+          invest: 'invest',
+          redeem: 'redeem'
         },
         {
+          id: 'USDCv1',
           name: 'USD Coin',
           symbol: 'USDC',
           description: 'USD//C',
@@ -215,9 +345,13 @@ class Store {
           decimals: 6,
           poolValue: 0,
           abi: config.IEarnERC20ABI,
-          version: 1
+          version: 1,
+          disabled: true,
+          invest: 'invest',
+          redeem: 'redeem'
         },
         {
+          id: 'USDTv1',
           name: 'USDT',
           symbol: 'USDT',
           description: 'Tether USD',
@@ -234,9 +368,13 @@ class Store {
           decimals: 6,
           poolValue: 0,
           abi: config.IEarnERC20ABI,
-          version: 1
+          version: 1,
+          disabled: true,
+          invest: 'invest',
+          redeem: 'redeem'
         },
         {
+          id: 'SUSDv1',
           name: 'SUSD',
           symbol: 'SUSD',
           description: 'Synth sUSD',
@@ -253,29 +391,13 @@ class Store {
           decimals: 18,
           poolValue: 0,
           abi: config.IEarnERC20ABI,
-          version: 1
+          version: 1,
+          disabled: true,
+          invest: 'invest',
+          redeem: 'redeem'
         },
         {
-          name: 'cDAI/cUSDC',
-          symbol: 'CRV',
-          tokenSymbol: 'DAI',
-          description: 'Curve.fi cDAI/cUSDC',
-          investSymbol: 'yCRV',
-          erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-          iEarnContract: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
-          lastMeasurement: 9414437,
-          measurement: 1008192205495361668,
-          apr: 0,
-          maxApr: 0,
-          balance: 0,
-          investedBalance: 0,
-          price: 0,
-          decimals: 18,
-          poolValue: 0,
-          abi: config.IEarnERC20ABI,
-          version: 1
-        },
-        {
+          id: 'wBTCv1',
           name: 'wBTC',
           symbol: 'wBTC',
           tokenSymbol: 'wBTC',
@@ -293,9 +415,37 @@ class Store {
           decimals: 8,
           poolValue: 0,
           abi: config.IEarnERC20ABI,
-          version: 1
+          version: 1,
+          disabled: true,
+          invest: 'invest',
+          redeem: 'redeem'
         },
         {
+          id: 'CRVv1',
+          name: 'cDAI/cUSDC',
+          symbol: 'CRV',
+          tokenSymbol: 'DAI',
+          description: 'Curve.fi cDAI/cUSDC',
+          investSymbol: 'yCRV',
+          erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          iEarnContract: '0x9Ce551A9D2B1A4Ec0cc6eB0E0CC12977F6ED306C',
+          lastMeasurement: 9414437,
+          measurement: 1008192205495361668,
+          apr: 0,
+          maxApr: 0,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 18,
+          poolValue: 0,
+          abi: config.IEarnERC20ABI,
+          version: 1,
+          disabled: true,
+          invest: 'invest',
+          redeem: 'redeem'
+        },
+        {
+          id: 'ETHv1',
           name: 'ETH',
           symbol: 'ETH',
           description: 'Ethereum',
@@ -310,7 +460,10 @@ class Store {
           price: 0,
           poolValue: 0,
           abi: config.IEarnABI,
-          version: 1
+          version: 1,
+          disabled: true,
+          invest: 'invest',
+          redeem: 'redeem'
         },
       ],
       account: {},
@@ -324,7 +477,7 @@ class Store {
       events: [],
       connectorsByName: {
         MetaMask: injected,
-        TrustWallet: walletconnect,
+        TrustWallet: injected,
         WalletConnect: walletconnect,
         WalletLink: walletlink,
         Ledger: ledger,
@@ -640,7 +793,7 @@ class Store {
 
     let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
     if(asset.erc20address === 'Ethereum') {
-      iEarnContract.methods.invest().send({ from: account.address, value: web3.utils.toWei(amount, "ether"), gasPrice: web3.utils.toWei('6', 'gwei') })
+      iEarnContract.methods[asset.invest]().send({ from: account.address, value: web3.utils.toWei(amount, "ether"), gasPrice: web3.utils.toWei('6', 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
           callback(null, hash)
@@ -672,7 +825,7 @@ class Store {
       if (asset.decimals != 18) {
         amountToSend = amount*10**asset.decimals;
       }
-      iEarnContract.methods.invest(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+      iEarnContract.methods[asset.invest](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
           callback(null, hash)
@@ -802,14 +955,14 @@ class Store {
   _callRedeem = async (asset, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
+    let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
 
     var amountSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals != 18) {
       amountSend = amount*10**asset.decimals;
     }
 
-    iEarnContract.methods.redeem(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+    iEarnContract.methods[asset.redeem](amountSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
     .on('transactionHash', function(hash){
       console.log(hash)
       callback(null, hash)

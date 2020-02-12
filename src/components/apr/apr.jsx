@@ -285,12 +285,13 @@ class APR extends Component {
         </div>
         <div className={classes.footer}>
           <div className={classes.footerLinks}>
+            <Typography onClick={()=> window.open("https://iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Home') }</Typography>
             <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.About') }</Typography>
             <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Docs') }</Typography>
             <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Code') }</Typography>
             <Typography onClick={()=> window.open("https://t.me/iearnfinance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Telegram') }</Typography>
             <Typography onClick={()=> window.open("/apr", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Yield') }</Typography>
-            <Typography onClick={ this.builtWithOverlayClicked } className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.BuiltWith') }</Typography>
+            <Typography onClick={()=> window.open("/builtwith", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.BuiltWith') }</Typography>
           </div>
           <div className={ classes.languageContainer }>
             <FormControl variant="outlined">

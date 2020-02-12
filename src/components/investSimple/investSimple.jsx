@@ -90,9 +90,6 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    [theme.breakpoints.up('md')]: {
-      paddingLeft: '38%',
-    }
   },
   introCenter: {
     maxWidth: '500px',
@@ -236,7 +233,6 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    width: '100%'
   },
   languageContainer: {
     paddingLeft: '12px'
@@ -267,7 +263,7 @@ class InvestSimple extends Component {
       modalBuiltWithOpen: false,
       snackbarType: null,
       snackbarMessage: null,
-      hideV1: true
+      hideV1: false
     }
   }
   componentWillMount() {
@@ -300,6 +296,7 @@ class InvestSimple extends Component {
 
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('assets') })
+    setTimeout(this.refresh,5000);
   };
 
   connectionConnected = () => {
@@ -392,8 +389,32 @@ class InvestSimple extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
-          <div className={ classes.introCenter }>
-            <Typography variant='h2'>{ t('InvestSimple.Intro') }</Typography>
+          { account.address &&
+            <div className={ classes.intro }>
+              { account.address && <div className={ classes.versionToggle }>
+                <Switch
+                  id='hideV1'
+                  checked={ hideV1 }
+                  onChange={ this.onChange }
+                  value={ 'hideV1' } />
+                <Typography variant={ 'h6'}>{ t('InvestSimple.Show') }</Typography>
+              </div> }
+              <Typography variant='h2' className={ classes.introText }>{ t('InvestSimple.Intro') }</Typography>
+              <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
+                <Typography variant={ 'h5'} noWrap>{ address }</Typography>
+                <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
+              </Card>
+            </div>
+          }
+          { !account.address &&
+            <div className={ classes.introCenter }>
+              <Typography variant='h2'>{ t('InvestSimple.Intro') }</Typography>
+            </div>
+          }
+          <div className={ classes.balancesContainer }>
+            { false && <div className={ classes.overlay } onClick={ this.overlayClicked }>
+              <Typography variant='h1' >{ t('InvestSimple.Connect') }</Typography>
+            </div>}
           </div>
 
           {!account.address &&
@@ -407,24 +428,6 @@ class InvestSimple extends Component {
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('InvestSimple.Connect') }</Typography>
               </Button>
-            </div>
-          }
-
-          { account.address &&
-            <div className={ classes.tableHeadContainer} >
-              <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-                <Typography variant={ 'h5'} noWrap>{ address }</Typography>
-                <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
-              </Card>
-              <div className={ classes.versionToggle }>
-                <Typography variant={ 'h6'}>{ t('InvestSimple.Show') }</Typography>
-                <Switch
-                  id='hideV1'
-                  checked={ hideV1 }
-                  onChange={ this.onChange }
-                  value={ 'hideV1' } />
-                <Typography variant={ 'h6'}>{ t('InvestSimple.Hide') }</Typography>
-              </div>
             </div>
           }
           { account.address && this.renderAssetBlocks() }
@@ -483,10 +486,12 @@ class InvestSimple extends Component {
     const width = window.innerWidth
 
     return assets.filter((asset) => {
-      return (hideV1 !== true || asset.version !== 1)
+      return (hideV1 === true || asset.version !== 1)
+    }).filter((asset) => {
+      return asset.version == 2 || (asset.version == 1 && (asset.investedBalance).toFixed(4) > 0)
     }).map((asset) => {
       return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.symbol+"_expand" } expanded={ expanded === asset.symbol} onChange={ () => { this.handleChange(asset.symbol) } }>
+        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
           <ExpansionPanelSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
@@ -499,11 +504,12 @@ class InvestSimple extends Component {
                     alt=""
                     src={ require('../../assets/'+asset.symbol+'-logo.png') }
                     height={ width > 600 ? '40px' : '30px'}
+                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
                 </div>
                 <div>
-                  <Typography variant={ 'h3' }>{ asset.name == 'ETH' ? 'Deprecated' : asset.name }</Typography>
-                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
+                  <Typography variant={ 'h5' }>{ asset.version == 1?asset.description+' - v'+asset.version+'':asset.description }</Typography>
                 </div>
               </div>
               <div className={classes.heading}>
@@ -524,8 +530,8 @@ class InvestSimple extends Component {
     })
   }
 
-  handleChange = (symbol) => {
-    this.setState({ expanded: this.state.expanded === symbol ? null : symbol })
+  handleChange = (id) => {
+    this.setState({ expanded: this.state.expanded === id ? null : id })
   }
 
   startLoading = () => {
