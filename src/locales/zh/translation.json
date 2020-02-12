@@ -1,0 +1,31 @@
+{
+  "InvestSimple.Intro": "Earn interest. Simple. ZH.",
+  "InvestSimple.Connect": "Connect wallet",
+  "InvestSimple.Show": "Show V1",
+  "InvestSimple.Hide": "Hide V1",
+  "InvestSimple.Home": "home",
+  "InvestSimple.About": "about",
+  "InvestSimple.Docs": "docs",
+  "InvestSimple.Code": "code",
+  "InvestSimple.Telegram": "telegram",
+  "InvestSimple.Yield": "yield",
+  "InvestSimple.BuiltWith": "builtwith",
+  "InvestSimple.InterestRate": "Interest Rate",
+  "InvestSimple.AvailableBalance": "Available Balance",
+
+  "Asset.InterestRate": "Interest Rate",
+  "Asset.AvailableBalance": "Available Balance",
+  "Asset.Disabled": "Disabled",
+  "Asset.Earn": "Earn",
+  "Asset.Claim": "Claim",
+
+  "Unlock.Deactivate": "Deactivate",
+
+  "APR.HowMuch": "How much do you want to invest?",
+
+  "Snackbar.Error": "Error",
+  "Snackbar.Warning": "Warning",
+  "Snackbar.Info": "Info",
+  "Snackbar.Succecss": "Success",
+  "Snackbar.Hash": "Hash"
+}

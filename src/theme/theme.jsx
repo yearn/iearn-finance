@@ -67,11 +67,8 @@ const iswapTheme =  {
   overrides: {
     MuiSelect: {
       selectMenu: {
-        padding: '0px',
-        minHeight: '72px'
       },
       select: {
-        background: 'none !important',
       }
     },
     MuiInputBase: {
@@ -79,10 +76,8 @@ const iswapTheme =  {
         color: '#010101',
         fontSize: '1.5rem',
         background: 'none',
-        paddingRight: '10px',
         fontWeight: '600',
         borderRadius: '1.25rem',
-        backgroundColor: '#FFFFFF',
         [breakpoints.up('md')]: {
           fontSize: '1.5rem',
         }
