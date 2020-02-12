@@ -264,7 +264,7 @@ class InvestSimple extends Component {
       modalBuiltWithOpen: false,
       snackbarType: null,
       snackbarMessage: null,
-      hideV1: false
+      hideV1: true
     }
   }
   componentWillMount() {
