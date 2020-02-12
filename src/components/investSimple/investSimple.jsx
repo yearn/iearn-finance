@@ -235,7 +235,8 @@ const styles = theme => ({
     justifyContent: 'flex-end',
   },
   languageContainer: {
-    paddingLeft: '12px'
+    paddingLeft: '12px',
+    display: 'none'
   },
   selectInput: {
     fontSize: '14px',
