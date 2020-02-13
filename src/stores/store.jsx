@@ -1012,6 +1012,7 @@ class Store {
         (callbackInner) => { this._getAPY(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getCurrentLender(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getRecommendedLender(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getBalance(web3, asset, account, callbackInner) },
       ], (err, data) => {
         asset.balance = data[0]
         asset.investedBalance = data[1]
@@ -1021,6 +1022,7 @@ class Store {
         asset.apy = data[5]
         asset.current = data[6]
         asset.recommended = data[7]
+        asset.tokenBalance = data[8]
 
         callback(null, asset)
       })
@@ -1049,6 +1051,30 @@ class Store {
 
       try {
         var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
+        balance = parseFloat(balance)/10**asset.decimals
+        callback(null, parseFloat(balance))
+      } catch(ex) {
+        console.log(ex)
+        return callback(ex)
+      }
+    }
+  }
+
+  _getBalance = async (web3, asset, account, callback) => {
+
+    if(asset.erc20address === 'Ethereum') {
+      try {
+        const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(asset.iEarnContract), "ether");
+        callback(null, parseFloat(eth_balance))
+      } catch(ex) {
+        console.log(ex)
+        return callback(ex)
+      }
+    } else {
+      let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
+
+      try {
+        var balance = await erc20Contract.methods.balanceOf(asset.iEarnContract).call({ from: account.address });
         balance = parseFloat(balance)/10**asset.decimals
         callback(null, parseFloat(balance))
       } catch(ex) {
@@ -1191,7 +1217,7 @@ class Store {
       return callback(null, web3.utils.fromWei(parseFloat(aprs).toFixed(0), 'ether'))
     }
 
-    let aprContract = new web3.eth.Contract(config.aggregatedContractABI, config.aggregatedContractAddress)
+    let aprContract = new web3.eth.Contract(config.aprContractABI, config.aprContractAddress)
 
     var call = 'getAPROptions';//+asset.symbol
     var address = asset.erc20address
@@ -1422,7 +1448,6 @@ class Store {
     }
     try {
       const val = await contract.methods['getAPROptionsAdjusted'](apr.address, value).call()
-
       const keys = Object.keys(val)
 
       const vals = keys.filter((key) => {
