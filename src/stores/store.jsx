@@ -413,7 +413,7 @@ class Store {
         {
           id: 'wBTCv1',
           name: 'wBTC',
-          symbol: 'wBTC',
+          symbol: 'WBTC',
           tokenSymbol: 'wBTC',
           description: 'Wrapped BTC',
           investSymbol: 'yBTC',

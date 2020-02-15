@@ -369,7 +369,6 @@ class Asset extends Component {
         amount = amount - 0.009
     }
     amount = Math.floor(amount*10000)/10000;
-
     this.setState({ amount: amount.toFixed(4) })
   }
 
