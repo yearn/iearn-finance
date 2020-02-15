@@ -368,8 +368,8 @@ class Asset extends Component {
     if(percent === 100 && asset.symbol === 'ETH') {
         amount = amount - 0.009
     }
-    amount = Math.floor(amount*10000)/10000;
-    this.setState({ amount: amount.toFixed(4) })
+
+    this.setState({ amount: amount.toString() })
   }
 
   setRedeemAmount = (percent) => {
@@ -380,9 +380,8 @@ class Asset extends Component {
 
     const balance = this.props.asset.investedBalance
     let amount = balance*percent/100
-    amount = Math.floor(amount*10000)/10000;
 
-    this.setState({ redeemAmount: amount.toFixed(4) })
+    this.setState({ redeemAmount: amount.toString() })
   }
 }
 
