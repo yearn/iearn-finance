@@ -8,9 +8,17 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
+  Switch,
+  Select,
+  MenuItem,
+  FormControl
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { withNamespaces } from 'react-i18next';
+import i18n from '../../i18n';
+import { colors } from '../../theme'
 
+import BuiltWithModal from '../builtwith/builtwithModal.jsx'
 import UnlockModal from '../unlock/unlockModal.jsx'
 import Snackbar from '../snackbar'
 import Asset from './asset'
@@ -52,6 +60,10 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     padding: '12px',
+    minWidth: '100%',
+    [theme.breakpoints.up('md')]: {
+      minWidth: '800px',
+    }
   },
   balancesContainer: {
     display: 'flex',
@@ -78,14 +90,12 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    [theme.breakpoints.up('md')]: {
-      paddingLeft: '38%',
-    }
   },
   introCenter: {
     maxWidth: '500px',
     textAlign: 'center',
     display: 'flex',
+    padding: '48px 0px'
   },
   introText: {
     paddingLeft: '20px'
@@ -148,11 +158,25 @@ const styles = theme => ({
   footer: {
     padding: '24px',
     display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+    width: '100%',
+    alignItems: 'center',
+    [theme.breakpoints.up('sm')]: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
+      alignItems: 'center',
+    }
+  },
+  footerLinks: {
+    display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    width: '100%',
+    maxWidth: '350px'
   },
   footerText: {
-    padding: '10px',
     cursor: 'pointer'
   },
   buttonText: {
@@ -191,33 +215,56 @@ const styles = theme => ({
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     fontSize: '0.83rem',
-    margin: "0px 0.5rem 0px 0.25rem",
     textOverflow:'ellipsis',
     cursor: 'pointer',
     padding: '10px',
     borderRadius: '0.75rem',
+    height: 'max-content',
     [theme.breakpoints.up('md')]: {
-      maxWidth: '150px',
+      maxWidth: '130px',
+      width: '100%'
     }
   },
   expansionPanel: {
-    maxWidth: 'calc(100vw - 24px)'
+    maxWidth: 'calc(100vw - 24px)',
+    width: '100%'
+  },
+  versionToggle: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  languageContainer: {
+    paddingLeft: '12px',
+    display: 'none'
+  },
+  selectInput: {
+    fontSize: '14px',
+    color: colors.pink
+  },
+  tableHeadContainer: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   }
 });
 
 class InvestSimple extends Component {
 
-  constructor() {
+  constructor(props) {
     super()
-
-    // dispatcher.dispatch({ type: CONNECT_METAMASK_PASSIVE, content: {} })
 
     this.state = {
       assets: store.getStore('assets'),
       account: store.getStore('account'),
+      languages: store.getStore('languages'),
+      language: 'en',
       modalOpen: false,
+      modalBuiltWithOpen: false,
       snackbarType: null,
       snackbarMessage: null,
+      hideV1: true
     }
   }
   componentWillMount() {
@@ -250,6 +297,7 @@ class InvestSimple extends Component {
 
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('assets') })
+    setTimeout(this.refresh,5000);
   };
 
   connectionConnected = () => {
@@ -324,12 +372,16 @@ class InvestSimple extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, t } = this.props;
     const {
       loading,
       account,
       modalOpen,
-      snackbarMessage
+      modalBuiltWithOpen,
+      snackbarMessage,
+      hideV1,
+      languages,
+      language
     } = this.state
     var address = null;
     if (account.address) {
@@ -340,7 +392,15 @@ class InvestSimple extends Component {
         <div className={ classes.investedContainer }>
           { account.address &&
             <div className={ classes.intro }>
-              <Typography variant='h2' className={ classes.introText }>Earn interest. Simple.</Typography>
+              { account.address && <div className={ classes.versionToggle }>
+                <Switch
+                  id='hideV1'
+                  checked={ hideV1 }
+                  onChange={ this.onChange }
+                  value={ 'hideV1' } />
+                <Typography variant={ 'h6'}>{ t('InvestSimple.Show') }</Typography>
+              </div> }
+              <Typography variant='h2' className={ classes.introText }>{ t('InvestSimple.Intro') }</Typography>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
                 <Typography variant={ 'h5'} noWrap>{ address }</Typography>
                 <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
@@ -349,12 +409,12 @@ class InvestSimple extends Component {
           }
           { !account.address &&
             <div className={ classes.introCenter }>
-              <Typography variant='h2'>Earn interest. Simple.</Typography>
+              <Typography variant='h2'>{ t('InvestSimple.Intro') }</Typography>
             </div>
           }
           <div className={ classes.balancesContainer }>
             { false && <div className={ classes.overlay } onClick={ this.overlayClicked }>
-              <Typography variant='h1' >Connect wallet</Typography>
+              <Typography variant='h1' >{ t('InvestSimple.Connect') }</Typography>
             </div>}
           </div>
 
@@ -367,36 +427,72 @@ class InvestSimple extends Component {
                 disabled={ loading }
                 onClick={ this.overlayClicked }
                 >
-                <Typography className={ classes.buttonText } variant={ 'h5'}>Connect Wallet</Typography>
+                <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('InvestSimple.Connect') }</Typography>
               </Button>
             </div>
           }
-
           { account.address && this.renderAssetBlocks() }
         </div>
         { loading && <Loader /> }
         <div className={classes.footer}>
-          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>about</Typography>
-          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>docs</Typography>
-          <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>code</Typography>
-          <Typography onClick={()=> window.open("https://t.me/iearnfinance", "_blank")} className={ classes.footerText } variant={ 'h6'}>telegram</Typography>
-          <Typography onClick={()=> window.open("/apr", "_blank")} className={ classes.footerText } variant={ 'h6'}>yield</Typography>
+          <div className={classes.footerLinks}>
+            <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.About') }</Typography>
+            <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Docs') }</Typography>
+            <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Code') }</Typography>
+            <Typography onClick={()=> window.open("https://t.me/iearnfinance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Telegram') }</Typography>
+            <Typography onClick={()=> window.open("/apr", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Yield') }</Typography>
+            <Typography onClick={ this.builtWithOverlayClicked } className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.BuiltWith') }</Typography>
+          </div>
+          <div className={ classes.languageContainer }>
+            <FormControl variant="outlined">
+              <Select
+                id="language"
+                value={ language }
+                onChange={ this.handleLanguageChange }
+                inputProps={{ className: classes.selectInput }}
+                color="primary"
+                fullWidth
+              >
+                { languages.map((language) => {
+                  return <MenuItem value={language.code}>{language.language}</MenuItem>
+                })}
+              </Select>
+            </FormControl>
+          </div>
         </div>
         { modalOpen && this.renderModal() }
+        { modalBuiltWithOpen && this.renderBuiltWithModal() }
         { snackbarMessage && this.renderSnackbar() }
       </div>
     )
   };
 
+  onChange = (event) => {
+    let val = []
+    val[event.target.id] = event.target.checked
+    this.setState(val)
+  };
+
+  handleLanguageChange = (event) => {
+    let val = []
+    val.language = event.target.value
+    this.setState(val)
+
+    i18n.changeLanguage(event.target.value)
+  }
 
   renderAssetBlocks = () => {
-    const { assets, expanded } = this.state
-    const { classes } = this.props
+    const { assets, expanded, hideV1 } = this.state
+    const { classes, t } = this.props
     const width = window.innerWidth
 
-    return assets.map((asset) => {
+    return assets.filter((asset) => {
+      return (hideV1 === true || asset.version !== 1)
+    }).filter((asset) => {
+      return asset.version == 2 || (asset.version == 1 && (asset.investedBalance).toFixed(4) > 0)
+    }).map((asset) => {
       return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.symbol+"_expand" } expanded={ expanded === asset.symbol} onChange={ () => { this.handleChange(asset.symbol) } }>
+        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
           <ExpansionPanelSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
@@ -409,20 +505,21 @@ class InvestSimple extends Component {
                     alt=""
                     src={ require('../../assets/'+asset.symbol+'-logo.png') }
                     height={ width > 600 ? '40px' : '30px'}
+                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
                 </div>
                 <div>
                   <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                  <Typography variant={ 'h5' }>{ asset.version == 1?asset.description+' - v'+asset.version+'':asset.description }</Typography>
                 </div>
               </div>
               <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
-                <Typography variant={ 'h5' }>{'Interest Rate'}</Typography>
+                <Typography variant={ 'h5' }>{ t('InvestSimple.InterestRate') }</Typography>
               </div>
               <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
-                <Typography variant={ 'h5' }>{'Available Balance'}</Typography>
+                <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
               </div>
             </div>
           </ExpansionPanelSummary>
@@ -434,8 +531,8 @@ class InvestSimple extends Component {
     })
   }
 
-  handleChange = (symbol) => {
-    this.setState({ expanded: this.state.expanded === symbol ? null : symbol })
+  handleChange = (id) => {
+    this.setState({ expanded: this.state.expanded === id ? null : id })
   }
 
   startLoading = () => {
@@ -461,6 +558,12 @@ class InvestSimple extends Component {
     )
   }
 
+  renderBuiltWithModal = () => {
+    return (
+      <BuiltWithModal closeModal={ this.closeBuiltWithModal } modalOpen={ this.state.modalBuiltWithOpen } />
+    )
+  }
+
   overlayClicked = () => {
     this.setState({ modalOpen: true })
   }
@@ -468,6 +571,14 @@ class InvestSimple extends Component {
   closeModal = () => {
     this.setState({ modalOpen: false })
   }
+
+  builtWithOverlayClicked = () => {
+    this.setState({ modalBuiltWithOpen: true })
+  }
+
+  closeBuiltWithModal = () => {
+    this.setState({ modalBuiltWithOpen: false })
+  }
 }
 
-export default withRouter(withStyles(styles)(InvestSimple));
+export default withNamespaces()(withRouter(withStyles(styles)(InvestSimple)));

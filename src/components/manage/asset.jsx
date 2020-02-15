@@ -283,6 +283,8 @@ class Asset extends Component {
       </div>
       <div className={classes.tradeContainer}>
         <div className={ classes.textContainer }>
+          <Typography className={ classes.text } variant={ 'h5' }>{ 'Token: ' }</Typography>
+          <Typography className={ classes.text } variant={ 'h3' }>{ parseFloat(asset.tokenBalance).toFixed(2) }</Typography>
           <Typography className={ classes.text } variant={ 'h5' }>{ 'Current: ' }</Typography>
           <Typography className={ classes.text } variant={ 'h3' }>{ this.lender(asset.current) }</Typography>
           <Typography className={ classes.text } variant={ 'h5' }>{ 'Recommend: ' }</Typography>

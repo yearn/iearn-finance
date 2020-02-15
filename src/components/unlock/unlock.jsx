@@ -7,6 +7,7 @@ import {
   CircularProgress
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
+import { withNamespaces } from 'react-i18next';
 
 import Web3 from 'web3'
 import {
@@ -204,84 +205,19 @@ class Unlock extends Component {
   }
 
   render() {
-    const { classes, closeModal } = this.props;
+    const { classes, closeModal, t } = this.props;
     const { metamaskLoading, ledgerLoading } = this.state;
 
     return (
       <div className={ classes.root }>
         <div className={ classes.closeIcon } onClick={ closeModal }><CloseIcon /></div>
         <div className={ classes.contentContainer }>
-          { /* metamaskLoading && this.renderMetamaskLoading() */ }
-          { /* ledgerLoading && this.renderLedgerLoading() */ }
-          { /* (!metamaskLoading && !ledgerLoading) && this.renderOptions() */ }
-          { /* (!metamaskLoading && !ledgerLoading && closeModal != null) && <Button className={ classes.actionButton } variant='outlined' color='secondary' onClick={ closeModal } fullWidth>
-            <Typography className={ classes.buttonText } variant={ 'h5'}>Close</Typography>
-          </Button> */ }
-
-
           <Web3ReactProvider getLibrary={getLibrary}>
-            <MyComponent closeModal={ closeModal} />
+            <MyComponent closeModal={ closeModal} t={t} />
           </Web3ReactProvider>
         </div>
       </div>
     )
-  };
-
-  renderMetamaskLoading = () => {
-    const { classes } = this.props;
-
-    return (<div className={ classes.cardContainer }>
-      <div className={ classes.metamask }>
-      </div>
-      <Typography variant={ 'h3'} className={ classes.instruction }>
-        Click connect in the MetaMask notification window to connect your wallet to iearn finance.
-      </Typography>
-      <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.cancelMetamask } fullWidth>
-        <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Cancel</Typography>
-      </Button>
-    </div>)
-  };
-
-  renderLedgerLoading = () => {
-    const { classes } = this.props;
-
-    return (<div className={ classes.cardContainer }>
-      <div className={ classes.ledger }>
-      </div>
-      <Typography variant={ 'h3'} className={ classes.instruction }>
-        Insert yout ledger device and authorize iEarn.
-      </Typography>
-      <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.cancelLedger } fullWidth>
-        <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Cancel</Typography>
-      </Button>
-    </div>)
-  }
-
-  renderOptions = () => {
-    const { classes, closeModal } = this.props;
-    const connectorsByName = store.getStore('connectorsByName')
-
-    return Object.keys(connectorsByName).map((name) => {
-      return (<Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ () => { this.unlockConnector(name) } } fullWidth>
-        <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Unlock using {name}</Typography>
-      </Button>)
-    })
-
-    // return (
-    //   <div className={ classes.cardContainer }>
-    //     <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.unlockMetamask } fullWidth>
-    //       <div className={ classes.metamaskIcon }></div>
-    //       <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Unlock using Metamask</Typography>
-    //     </Button>
-    //     <Button className={ classes.actionButton } variant='outlined' color='primary' onClick={ this.unlockLedger } fullWidth>
-    //       <div className={ classes.ledgerIcon }></div>
-    //       <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Unlock using Ledger</Typography>
-    //     </Button>
-    //     { closeModal != null && <Button className={ classes.actionButton } variant='outlined' color='secondary' onClick={ closeModal } fullWidth>
-    //       <Typography className={ classes.buttonText } variant={ 'h5'}>Close</Typography>
-    //     </Button> }
-    //   </div>
-    // )
   };
 }
 
@@ -344,11 +280,9 @@ function MyComponent(props) {
     active,
     error
   } = context;
-  const connectorsByName = store.getStore('connectorsByName')
+  var connectorsByName = store.getStore('connectorsByName')
 
-  console.log(localContext);
-
-  const { closeModal } = props
+  const { closeModal, t } = props
 
   const [activatingConnector, setActivatingConnector] = React.useState();
   React.useEffect(() => {
@@ -359,7 +293,6 @@ function MyComponent(props) {
 
   React.useEffect(() => {
     if (account && active && library) {
-      console.log("we are active: "+account)
       store.setStore({ account: { address: account }, web3context: context })
       emitter.emit(CONNECTION_CONNECTED)
     }
@@ -390,11 +323,12 @@ function MyComponent(props) {
 
         var url;
         var display = name;
-        if (name == 'Injected') {
-          display = 'MetaMask';
+        if (name == 'MetaMask') {
           url = require('../../assets/icn-metamask.svg')
         } else if (name == 'WalletConnect') {
           url = require('../../assets/walletConnectIcon.svg')
+        } else if (name == 'TrustWallet') {
+          url = require('../../assets/trustWallet.png')
         } else if (name == 'Portis') {
           url = require('../../assets/portisIcon.png')
         } else if (name == 'Fortmatic') {
@@ -407,10 +341,12 @@ function MyComponent(props) {
           url = require('../../assets/trezor.png')
         } else if (name == 'Torus') {
           url = require('../../assets/torus.jpg')
+        } else if (name == 'Authereum') {
+          url = require('../../assets/icn-aethereum.svg')
         } else if (name == 'WalletLink') {
           display = 'Coinbase Wallet'
           url = require('../../assets/coinbaseWalletIcon.svg')
-        } else if (name == 'Frame'||name == 'Authereum') {
+        } else if (name == 'Frame') {
           return ''
         }
 
@@ -476,7 +412,7 @@ function MyComponent(props) {
             } }
             variant={ 'h5'}
             color='primary'>
-            Deactivate
+            { t('Unlock.Deactivate') }
           </Typography>
         </Button>
       </div>
@@ -485,6 +421,4 @@ function MyComponent(props) {
 
 }
 
-
-
-export default withRouter(withStyles(styles)(Unlock));
+export default withNamespaces()(withRouter(withStyles(styles)(Unlock)));

@@ -72,4 +72,4 @@ export const squarelink = new SquarelinkConnector({
 
 export const torus = new TorusConnector({ chainId: 1 });
 
-export const authereum = new AuthereumConnector({ chainId: 42 });
+export const authereum = new AuthereumConnector({ chainId: 1 });
