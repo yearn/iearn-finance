@@ -79,7 +79,9 @@ class Store {
         },*/{
           token: 'TUSD',
           address: '0x0000000000085d4780B73119b644AE5ecd22b376',
-          earnAddress: '',
+          earnAddress: '0x73a052500105205d34daf004eab301916da8190f',
+          lastMeasurement: 9479531,
+          measurement: 1000197346651007837 ,
           created: 0,
           mod: 1,
           decimals: 18
@@ -279,8 +281,8 @@ class Store {
           investSymbol: 'yTUSD',
           erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
           iEarnContract: '0x73a052500105205d34Daf004eAb301916DA8190f',
-          lastMeasurement: 9465880,
-          measurement: 1000003573234019982,
+          lastMeasurement: 9479531,
+          measurement: 1000197346651007837 ,
           apr: 0,
           maxApr: 0,
           balance: 0,
@@ -516,6 +518,11 @@ class Store {
           website: 'https://www.defisnap.io',
           logo: 'defisnap.svg',
           name: 'DefiSnap'
+        },
+        {
+          website: 'https://www.defipulse.com',
+          logo: 'defipulse.png',
+          name: 'DeFi Pulse'
         },
         {
           website: 'https://www.curve.fi',
@@ -1217,7 +1224,7 @@ class Store {
       return callback(null, web3.utils.fromWei(parseFloat(aprs).toFixed(0), 'ether'))
     }
 
-    let aprContract = new web3.eth.Contract(config.aprContractABI, config.aprContractAddress)
+    let aprContract = new web3.eth.Contract(config.aggregatedContractABI, config.aggregatedContractAddress)
 
     var call = 'getAPROptions';//+asset.symbol
     var address = asset.erc20address
