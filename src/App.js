@@ -14,7 +14,7 @@ import APR from './components/apr';
 import InvestSimple from './components/investSimple';
 import Manage from './components/manage';
 import Performance from './components/performance';
-
+import Zap from './components/zap';
 
 class App extends Component {
 
@@ -37,6 +37,9 @@ class App extends Component {
               </Route>
               <Route path="/invest">
                 <InvestSimple />
+              </Route>
+              <Route path="/zap">
+                <Zap />
               </Route>
               <Route path="/performance">
                 <Performance />

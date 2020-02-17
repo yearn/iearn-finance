@@ -26,7 +26,13 @@ import {
   GET_UNISWAP_COMPARRISONS,
   GET_UNISWAP_COMPARRISONS_RETURNED,
   GET_CONTRACT_EVENTS,
-  GET_CONTRACT_EVENTS_RETURNED
+  GET_CONTRACT_EVENTS_RETURNED,
+  ZAP,
+  ZAP_RETURNED,
+  SWAP,
+  SWAP_RETURNED,
+  GET_CURV_BALANCE,
+  GET_CURV_BALANCE_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 import createLedgerSubprovider from "@ledgerhq/web3-subprovider";
@@ -202,7 +208,8 @@ class Store {
           version: 2,
           disabled: false,
           invest: 'deposit',
-          redeem: 'withdraw'
+          redeem: 'withdraw',
+          curve: true,
         },
         {
           id: 'USDCv2',
@@ -225,7 +232,8 @@ class Store {
           version: 2,
           disabled: false,
           invest: 'deposit',
-          redeem: 'withdraw'
+          redeem: 'withdraw',
+          curve: true,
         },
         {
           id: 'USDTv2',
@@ -248,7 +256,8 @@ class Store {
           version: 2,
           disabled: false,
           invest: 'deposit',
-          redeem: 'withdraw'
+          redeem: 'withdraw',
+          curve: true,
         },
         {
           id: 'SUSDv2',
@@ -271,7 +280,8 @@ class Store {
           version: 2,
           disabled: false,
           invest: 'deposit',
-          redeem: 'withdraw'
+          redeem: 'withdraw',
+          curve: false,
         },
         {
           id: 'TUSDv2',
@@ -294,7 +304,8 @@ class Store {
           version: 2,
           disabled: false,
           invest: 'deposit',
-          redeem: 'withdraw'
+          redeem: 'withdraw',
+          curve: true,
         },
         {
           id: 'wBTCv2',
@@ -317,7 +328,8 @@ class Store {
           version: 2,
           disabled: false,
           invest: 'deposit',
-          redeem: 'withdraw'
+          redeem: 'withdraw',
+          curve: false,
         },
         {
           id: 'DAIv1',
@@ -339,7 +351,8 @@ class Store {
           version: 1,
           disabled: true,
           invest: 'invest',
-          redeem: 'redeem'
+          redeem: 'redeem',
+          curve: false,
         },
         {
           id: 'USDCv1',
@@ -362,7 +375,8 @@ class Store {
           version: 1,
           disabled: true,
           invest: 'invest',
-          redeem: 'redeem'
+          redeem: 'redeem',
+          curve: false,
         },
         {
           id: 'USDTv1',
@@ -385,7 +399,8 @@ class Store {
           version: 1,
           disabled: true,
           invest: 'invest',
-          redeem: 'redeem'
+          redeem: 'redeem',
+          curve: false,
         },
         {
           id: 'SUSDv1',
@@ -408,7 +423,8 @@ class Store {
           version: 1,
           disabled: true,
           invest: 'invest',
-          redeem: 'redeem'
+          redeem: 'redeem',
+          curve: false,
         },
         {
           id: 'wBTCv1',
@@ -432,7 +448,8 @@ class Store {
           version: 1,
           disabled: true,
           invest: 'invest',
-          redeem: 'redeem'
+          redeem: 'redeem',
+          curve: false,
         },
         {
           id: 'CRVv1',
@@ -456,7 +473,8 @@ class Store {
           version: 1,
           disabled: true,
           invest: 'invest',
-          redeem: 'redeem'
+          redeem: 'redeem',
+          curve: false,
         },
         {
           id: 'ETHv1',
@@ -477,8 +495,42 @@ class Store {
           version: 1,
           disabled: true,
           invest: 'invest',
-          redeem: 'redeem'
+          redeem: 'redeem',
+          curve: false,
         },
+        // {
+        //   id: 'CurveV1',
+        //   symbol: 'Curve V1',
+        //   version: 1,
+        //   erc20address: '0x3740fb63ab7a09891d7c0d4299442a551d06f5fd',
+        //   iEarnContract:  null,
+        //   decimals: 18,
+        //   balance: 0,
+        //   disabled: true,
+        //   curve: true
+        // },
+        // {
+        //   id: 'CurveV2',
+        //   symbol: 'Curve V2',
+        //   version: 2,
+        //   erc20address: '0x9fc689ccada600b6df723d9e47d84d76664a1f23',
+        //   iEarnContract:  null,
+        //   decimals: 18,
+        //   balance: 0,
+        //   disabled: true,
+        //   curve: true
+        // },
+        // {
+        //   id: 'CurveV3',
+        //   symbol: 'Curve V3',
+        //   version: 3,
+        //   erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
+        //   iEarnContract:  null,
+        //   decimals: 18,
+        //   balance: 0,
+        //   disabled: true,
+        //   curve: true
+        // }
       ],
       account: {},
       web3: null,
@@ -604,6 +656,30 @@ class Store {
           language: 'Chinese',
           code: 'zh'
         }
+      ],
+      curvBalance: 0,
+      curveContracts: [
+        {
+          symbol: 'CurveV1',
+          version: 1,
+          erc20address: '0x3740fb63ab7a09891d7c0d4299442a551d06f5fd',
+          decimals: 18,
+          balance: 0
+        },
+        {
+          symbol: 'CurveV2',
+          version: 2,
+          erc20address: '0x9fc689ccada600b6df723d9e47d84d76664a1f23',
+          decimals: 18,
+          balance: 0
+        },
+        {
+          symbol: 'CurveV3',
+          version: 3,
+          erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
+          decimals: 18,
+          balance: 0
+        }
       ]
     }
 
@@ -648,6 +724,15 @@ class Store {
             break;
           case GET_CONTRACT_EVENTS:
             this.getContractEvents(payload)
+            break;
+          case ZAP:
+            this.zap(payload)
+            break;
+          case SWAP:
+            this.swap(payload)
+            break;
+          case GET_CURV_BALANCE:
+            this.getCurveBalances(payload)
             break;
           default: {
           }
@@ -762,7 +847,7 @@ class Store {
     const { asset, amount } = payload.content
 
     if(asset.erc20address !== 'Ethereum') {
-      this._checkApproval(asset, account, amount, (err) => {
+      this._checkApproval(asset, account, amount, asset.iEarnContract, (err) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
@@ -786,15 +871,15 @@ class Store {
     }
   }
 
-  _checkApproval = async (asset, account, amount, callback) => {
+  _checkApproval = async (asset, account, amount, contract, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
     let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
 
     try {
-      const allowance = await erc20Contract.methods.allowance(account.address, asset.iEarnContract).call({ from: account.address })
+      const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
 
       if(parseFloat(allowance) < parseFloat(amount)) {
-        const allowanceSet = await erc20Contract.methods.approve(asset.iEarnContract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+        const allowanceSet = await erc20Contract.methods.approve(contract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         callback()
       } else {
         callback()
@@ -841,7 +926,7 @@ class Store {
         })
     } else {
       var amountToSend = web3.utils.toWei(amount, "ether")
-      if (asset.decimals != 18) {
+      if (asset.decimals !== 18) {
         amountToSend = amount*10**asset.decimals;
       }
       iEarnContract.methods[asset.invest](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
@@ -933,7 +1018,7 @@ class Store {
     let iEarnContract = new web3.eth.Contract(config.IEarnERC20ABI, asset.erc20address)
 
     var amountSend = web3.utils.toWei(amount, "ether")
-    if (asset.decimals != 18) {
+    if (asset.decimals !== 18) {
       amountSend = amount*10**asset.decimals;
     }
 
@@ -977,7 +1062,7 @@ class Store {
     let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
 
     var amountSend = web3.utils.toWei(amount, "ether")
-    if (asset.decimals != 18) {
+    if (asset.decimals !== 18) {
       amountSend = amount*10**asset.decimals;
     }
 
@@ -1175,7 +1260,7 @@ class Store {
         value = web3.utils.fromWei(await iEarnContract.methods.calcPoolValueInETH().call({ from: account.address }), 'ether');
       } else {
         value = await iEarnContract.methods.calcPoolValueInToken().call({ from: account.address });
-        if (asset.decimals == 18) {
+        if (asset.decimals === 18) {
           value = web3.utils.fromWei(value, 'ether');
         } else {
           value = value / (10 ** asset.decimals);
@@ -1217,7 +1302,7 @@ class Store {
     if(asset.iEarnContract === null) {
       return callback(null, asset)
     }
-    if (asset.symbol == 'CRV') {
+    if (asset.symbol === 'CRV') {
       let aprContract = new web3.eth.Contract(config.crvContractABI, config.crvAddress)
       const call = 'crvapr'
       const aprs = await aprContract.methods[call]().call();
@@ -1229,7 +1314,7 @@ class Store {
     var call = 'getAPROptions';//+asset.symbol
     var address = asset.erc20address
     var aprs = 0;
-    if (asset.erc20address == 'Ethereum') {
+    if (asset.erc20address === 'Ethereum') {
       call = 'getETH';
       aprs = await aprContract.methods[call]().call();
     } else {
@@ -1448,7 +1533,7 @@ class Store {
   _getAPR = async (web3, apr, callback) => {
     let contract = new web3.eth.Contract(config.aprContractABI, config.aprContractAddress)
     var value = apr.value;
-    if (apr.decimals == 6) {
+    if (apr.decimals === 6) {
       value = web3.utils.toWei(apr.value, 'picoether');
     } else {
       value = web3.utils.toWei(apr.value, 'ether');
@@ -1469,7 +1554,7 @@ class Store {
 
       for(let i = 0; i < vals.length; i++) {
         const keys = Object.keys(vals[i])
-        if (keys == '_unifulcrum'||keys =='_uniaave'||keys=='_unicompound'||keys=='_lendf') {
+        if (keys[0] === '_unifulcrum'||keys[0] === '_uniaave'||keys[0] === '_unicompound'||keys[0] === '_lendf') {
           // skip
         } else {
           output[keys[0]] = vals[i][keys[0]]
@@ -1550,11 +1635,11 @@ class Store {
             return false
           }
 
-          if(!tx.returnValues.value || tx.returnValues.value == 0) {
+          if(!tx.returnValues.value || tx.returnValues.value === 0) {
             return false
           }
 
-          if(tx.returnValues.from != '0x0000000000000000000000000000000000000000') {
+          if(tx.returnValues.from !== '0x0000000000000000000000000000000000000000') {
             return false
           }
 
@@ -1607,6 +1692,202 @@ class Store {
   _getIEthBalance = async (web3, iEarnContract, address) => {
     const balance = web3.utils.fromWei(await iEarnContract.methods.balanceOf(address).call({ }), 'ether');
     return balance
+  }
+
+  swap = (payload) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const account = store.getStore('account')
+    const { sendAsset, receiveAsset, amount } = payload.content
+
+    this._checkApproval(sendAsset, account, amount, config.yCurveZapSwapAddress, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callSwap(sendAsset, account, amount, (err, swapResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(SWAP_RETURNED, swapResult)
+      })
+    })
+  }
+
+  _callSwap = (sendAsset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    var amountToSend = web3.utils.toWei(amount, "ether")
+    if (sendAsset.decimals !== 18) {
+      amountToSend = amount*10**sendAsset.decimals;
+    }
+
+    let call = ''
+
+    switch (sendAsset.symbol) {
+      case 'CurveV1':
+        call = 'swapv1tov3'
+        break;
+      case 'CurveV2':
+        call = 'swapv2tov3'
+        break;
+      default:
+    }
+
+    console.log(config.yCurveZapSwapAddress)
+    console.log(call)
+    console.log(amountToSend)
+    console.log(account.address)
+    console.log(web3.utils.toWei('6', 'gwei'))
+
+    let yCurveZapSwapContract = new web3.eth.Contract(config.yCurveZapSwapABI, config.yCurveZapSwapAddress)
+    yCurveZapSwapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  zap = (payload) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const account = store.getStore('account')
+    const { sendAsset, receiveAsset, amount } = payload.content
+
+    this._checkApproval(sendAsset, account, amount, config.yCurveZapAddress, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callZap(sendAsset, receiveAsset, account, amount, (err, zapResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(ZAP_RETURNED, zapResult)
+      })
+    })
+  }
+
+  _callZap = (sendAsset, receiveAsset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    var amountToSend = web3.utils.toWei(amount, "ether")
+    if (sendAsset.decimals !== 18) {
+      amountToSend = amount*10**sendAsset.decimals;
+    }
+
+    let call = ''
+
+    switch (sendAsset.symbol) {
+      case 'DAI':
+        call = 'depositDAI'
+        break;
+      case 'USDC':
+        call = 'depositUSDC'
+        break;
+      case 'USDT':
+        call = 'depositUSDT'
+        break;
+      case 'TUSD':
+        call = 'depositTUSD'
+        break;
+      case 'Curve.fi':
+        switch (receiveAsset.symbol) {
+          case 'DAI':
+            call = 'withdrawDAI'
+            break;
+          case 'USDC':
+            call = 'withdrawUSDC'
+            break;
+          case 'USDT':
+            call = 'withdrawUSDT'
+            break;
+          case 'TUSD':
+            call = 'withdrawTUSD'
+            break;
+          default:
+
+        }
+        break;
+      default:
+    }
+
+    let yCurveZapContract = new web3.eth.Contract(config.yCurveZapABI, config.yCurveZapAddress)
+    yCurveZapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  getCurveBalances = (payload) => {
+    const account = store.getStore('account')
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const curveContracts = store.getStore('curveContracts')
+
+    async.map(curveContracts, (curv, callback) => {
+
+      this._getERC20Balance(web3, curv, account, (err, balance) => {
+        if(err) {
+          return callback(err)
+        }
+        curv.balance = balance
+
+        callback(null, curv)
+      })
+    }, (err, result) => {
+
+      store.setStore({ curveContracts: result })
+
+      return emitter.emit(GET_CURV_BALANCE_RETURNED, result)
+    })
   }
 }
 

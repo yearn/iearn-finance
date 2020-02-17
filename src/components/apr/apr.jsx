@@ -341,7 +341,7 @@ class APR extends Component {
       aggregatedYields.map((y) => {
 
         const keys = Object.keys(y.apr)
-        if (y.token == 'WBTC') {
+        if (y.token === 'WBTC') {
           y.token = 'wBTC';
         }
 
@@ -360,14 +360,14 @@ class APR extends Component {
             { keys.map((key) => {
 
                 let val = parseFloat(y.apr[key])
-                if((key === '_uniswap' || key === 'unicapr') && val != 0) {
+                if((key === '_uniswap' || key === 'unicapr') && val !== 0) {
                   val = val*100 - 100
                 } else {
                   val = val*100
                 }
 
                 return (<td key={ key } className={ classes.apr }>
-                  <Typography align='right' color='secondary'>{ val == 0 ? '' : ((val).toFixed(4) + ' %') }</Typography>
+                  <Typography align='right' color='secondary'>{ val === 0 ? '' : ((val).toFixed(4) + ' %') }</Typography>
                 </td>)
               })
             }

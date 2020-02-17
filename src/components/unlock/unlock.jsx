@@ -323,30 +323,30 @@ function MyComponent(props) {
 
         var url;
         var display = name;
-        if (name == 'MetaMask') {
+        if (name === 'MetaMask') {
           url = require('../../assets/icn-metamask.svg')
-        } else if (name == 'WalletConnect') {
+        } else if (name === 'WalletConnect') {
           url = require('../../assets/walletConnectIcon.svg')
-        } else if (name == 'TrustWallet') {
+        } else if (name === 'TrustWallet') {
           url = require('../../assets/trustWallet.png')
-        } else if (name == 'Portis') {
+        } else if (name === 'Portis') {
           url = require('../../assets/portisIcon.png')
-        } else if (name == 'Fortmatic') {
+        } else if (name === 'Fortmatic') {
           url = require('../../assets/fortmaticIcon.png')
-        } else if (name == 'Ledger') {
+        } else if (name === 'Ledger') {
           url = require('../../assets/icn-ledger.svg')
-        } else if (name == 'Squarelink') {
+        } else if (name === 'Squarelink') {
           url = require('../../assets/squarelink.png')
-        } else if (name == 'Trezor') {
+        } else if (name === 'Trezor') {
           url = require('../../assets/trezor.png')
-        } else if (name == 'Torus') {
+        } else if (name === 'Torus') {
           url = require('../../assets/torus.jpg')
-        } else if (name == 'Authereum') {
+        } else if (name === 'Authereum') {
           url = require('../../assets/icn-aethereum.svg')
-        } else if (name == 'WalletLink') {
+        } else if (name === 'WalletLink') {
           display = 'Coinbase Wallet'
           url = require('../../assets/coinbaseWalletIcon.svg')
-        } else if (name == 'Frame') {
+        } else if (name === 'Frame') {
           return ''
         }
 
