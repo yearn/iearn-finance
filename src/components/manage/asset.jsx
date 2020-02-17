@@ -306,15 +306,15 @@ class Asset extends Component {
   };
 
   lender = (val) => {
-    if (val == 0) {
+    if (val === 0) {
       return 'NONE'
-    } else if (val == 1) {
+    } else if (val === 1) {
       return 'dYdX'
-    } else if (val == 2) {
+    } else if (val === 2) {
       return 'Compound'
-    } else if (val == 3) {
+    } else if (val === 3) {
       return 'Aave'
-    } else if (val == 4) {
+    } else if (val === 4) {
       return 'Fulcrum'
     }
   }
@@ -370,7 +370,7 @@ class Asset extends Component {
     const balance = asset.balance
     let amount = balance*percent/100
 
-    if (percent == 100) {
+    if (percent === 100) {
       amount = ((asset.poolValue/100)*10)/365;
     }
 

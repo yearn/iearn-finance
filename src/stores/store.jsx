@@ -841,7 +841,7 @@ class Store {
         })
     } else {
       var amountToSend = web3.utils.toWei(amount, "ether")
-      if (asset.decimals != 18) {
+      if (asset.decimals !== 18) {
         amountToSend = amount*10**asset.decimals;
       }
       iEarnContract.methods[asset.invest](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
@@ -933,7 +933,7 @@ class Store {
     let iEarnContract = new web3.eth.Contract(config.IEarnERC20ABI, asset.erc20address)
 
     var amountSend = web3.utils.toWei(amount, "ether")
-    if (asset.decimals != 18) {
+    if (asset.decimals !== 18) {
       amountSend = amount*10**asset.decimals;
     }
 
@@ -977,7 +977,7 @@ class Store {
     let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
 
     var amountSend = web3.utils.toWei(amount, "ether")
-    if (asset.decimals != 18) {
+    if (asset.decimals !== 18) {
       amountSend = amount*10**asset.decimals;
     }
 
@@ -1175,7 +1175,7 @@ class Store {
         value = web3.utils.fromWei(await iEarnContract.methods.calcPoolValueInETH().call({ from: account.address }), 'ether');
       } else {
         value = await iEarnContract.methods.calcPoolValueInToken().call({ from: account.address });
-        if (asset.decimals == 18) {
+        if (asset.decimals === 18) {
           value = web3.utils.fromWei(value, 'ether');
         } else {
           value = value / (10 ** asset.decimals);
@@ -1217,7 +1217,7 @@ class Store {
     if(asset.iEarnContract === null) {
       return callback(null, asset)
     }
-    if (asset.symbol == 'CRV') {
+    if (asset.symbol === 'CRV') {
       let aprContract = new web3.eth.Contract(config.crvContractABI, config.crvAddress)
       const call = 'crvapr'
       const aprs = await aprContract.methods[call]().call();
@@ -1229,7 +1229,7 @@ class Store {
     var call = 'getAPROptions';//+asset.symbol
     var address = asset.erc20address
     var aprs = 0;
-    if (asset.erc20address == 'Ethereum') {
+    if (asset.erc20address === 'Ethereum') {
       call = 'getETH';
       aprs = await aprContract.methods[call]().call();
     } else {
@@ -1448,7 +1448,7 @@ class Store {
   _getAPR = async (web3, apr, callback) => {
     let contract = new web3.eth.Contract(config.aprContractABI, config.aprContractAddress)
     var value = apr.value;
-    if (apr.decimals == 6) {
+    if (apr.decimals === 6) {
       value = web3.utils.toWei(apr.value, 'picoether');
     } else {
       value = web3.utils.toWei(apr.value, 'ether');
@@ -1469,7 +1469,7 @@ class Store {
 
       for(let i = 0; i < vals.length; i++) {
         const keys = Object.keys(vals[i])
-        if (keys == '_unifulcrum'||keys =='_uniaave'||keys=='_unicompound'||keys=='_lendf') {
+        if (keys === '_unifulcrum'||keys === '_uniaave'||keys === '_unicompound'||keys === '_lendf') {
           // skip
         } else {
           output[keys[0]] = vals[i][keys[0]]
@@ -1550,11 +1550,11 @@ class Store {
             return false
           }
 
-          if(!tx.returnValues.value || tx.returnValues.value == 0) {
+          if(!tx.returnValues.value || tx.returnValues.value === 0) {
             return false
           }
 
-          if(tx.returnValues.from != '0x0000000000000000000000000000000000000000') {
+          if(tx.returnValues.from !== '0x0000000000000000000000000000000000000000') {
             return false
           }
 
