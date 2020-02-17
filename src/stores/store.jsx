@@ -62,10 +62,10 @@ class Store {
     this.store = {
       aprs: [{
           token: 'DAI',
-          address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-          earnAddress: '0x9D25057e62939D3408406975aD75Ffe834DA4cDd',
-          lastMeasurement: 9400732,
-          measurement: 1000848185112260412,
+          address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          earnAddress: '0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01',
+          lastMeasurement: 9465912,
+          measurement: 1000037230456849197,
           mod: 1,
           decimals: 18
         },/*{
@@ -96,9 +96,9 @@ class Store {
         },{
           token: 'USDT',
           address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-          earnAddress: '0xa1787206d5b1bE0f432C4c4f96Dc4D1257A1Dd14',
-          lastMeasurement: 9400732,
-          measurement: 1085531657202472310,
+          earnAddress: '0x83f798e925BcD4017Eb265844FDDAbb448f1707D',
+          lastMeasurement: 9465880,
+          measurement: 1000030025124779312,
           mod: 1,
           decimals: 6
         },{
@@ -191,7 +191,7 @@ class Store {
           erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
           iEarnContract: '0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01',
           lastMeasurement: 9465912,
-          measurement: 1000037230456849197 ,
+          measurement: 1000037230456849197,
           maxApr: 0,
           balance: 0,
           investedBalance: 0,
@@ -413,7 +413,7 @@ class Store {
         {
           id: 'wBTCv1',
           name: 'wBTC',
-          symbol: 'WBTC',
+          symbol: 'wBTC',
           tokenSymbol: 'wBTC',
           description: 'Wrapped BTC',
           investSymbol: 'yBTC',
