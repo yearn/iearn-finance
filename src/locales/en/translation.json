@@ -27,5 +27,10 @@
   "Snackbar.Warning": "Warning",
   "Snackbar.Info": "Info",
   "Snackbar.Succecss": "Success",
-  "Snackbar.Hash": "Hash"
+  "Snackbar.Hash": "Hash",
+
+  "Zap.Intro": "Zap. Simple.",
+  "Zap.Zap": "Zap",
+  "Zap.Swap": "Swap"
+
 }
