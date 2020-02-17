@@ -69,6 +69,9 @@ const iswapTheme =  {
       selectMenu: {
       },
       select: {
+      },
+      icon: {
+        right: '8px'
       }
     },
     MuiInputBase: {
