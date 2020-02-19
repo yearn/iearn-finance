@@ -198,7 +198,7 @@ class Zap extends Component {
 
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('assets').filter((asset) => asset.curve === true) })
-    setTimeout(this.refresh,15000);
+    this.setSendAsset(store.getStore('assets').filter((asset) => asset.curve === true)[0])
   };
 
   getCurvBalanceReturned = (balance) => {
@@ -259,7 +259,7 @@ class Zap extends Component {
         { !account.address &&
           <div className={ classes.investedContainer }>
               <div className={ classes.introCenter }>
-                <Typography variant='h2'>{ t('InvestSimple.Intro') }</Typography>
+                <Typography variant='h2'>{ t('Zap.Intro') }</Typography>
               </div>
               <div className={ classes.connectContainer }>
                 <Button
@@ -369,7 +369,12 @@ class Zap extends Component {
       receiveAsset = null
     }
 
-    this.setState({ sendAsset, receiveAsset })
+    const balance = sendAsset.balance
+    let sendAmount = balance*100/100
+
+    sendAmount = Math.floor(sendAmount*10000)/10000;
+
+    this.setState({ sendAsset, receiveAsset, sendAmount: sendAmount.toFixed(4) })
   }
 
   setSendAmountPercent = (percent) => {

@@ -94,10 +94,10 @@ class Have extends Component {
 
   componentWillReceiveProps(props) {
     if(props.assets && props.curveContracts) {
-
+      const _asset = this.state.asset?this.state.asset:props.assets[0].symbol
       const a = props.assets.filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
       const b = props.curveContracts.filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
-      this.setState({ assetOptions: [...a, ...b], assets: props.assets, curveContracts: props.curveContracts })
+      this.setState({ assetOptions: [...a, ...b], assets: props.assets, curveContracts: props.curveContracts, asset: _asset })
     }
   }
 
@@ -148,7 +148,11 @@ class Have extends Component {
       }
     }
 
-    this.props.setSendAsset(asset)
+    var that = this;
+    setTimeout(() => {
+      that.props.setSendAsset(asset)
+    })
+
   };
 
   renderAssetSelect = (id, value, options, error) => {
