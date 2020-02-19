@@ -19,6 +19,7 @@ import i18n from '../../i18n';
 import { colors } from '../../theme'
 
 import BuiltWithModal from '../builtwith/builtwithModal.jsx'
+import InvestAllModal from './investAllModal.jsx'
 import UnlockModal from '../unlock/unlockModal.jsx'
 import Snackbar from '../snackbar'
 import Asset from './asset'
@@ -247,6 +248,12 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center'
+  },
+  investAllContainer: {
+    paddingTop: '24px',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    width: '100%'
   }
 });
 
@@ -262,6 +269,7 @@ class InvestSimple extends Component {
       language: 'en',
       modalOpen: false,
       modalBuiltWithOpen: false,
+      modalInvestAllOpen: false,
       snackbarType: null,
       snackbarMessage: null,
       hideV1: true
@@ -378,6 +386,7 @@ class InvestSimple extends Component {
       account,
       modalOpen,
       modalBuiltWithOpen,
+      modalInvestAllOpen,
       snackbarMessage,
       hideV1,
       languages,
@@ -432,6 +441,17 @@ class InvestSimple extends Component {
             </div>
           }
           { account.address && this.renderAssetBlocks() }
+          {/* account.address && <div className={ classes.investAllContainer }>
+            <Button
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ loading }
+              onClick={ this.investAllClicked }
+              >
+              <Typography className={ classes.buttonText } variant={ 'h5'}>{ 'Earn All' }</Typography>
+            </Button>
+          </div> */}
         </div>
         { loading && <Loader /> }
         <div className={classes.footer}>
@@ -462,6 +482,7 @@ class InvestSimple extends Component {
         </div>
         { modalOpen && this.renderModal() }
         { modalBuiltWithOpen && this.renderBuiltWithModal() }
+        { modalInvestAllOpen && this.renderInvestAllModal() }
         { snackbarMessage && this.renderSnackbar() }
       </div>
     )
@@ -566,6 +587,12 @@ class InvestSimple extends Component {
     )
   }
 
+  renderInvestAllModal = () => {
+    return (
+      <InvestAllModal closeModal={ this.closeInvestAllModal } modalOpen={ this.state.modalInvestAllOpen } assets={ this.state.assets } />
+    )
+  }
+
   overlayClicked = () => {
     this.setState({ modalOpen: true })
   }
@@ -580,6 +607,14 @@ class InvestSimple extends Component {
 
   closeBuiltWithModal = () => {
     this.setState({ modalBuiltWithOpen: false })
+  }
+
+  investAllClicked = () => {
+    this.setState({ modalInvestAllOpen: true })
+  }
+
+  closeInvestAllModal = () => {
+    this.setState({ modalInvestAllOpen: false })
   }
 }
 

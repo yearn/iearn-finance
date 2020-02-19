@@ -5,6 +5,7 @@ import {
   Typography,
   TextField,
   MenuItem,
+  InputAdornment
 } from '@material-ui/core';
 
 // import {
@@ -61,13 +62,10 @@ class Want extends Component {
   constructor(props) {
     super()
 
-    const a = props.assets.map((asset) => asset.symbol)
-    const b = props.curveContracts.filter((asset) => { return asset.symbol === 'CurveV3' }).map((asset) => asset.symbol)
-
     this.state = {
       asset: '',
       assets: props.assets,
-      assetOptions: [...a, ...b],
+      assetOptions: props.assets,
       assetError: false
     }
   }
@@ -84,9 +82,9 @@ class Want extends Component {
       <div className={ classes.root }>
         <div className={ classes.inputCard }>
           <Typography variant='h3' className={ classes.inputCardHeading }>I will receive</Typography>
-          { (!receiveAsset || (receiveAsset.symbol !== 'Curve.fi' && receiveAsset.symbol !== 'CurveV3')) && this.renderAsset('') }
+          { (!receiveAsset || (receiveAsset.symbol !== 'Curve.fi' && receiveAsset.symbol !== 'Curve.fi V3')) && this.renderAssetSelect('asset', asset, assetOptions) }
           { (receiveAsset && receiveAsset.symbol === 'Curve.fi') && this.renderAsset('Curve.fi') }
-          { (receiveAsset && receiveAsset.symbol === 'CurveV3') && this.renderAsset('CurveV3') }
+          { (receiveAsset && receiveAsset.symbol === 'Curve.fi V3') && this.renderAsset('Curve.fi V3') }
         </div>
       </div>
     )
@@ -119,6 +117,17 @@ class Want extends Component {
         value={ id }
         variant="outlined"
         disabled
+        InputProps={{
+          startAdornment: <InputAdornment position="start" className={ classes.inputAdornment }>
+            <div className={ classes.assetSelectIcon }>
+              <img
+                alt=""
+                src={ require('../../assets/'+(['Curve.fi V1', 'Curve.fi V2', 'Curve.fi V3', 'Curve.fi'].includes(id) ? 'CRV' : id)+'-logo.png') }
+                height="30px"
+              />
+            </div>
+          </InputAdornment>,
+        }}
       />
     )
 
@@ -151,17 +160,17 @@ class Want extends Component {
     const { classes } = this.props
 
     return (
-      <MenuItem key={option} value={option} className={ classes.assetSelectMenu }>
+      <MenuItem key={ option.symbol } value={ option.symbol } className={ classes.assetSelectMenu }>
         <React.Fragment>
           <div className={ classes.assetSelectIcon }>
             <img
               alt=""
-              src={ require('../../assets/'+(['CurveV1', 'CurveV2', 'CurveV3'].includes(option) ? 'CRV' : option)+'-logo.png') }
+              src={ require('../../assets/'+(['Curve.fi V1', 'Curve.fi V2', 'Curve.fi V3'].includes(option.symbol) ? 'CRV' : option.symbol)+'-logo.png') }
               height="30px"
             />
           </div>
           <div className={ classes.assetSelectIconName }>
-            <Typography variant='h2'>{ option }</Typography>
+            <Typography variant='h2'>{ option.investSymbol }</Typography>
           </div>
         </React.Fragment>
       </MenuItem>

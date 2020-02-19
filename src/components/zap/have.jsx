@@ -81,7 +81,7 @@ class Have extends Component {
     super()
 
     const a = props.assets.filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
-    const b = props.curveContracts.filter((asset) => { return asset.symbol != 'CurveV3' }).filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
+    const b = props.curveContracts.filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
 
     this.state = {
       asset: '',
@@ -94,8 +94,9 @@ class Have extends Component {
 
   componentWillReceiveProps(props) {
     if(props.assets && props.curveContracts) {
+
       const a = props.assets.filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
-      const b = props.curveContracts.filter((asset) => { return asset.symbol != 'CurveV3' }).filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
+      const b = props.curveContracts.filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
       this.setState({ assetOptions: [...a, ...b], assets: props.assets, curveContracts: props.curveContracts })
     }
   }
@@ -184,7 +185,7 @@ class Have extends Component {
           <div className={ classes.assetSelectIcon }>
             <img
               alt=""
-              src={ require('../../assets/'+(['CurveV1', 'CurveV2', 'CurveV3'].includes(option) ? 'CRV' : option)+'-logo.png') }
+              src={ require('../../assets/'+(['Curve.fi V1', 'Curve.fi V2', 'Curve.fi V3'].includes(option) ? 'CRV' : option)+'-logo.png') }
               height="30px"
             />
           </div>
