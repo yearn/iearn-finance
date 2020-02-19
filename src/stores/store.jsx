@@ -29,6 +29,8 @@ import {
   GET_CONTRACT_EVENTS_RETURNED,
   ZAP,
   ZAP_RETURNED,
+  IDAI,
+  IDAI_RETURNED,
   SWAP,
   SWAP_RETURNED,
   GET_CURV_BALANCE,
@@ -210,6 +212,22 @@ class Store {
           invest: 'deposit',
           redeem: 'withdraw',
           curve: true,
+        },
+        {
+          id: 'iDAIv1',
+          name: 'Fulcrum DAI iToken',
+          symbol: 'iDAI',
+          description: 'Fulcrum DAI iToken',
+          erc20address: '0x493c57c4763932315a328269e1adad09653b9081',
+          iEarnContract: null,
+          balance: 0,
+          investedBalance: 0,
+          price: 0,
+          decimals: 18,
+          poolValue: 0,
+          version: 2,
+          disabled: true,
+          idai: true
         },
         {
           id: 'USDCv2',
@@ -695,6 +713,9 @@ class Store {
           case ZAP:
             this.zap(payload)
             break;
+          case IDAI:
+            this.idai(payload)
+            break;
           case SWAP:
             this.swap(payload)
             break;
@@ -841,7 +862,6 @@ class Store {
   _checkApproval = async (asset, account, amount, contract, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
     let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
-
     try {
       const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
 
@@ -1071,6 +1091,7 @@ class Store {
 
     const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
 
+    console.log(assets);
     async.map(assets, (asset, callback) => {
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
@@ -1131,6 +1152,10 @@ class Store {
 
   _getBalance = async (web3, asset, account, callback) => {
 
+    if(asset.iEarnContract === null) {
+      return callback(null, 0)
+    }
+
     if(asset.erc20address === 'Ethereum') {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(asset.iEarnContract), "ether");
@@ -1183,7 +1208,7 @@ class Store {
 
   _getCurrentLender = async (web3, asset, account, callback) => {
     if(asset.iEarnContract === null) {
-      return callback(null, asset)
+      return callback(null, 0)
     }
 
     try {
@@ -1204,7 +1229,7 @@ class Store {
 
   _getRecommendedLender = async (web3, asset, account, callback) => {
     if(asset.iEarnContract === null) {
-      return callback(null, asset)
+      return callback(null, 0)
     }
 
     try {
@@ -1226,7 +1251,7 @@ class Store {
   _getPoolValue = async (web3, asset, account, callback) => {
 
     if(asset.iEarnContract === null) {
-      return callback(null, asset)
+      return callback(null, 0)
     }
 
     try {
@@ -1254,7 +1279,7 @@ class Store {
   _getPoolPrice = async (web3, asset, account, callback) => {
 
     if(asset.iEarnContract === null) {
-      return callback(null, asset)
+      return callback(null, 0)
     }
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
@@ -1265,7 +1290,7 @@ class Store {
   _getInvestedBalance = async (web3, asset, account, callback) => {
 
     if(asset.iEarnContract === null) {
-      return callback(null, asset)
+      return callback(null, 0)
     }
 
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract)
@@ -1277,7 +1302,7 @@ class Store {
   _getMaxAPR = async (web3, asset, account, callback) => {
 
     if(asset.iEarnContract === null) {
-      return callback(null, asset)
+      return callback(null, 0)
     }
     if (asset.symbol === 'CRV') {
       let aprContract = new web3.eth.Contract(config.crvContractABI, config.crvAddress)
@@ -1303,9 +1328,8 @@ class Store {
     const workKeys = keys.filter((key) => {
       return isNaN(key)
     })
-
     const maxApr = Math.max.apply(Math, workKeys.map(function(o) {
-      if(o === 'uniapr' || o === 'unicapr') {
+      if(o === 'uniapr' || o === 'unicapr' || o === "iapr") {
         return aprs[o]-100000000000000000000
       }
       return aprs[o];
@@ -1712,12 +1736,6 @@ class Store {
       default:
     }
 
-    console.log(config.yCurveZapSwapAddress)
-    console.log(call)
-    console.log(amountToSend)
-    console.log(account.address)
-    console.log(web3.utils.toWei('6', 'gwei'))
-
     let yCurveZapSwapContract = new web3.eth.Contract(config.yCurveZapSwapABI, config.yCurveZapSwapAddress)
     yCurveZapSwapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
       .on('transactionHash', function(hash){
@@ -1821,6 +1839,67 @@ class Store {
     }
 
     yCurveZapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  idai = (payload) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const account = store.getStore('account')
+    const { sendAsset, receiveAsset, amount } = payload.content
+
+    this._checkApproval(sendAsset, account, amount, config.iDAIZapSwapAddress, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callIDAI(sendAsset, receiveAsset, account, amount, (err, zapResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(IDAI_RETURNED, zapResult)
+      })
+    })
+  }
+
+  _callIDAI = (sendAsset, receiveAsset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    var amountToSend = web3.utils.toWei(amount, "ether")
+    if (sendAsset.decimals !== 18) {
+      amountToSend = amount*10**sendAsset.decimals;
+    }
+
+    let call = 'swapiDAItoyDAI'
+
+    let iDAIZapSwapContract = new web3.eth.Contract(config.iDAIZapSwapABI, config.iDAIZapSwapAddress)
+    iDAIZapSwapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
