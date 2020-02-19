@@ -44,6 +44,9 @@ export const LEDGER_CONNECTED = 'LEDGER_CONNECTED'
 export const ZAP = 'ZAP'
 export const ZAP_RETURNED = 'ZAP_RETURNED'
 
+export const IDAI = 'IDAI'
+export const IDAI_RETURNED = 'IDAI_RETURNED'
+
 export const SWAP = 'SWAP'
 export const SWAP_RETURNED = 'SWAP_RETURNED'
 
