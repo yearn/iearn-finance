@@ -498,39 +498,6 @@ class Store {
           redeem: 'redeem',
           curve: false,
         },
-        // {
-        //   id: 'CurveV1',
-        //   symbol: 'Curve V1',
-        //   version: 1,
-        //   erc20address: '0x3740fb63ab7a09891d7c0d4299442a551d06f5fd',
-        //   iEarnContract:  null,
-        //   decimals: 18,
-        //   balance: 0,
-        //   disabled: true,
-        //   curve: true
-        // },
-        // {
-        //   id: 'CurveV2',
-        //   symbol: 'Curve V2',
-        //   version: 2,
-        //   erc20address: '0x9fc689ccada600b6df723d9e47d84d76664a1f23',
-        //   iEarnContract:  null,
-        //   decimals: 18,
-        //   balance: 0,
-        //   disabled: true,
-        //   curve: true
-        // },
-        // {
-        //   id: 'CurveV3',
-        //   symbol: 'Curve V3',
-        //   version: 3,
-        //   erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
-        //   iEarnContract:  null,
-        //   decimals: 18,
-        //   balance: 0,
-        //   disabled: true,
-        //   curve: true
-        // }
       ],
       account: {},
       web3: null,
@@ -660,21 +627,21 @@ class Store {
       curvBalance: 0,
       curveContracts: [
         {
-          symbol: 'CurveV1',
+          symbol: 'Curve.fi V1',
           version: 1,
           erc20address: '0x3740fb63ab7a09891d7c0d4299442a551d06f5fd',
           decimals: 18,
           balance: 0
         },
         {
-          symbol: 'CurveV2',
+          symbol: 'Curve.fi V2',
           version: 2,
           erc20address: '0x9fc689ccada600b6df723d9e47d84d76664a1f23',
           decimals: 18,
           balance: 0
         },
         {
-          symbol: 'CurveV3',
+          symbol: 'Curve.fi V3',
           version: 3,
           erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
           decimals: 18,
@@ -878,27 +845,19 @@ class Store {
     try {
       const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
 
-      if(parseFloat(allowance) < parseFloat(amount)) {
-        erc20Contract.methods.approve(contract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
-        .on('transactionHash', function(hash){
-          callback()
-        })
-        .on('error', function(error) {
-          if (!error.toString().includes("-32601")) {
-            if(error.message) {
-              return callback(error.message)
-            }
-            callback(error)
-          }
-        })
-        .catch((error) => {
-          if (!error.toString().includes("-32601")) {
-            if(error.message) {
-              return callback(error.message)
-            }
-            callback(error)
-          }
-        })
+      const ethAllowance = web3.utils.fromWei(allowance, "ether")
+
+      if(parseFloat(ethAllowance) < parseFloat(amount)) {
+        /*
+          code to accomodate for "assert _value == 0 or self.allowances[msg.sender][_spender] == 0" in contract
+          We check to see if the allowance is > 0. If > 0 set to 0 before we set it to the correct amount.
+        */
+        if(['Curve.fi V1', 'Curve.fi V2', 'Curve.fi V3'].includes(asset.symbol) && ethAllowance > 0) {
+          const allowanceSetTo0 = await erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+        }
+
+        const allowanceSet = await erc20Contract.methods.approve(contract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+        callback()
       } else {
         callback()
       }
@@ -1744,10 +1703,10 @@ class Store {
     let call = ''
 
     switch (sendAsset.symbol) {
-      case 'CurveV1':
+      case 'Curve.fi V1':
         call = 'swapv1tov3'
         break;
-      case 'CurveV2':
+      case 'Curve.fi V2':
         call = 'swapv2tov3'
         break;
       default:
@@ -1795,7 +1754,12 @@ class Store {
     const account = store.getStore('account')
     const { sendAsset, receiveAsset, amount } = payload.content
 
-    this._checkApproval(sendAsset, account, amount, config.yCurveZapAddress, (err) => {
+    let contractAddress = config.yCurveZapAddress
+    if(sendAsset.symbol === 'Curve.fi V3') {
+      contractAddress = config.yCurveZapOutAddress
+    }
+
+    this._checkApproval(sendAsset, account, amount, contractAddress, (err) => {
       if(err) {
         return emitter.emit(ERROR, err);
       }
@@ -1818,6 +1782,7 @@ class Store {
       amountToSend = amount*10**sendAsset.decimals;
     }
 
+    let yCurveZapContract = new web3.eth.Contract(config.yCurveZapABI, config.yCurveZapAddress)
     let call = ''
 
     switch (sendAsset.symbol) {
@@ -1833,7 +1798,8 @@ class Store {
       case 'TUSD':
         call = 'depositTUSD'
         break;
-      case 'Curve.fi':
+      case 'Curve.fi V3':
+        yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutABI, config.yCurveZapOutAddress)
         switch (receiveAsset.symbol) {
           case 'DAI':
             call = 'withdrawDAI'
@@ -1854,7 +1820,6 @@ class Store {
       default:
     }
 
-    let yCurveZapContract = new web3.eth.Contract(config.yCurveZapABI, config.yCurveZapAddress)
     yCurveZapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)

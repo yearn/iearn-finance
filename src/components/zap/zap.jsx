@@ -198,7 +198,7 @@ class Zap extends Component {
 
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('assets').filter((asset) => asset.curve === true) })
-    setTimeout(this.refresh,10000);
+    setTimeout(this.refresh,15000);
   };
 
   getCurvBalanceReturned = (balance) => {
@@ -285,21 +285,21 @@ class Zap extends Component {
               <div className={ classes.sepperator }></div>
               <Want assets={ assets } curveContracts={ curveContracts } receiveAsset={ receiveAsset } setReceiveAsset={ this.setReceiveAsset } loading={ loading }  />
               <div className={ classes.sepperator }></div>
-              { (!receiveAsset || receiveAsset.symbol !== 'CurveV3') && <Button
+              { (!receiveAsset || receiveAsset.symbol !== 'Curve.fi V3') && <Button
                 className={ classes.actionButton }
                 variant="outlined"
                 color="primary"
-                disabled={ loading }
+                disabled={ loading || !sendAsset || !receiveAsset || !sendAmount || sendAmount === '' }
                 onClick={ this.onZap }
                 fullWidth
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Zap.Zap') }</Typography>
               </Button> }
-              { (receiveAsset && receiveAsset.symbol === 'CurveV3') && <Button
+              { (receiveAsset && receiveAsset.symbol === 'Curve.fi V3') && <Button
                 className={ classes.actionButton }
                 variant="outlined"
                 color="primary"
-                disabled={ loading }
+                disabled={ loading || !sendAsset || !receiveAsset || !sendAmount || sendAmount === '' }
                 onClick={ this.onSwap }
                 fullWidth
                 >
@@ -361,8 +361,12 @@ class Zap extends Component {
       }
     }
 
-    if(['CurveV1', 'CurveV2'].includes(sendAsset.symbol)) {
-      receiveAsset = store.getStore('curveContracts').filter((contract) => { return contract.symbol === 'CurveV3'})[0]
+    if(['Curve.fi V1', 'Curve.fi V2'].includes(sendAsset.symbol)) {
+      receiveAsset = store.getStore('curveContracts').filter((contract) => { return contract.symbol === 'Curve.fi V3'})[0]
+    }
+
+    if(['Curve.fi V3'].includes(sendAsset.symbol)) {
+      receiveAsset = null
     }
 
     this.setState({ sendAsset, receiveAsset })
