@@ -3,13 +3,6 @@
   "InvestSimple.Connect": "Connect wallet",
   "InvestSimple.Show": "Show V1",
   "InvestSimple.Hide": "Hide V1",
-  "InvestSimple.Home": "home",
-  "InvestSimple.About": "about",
-  "InvestSimple.Docs": "docs",
-  "InvestSimple.Code": "code",
-  "InvestSimple.Telegram": "telegram",
-  "InvestSimple.Yield": "yield",
-  "InvestSimple.BuiltWith": "builtwith",
   "InvestSimple.InterestRate": "Interest Rate",
   "InvestSimple.AvailableBalance": "Available Balance",
 
@@ -34,6 +27,18 @@
   "Zap.Swap": "Swap",
 
   "IDai.Intro": "Simple iDAI to DAI.",
-  "IDai.Swap": "Swap"
+  "IDai.Swap": "Swap",
 
+  "Insure.Intro": "Insurance. Simple.",
+  "Insure.Connect": "Connect wallet",
+
+  "Footer.Home": "home",
+  "Footer.About": "about",
+  "Footer.Docs": "docs",
+  "Footer.Code": "code",
+  "Footer.Telegram": "telegram",
+  "Footer.Yield": "yield",
+  "Footer.BuiltWith": "builtwith",
+  "Footer.Zap": "zap",
+  "Footer.Insure": "insure"
 }
