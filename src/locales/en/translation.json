@@ -40,5 +40,13 @@
   "Footer.Yield": "yield",
   "Footer.BuiltWith": "builtwith",
   "Footer.Zap": "zap",
-  "Footer.Insure": "insure"
+  "Footer.Insure": "insure",
+
+  "Insure.Balance": "Uninsured Balance",
+  "Insure.Insured": "Insured Percent",
+  "Insure.UninsuredYield": "Uninsured Yield",
+  "Insure.InsuredYield": "Insured Yield",
+  "Insure.BuyInsurance": "Buy Insurance",
+  "Insure.Disabled": "Disabled"
+
 }

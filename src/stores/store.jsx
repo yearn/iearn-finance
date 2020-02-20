@@ -212,6 +212,9 @@ class Store {
           invest: 'deposit',
           redeem: 'withdraw',
           curve: true,
+          insurance: true,
+          insuredBalance: 0,
+          insuredApr: 0
         },
         {
           id: 'iDAIv1',
@@ -252,6 +255,9 @@ class Store {
           invest: 'deposit',
           redeem: 'withdraw',
           curve: true,
+          insurance: true,
+          insuredBalance: 0,
+          insuredApr: 0
         },
         {
           id: 'USDTv2',
