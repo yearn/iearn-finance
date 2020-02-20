@@ -158,7 +158,7 @@ class Want extends Component {
   renderAssetOption = (option) => {
 
     const { classes } = this.props
-
+    console.log(option);
     return (
       <MenuItem key={ option.symbol } value={ option.symbol } className={ classes.assetSelectMenu }>
         <React.Fragment>
@@ -170,7 +170,7 @@ class Want extends Component {
             />
           </div>
           <div className={ classes.assetSelectIconName }>
-            <Typography variant='h2'>{ option.investSymbol }</Typography>
+            <Typography variant='h2'>{ option.symbol }</Typography>
           </div>
         </React.Fragment>
       </MenuItem>

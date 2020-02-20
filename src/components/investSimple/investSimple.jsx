@@ -400,6 +400,8 @@ class InvestSimple extends Component {
       return (hideV1 === true || asset.version !== 1)
     }).filter((asset) => {
       return asset.version == 2 || (asset.version == 1 && (asset.investedBalance).toFixed(4) > 0)
+    }).filter((asset) => {
+      return !(asset.symbol == "iDAI")
     }).map((asset) => {
       return (
         <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
