@@ -50,8 +50,8 @@ const styles = theme => ({
   },
   apr: {
     flex: '1',
-    padding: '6px 15px',
-    width: '110px',
+    padding: '6px 25px',
+    width: '133px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -85,7 +85,7 @@ const styles = theme => ({
   headerValue: {
     fontWeight: 'bold',
     flex: '1',
-    width: '111px',
+    width: '135px',
     padding: '6px 12px',
     paddingBottom: '12px',
     '&:nth-child(2)': {
