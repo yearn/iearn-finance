@@ -878,7 +878,7 @@ class Store {
           code to accomodate for "assert _value == 0 or self.allowances[msg.sender][_spender] == 0" in contract
           We check to see if the allowance is > 0. If > 0 set to 0 before we set it to the correct amount.
         */
-        if(['Curve.fi V1', 'Curve.fi V2', 'Curve.fi V3'].includes(asset.symbol) && ethAllowance > 0) {
+        if(['Curve.fi V1', 'Curve.fi V2', 'Curve.fi V3', 'USDT'].includes(asset.symbol) && ethAllowance > 0) {
           const allowanceSetTo0 = await erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         }
 
