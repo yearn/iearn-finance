@@ -35,6 +35,7 @@ const styles = theme => ({
   },
   footerLinks: {
     display: 'flex',
+    flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
