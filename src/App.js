@@ -35,6 +35,7 @@ class App extends Component {
             alignItems: 'center',
             background: "#f9fafb"
           }}>
+            <Footer />
             <Switch>
               <Route path="/apr">
                 <APR />
@@ -61,7 +62,6 @@ class App extends Component {
                 <Home />
               </Route>
             </Switch>
-            <Footer />
           </div>
         </Router>
       </MuiThemeProvider>
