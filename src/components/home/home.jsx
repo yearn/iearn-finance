@@ -26,20 +26,27 @@ const styles = theme => ({
     display: 'flex',
     width: '100%',
     justifyContent: 'space-around',
-    alignItems: 'center'
+    alignItems: 'center',
+    flexDirection: 'column',
+    [theme.breakpoints.up('sm')]: {
+      flexDirection: 'row',
+    }
   },
   card: {
     flex: '1',
-    height: '100vh',
-    minWidth: '20%',
-    minHeight: '50vh',
-    padding: '60px',
+    height: '25vh',
+    width: '100%',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'column',
     cursor: 'pointer',
-
+    borderRadius: '0px',
+    [theme.breakpoints.up('sm')]: {
+      height: '100vh',
+      minWidth: '20%',
+      minHeight: '50vh',
+    }
   },
   earn: {
     backgroundColor: colors.white,
@@ -124,10 +131,17 @@ const styles = theme => ({
     },
   },
   title: {
-    padding: '24px'
+    padding: '24px',
+    paddingBottom: '0px',
+    [theme.breakpoints.up('sm')]: {
+      paddingBottom: '24px'
+    }
   },
   icon: {
-    fontSize: '100px'
+    fontSize: '60px',
+    [theme.breakpoints.up('sm')]: {
+      fontSize: '100px',
+    }
   },
   link: {
     textDecoration: 'none'
