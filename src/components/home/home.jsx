@@ -167,7 +167,7 @@ class Home extends Component {
         <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { /*this.nav('/cover')  */}}>
           <SecurityIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>Cover</Typography>
-          <Typography variant={'h1'} className={ `${classes.title} title soon` }>Coming soon</Typography>
+          <Typography variant={'h1'} className={ `${classes.title} title soon` }>Coming Soon</Typography>
         </Card>
       </div>
     )
