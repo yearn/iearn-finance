@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
@@ -71,12 +72,16 @@ class Footer extends Component {
   }
 
   render() {
-    const { classes, t } = this.props;
+    const { classes, t, location } = this.props;
     const {
       modalBuiltWithOpen,
       languages,
       language
     } = this.state
+
+    if(location.pathname === '/') {
+      return null
+    }
 
     return (
       <div className={classes.footer}>
@@ -143,4 +148,4 @@ class Footer extends Component {
   }
 }
 
-export default withNamespaces()(withStyles(styles)(Footer));
+export default withNamespaces()(withRouter(withStyles(styles)(Footer)));

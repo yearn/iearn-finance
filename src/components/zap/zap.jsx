@@ -91,6 +91,8 @@ const styles = theme => ({
     justifyContent: 'center',
     padding: '12px',
     minWidth: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   intro: {
     width: '100%',
@@ -98,6 +100,7 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    maxWidth: '400px'
   },
   introCenter: {
     minWidth: '100%',

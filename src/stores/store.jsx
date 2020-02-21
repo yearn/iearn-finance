@@ -35,6 +35,12 @@ import {
   SWAP_RETURNED,
   GET_CURV_BALANCE,
   GET_CURV_BALANCE_RETURNED,
+  BUY_INSURANCE,
+  BUY_INSURANCE_RETURNED,
+  CLAIM_INSURANCE,
+  CLAIM_INSURANCE_RETURNED,
+  GET_INSURANCE_BALANCES,
+  GET_INSURANCE_BALANCES_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 import createLedgerSubprovider from "@ledgerhq/web3-subprovider";
@@ -211,10 +217,7 @@ class Store {
           disabled: false,
           invest: 'deposit',
           redeem: 'withdraw',
-          curve: true,
-          insurance: true,
-          insuredBalance: 0,
-          insuredApr: 0
+          curve: true
         },
         {
           id: 'iDAIv1',
@@ -254,10 +257,7 @@ class Store {
           disabled: false,
           invest: 'deposit',
           redeem: 'withdraw',
-          curve: true,
-          insurance: true,
-          insuredBalance: 0,
-          insuredApr: 0
+          curve: true
         },
         {
           id: 'USDTv2',
@@ -671,6 +671,23 @@ class Store {
           decimals: 18,
           balance: 0
         }
+      ],
+      insuranceAssets: [
+        {
+          id: 'oyCRV',
+          symbol: 'CRV',
+          insuredSymbol: 'oyCRV',
+          name: 'Curve.fi',
+          description: 'yDAI/yUSDC/yUSDT/yTUSD',
+          erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
+          insuranceAddress: '0xC714cEa4dAaEd7fbC66f936B69E79eC0ee998d93',
+          decimals: 18,
+          insuredDecimals: 15,
+          balance: 0,
+          insuredBalance: 0,
+          apr: 0,
+          insuredApr: 0
+        }
       ]
     }
 
@@ -727,6 +744,15 @@ class Store {
             break;
           case GET_CURV_BALANCE:
             this.getCurveBalances(payload)
+            break;
+          case BUY_INSURANCE:
+            this.buyInsurance(payload)
+            break;
+          case CLAIM_INSURANCE:
+            this.claimInsurance(payload)
+            break;
+          case GET_INSURANCE_BALANCES:
+            this.getInsuranceBalances(payload)
             break;
           default: {
           }
@@ -1097,7 +1123,6 @@ class Store {
 
     const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
 
-    console.log(assets);
     async.map(assets, (asset, callback) => {
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
@@ -1130,6 +1155,24 @@ class Store {
       store.setStore({ assets: assets })
       return emitter.emit(BALANCES_RETURNED, assets)
     })
+  }
+
+  _getInsuredBalance = async (web3, asset, account, callback) => {
+
+    if(asset.insuranceAddress === null) {
+      return callback(null, 0)
+    }
+
+    let erc20Contract = new web3.eth.Contract(config.insuranceABI, asset.insuranceAddress)
+
+    try {
+      var balance = await erc20Contract.methods.balanceOf(account.address).call({ from: account.address });
+      balance = parseFloat(balance)/10**asset.insuredDecimals
+      callback(null, parseFloat(balance))
+    } catch(ex) {
+      console.log(ex)
+      return callback(ex)
+    }
   }
 
   _getERC20Balance = async (web3, asset, account, callback) => {
@@ -1956,6 +1999,59 @@ class Store {
 
       return emitter.emit(GET_CURV_BALANCE_RETURNED, result)
     })
+  }
+
+  buyInsurance = (payload) => {
+
+  }
+
+  claimInsurance = (payload) => {
+
+  }
+
+  getInsuranceBalances = (payload) => {
+    const account = store.getStore('account')
+    const assets = store.getStore('insuranceAssets')
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+
+    async.map(assets, (asset, callback) => {
+      async.parallel([
+        (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getInsuredBalance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getExpiryBlock(web3, asset, account, callbackInner) },
+      ], (err, data) => {
+        asset.balance = data[0]
+        asset.insuredBalance = data[1]
+        asset.expiryBlock = data[2]
+
+        callback(null, asset)
+      })
+    }, (err, assets) => {
+      console.log(assets)
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+
+      store.setStore({ insuranceAssets: assets })
+      return emitter.emit(GET_INSURANCE_BALANCES_RETURNED, assets)
+    })
+  }
+
+  _getExpiryBlock = async (web3, asset, account, callback) => {
+    if(asset.insuranceAddress === null) {
+      return callback(null, 0)
+    }
+
+    let erc20Contract = new web3.eth.Contract(config.insuranceABI, asset.insuranceAddress)
+
+    try {
+      var expiryBlock = await erc20Contract.methods.expiry().call({ from: account.address });
+      callback(null, expiryBlock)
+    } catch(ex) {
+      console.log(ex)
+      return callback(ex)
+    }
   }
 }
 

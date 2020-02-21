@@ -25,8 +25,8 @@ import InsuredAsset from './insuredAsset'
 
 import {
   ERROR,
-  GET_BALANCES,
-  BALANCES_RETURNED,
+  GET_INSURANCE_BALANCES,
+  GET_INSURANCE_BALANCES_RETURNED,
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED
 } from '../../constants'
@@ -131,16 +131,16 @@ const styles = theme => ({
   heading: {
     display: 'none',
     paddingTop: '12px',
-    flex: 1,
     flexShrink: 0,
     [theme.breakpoints.up('sm')]: {
       paddingTop: '5px',
-      display: 'block'
+      display: 'block',
+      padding: '0px 12px'
     }
   },
   headingName: {
     paddingTop: '5px',
-    flex: 2,
+    flex: 1,
     flexShrink: 0,
     display: 'flex',
     alignItems: 'center',
@@ -182,7 +182,7 @@ class InvestSimple extends Component {
     super()
 
     this.state = {
-      assets: store.getStore('assets'),
+      assets: store.getStore('insuranceAssets'),
       account: store.getStore('account'),
       languages: store.getStore('languages'),
       language: 'en',
@@ -194,31 +194,31 @@ class InvestSimple extends Component {
   }
   componentWillMount() {
     emitter.on(ERROR, this.errorReturned);
-    emitter.on(BALANCES_RETURNED, this.balancesReturned);
+    emitter.on(GET_INSURANCE_BALANCES_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
   }
 
   componentWillUnmount() {
     emitter.removeListener(ERROR, this.errorReturned);
-    emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
+    emitter.removeListener(GET_INSURANCE_BALANCES_RETURNED, this.balancesReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
   };
 
   refresh() {
-    dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_INSURANCE_BALANCES, content: {} })
   }
 
   balancesReturned = (balances) => {
-    this.setState({ assets: store.getStore('assets') })
+    this.setState({ assets: store.getStore('insuranceAssets') })
     setTimeout(this.refresh,15000);
   };
 
   connectionConnected = () => {
     this.setState({ account: store.getStore('account') })
 
-    dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_INSURANCE_BALANCES, content: {} })
 
     const that = this
     setTimeout(() => {
@@ -311,9 +311,7 @@ class InvestSimple extends Component {
     const { classes, t } = this.props
     const width = window.innerWidth
 
-    return assets.filter((asset) => {
-      return (asset.insurance === true)
-    }).map((asset) => {
+    return assets.map((asset) => {
       return (
         <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
           <ExpansionPanelSummary
@@ -326,7 +324,7 @@ class InvestSimple extends Component {
                 <div className={ classes.assetIcon }>
                   <img
                     alt=""
-                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                    src={ require('../../assets/'+(['Curve.fi V1', 'Curve.fi V2', 'Curve.fi V3', 'Curve.fi'].includes(asset.symbol) ? 'CRV' : asset.symbol)+'-logo.png') }
                     height={ width > 600 ? '40px' : '30px'}
                     style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
@@ -337,21 +335,21 @@ class InvestSimple extends Component {
                 </div>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ (asset.investedBalance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol ) }</Typography>
+                <Typography variant={ 'h3' }>{ (asset.balance ? (asset.balance).toFixed(4) : '0.0000')+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol ) }</Typography>
                 <Typography variant={ 'h5' }>{ t('Insure.Balance') }</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ (asset.investedBalance > 0 ? (asset.insuredBalance  * 100 / (asset.insuredBalance + asset.investedBalance)).toFixed(4) : '0.0000')+' %'}</Typography>
+                <Typography variant={ 'h3' }>{ (asset.balance > 0 ? (asset.insuredBalance  * 100 / (asset.insuredBalance + asset.balance)).toFixed(4) : '0.0000')+' %'}</Typography>
                 <Typography variant={ 'h5' }>{ t('Insure.Insured') }</Typography>
               </div>
-              <div className={classes.heading}>
+              { /* <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4)+' %'}</Typography>
                 <Typography variant={ 'h5' }>{ t('Insure.UninsuredYield') }</Typography>
               </div>
               <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{ (asset.insuredApr*100).toFixed(4)+' %'}</Typography>
                 <Typography variant={ 'h5' }>{ t('Insure.InsuredYield') }</Typography>
-              </div>
+              </div> */}
             </div>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>

@@ -13,6 +13,7 @@ export const colors = {
   red: '#ed4337',
   orange: 'orange',
   pink: '#DC6BE5',
+  compoundGreen: '#00d395',
 };
 
 const breakpoints = createBreakpoints({

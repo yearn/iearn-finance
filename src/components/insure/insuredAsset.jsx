@@ -11,10 +11,12 @@ import { withNamespaces } from 'react-i18next';
 
 import {
   ERROR,
-  INVEST,
-  INVEST_RETURNED,
-  REDEEM,
-  REDEEM_RETURNED,
+  INSURANCE_BALANCES,
+  INSURANCE_BALANCES_RETURNED,
+  BUY_INSURANCE,
+  BUY_INSURANCE_RETURNED,
+  CLAIM_INSURANCE,
+  CLAIM_INSURANCE_RETURNED,
 } from '../../constants'
 
 import Store from "../../stores";
@@ -122,16 +124,16 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '0px 0px 20px 12px'
+    paddingBottom: '12px'
   },
   tradeContainerInfo: {
     background: '#efefef',
-    padding: '24px',
+    padding: '18px 18px 6px 18px',
     borderRadius: '1.25em',
-    marginTop: '24px',
+    width: '100%',
+    marginBottom: '12px',
     [theme.breakpoints.up('sm')]: {
       marginLeft: '24px',
-      marginTop: '0px',
     }
   },
   tradeContainerCapture: {
@@ -155,23 +157,23 @@ class Asset extends Component {
   }
 
   componentWillMount() {
-    emitter.on(INVEST_RETURNED, this.investReturned);
-    emitter.on(REDEEM_RETURNED, this.redeemReturned);
+    emitter.on(BUY_INSURANCE_RETURNED, this.buyInsuranceReturned);
+    emitter.on(CLAIM_INSURANCE_RETURNED, this.claimInsuranceReturned);
     emitter.on(ERROR, this.errorReturned);
   }
 
   componentWillUnmount() {
-    emitter.removeListener(INVEST_RETURNED, this.investReturned);
-    emitter.removeListener(REDEEM_RETURNED, this.redeemReturned);
+    emitter.removeListener(BUY_INSURANCE_RETURNED, this.buyInsuranceReturned);
+    emitter.removeListener(CLAIM_INSURANCE_RETURNED, this.claimInsuranceReturned);
     emitter.removeListener(ERROR, this.errorReturned);
   };
 
-  investReturned = () => {
+  buyInsuranceReturned = () => {
     this.setState({ loading: false, amount: '' })
   };
 
-  redeemReturned = (txHash) => {
-    this.setState({ loading: false, redeemAmount: '' })
+  claimInsuranceReturned = (txHash) => {
+    this.setState({ loading: false })
   };
 
   errorReturned = (error) => {
@@ -192,11 +194,11 @@ class Asset extends Component {
     return (<div className={ classes.actionsContainer }>
       <div className={ classes.headingContainer }>
         <div className={classes.heading}>
-          <Typography variant={ 'h3' }>{ (asset.investedBalance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol ) }</Typography>
+          <Typography variant={ 'h3' }>{ ( asset.balance ? (asset.balance).toFixed(4) : '0.0000')+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol ) }</Typography>
           <Typography variant={ 'h5' }>{ t('Insure.Balance') }</Typography>
         </div>
         <div className={`${classes.heading} ${classes.right}`}>
-          <Typography variant={ 'h3' }>{ (asset.investedBalance > 0 ? (asset.insuredBalance  * 100 / (asset.insuredBalance + asset.investedBalance)).toFixed(4) : '0.0000')+' %'}</Typography>
+          <Typography variant={ 'h3' }>{ (asset.balance > 0 ? (asset.insuredBalance  * 100 / (asset.insuredBalance + asset.balance)).toFixed(4) : '0.0000')+' %'}</Typography>
           <Typography variant={ 'h5' }>{ t('Insure.Insured') }</Typography>
         </div>
         <div className={classes.heading}>
@@ -267,25 +269,36 @@ class Asset extends Component {
           variant="outlined"
           color="primary"
           disabled={ loading || !account.address || asset.disabled }
-          onClick={ this.onInvest }
+          onClick={ this.onBuy }
           >
           <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.BuyInsurance')}</Typography>
         </Button>
       </div>
       <div className={ classes.sepperator }></div>
-      <div className={ `${classes.tradeContainer} ${classes.tradeContainerInfo}` }>
-        <div className={ classes.infoContainer} >
-          <Typography variant={'h3'}>Total Cost</Typography>
-          <Typography variant={'h3'}>{ amount*0.0001 + ' DAI' }</Typography>
-        </div>
+      <div className={ `${classes.tradeContainer}` }>
+        <div className={ classes.tradeContainerInfo }>
           <div className={ classes.infoContainer} >
-          <Typography variant={'h5'}>Max Loss</Typography>
-          <Typography variant={'h4'}>{ amount*0.082 + ' DAI' }</Typography>
+            <Typography variant={'h3'}>Total Cost</Typography>
+            <Typography variant={'h3'}>{ (amount*0.0001).toFixed(4) + ' ' + asset.symbol }</Typography>
+          </div>
+            <div className={ classes.infoContainer} >
+            <Typography variant={'h5'}>Max Loss</Typography>
+            <Typography variant={'h4'}>{ (amount*0.082).toFixed(4) + ' ' + asset.symbol }</Typography>
+          </div>
+            <div className={ classes.infoContainer} >
+            <Typography variant={'h5'}>Duration</Typography>
+            <Typography variant={'h4'}>12 Months</Typography>
+          </div>
         </div>
-          <div className={ classes.infoContainer} >
-          <Typography variant={'h5'}>Duration</Typography>
-          <Typography variant={'h4'}>12 Months</Typography>
-        </div>
+        <Button
+          className={ classes.actionButton }
+          variant="outlined"
+          color="primary"
+          disabled={ loading || !account.address || asset.disabled }
+          onClick={ this.onClaim }
+          >
+          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.ClaimInsurance')}</Typography>
+        </Button>
       </div>
     </div>)
   };
@@ -302,11 +315,11 @@ class Asset extends Component {
     }
   }
 
-  onInvest = () => {
+  onBuy = () => {
     this.setState({ amountError: false })
 
     const { amount } = this.state
-    const { asset, startLoading } = this.props
+    const { asset } = this.props
 
     if(!amount || isNaN(amount) || amount <= 0 || amount > asset.balance) {
       this.setState({ amountError: true })
@@ -314,15 +327,14 @@ class Asset extends Component {
     }
 
     this.setState({ loading: true })
-    startLoading()
-    dispatcher.dispatch({ type: INVEST, content: { amount: amount, asset: asset } })
+    dispatcher.dispatch({ type: BUY_INSURANCE, content: { amount: amount, asset: asset } })
   }
 
-  onRedeem = () => {
+  onClaim = () => {
     this.setState({ redeemAmountError: false })
 
     const { redeemAmount } = this.state
-    const { asset, startLoading  } = this.props
+    const { asset  } = this.props
 
     if(!redeemAmount || isNaN(redeemAmount) || redeemAmount <= 0 || redeemAmount > asset.investedBalance) {
       this.setState({ redeemAmountError: true })
@@ -330,9 +342,7 @@ class Asset extends Component {
     }
 
     this.setState({ loading: true })
-    startLoading()
-
-    dispatcher.dispatch({ type: REDEEM, content: { amount: redeemAmount, asset: asset } })
+    dispatcher.dispatch({ type: CLAIM_INSURANCE, content: { amount: redeemAmount, asset: asset } })
   }
 
   setAmount = (percent) => {

@@ -42,11 +42,11 @@
   "Footer.Zap": "zap",
   "Footer.Insure": "insure",
 
-  "Insure.Balance": "Uninsured Balance",
+  "Insure.Balance": "Current Balance",
   "Insure.Insured": "Insured Percent",
   "Insure.UninsuredYield": "Uninsured Yield",
   "Insure.InsuredYield": "Insured Yield",
   "Insure.BuyInsurance": "Buy Insurance",
-  "Insure.Disabled": "Disabled"
-
+  "Insure.Disabled": "Disabled",
+  "Insure.ClaimInsurance": "Claim"
 }

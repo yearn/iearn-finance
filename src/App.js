@@ -18,6 +18,7 @@ import Zap from './components/zap';
 import IDai from './components/idai';
 import Insure from './components/insure';
 import Footer from './components/footer';
+import Home from './components/home';
 
 class App extends Component {
 
@@ -57,7 +58,7 @@ class App extends Component {
                 <Insure />
               </Route>
               <Route path="/">
-                <InvestSimple />
+                <Home />
               </Route>
             </Switch>
             <Footer />
