@@ -39,7 +39,7 @@ class App extends Component {
               <Route path="/apr">
                 <APR />
               </Route>
-              <Route path="/invest">
+              <Route path="/earn">
                 <InvestSimple />
               </Route>
               <Route path="/zap">
@@ -54,9 +54,9 @@ class App extends Component {
               <Route path="/manage">
                 <Manage />
               </Route>
-              <Route path="/insure">
+              {/*<Route path="/cover">
                 <Insure />
-              </Route>
+              </Route>*/}
               <Route path="/">
                 <Home />
               </Route>

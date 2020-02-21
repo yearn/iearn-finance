@@ -41,7 +41,7 @@ const styles = theme => ({
     cursor: 'pointer',
 
   },
-  invest: {
+  earn: {
     backgroundColor: colors.white,
     '&:hover': {
       backgroundColor: colors.pink,
@@ -95,19 +95,29 @@ const styles = theme => ({
       color: colors.lightBlack
     },
   },
-  insurance: {
+  cover: {
     backgroundColor: colors.white,
     '&:hover': {
       backgroundColor: colors.compoundGreen,
       '& .title': {
-        color: colors.white
+        color: colors.white,
+        display: 'none'
+      },
+      '& .soon': {
+        color: colors.white,
+        display: 'block'
       },
       '& .icon': {
         color: colors.white
       }
     },
     '& .title': {
-      color: colors.compoundGreen
+      color: colors.compoundGreen,
+      display: 'block'
+    },
+    '& .soon': {
+      color: colors.compoundGreen,
+      display: 'none'
     },
     '& .icon': {
       color: colors.compoundGreen
@@ -142,9 +152,9 @@ class Home extends Component {
 
     return (
       <div className={ classes.root }>
-        <Card className={ `${classes.card} ${classes.invest}` } onClick={ () => { this.nav('/invest') } }>
+        <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav('/earn') } }>
           <AttachMoneyIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>Invest</Typography>
+          <Typography variant={'h1'} className={ `${classes.title} title` }>Earn</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav('/zap') } }>
           <FlashOnIcon className={ `${classes.icon} icon` } />
@@ -154,9 +164,10 @@ class Home extends Component {
           <BarChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>APR</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.insurance}` } onClick={ () => { this.nav('/insure') } }>
+        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { /*this.nav('/cover')  */}}>
           <SecurityIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>Insurance</Typography>
+          <Typography variant={'h1'} className={ `${classes.title} title` }>Cover</Typography>
+          <Typography variant={'h1'} className={ `${classes.title} title soon` }>Coming soon</Typography>
         </Card>
       </div>
     )
