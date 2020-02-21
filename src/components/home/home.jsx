@@ -1,34 +1,20 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
+import { Card, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  Card,
-  Typography,
-  Button,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Switch
-} from '@material-ui/core';
-import { withNamespaces } from 'react-i18next';
-import { colors } from '../../theme'
-import FlashOnIcon from '@material-ui/icons/FlashOn';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
-import SecurityIcon from '@material-ui/icons/Security';
 import BarChartIcon from '@material-ui/icons/BarChart';
-import {
-  Link
-} from "react-router-dom";
+import FlashOnIcon from '@material-ui/icons/FlashOn';
+import SecurityIcon from '@material-ui/icons/Security';
+import React, { Component } from "react";
+import { withNamespaces } from 'react-i18next';
+import { withRouter } from "react-router-dom";
+import { colors } from '../../theme';
+import AppLayout from '../appLayout';
 
 const styles = theme => ({
-  root: {
-    flex: 1,
-    display: 'flex',
-    width: '100%',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    flexDirection: 'column',
-    [theme.breakpoints.up('sm')]: {
+  cardsContainer: {
+    [theme.breakpoints.up('md')]: {
+      display: 'flex',
+      flexWrap: 'wrap',
       flexDirection: 'row',
     }
   },
@@ -42,10 +28,9 @@ const styles = theme => ({
     flexDirection: 'column',
     cursor: 'pointer',
     borderRadius: '0px',
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up('md')]: {
       height: '100vh',
-      minWidth: '20%',
-      minHeight: '50vh',
+      width: '100%'
     }
   },
   earn: {
@@ -82,7 +67,7 @@ const styles = theme => ({
     },
     '& .icon': {
       color: colors.blue
-    },
+    }
   },
   apr: {
     backgroundColor: colors.white,
@@ -100,7 +85,7 @@ const styles = theme => ({
     },
     '& .icon': {
       color: colors.lightBlack
-    },
+    }
   },
   cover: {
     backgroundColor: colors.white,
@@ -128,7 +113,7 @@ const styles = theme => ({
     },
     '& .icon': {
       color: colors.compoundGreen
-    },
+    }
   },
   title: {
     padding: '24px',
@@ -140,13 +125,13 @@ const styles = theme => ({
   icon: {
     fontSize: '60px',
     [theme.breakpoints.up('sm')]: {
-      fontSize: '100px',
+      fontSize: '100px'
     }
   },
   link: {
     textDecoration: 'none'
   }
-});
+})
 
 class Home extends Component {
 
@@ -165,25 +150,27 @@ class Home extends Component {
     } = this.state
 
     return (
-      <div className={ classes.root }>
-        <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav('/earn') } }>
-          <AttachMoneyIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>Earn</Typography>
-        </Card>
-        <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav('/zap') } }>
-          <FlashOnIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>Zap</Typography>
-        </Card>
-        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('/apr') } }>
-          <BarChartIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>APR</Typography>
-        </Card>
-        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { /*this.nav('/cover')  */}}>
-          <SecurityIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>Cover</Typography>
-          <Typography variant={'h1'} className={ `${classes.title} title soon` }>Coming soon</Typography>
-        </Card>
-      </div>
+      <AppLayout>
+        <div className={classes.cardsContainer}>
+          <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav('/earn') } }>
+            <AttachMoneyIcon className={ `${classes.icon} icon` } />
+            <Typography variant={'h1'} className={ `${classes.title} title` }>Earn</Typography>
+          </Card>
+          <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav('/zap') } }>
+            <FlashOnIcon className={ `${classes.icon} icon` } />
+            <Typography variant={'h1'} className={ `${classes.title} title` }>Zap</Typography>
+          </Card>
+          <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('/apr') } }>
+            <BarChartIcon className={ `${classes.icon} icon` } />
+            <Typography variant={'h1'} className={ `${classes.title} title` }>APR</Typography>
+          </Card>
+          <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { /*this.nav('/cover')  */}}>
+            <SecurityIcon className={ `${classes.icon} icon` } />
+            <Typography variant={'h1'} className={ `${classes.title} title` }>Cover</Typography>
+            <Typography variant={'h1'} className={ `${classes.title} title soon` }>Coming soon</Typography>
+          </Card>
+        </div>
+      </AppLayout>
     )
   };
 

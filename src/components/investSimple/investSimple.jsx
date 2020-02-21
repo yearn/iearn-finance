@@ -1,50 +1,34 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
+import { Button, Card, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Switch, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  Card,
-  Typography,
-  Button,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Switch
-} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import React, { Component } from "react";
 import { withNamespaces } from 'react-i18next';
-import { colors } from '../../theme'
-
-import InvestAllModal from './investAllModal.jsx'
-import UnlockModal from '../unlock/unlockModal.jsx'
-import Snackbar from '../snackbar'
-import Asset from './asset'
-import Loader from '../loader'
-
-import {
-  ERROR,
-  GET_BALANCES,
-  BALANCES_RETURNED,
-  INVEST_RETURNED,
-  REDEEM_RETURNED,
-  CONNECTION_CONNECTED,
-  CONNECTION_DISCONNECTED
-} from '../../constants'
-
+import { withRouter } from "react-router-dom";
+import { BALANCES_RETURNED, CONNECTION_CONNECTED, CONNECTION_DISCONNECTED, ERROR, GET_BALANCES, INVEST_RETURNED, REDEEM_RETURNED } from '../../constants';
 import Store from "../../stores";
+import AppLayout from '../appLayout';
+import Loader from '../loader';
+import Snackbar from '../snackbar';
+import UnlockModal from '../unlock/unlockModal.jsx';
+import Asset from './asset';
+import InvestAllModal from './investAllModal.jsx';
+
+
+
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
 
 const styles = theme => ({
-  root: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    maxWidth: '1200px',
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
+  // root: {
+  //   flex: 1,
+  //   display: 'flex',
+  //   flexDirection: 'column',
+  //   maxWidth: '1200px',
+  //   width: '100%',
+  //   justifyContent: 'center',
+  //   alignItems: 'center'
+  // },
   investedContainer: {
     display: 'flex',
     flex: 1,
@@ -326,8 +310,8 @@ class InvestSimple extends Component {
       address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
     }
     return (
-      <div className={ classes.root }>
-        <div className={ classes.investedContainer }>
+      <AppLayout>
+        <div className={classes.investedContainer}>
           { account.address &&
             <div className={ classes.intro }>
               { account.address && <div className={ classes.versionToggle }>
@@ -381,7 +365,7 @@ class InvestSimple extends Component {
         { modalOpen && this.renderModal() }
         { modalInvestAllOpen && this.renderInvestAllModal() }
         { snackbarMessage && this.renderSnackbar() }
-      </div>
+      </AppLayout>
     )
   };
 

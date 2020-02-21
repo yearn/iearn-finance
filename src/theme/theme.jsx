@@ -1,4 +1,4 @@
-import createBreakpoints from '@material-ui/core/styles/createBreakpoints'
+import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
 
 export const colors = {
   white: "#fff",
@@ -29,12 +29,12 @@ const breakpoints = createBreakpoints({
 
 const iswapTheme =  {
   typography: {
-    fontFamily: ['Open Sans', 'sans-serif'].join(","),
     lineHeight: '1rem',
+    fontSize: '18px',
     fontWeight: '700',
     useNextVariants: true,
     h1: {
-      fontSize: '1.0rem',
+      fontSize: '1rem',
       fontWeight: 'bold',
       [breakpoints.up('md')]: {
         fontSize: '1.5rem',
@@ -65,6 +65,7 @@ const iswapTheme =  {
     },
   },
   type: 'light',
+  spacing: 8,
   overrides: {
     MuiSelect: {
       selectMenu: {
@@ -200,7 +201,7 @@ const iswapTheme =  {
   },
   palette: {
     primary: {
-      main: colors.blue,
+      main: colors.pink,
       contrastText: colors.white
     },
     secondary: {
@@ -210,9 +211,6 @@ const iswapTheme =  {
       paper: colors.white,
       default: colors.white
     },
-    text: {
-      primary: colors.pink
-    }
   },
   breakpoints: breakpoints
 };

@@ -1,22 +1,14 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
+import { FormControl, MenuItem, Select, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  Typography,
-  Select,
-  MenuItem,
-  FormControl
-} from '@material-ui/core';
-import {
-  Link
-} from "react-router-dom";
+import React, { Component } from "react";
 import { withNamespaces } from 'react-i18next';
+import { Link, withRouter } from "react-router-dom";
 import i18n from '../../i18n';
-import { colors } from '../../theme'
-
-import BuiltWithModal from '../builtwith/builtwithModal.jsx'
-
 import Store from "../../stores";
+import { colors } from '../../theme';
+import BuiltWithModal from '../builtwith/builtwithModal.jsx';
+
+
 const store = Store.store
 
 const styles = theme => ({

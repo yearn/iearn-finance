@@ -1,39 +1,24 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
+import { Button, Card, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  Card,
-  Typography,
-  Button
-} from '@material-ui/core';
-
-import Have from './have'
-import Want from './want'
-import Sending from './sending'
+import React, { Component } from "react";
+import { withNamespaces } from 'react-i18next';
+import { withRouter } from "react-router-dom";
+import { BALANCES_RETURNED, CONNECTION_CONNECTED, CONNECTION_DISCONNECTED, ERROR, GET_BALANCES, GET_CURV_BALANCE, GET_CURV_BALANCE_RETURNED, SWAP, SWAP_RETURNED, ZAP, ZAP_RETURNED } from '../../constants';
+import Store from "../../stores";
+import AppLayout from '../appLayout';
+import BuiltWithModal from '../builtwith/builtwithModal.jsx';
 //import Receiving from './receiving'
 // import ConversionRatios from './conversionRatios'
 // import Fees from './fees'
-import Loader from '../loader'
-import BuiltWithModal from '../builtwith/builtwithModal.jsx'
-import UnlockModal from '../unlock/unlockModal.jsx'
-import Snackbar from '../snackbar'
+import Loader from '../loader';
+import Snackbar from '../snackbar';
+import UnlockModal from '../unlock/unlockModal.jsx';
+import Have from './have';
+import Sending from './sending';
+import Want from './want';
 
-import {
-  ERROR,
-  GET_BALANCES,
-  BALANCES_RETURNED,
-  CONNECTION_CONNECTED,
-  CONNECTION_DISCONNECTED,
-  ZAP,
-  ZAP_RETURNED,
-  GET_CURV_BALANCE,
-  GET_CURV_BALANCE_RETURNED,
-  SWAP,
-  SWAP_RETURNED
-} from '../../constants'
 
-import { withNamespaces } from 'react-i18next';
-import Store from "../../stores";
+
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
@@ -293,7 +278,7 @@ class Zap extends Component {
     }
 
     return (
-      <div className={ classes.root }>
+      <AppLayout>
         { !account.address &&
           <div className={ classes.investedContainer }>
               <div className={ classes.introCenter }>
@@ -356,7 +341,7 @@ class Zap extends Component {
         { modalBuiltWithOpen && this.renderBuiltWithModal() }
         { snackbarMessage && this.renderSnackbar() }
         { loading && <Loader /> }
-      </div>
+      </AppLayout>
     )
   };
 

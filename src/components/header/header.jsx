@@ -1,43 +1,21 @@
+import { AppBar, Button, IconButton, Toolbar } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
+import { Menu } from '@material-ui/icons';
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import { withStyles } from '@material-ui/core/styles';
-import { Typography } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-
-import UnlockModal from '../unlock/unlockModal.jsx'
-
-import {
-  CONNECT_METAMASK,
-  CONNECT_METAMASK_PASSIVE,
-  METAMASK_CONNECTED
-} from '../../constants'
-
-import { colors } from '../../theme'
-
+import { CONNECT_METAMASK_PASSIVE, METAMASK_CONNECTED } from '../../constants';
 import Store from "../../stores";
+import { colors } from '../../theme';
+import UnlockModal from '../unlock/unlockModal.jsx';
+
+
 const dispatcher = Store.dispatcher
 const emitter = Store.emitter
 const store = Store.store
 
+const drawerWidth = 240
+
 const styles = theme => ({
-  root: {
-    display: 'flex',
-    justifyContent: 'space-around',
-    background: colors.blue,
-    borderBottom: '1px solid #aaa',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
-    width: '100%',
-  },
-  header: {
-    maxWidth: '1200px',
-    flex: 1,
-    display: 'flex',
-    padding: '20px 12px',
-    alignItems: 'center',
-    [theme.breakpoints.up('lg')]: {
-      padding: '30px 0px',
-    }
-  },
   brandingContainer: {
     display: 'flex',
     flex: 1,
@@ -48,7 +26,7 @@ const styles = theme => ({
     cursor: 'pointer'
   },
   brandingIcon: {
-    border: '1px solid '+colors.white,
+    border: '1px solid ' + colors.white,
     cursor: 'pointer'
   },
   linksContainer: {
@@ -60,7 +38,7 @@ const styles = theme => ({
       margin: 0,
       padding: 0,
       display: 'flex',
-      justifyContent: 'space-evenly',
+      justifyContent: 'space-evenly'
     }
   },
   linksContainerMobile: {
@@ -75,7 +53,7 @@ const styles = theme => ({
     alignItems: 'center',
     zIndex: 99,
     [theme.breakpoints.up('md')]: {
-      display: 'none',
+      display: 'none'
     }
   },
   link: {
@@ -88,9 +66,9 @@ const styles = theme => ({
     }
   },
   link_active: {
-    borderBottom: '2px solid '+colors.blue,
+    borderBottom: '2px solid ' + colors.blue,
     [theme.breakpoints.up('md')]: {
-      borderBottom: '2px solid '+colors.white,
+      borderBottom: '2px solid ' + colors.white
     }
   },
   addressContainer: {
@@ -99,7 +77,7 @@ const styles = theme => ({
     background: '#fbfbfb',
     cursor: 'pointer',
     [theme.breakpoints.up('md')]: {
-      maxWidth: '300px',
+      maxWidth: '300px'
     }
   },
   menuIconContainer: {
@@ -114,7 +92,7 @@ const styles = theme => ({
   menuIcon: {
     color: colors.white
   }
-});
+})
 
 class Header extends Component {
   constructor(props) {
@@ -163,47 +141,63 @@ class Header extends Component {
     } = this.state
 
     return (
-      <div className={ classes.root }>
-        <div className={ classes.header }>
-          <div className={ classes.brandingContainer }>
-            <div className={ classes.brandingIcon } onClick={ this.navigateHome }><Typography variant={ 'body1' } color='secondary'>icon</Typography></div>
-            <div className={ classes.brandingName } onClick={ this.navigateHome }>
-              <Typography variant={ 'h1' } color='secondary'>iearn</Typography>
-            </div>
-          </div>
-          <div className={ classes.linksContainer }>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>iswap</Typography></div>
-            <div className={ `${classes.link} ${classes.link_active}` }><Typography variant={ 'body1' } color='secondary'>iearn</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>ireward</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>iam</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>irefer</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>faq</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>what</Typography></div>
-          </div>
-          { address && <div className={ classes.addressContainer } onClick={this.onAddressClick}>
-            <Typography variant={ 'h2' } noWrap>{ address }</Typography>
-          </div>}
-          { !address &&  <div className={ classes.addressContainer } onClick={this.onAddressClick}>
-            <Typography variant={ 'h2' } noWrap>Connect Wallet</Typography>
-          </div> }
-          <div className={ classes.menuIconContainer } ref={this.menuOpenRef}>
-            <MenuIcon onClick={ !menuOpen ? this.toggleMenu : this.closeMenu } className={ classes.menuIcon } />
-          </div>
-          {
-            menuOpen && (<div className={ classes.linksContainerMobile } ref={this.menuRef} >
-              <div className={ classes.link }><Typography variant={ 'body1' }>iswap</Typography></div>
-              <div className={ `${classes.link} ${classes.link_active}` }><Typography variant={ 'body1' }>iearn</Typography></div>
-              <div className={ classes.link }><Typography variant={ 'body1' }>ireward</Typography></div>
-              <div className={ classes.link }><Typography variant={ 'body1' }>iam</Typography></div>
-              <div className={ classes.link }><Typography variant={ 'body1' }>irefer</Typography></div>
-              <div className={ classes.link }><Typography variant={ 'body1' }>faq</Typography></div>
-              <div className={ classes.link }><Typography variant={ 'body1' }>what</Typography></div>
-            </div>)
-          }
-        </div>
+      <>
+        <AppBar position="static" color="transparent">
+          <Toolbar>
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="menu"
+            >
+              <Menu />
+            </IconButton>
+            <Button>Login</Button>
+          </Toolbar>
+        </AppBar>
 
-        { modalOpen && this.renderModal() }
-      </div>
+      </>
+      // <div className={ classes.root }>
+      //   <div className={ classes.header }>
+      //     <div className={ classes.brandingContainer }>
+      //       <div className={ classes.brandingIcon } onClick={ this.navigateHome }><Typography variant={ 'body1' } color='secondary'>icon</Typography></div>
+      //       <div className={ classes.brandingName } onClick={ this.navigateHome }>
+      //         <Typography variant={ 'h1' } color='secondary'>iearn</Typography>
+      //       </div>
+      //     </div>
+      //     <div className={ classes.linksContainer }>
+      //       <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>iswap</Typography></div>
+      //       <div className={ `${classes.link} ${classes.link_active}` }><Typography variant={ 'body1' } color='secondary'>iearn</Typography></div>
+      //       <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>ireward</Typography></div>
+      //       <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>iam</Typography></div>
+      //       <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>irefer</Typography></div>
+      //       <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>faq</Typography></div>
+      //       <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>what</Typography></div>
+      //     </div>
+      //     { address && <div className={ classes.addressContainer } onClick={this.onAddressClick}>
+      //       <Typography variant={ 'h2' } noWrap>{ address }</Typography>
+      //     </div>}
+      //     { !address &&  <div className={ classes.addressContainer } onClick={this.onAddressClick}>
+      //       <Typography variant={ 'h2' } noWrap>Connect Wallet</Typography>
+      //     </div> }
+      //     <div className={ classes.menuIconContainer } ref={this.menuOpenRef}>
+      //       <Menu onClick={ !menuOpen ? this.toggleMenu : this.closeMenu } className={ classes.menuIcon } />
+      //     </div>
+      //     {
+      //       menuOpen && (<div className={ classes.linksContainerMobile } ref={this.menuRef} >
+      //         <div className={ classes.link }><Typography variant={ 'body1' }>iswap</Typography></div>
+      //         <div className={ `${classes.link} ${classes.link_active}` }><Typography variant={ 'body1' }>iearn</Typography></div>
+      //         <div className={ classes.link }><Typography variant={ 'body1' }>ireward</Typography></div>
+      //         <div className={ classes.link }><Typography variant={ 'body1' }>iam</Typography></div>
+      //         <div className={ classes.link }><Typography variant={ 'body1' }>irefer</Typography></div>
+      //         <div className={ classes.link }><Typography variant={ 'body1' }>faq</Typography></div>
+      //         <div className={ classes.link }><Typography variant={ 'body1' }>what</Typography></div>
+      //       </div>)
+      //     }
+      //   </div>
+
+      //   { modalOpen && this.renderModal() }
+      // </div>
     )
   };
 

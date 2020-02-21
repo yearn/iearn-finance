@@ -1,42 +1,18 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
+import { Card, TextField, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  Typography,
-  TextField,
-  Card,
-  Select,
-  MenuItem,
-  FormControl
-} from '@material-ui/core';
+import React, { Component } from "react";
 import { withNamespaces } from 'react-i18next';
-import { colors } from '../../theme'
-
-import {
-  GET_AGGREGATED_YIELD,
-  GET_AGGREGATED_YIELD_RETURNED,
-} from '../../constants'
-
+import { withRouter } from "react-router-dom";
+import { GET_AGGREGATED_YIELD, GET_AGGREGATED_YIELD_RETURNED } from '../../constants';
 import Store from "../../stores";
+import AppLayout from '../appLayout';
+
+
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
 
 const styles = theme => ({
-  root: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    maxWidth: '1000px',
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: '60px',
-    [theme.breakpoints.up('md')]: {
-      alignItems: 'center',
-      marginTop: '0px',
-    }
-  },
   actionInput: {
     padding: '0px 0px 12px 0px',
     fontSize: '0.5rem'
@@ -220,9 +196,9 @@ class APR extends Component {
     } = this.state
 
     return (
-      <div className={ classes.root }>
-        <div className={ classes.tablesContainer }>
-          <div className={ classes.investedContainer }>
+      <AppLayout>
+        <div>
+          <div>
             <Card className={ classes.pairs }>
               <TextField
                 fullWidth
@@ -246,7 +222,7 @@ class APR extends Component {
             </Card>
           </div>
         </div>
-      </div>
+      </AppLayout>
     )
   };
 
