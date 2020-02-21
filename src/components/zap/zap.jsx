@@ -52,10 +52,14 @@ const styles = theme => ({
     flex: 1,
     display: 'flex',
     flexWrap: 'wrap',
-    padding: '24px',
+    padding: '12px',
     borderRadius: '1.25em',
     maxWidth: '400px',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginTop: '20px',
+    [theme.breakpoints.up('md')]: {
+      padding: '24px',
+    }
   },
   iWantContainer: {
     flex: 1,
@@ -83,8 +87,20 @@ const styles = theme => ({
     display: 'flex',
     marginTop: '60px',
     flexWrap: 'wrap',
-    maxWidth: '900px',
-    justifyContent: 'center'
+    maxWidth: '400px',
+    justifyContent: 'center',
+    padding: '12px',
+    minWidth: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  intro: {
+    width: '100%',
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    maxWidth: '400px'
   },
   introCenter: {
     minWidth: '100%',
@@ -135,6 +151,23 @@ const styles = theme => ({
     minWidth: '100%',
     marginBottom: '24px',
     marginTop: '24px'
+  },
+  addressContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    maxWidth: '100px',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    fontSize: '0.83rem',
+    textOverflow:'ellipsis',
+    cursor: 'pointer',
+    padding: '10px',
+    borderRadius: '0.75rem',
+    height: 'max-content',
+    [theme.breakpoints.up('md')]: {
+      maxWidth: '130px',
+      width: '100%'
+    }
   },
 });
 
@@ -254,6 +287,11 @@ class Zap extends Component {
       snackbarMessage
     } = this.state
 
+    var address = null;
+    if (account.address) {
+      address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
+    }
+
     return (
       <div className={ classes.root }>
         { !account.address &&
@@ -276,8 +314,12 @@ class Zap extends Component {
         }
         { account.address &&
           <div className={ classes.card }>
-            <div className={ classes.introCenter }>
-              <Typography variant='h2'>{ t('Zap.Intro') }</Typography>
+            <div className={ classes.intro }>
+              <Typography variant='h2' className={ classes.introText }>{ t('Zap.Intro') }</Typography>
+              <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
+                <Typography variant={ 'h5'} noWrap>{ address }</Typography>
+                <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
+              </Card>
             </div>
             <Card className={ classes.iHaveContainer }>
               <Have assets={ assets } curveContracts={ curveContracts } setSendAsset={ this.setSendAsset } sendAsset={ sendAsset } setSendAmountPercent={ this.setSendAmountPercent } loading={ loading } />

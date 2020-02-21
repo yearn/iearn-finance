@@ -16,6 +16,9 @@ import Manage from './components/manage';
 import Performance from './components/performance';
 import Zap from './components/zap';
 import IDai from './components/idai';
+import Insure from './components/insure';
+import Footer from './components/footer';
+import Home from './components/home';
 
 class App extends Component {
 
@@ -36,7 +39,7 @@ class App extends Component {
               <Route path="/apr">
                 <APR />
               </Route>
-              <Route path="/invest">
+              <Route path="/earn">
                 <InvestSimple />
               </Route>
               <Route path="/zap">
@@ -51,10 +54,14 @@ class App extends Component {
               <Route path="/manage">
                 <Manage />
               </Route>
+              {/*<Route path="/cover">
+                <Insure />
+              </Route>*/}
               <Route path="/">
-                <InvestSimple />
+                <Home />
               </Route>
             </Switch>
+            <Footer />
           </div>
         </Router>
       </MuiThemeProvider>

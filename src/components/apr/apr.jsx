@@ -10,7 +10,6 @@ import {
   FormControl
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
-import i18n from '../../i18n';
 import { colors } from '../../theme'
 
 import {
@@ -154,30 +153,6 @@ const styles = theme => ({
     maxWidth: 'calc(100vw - 68px)',
     overflowX: 'auto'
   },
-  footer: {
-    padding: '24px',
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end',
-    width: '100%',
-    alignItems: 'center',
-    [theme.breakpoints.up('sm')]: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      width: '100%',
-      alignItems: 'center',
-    }
-  },
-  footerLinks: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    maxWidth: '350px'
-  },
-  footerText: {
-    cursor: 'pointer'
-  },
   assetIcon: {
     display: 'inline-block',
     verticalAlign: 'middle',
@@ -187,14 +162,6 @@ const styles = theme => ({
     textAlign: 'center',
     cursor: 'pointer',
     marginRight: '12px'
-  },
-  languageContainer: {
-    paddingLeft: '12px',
-    display: 'none'
-  },
-  selectInput: {
-    fontSize: '14px',
-    color: colors.pink
   },
 });
 
@@ -209,8 +176,6 @@ class APR extends Component {
       uniswapYieldsV2: store.getStore('uniswapYieldsV2'),
       aggregatedYields: store.getStore('aggregatedYields'),
       aggregatedHeaders: store.getStore('aggregatedHeaders'),
-      languages: store.getStore('languages'),
-      language: 'en',
       amount: '',
       amountError: false,
       loading: false
@@ -218,15 +183,12 @@ class APR extends Component {
   }
 
   componentWillMount() {
-    // emitter.on(GET_YIELD_RETURNED, this.yieldReturned);
     emitter.on(GET_AGGREGATED_YIELD_RETURNED, this.aggregatedYieldReturned);
 
-    // dispatcher.dispatch({ type: GET_YIELD, content: {  } })
     dispatcher.dispatch({ type: GET_AGGREGATED_YIELD, content: { amount: 0 } })
   }
 
   componentWillUnmount() {
-    // emitter.removeListener(GET_YIELD_RETURNED, this.yieldReturned);
     emitter.removeListener(GET_AGGREGATED_YIELD_RETURNED, this.aggregatedYieldReturned);
   };
 
@@ -282,33 +244,6 @@ class APR extends Component {
                 { this.renderAggregatedYields() }
               </table>
             </Card>
-          </div>
-        </div>
-        <div className={classes.footer}>
-          <div className={classes.footerLinks}>
-            <Typography onClick={()=> window.open("https://iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Home') }</Typography>
-            <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.About') }</Typography>
-            <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Docs') }</Typography>
-            <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Code') }</Typography>
-            <Typography onClick={()=> window.open("https://t.me/iearnfinance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Telegram') }</Typography>
-            <Typography onClick={()=> window.open("/apr", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.Yield') }</Typography>
-            <Typography onClick={()=> window.open("/builtwith", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('InvestSimple.BuiltWith') }</Typography>
-          </div>
-          <div className={ classes.languageContainer }>
-            <FormControl variant="outlined">
-              <Select
-                id="language"
-                value={ language }
-                onChange={ this.handleLanguageChange }
-                inputProps={{ className: classes.selectInput }}
-                color="primary"
-                fullWidth
-              >
-                { languages.map((language) => {
-                  return <MenuItem value={language.code}>{language.language}</MenuItem>
-                })}
-              </Select>
-            </FormControl>
           </div>
         </div>
       </div>
@@ -381,14 +316,6 @@ class APR extends Component {
     val[event.target.id] = event.target.value
     this.setState(val)
     setTimeout(this.dispatch(event.target.value));
-  }
-
-  handleLanguageChange = (event) => {
-    let val = []
-    val.language = event.target.value
-    this.setState(val)
-
-    i18n.changeLanguage(event.target.value)
   }
 
   inputKeyDown = (event) => {
