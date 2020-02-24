@@ -321,7 +321,7 @@ class Asset extends Component {
             <Typography variant={'h3'}>{ (amount*(pricePerInsurance !== null ? pricePerInsurance : asset.pricePerInsurance)).toFixed(4) + ' ETH' }</Typography>
           </div>
           <div className={ classes.infoContainer } >
-            <Typography variant={'h5'}>Duration</Typography>
+            <Typography variant={'h5'}>Expiry</Typography>
             <Typography variant={'h4'}>{asset.expiryBlock ? moment(asset.expiryBlock, 'X').fromNow() : 'Unknown'}</Typography>
           </div>
           <div className={ classes.infoContainer } >
