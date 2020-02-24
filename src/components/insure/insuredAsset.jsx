@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
 import * as moment from 'moment'
+import { colors } from '../../theme'
 
 import {
   ERROR,
@@ -142,6 +143,15 @@ const styles = theme => ({
   },
   tradeContainerCapture: {
     padding: '12px 0px'
+  },
+  positive: {
+    color: colors.green
+  },
+  warning: {
+    color: colors.orange
+  },
+  error: {
+    color: colors.red
   }
 });
 
@@ -213,9 +223,6 @@ class Asset extends Component {
 
     let yearlyPremium = 0
     let expectedReturn = 0
-
-    console.log(pricePerInsurance)
-    console.log(ethPrice)
 
     if(pricePerInsurance && pricePerInsurance > 0 && ethPrice && ethPrice > 0) {
       const price = pricePerInsurance * ethPrice
@@ -300,7 +307,7 @@ class Asset extends Component {
           className={ classes.actionButton }
           variant="outlined"
           color="primary"
-          disabled={ loading || !account.address || asset.disabled }
+          disabled={ loading || !account.address || asset.disabled || expectedReturn <= 0 }
           onClick={ this.onBuy }
           >
           <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.BuyInsurance')}</Typography>
@@ -309,21 +316,21 @@ class Asset extends Component {
       <div className={ classes.sepperator }></div>
       <div className={ `${classes.tradeContainer}` }>
         <div className={ classes.tradeContainerInfo }>
-          <div className={ classes.infoContainer} >
+          <div className={ classes.infoContainer } >
             <Typography variant={'h3'}>Total Cost</Typography>
             <Typography variant={'h3'}>{ (amount*(pricePerInsurance !== null ? pricePerInsurance : asset.pricePerInsurance)).toFixed(4) + ' ETH' }</Typography>
           </div>
-          <div className={ classes.infoContainer} >
+          <div className={ classes.infoContainer } >
             <Typography variant={'h5'}>Duration</Typography>
             <Typography variant={'h4'}>{asset.expiryBlock ? moment(asset.expiryBlock, 'X').fromNow() : 'Unknown'}</Typography>
           </div>
-          <div className={ classes.infoContainer} >
+          <div className={ classes.infoContainer } >
             <Typography variant={'h5'}>Premium</Typography>
-            <Typography variant={'h4'}>{ '' + (yearlyPremium).toFixed(4) + '%' }</Typography>
+            <Typography variant={'h4'} className={ expectedReturn > 10 ? classes.positive : (expectedReturn > 5 ? classes.warning : classes.error) }>{ '' + (yearlyPremium).toFixed(4) + '%' }</Typography>
           </div>
-          <div className={ classes.infoContainer} >
+          <div className={ classes.infoContainer } >
             <Typography variant={'h5'}>Expected Returns</Typography>
-            <Typography variant={'h4'}>{ '' + (expectedReturn).toFixed(4) + '%' }</Typography>
+            <Typography variant={'h4'} className={ expectedReturn > 10 ? classes.positive : (expectedReturn > 5 ? classes.warning : classes.error) }>{ '' + (expectedReturn).toFixed(4) + '%' }</Typography>
           </div>
         </div>
         <Button
