@@ -321,7 +321,7 @@ class Asset extends Component {
             <Typography variant={'h3'}>{ (amount*(pricePerInsurance !== null ? pricePerInsurance : asset.pricePerInsurance)).toFixed(4) + ' ETH' }</Typography>
           </div>
           <div className={ classes.infoContainer } >
-            <Typography variant={'h5'}>Expiry</Typography>
+            <Typography variant={'h5'}>Expiration</Typography>
             <Typography variant={'h4'}>{asset.expiryBlock ? moment(asset.expiryBlock, 'X').fromNow() : 'Unknown'}</Typography>
           </div>
           <div className={ classes.infoContainer } >
@@ -333,15 +333,6 @@ class Asset extends Component {
             <Typography variant={'h4'} className={ expectedReturn > 10 ? classes.positive : (expectedReturn > 5 ? classes.warning : classes.error) }>{ '' + (expectedReturn).toFixed(4) + '%' }</Typography>
           </div>
         </div>
-        <Button
-          className={ classes.actionButton }
-          variant="outlined"
-          color="primary"
-          disabled={ true || loading || !account.address || asset.disabled }
-          onClick={ this.onClaim }
-          >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.ClaimInsurance')}</Typography>
-        </Button>
       </div>
     </div>)
   };
