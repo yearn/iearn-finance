@@ -29,9 +29,6 @@
   "IDai.Intro": "Simple iDAI to DAI.",
   "IDai.Swap": "Swap",
 
-  "Insure.Intro": "Insurance. Simple.",
-  "Insure.Connect": "Connect wallet",
-
   "Footer.Home": "home",
   "Footer.About": "about",
   "Footer.Docs": "docs",
@@ -42,11 +39,13 @@
   "Footer.Zap": "zap",
   "Footer.Insure": "insure",
 
+  "Insure.Intro": "Cover. Simple.",
+  "Insure.Connect": "Connect wallet",
   "Insure.Balance": "Current Balance",
   "Insure.Insured": "Insured Percent",
   "Insure.UninsuredYield": "Uninsured Yield",
   "Insure.InsuredYield": "Insured Yield",
-  "Insure.BuyInsurance": "Buy Insurance",
+  "Insure.BuyInsurance": "Purchase Cover",
   "Insure.Disabled": "Disabled",
   "Insure.ClaimInsurance": "Claim"
 }

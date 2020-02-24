@@ -28,7 +28,8 @@ import {
   GET_INSURANCE_BALANCES,
   GET_INSURANCE_BALANCES_RETURNED,
   CONNECTION_CONNECTED,
-  CONNECTION_DISCONNECTED
+  CONNECTION_DISCONNECTED,
+  GET_ETH_PRICE
 } from '../../constants'
 
 import Store from "../../stores";
@@ -164,19 +165,19 @@ const styles = theme => ({
     verticalAlign: 'middle',
     borderRadius: '20px',
     height: '30px',
-    width: '30px',
+    width: '80px',
     textAlign: 'center',
     cursor: 'pointer',
     marginRight: '20px',
     [theme.breakpoints.up('sm')]: {
       height: '40px',
-      width: '40px',
+      width: '100px',
       marginRight: '24px',
     }
   },
 });
 
-class InvestSimple extends Component {
+class Insure extends Component {
 
   constructor(props) {
     super()
@@ -207,7 +208,8 @@ class InvestSimple extends Component {
   };
 
   refresh() {
-    dispatcher.dispatch({ type: GET_INSURANCE_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_INSURANCE_BALANCES, content: {} });
+    dispatcher.dispatch({ type: GET_ETH_PRICE, content: {} });
   }
 
   balancesReturned = (balances) => {
@@ -218,7 +220,8 @@ class InvestSimple extends Component {
   connectionConnected = () => {
     this.setState({ account: store.getStore('account') })
 
-    dispatcher.dispatch({ type: GET_INSURANCE_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_INSURANCE_BALANCES, content: {} });
+    dispatcher.dispatch({ type: GET_ETH_PRICE, content: {} });
 
     const that = this
     setTimeout(() => {
@@ -324,8 +327,8 @@ class InvestSimple extends Component {
                 <div className={ classes.assetIcon }>
                   <img
                     alt=""
-                    src={ require('../../assets/'+(['Curve.fi V1', 'Curve.fi V2', 'Curve.fi V3', 'Curve.fi'].includes(asset.symbol) ? 'CRV' : asset.symbol)+'-logo.png') }
-                    height={ width > 600 ? '40px' : '30px'}
+                    src={ require('../../assets/oCurve-logo.svg') }
+                    height={ width > 600 ? '30px' : '25px'}
                     style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
                 </div>
@@ -391,4 +394,4 @@ class InvestSimple extends Component {
   }
 }
 
-export default withNamespaces()(withRouter(withStyles(styles)(InvestSimple)));
+export default withNamespaces()(withRouter(withStyles(styles)(Insure)));

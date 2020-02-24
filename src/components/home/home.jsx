@@ -26,22 +26,29 @@ const styles = theme => ({
     display: 'flex',
     width: '100%',
     justifyContent: 'space-around',
-    alignItems: 'center'
+    alignItems: 'center',
+    flexDirection: 'column',
+    [theme.breakpoints.up('sm')]: {
+      flexDirection: 'row',
+    }
   },
   card: {
     flex: '1',
-    height: '100vh',
-    minWidth: '20%',
-    minHeight: '50vh',
-    padding: '60px',
+    height: '25vh',
+    width: '100%',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'column',
     cursor: 'pointer',
-
+    borderRadius: '0px',
+    [theme.breakpoints.up('sm')]: {
+      height: '100vh',
+      minWidth: '20%',
+      minHeight: '50vh',
+    }
   },
-  invest: {
+  earn: {
     backgroundColor: colors.white,
     '&:hover': {
       backgroundColor: colors.pink,
@@ -95,29 +102,36 @@ const styles = theme => ({
       color: colors.lightBlack
     },
   },
-  insurance: {
+  cover: {
     backgroundColor: colors.white,
     '&:hover': {
       backgroundColor: colors.compoundGreen,
       '& .title': {
-        color: colors.white
+        color: colors.white,
       },
       '& .icon': {
         color: colors.white
       }
     },
     '& .title': {
-      color: colors.compoundGreen
+      color: colors.compoundGreen,
     },
     '& .icon': {
       color: colors.compoundGreen
     },
   },
   title: {
-    padding: '24px'
+    padding: '24px',
+    paddingBottom: '0px',
+    [theme.breakpoints.up('sm')]: {
+      paddingBottom: '24px'
+    }
   },
   icon: {
-    fontSize: '100px'
+    fontSize: '60px',
+    [theme.breakpoints.up('sm')]: {
+      fontSize: '100px',
+    }
   },
   link: {
     textDecoration: 'none'
@@ -142,9 +156,9 @@ class Home extends Component {
 
     return (
       <div className={ classes.root }>
-        <Card className={ `${classes.card} ${classes.invest}` } onClick={ () => { this.nav('/invest') } }>
+        <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav('/earn') } }>
           <AttachMoneyIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>Invest</Typography>
+          <Typography variant={'h1'} className={ `${classes.title} title` }>Earn</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav('/zap') } }>
           <FlashOnIcon className={ `${classes.icon} icon` } />
@@ -154,9 +168,9 @@ class Home extends Component {
           <BarChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>APR</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.insurance}` } onClick={ () => { this.nav('/insure') } }>
+        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { this.nav('/cover') }}>
           <SecurityIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>Insurance</Typography>
+          <Typography variant={'h1'} className={ `${classes.title} title` }>Cover</Typography>
         </Card>
       </div>
     )

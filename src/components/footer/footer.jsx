@@ -92,9 +92,9 @@ class Footer extends Component {
           <Link to={"/zap"} className={ classes.link }>
             <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Zap') }</Typography>
           </Link>
-          <Link to={"/insure"} className={ classes.link }>
+          {/*<Link to={"/insure"} className={ classes.link }>
             <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Insure') }</Typography>
-          </Link>
+          </Link>*/}
           <Link to={"/apr"} className={ classes.link }>
             <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Yield') }</Typography>
           </Link>

@@ -1,5 +1,7 @@
 import config from "../config";
 import async from 'async';
+import * as moment from 'moment';
+
 import {
   ERROR,
   CONNECT_LEDGER,
@@ -40,7 +42,11 @@ import {
   CLAIM_INSURANCE,
   CLAIM_INSURANCE_RETURNED,
   GET_INSURANCE_BALANCES,
-  GET_INSURANCE_BALANCES_RETURNED
+  GET_INSURANCE_BALANCES_RETURNED,
+  CALCULATE_INSURANCE_COST,
+  CALCULATE_INSURANCE_COST_RETURNED,
+  GET_ETH_PRICE,
+  GET_ETH_PRICE_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 import createLedgerSubprovider from "@ledgerhq/web3-subprovider";
@@ -62,6 +68,7 @@ import {
   authereum
 } from "./connectors";
 
+const rp = require('request-promise');
 
 const Dispatcher = require('flux').Dispatcher;
 const Emitter = require('events').EventEmitter;
@@ -74,6 +81,7 @@ class Store {
   constructor() {
 
     this.store = {
+      ethPrice: 0,
       aprs: [{
           token: 'DAI',
           address: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -674,19 +682,22 @@ class Store {
       ],
       insuranceAssets: [
         {
-          id: 'oyCRV',
-          symbol: 'CRV',
-          insuredSymbol: 'oyCRV',
-          name: 'Curve.fi',
+          id: 'oCurve.fi',
+          symbol: 'oCurve.fi',
+          insuredSymbol: 'oCurve.fi',
+          name: 'oCurve.fi',
           description: 'yDAI/yUSDC/yUSDT/yTUSD',
           erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
-          insuranceAddress: '0xC714cEa4dAaEd7fbC66f936B69E79eC0ee998d93',
+          insuranceAddress: '0x4BA8C6Ce0e855C051e65DfC37883360efAf7c82B',
+          uniswapInsuranceAddress: '0x21f5e9d4ec20571402a5396084b1634314a68c97',
+          uniswapInsuranceABI: config.uniswapInsuranceABI,
           decimals: 18,
           insuredDecimals: 15,
           balance: 0,
           insuredBalance: 0,
           apr: 0,
-          insuredApr: 0
+          insuredApr: 0,
+          pricePerInsurance: 0
         }
       ]
     }
@@ -753,6 +764,12 @@ class Store {
             break;
           case GET_INSURANCE_BALANCES:
             this.getInsuranceBalances(payload)
+            break;
+          case CALCULATE_INSURANCE_COST:
+            this.calculateInsuranceCost(payload)
+            break;
+          case GET_ETH_PRICE:
+            this.getEthPrice(payload)
             break;
           default: {
           }
@@ -1604,7 +1621,7 @@ class Store {
 
       for(let i = 0; i < vals.length; i++) {
         const keys = Object.keys(vals[i])
-        if (keys[0] === '_unifulcrum'||keys[0] === '_uniaave'||keys[0] === '_unicompound'||keys[0] === '_lendf') {
+        if (keys[0] === '_unifulcrum'||keys[0] === '_uniaave'||keys[0] === '_unicompound'||keys[0] === '_lendf'||keys[0] === '_fulcrum') {
           // skip
         } else {
           output[keys[0]] = vals[i][keys[0]]
@@ -2002,11 +2019,85 @@ class Store {
   }
 
   buyInsurance = (payload) => {
+    const account = store.getStore('account')
+    const { asset, amount } = payload.content
+
+    this._callBuyInsurance(asset, account, amount, (err, investResult) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(BUY_INSURANCE_RETURNED, investResult)
+    })
+  }
+
+  _callBuyInsurance = async (asset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    // let deadline = await web3.eth.getBlockNumber()
+    let deadline = moment().unix()
+    deadline = deadline + 1600
+    const tokensBought = (amount * 1e15).toFixed(0)
+
+    this._getPricePerInsurance(web3, asset, account, amount, (err, price) => {
+      let uniswapContract = new web3.eth.Contract(asset.uniswapInsuranceABI, asset.uniswapInsuranceAddress)
+
+      console.log(amount)
+      console.log(price)
+      console.log((price * 1e18 * amount).toFixed(0))
+
+      const sendEth = (price * 1e18 * amount).toFixed(0)
+
+      console.log(asset.uniswapInsuranceAddress)
+      console.log(account.address)
+      console.log(deadline)
+      console.log(tokensBought)
+      console.log(sendEth)
+
+      uniswapContract.methods.ethToTokenSwapOutput(tokensBought, deadline).send({ from: account.address, value: sendEth, gasPrice: web3.utils.toWei('6', 'gwei') })
+        .on('transactionHash', function(hash){
+          console.log(hash)
+          callback(null, hash)
+        })
+        .on('confirmation', function(confirmationNumber, receipt){
+          console.log(confirmationNumber, receipt);
+        })
+        .on('receipt', function(receipt){
+          console.log(receipt);
+        })
+        .on('error', function(error) {
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
+          }
+        })
+        .catch((error) => {
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
+          }
+        })
+    })
 
   }
 
   claimInsurance = (payload) => {
 
+  }
+
+  calculateInsuranceCost = (payload) => {
+    const account = store.getStore('account')
+    const { asset, amount } = payload.content
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+
+    this._getPricePerInsurance(web3, asset, account, amount, (err, price) => {
+      return emitter.emit(CALCULATE_INSURANCE_COST_RETURNED, price)
+    })
   }
 
   getInsuranceBalances = (payload) => {
@@ -2020,15 +2111,16 @@ class Store {
         (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getInsuredBalance(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getExpiryBlock(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getPricePerInsurance(web3, asset, account, 1000, callbackInner) },
       ], (err, data) => {
         asset.balance = data[0]
         asset.insuredBalance = data[1]
         asset.expiryBlock = data[2]
+        asset.pricePerInsurance = data[3]
 
         callback(null, asset)
       })
     }, (err, assets) => {
-      console.log(assets)
       if(err) {
         return emitter.emit(ERROR, err)
       }
@@ -2036,6 +2128,14 @@ class Store {
       store.setStore({ insuranceAssets: assets })
       return emitter.emit(GET_INSURANCE_BALANCES_RETURNED, assets)
     })
+  }
+
+  _getPricePerInsurance = async (web3, asset, account, amount, callback) => {
+    let uniswapContract = new web3.eth.Contract(asset.uniswapInsuranceABI, asset.uniswapInsuranceAddress)
+
+    var price = await uniswapContract.methods.getEthToTokenOutputPrice(amount).call({ from: account.address });
+    price = price/(amount*1000)
+    callback(null, price)
   }
 
   _getExpiryBlock = async (web3, asset, account, callback) => {
@@ -2052,6 +2152,28 @@ class Store {
       console.log(ex)
       return callback(ex)
     }
+  }
+
+  getEthPrice = (payload) => {
+    this._getEthPrice((err, price) => {
+      store.setStore({ ethPrice: price })
+      return emitter.emit(GET_ETH_PRICE_RETURNED, price)
+    })
+  }
+
+  _getEthPrice = (callback) => {
+    const requestOptions = {
+      method: 'GET',
+      uri: 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd',
+      json: true
+    };
+
+    rp(requestOptions).then(response => {
+      console.log(response.ethereum.usd)
+      callback(null, response.ethereum.usd);
+    }).catch((err) => {
+      callback(err.message);
+    });
   }
 }
 
