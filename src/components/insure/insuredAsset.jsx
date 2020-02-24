@@ -8,6 +8,7 @@ import {
   Button
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
+import * as moment from 'moment'
 
 import {
   ERROR,
@@ -17,6 +18,9 @@ import {
   BUY_INSURANCE_RETURNED,
   CLAIM_INSURANCE,
   CLAIM_INSURANCE_RETURNED,
+  CALCULATE_INSURANCE_COST,
+  CALCULATE_INSURANCE_COST_RETURNED,
+  GET_ETH_PRICE_RETURNED,
 } from '../../constants'
 
 import Store from "../../stores";
@@ -153,6 +157,8 @@ class Asset extends Component {
       redeemAmount: '',
       redeemAmountError: false,
       account: store.getStore('account'),
+      pricePerInsurance: null,
+      ethPrice: 0
     }
   }
 
@@ -160,12 +166,20 @@ class Asset extends Component {
     emitter.on(BUY_INSURANCE_RETURNED, this.buyInsuranceReturned);
     emitter.on(CLAIM_INSURANCE_RETURNED, this.claimInsuranceReturned);
     emitter.on(ERROR, this.errorReturned);
+    emitter.on(CALCULATE_INSURANCE_COST_RETURNED, this.insuranceCostReturned);
+    emitter.on(GET_ETH_PRICE_RETURNED, this.getEthPriceReturned);
   }
 
   componentWillUnmount() {
     emitter.removeListener(BUY_INSURANCE_RETURNED, this.buyInsuranceReturned);
     emitter.removeListener(CLAIM_INSURANCE_RETURNED, this.claimInsuranceReturned);
     emitter.removeListener(ERROR, this.errorReturned);
+    emitter.removeListener(CALCULATE_INSURANCE_COST_RETURNED, this.insuranceCostReturned);
+    emitter.removeListener(GET_ETH_PRICE_RETURNED, this.getEthPriceReturned);
+  };
+
+  getEthPriceReturned = (price) => {
+    this.setState({ ethPrice: price })
   };
 
   buyInsuranceReturned = () => {
@@ -174,6 +188,10 @@ class Asset extends Component {
 
   claimInsuranceReturned = (txHash) => {
     this.setState({ loading: false })
+  };
+
+  insuranceCostReturned = (pricePerInsurance) => {
+    this.setState({ pricePerInsurance: pricePerInsurance })
   };
 
   errorReturned = (error) => {
@@ -188,8 +206,22 @@ class Asset extends Component {
       amountError,
       redeemAmount,
       redeemAmountError,
-      loading
+      loading,
+      pricePerInsurance,
+      ethPrice
     } = this.state
+
+    let yearlyPremium = 0
+    let expectedReturn = 0
+
+    console.log(pricePerInsurance)
+    console.log(ethPrice)
+
+    if(pricePerInsurance && pricePerInsurance > 0 && ethPrice && ethPrice > 0) {
+      const price = pricePerInsurance * ethPrice
+      yearlyPremium = price * 9.125 * 100
+      expectedReturn = 20 - yearlyPremium
+    }
 
     return (<div className={ classes.actionsContainer }>
       <div className={ classes.headingContainer }>
@@ -279,22 +311,26 @@ class Asset extends Component {
         <div className={ classes.tradeContainerInfo }>
           <div className={ classes.infoContainer} >
             <Typography variant={'h3'}>Total Cost</Typography>
-            <Typography variant={'h3'}>{ (amount*0.0001).toFixed(4) + ' ' + asset.symbol }</Typography>
+            <Typography variant={'h3'}>{ (amount*(pricePerInsurance !== null ? pricePerInsurance : asset.pricePerInsurance)).toFixed(4) + ' ETH' }</Typography>
           </div>
-            <div className={ classes.infoContainer} >
-            <Typography variant={'h5'}>Max Loss</Typography>
-            <Typography variant={'h4'}>{ (amount*0.082).toFixed(4) + ' ' + asset.symbol }</Typography>
-          </div>
-            <div className={ classes.infoContainer} >
+          <div className={ classes.infoContainer} >
             <Typography variant={'h5'}>Duration</Typography>
-            <Typography variant={'h4'}>12 Months</Typography>
+            <Typography variant={'h4'}>{asset.expiryBlock ? moment(asset.expiryBlock, 'X').fromNow() : 'Unknown'}</Typography>
+          </div>
+          <div className={ classes.infoContainer} >
+            <Typography variant={'h5'}>Premium</Typography>
+            <Typography variant={'h4'}>{ '' + (yearlyPremium).toFixed(4) + '%' }</Typography>
+          </div>
+          <div className={ classes.infoContainer} >
+            <Typography variant={'h5'}>Expected Returns</Typography>
+            <Typography variant={'h4'}>{ '' + (expectedReturn).toFixed(4) + '%' }</Typography>
           </div>
         </div>
         <Button
           className={ classes.actionButton }
           variant="outlined"
           color="primary"
-          disabled={ loading || !account.address || asset.disabled }
+          disabled={ true || loading || !account.address || asset.disabled }
           onClick={ this.onClaim }
           >
           <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.ClaimInsurance')}</Typography>
@@ -304,6 +340,15 @@ class Asset extends Component {
   };
 
   onChange = (event) => {
+
+    if(event.target.id === 'amount') {
+      if(isNaN(event.target.value) || event.target.value <= 0) {
+        return false
+      }
+
+      dispatcher.dispatch({ type: CALCULATE_INSURANCE_COST, content: { amount: event.target.value, asset: this.props.asset } })
+    }
+
     let val = []
     val[event.target.id] = event.target.value
     this.setState(val)
@@ -357,23 +402,12 @@ class Asset extends Component {
     let amount = balance*percent/100
 
     if(percent === 100 && asset.symbol === 'ETH') {
-        amount = amount - 0.009
+      amount = amount - 0.009
     }
-    amount = Math.floor(amount*10000)/10000;
-    this.setState({ amount: amount.toFixed(4) })
-  }
+    amount = Math.floor(amount*10000/10000);
+    this.setState({ amount: amount.toFixed(0) })
 
-  setRedeemAmount = (percent) => {
-
-    if(this.state.loading) {
-      return
-    }
-
-    const balance = this.props.asset.investedBalance
-    let amount = balance*percent/100
-    amount = Math.floor(amount*10000)/10000;
-
-    this.setState({ redeemAmount: amount.toFixed(4) })
+    dispatcher.dispatch({ type: CALCULATE_INSURANCE_COST, content: { amount: amount.toFixed(0), asset: this.props.asset } })
   }
 }
 

@@ -108,11 +108,6 @@ const styles = theme => ({
       backgroundColor: colors.compoundGreen,
       '& .title': {
         color: colors.white,
-        display: 'none'
-      },
-      '& .soon': {
-        color: colors.white,
-        display: 'block'
       },
       '& .icon': {
         color: colors.white
@@ -120,11 +115,6 @@ const styles = theme => ({
     },
     '& .title': {
       color: colors.compoundGreen,
-      display: 'block'
-    },
-    '& .soon': {
-      color: colors.compoundGreen,
-      display: 'none'
     },
     '& .icon': {
       color: colors.compoundGreen
@@ -178,10 +168,9 @@ class Home extends Component {
           <BarChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>APR</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { /*this.nav('/cover')  */}}>
+        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { this.nav('/cover') }}>
           <SecurityIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>Cover</Typography>
-          <Typography variant={'h1'} className={ `${classes.title} title soon` }>Coming Soon</Typography>
         </Card>
       </div>
     )
