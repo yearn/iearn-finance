@@ -683,7 +683,7 @@ class Store {
       insuranceAssets: [
         {
           id: 'oCurve.fi',
-          symbol: 'oCurve.fi',
+          symbol: '$Curve.fi',
           insuredSymbol: 'oCurve.fi',
           name: 'oCurve.fi',
           description: 'yDAI/yUSDC/yUSDT/yTUSD',
