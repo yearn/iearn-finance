@@ -1621,7 +1621,7 @@ class Store {
 
       for(let i = 0; i < vals.length; i++) {
         const keys = Object.keys(vals[i])
-        if (keys[0] === '_unifulcrum'||keys[0] === '_uniaave'||keys[0] === '_unicompound'||keys[0] === '_lendf') {
+        if (keys[0] === '_unifulcrum'||keys[0] === '_uniaave'||keys[0] === '_unicompound'||keys[0] === '_lendf'||keys[0] === '_fulcrum') {
           // skip
         } else {
           output[keys[0]] = vals[i][keys[0]]
