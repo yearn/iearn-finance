@@ -29,7 +29,8 @@ import {
   GET_INSURANCE_BALANCES_RETURNED,
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED,
-  GET_ETH_PRICE
+  GET_ETH_PRICE,
+  BUY_INSURANCE_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -198,6 +199,7 @@ class Insure extends Component {
     emitter.on(GET_INSURANCE_BALANCES_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
+    emitter.on(BUY_INSURANCE_RETURNED, this.buyInsuranceReturned);
   }
 
   componentWillUnmount() {
@@ -205,12 +207,24 @@ class Insure extends Component {
     emitter.removeListener(GET_INSURANCE_BALANCES_RETURNED, this.balancesReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
+    emitter.removeListener(BUY_INSURANCE_RETURNED, this.buyInsuranceReturned);
   };
 
   refresh() {
     dispatcher.dispatch({ type: GET_INSURANCE_BALANCES, content: {} });
     dispatcher.dispatch({ type: GET_ETH_PRICE, content: {} });
   }
+
+  buyInsuranceReturned = (txHash) => {
+    const snackbarObj = { snackbarMessage: null, snackbarType: null }
+    this.setState(snackbarObj)
+    this.setState({ loading: false })
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
+      that.setState(snackbarObj)
+    })
+  };
 
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('insuranceAssets') })

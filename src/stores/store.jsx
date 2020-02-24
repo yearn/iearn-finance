@@ -2022,12 +2022,12 @@ class Store {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
 
-    this._callBuyInsurance(asset, account, amount, (err, investResult) => {
+    this._callBuyInsurance(asset, account, amount, (err, insureResult) => {
       if(err) {
         return emitter.emit(ERROR, err);
       }
 
-      return emitter.emit(BUY_INSURANCE_RETURNED, investResult)
+      return emitter.emit(BUY_INSURANCE_RETURNED, insureResult)
     })
   }
 
@@ -2039,14 +2039,10 @@ class Store {
     deadline = deadline + 1600
     const tokensBought = (amount * 1e15).toFixed(0)
 
-    this._getPricePerInsurance(web3, asset, account, amount, (err, price) => {
+    this._getPricePerInsurance(web3, asset, account, amount, async (err, price) => {
       let uniswapContract = new web3.eth.Contract(asset.uniswapInsuranceABI, asset.uniswapInsuranceAddress)
 
-      console.log(amount)
-      console.log(price)
-      console.log((price * 1e18 * amount).toFixed(0))
-
-      const sendEth = (price * 1e18 * amount).toFixed(0)
+      const sendEth = await uniswapContract.methods.getEthToTokenOutputPrice(tokensBought).call({ from: account.address })
 
       console.log(asset.uniswapInsuranceAddress)
       console.log(account.address)
@@ -2133,8 +2129,9 @@ class Store {
   _getPricePerInsurance = async (web3, asset, account, amount, callback) => {
     let uniswapContract = new web3.eth.Contract(asset.uniswapInsuranceABI, asset.uniswapInsuranceAddress)
 
-    var price = await uniswapContract.methods.getEthToTokenOutputPrice(amount).call({ from: account.address });
-    price = price/(amount*1000)
+    var price = await uniswapContract.methods.getEthToTokenOutputPrice((amount * 1e15).toFixed(0)).call({ from: account.address });
+
+    price = (price/1e18)/amount
     callback(null, price)
   }
 
