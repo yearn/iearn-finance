@@ -307,10 +307,10 @@ class Asset extends Component {
           className={ classes.actionButton }
           variant="outlined"
           color="primary"
-          disabled={ loading || !account.address || asset.disabled || expectedReturn <= 0 }
+          disabled={ loading || !account.address || asset.disabled || expectedReturn <= 10 }
           onClick={ this.onBuy }
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.BuyInsurance')}</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color={(asset.disabled || expectedReturn <= 10)?'':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.BuyInsurance')}</Typography>
         </Button>
       </div>
       <div className={ classes.sepperator }></div>
