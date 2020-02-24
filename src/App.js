@@ -55,9 +55,9 @@ class App extends Component {
               <Route path="/manage">
                 <Manage />
               </Route>
-              {/*<Route path="/cover">
+              <Route path="/cover">
                 <Insure />
-              </Route>*/}
+              </Route>
               <Route path="/">
                 <Home />
               </Route>
