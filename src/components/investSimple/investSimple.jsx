@@ -12,7 +12,6 @@ import {
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withNamespaces } from 'react-i18next';
-import { colors } from '../../theme'
 
 import InvestAllModal from './investAllModal.jsx'
 import UnlockModal from '../unlock/unlockModal.jsx'
@@ -225,7 +224,6 @@ class InvestSimple extends Component {
       assets: store.getStore('assets'),
       account: store.getStore('account'),
       modalOpen: false,
-      modalBuiltWithOpen: false,
       modalInvestAllOpen: false,
       snackbarType: null,
       snackbarMessage: null,
@@ -316,7 +314,6 @@ class InvestSimple extends Component {
       loading,
       account,
       modalOpen,
-      modalBuiltWithOpen,
       modalInvestAllOpen,
       snackbarMessage,
       hideV1,
@@ -399,9 +396,9 @@ class InvestSimple extends Component {
     return assets.filter((asset) => {
       return (hideV1 === true || asset.version !== 1)
     }).filter((asset) => {
-      return asset.version == 2 || (asset.version == 1 && (asset.investedBalance).toFixed(4) > 0)
+      return asset.version === 2 || (asset.version === 1 && (asset.investedBalance).toFixed(4) > 0)
     }).filter((asset) => {
-      return !(asset.symbol == "iDAI")
+      return !(asset.symbol === "iDAI")
     }).map((asset) => {
       return (
         <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
@@ -422,7 +419,7 @@ class InvestSimple extends Component {
                 </div>
                 <div>
                   <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' }>{ asset.version == 1?asset.description+' - v'+asset.version+'':asset.description }</Typography>
+                  <Typography variant={ 'h5' }>{ asset.version === 1?asset.description+' - v'+asset.version+'':asset.description }</Typography>
                 </div>
               </div>
               <div className={classes.heading}>

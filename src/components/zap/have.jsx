@@ -157,7 +157,7 @@ class Have extends Component {
 
   renderAssetSelect = (id, value, options, error) => {
 
-    const { classes, loading } = this.props
+    const { loading } = this.props
 
     return (
       <TextField

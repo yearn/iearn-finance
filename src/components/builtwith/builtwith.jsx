@@ -4,15 +4,11 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
   Button,
-  CircularProgress
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 
-
 import Store from "../../stores";
 const store = Store.store
-
-
 
 const styles = theme => ({
   root: {
@@ -113,7 +109,7 @@ class BuildWith extends Component {
       <div className={ classes.root }>
         <div className={ classes.closeIcon } onClick={ closeModal }><CloseIcon /></div>
         <div className={ classes.contentContainer }>
-          <MyComponent closeModal={ closeModal} />
+          <MyComponent />
         </div>
       </div>
     )
@@ -123,8 +119,6 @@ class BuildWith extends Component {
 function MyComponent(props) {
 
   const builtWith = store.getStore('builtWith')
-
-  const { closeModal } = props
 
   const width = window.innerWidth
 
@@ -169,7 +163,7 @@ function MyComponent(props) {
                   width: '30px',
                   height: '30px'
                 }
-              } src={url}/>
+              } src={url} alt=""/>
             </Button>
           </div>
         )

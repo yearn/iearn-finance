@@ -2,18 +2,10 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
-  Slide,
   Typography,
   TextField,
-  Button
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
-
-import Store from "../../stores";
-const emitter = Store.emitter
-const dispatcher = Store.dispatcher
-const store = Store.store
-
 
 const styles = theme => ({
   value: {
@@ -123,11 +115,10 @@ class Asset extends Component {
   }
 
   render() {
-    const { classes, asset, t } = this.props;
+    const { classes, asset } = this.props;
     const {
       amount,
       amountError,
-      checked,
       loading
     } = this.state
 
@@ -146,7 +137,7 @@ class Asset extends Component {
           </div>
           <div>
             <Typography variant={ 'h3' }>{ asset.name }</Typography>
-            <Typography variant={ 'h5' }>{ asset.version == 1?asset.description+' - v'+asset.version+'':asset.description }</Typography>
+            <Typography variant={ 'h5' }>{ asset.version === 1?asset.description+' - v'+asset.version+'':asset.description }</Typography>
           </div>
         </div>
         <div className={ classes.amountContainer }>

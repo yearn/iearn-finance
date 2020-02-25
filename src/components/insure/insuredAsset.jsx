@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
-  Slide,
   Typography,
   TextField,
   Button
@@ -13,15 +12,18 @@ import { colors } from '../../theme'
 
 import {
   ERROR,
-  INSURANCE_BALANCES,
-  INSURANCE_BALANCES_RETURNED,
   BUY_INSURANCE,
   BUY_INSURANCE_RETURNED,
   CLAIM_INSURANCE,
   CLAIM_INSURANCE_RETURNED,
+  MINT_INSURANCE,
+  MINT_INSURANCE_RETURNED,
   CALCULATE_INSURANCE_COST,
   CALCULATE_INSURANCE_COST_RETURNED,
   GET_ETH_PRICE_RETURNED,
+  GET_ETH_BALANCE_RETURNED,
+  CALCULATE_MAX_TOKENS,
+  CALCULATE_MAX_TOKENS_RETURNED,
 } from '../../constants'
 
 import Store from "../../stores";
@@ -57,7 +59,6 @@ const styles = theme => ({
     [theme.breakpoints.up('sm')]: {
       width: '750px',
       padding: '12px',
-      flexWrap: 'nowrap',
       flexDirection: 'row',
     }
   },
@@ -84,7 +85,7 @@ const styles = theme => ({
       padding: '0px 12px 24px 12px',
     }
   },
-  sepperator: {
+  separator: {
     borderBottom: '1px solid #E1E1E1',
     [theme.breakpoints.up('sm')]: {
       display: 'none'
@@ -152,6 +153,12 @@ const styles = theme => ({
   },
   error: {
     color: colors.red
+  },
+  sectionSeparator: {
+    borderBottom: '1px solid #DEDEDE',
+    width: '100%',
+    marginBottom: '36px',
+    marginTop: '24px'
   }
 });
 
@@ -164,29 +171,41 @@ class Asset extends Component {
     this.state = {
       amount: '',
       amountError: false,
-      redeemAmount: '',
-      redeemAmountError: false,
+      ethAmount: '',
+      ethAmountError: false,
       account: store.getStore('account'),
       pricePerInsurance: null,
-      ethPrice: 0
+      ethPrice: 0,
+      ethBalance: 0,
+      maxTokens: 0
     }
   }
 
   componentWillMount() {
     emitter.on(BUY_INSURANCE_RETURNED, this.buyInsuranceReturned);
     emitter.on(CLAIM_INSURANCE_RETURNED, this.claimInsuranceReturned);
+    emitter.on(MINT_INSURANCE_RETURNED, this.mintInsuranceReturned);
     emitter.on(ERROR, this.errorReturned);
     emitter.on(CALCULATE_INSURANCE_COST_RETURNED, this.insuranceCostReturned);
+    emitter.on(CALCULATE_MAX_TOKENS_RETURNED, this.calculateMaxTokensReturned);
     emitter.on(GET_ETH_PRICE_RETURNED, this.getEthPriceReturned);
+    emitter.on(GET_ETH_BALANCE_RETURNED, this.getEthBalanceReturned);
   }
 
   componentWillUnmount() {
     emitter.removeListener(BUY_INSURANCE_RETURNED, this.buyInsuranceReturned);
     emitter.removeListener(CLAIM_INSURANCE_RETURNED, this.claimInsuranceReturned);
+    emitter.removeListener(MINT_INSURANCE_RETURNED, this.mintInsuranceReturned);
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CALCULATE_INSURANCE_COST_RETURNED, this.insuranceCostReturned);
+    emitter.removeListener(CALCULATE_MAX_TOKENS_RETURNED, this.calculateMaxTokensReturned);
     emitter.removeListener(GET_ETH_PRICE_RETURNED, this.getEthPriceReturned);
+    emitter.removeListener(GET_ETH_BALANCE_RETURNED, this.getEthBalanceReturned);
   };
+
+  getEthBalanceReturned = (balance) => {
+    this.setState({ ethBalance: balance })
+  }
 
   getEthPriceReturned = (price) => {
     this.setState({ ethPrice: price })
@@ -200,8 +219,16 @@ class Asset extends Component {
     this.setState({ loading: false })
   };
 
+  mintInsuranceReturned = (txHash) => {
+    this.setState({ loading: false, ethAmount: '' })
+  };
+
   insuranceCostReturned = (pricePerInsurance) => {
     this.setState({ pricePerInsurance: pricePerInsurance })
+  };
+
+  calculateMaxTokensReturned = (maxTokens) => {
+    this.setState({ maxTokens: maxTokens })
   };
 
   errorReturned = (error) => {
@@ -214,11 +241,13 @@ class Asset extends Component {
       account,
       amount,
       amountError,
-      redeemAmount,
-      redeemAmountError,
+      ethAmount,
+      ethAmountError,
       loading,
       pricePerInsurance,
-      ethPrice
+      ethPrice,
+      ethBalance,
+      maxTokens
     } = this.state
 
     let yearlyPremium = 0
@@ -237,21 +266,13 @@ class Asset extends Component {
           <Typography variant={ 'h5' }>{ t('Insure.Balance') }</Typography>
         </div>
         <div className={`${classes.heading} ${classes.right}`}>
-          <Typography variant={ 'h3' }>{ (asset.balance > 0 ? (asset.insuredBalance  * 100 / (asset.insuredBalance + asset.balance)).toFixed(4) : '0.0000')+' %'}</Typography>
+          <Typography variant={ 'h3' }>{ (asset.balance > 0 ? (asset.insuredBalance  * 100 / (asset.insuredBalance + asset.balance)).toFixed(4) : '0.0000')+'%'}</Typography>
           <Typography variant={ 'h5' }>{ t('Insure.Insured') }</Typography>
-        </div>
-        <div className={classes.heading}>
-          <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4)+' %'}</Typography>
-          <Typography variant={ 'h5' }>{ t('Insure.UninsuredYield') }</Typography>
-        </div>
-        <div className={`${classes.heading} ${classes.right}`}>
-          <Typography variant={ 'h3' }>{ (asset.insuredApr*100).toFixed(4)+' %'}</Typography>
-          <Typography variant={ 'h5' }>{ t('Insure.InsuredYield') }</Typography>
         </div>
       </div>
       <div className={ `${classes.tradeContainer} ${classes.tradeContainerCapture}` }>
         {!asset.disabled && <div className={ classes.balances }>
-            <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
+          <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
         </div>}
         <div className={ classes.amountContainer }>
           <TextField
@@ -313,7 +334,7 @@ class Asset extends Component {
           <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.BuyInsurance')}</Typography>
         </Button>
       </div>
-      <div className={ classes.sepperator }></div>
+      <div className={ classes.separator }></div>
       <div className={ `${classes.tradeContainer}` }>
         <div className={ classes.tradeContainerInfo }>
           <div className={ classes.infoContainer } >
@@ -334,17 +355,119 @@ class Asset extends Component {
           </div>
         </div>
       </div>
+      <div className={ classes.sectionSeparator }></div>
+      <div className={ `${classes.tradeContainer} ${classes.tradeContainerCapture}` }>
+        {!asset.disabled && <div className={ classes.balances }>
+          <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setEthAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (ethBalance ? ethBalance.toFixed(4) : '0.0000') } { 'ETH' }</Typography>
+        </div>}
+        <div className={ classes.amountContainer }>
+          <TextField
+            fullWidth
+            className={ classes.actionInput }
+            id='ethAmount'
+            value={ ethAmount }
+            error={ ethAmountError }
+            onChange={ this.onChange }
+            disabled={ loading || asset.disabled }
+            label=""
+            size="small"
+            placeholder="0.00"
+            variant="outlined"
+            onKeyDown={ this.inputKeyDown }
+          />
+        </div>
+        <div className={ classes.scaleContainer }>
+          <Button
+            className={ classes.scale }
+            variant='text'
+            disabled={ loading || asset.disabled }
+            color="primary"
+            onClick={ () => { this.setEthAmount(25) } }>
+            <Typography variant={'h5'}>25%</Typography>
+          </Button>
+          <Button
+            className={ classes.scale }
+            variant='text'
+            disabled={ loading || asset.disabled }
+            color="primary"
+            onClick={ () => { this.setEthAmount(50) } }>
+            <Typography variant={'h5'}>50%</Typography>
+          </Button>
+          <Button
+            className={ classes.scale }
+            variant='text'
+            disabled={ loading || asset.disabled }
+            color="primary"
+            onClick={ () => { this.setEthAmount(75) } }>
+            <Typography variant={'h5'}>75%</Typography>
+          </Button>
+          <Button
+            className={ classes.scale }
+            variant='text'
+            disabled={ loading || asset.disabled }
+            color="primary"
+            onClick={ () => { this.setEthAmount(100) } }>
+            <Typography variant={'h5'}>100%</Typography>
+          </Button>
+        </div>
+        <Button
+          className={ classes.actionButton }
+          variant="outlined"
+          color="primary"
+          disabled={ loading || !account.address || asset.disabled }
+          onClick={ this.onMint }
+          >
+          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.MintInsurance')}</Typography>
+        </Button>
+      </div>
+      <div className={ classes.separator }></div>
+      <div className={ `${classes.tradeContainer}` }>
+        <div className={ classes.tradeContainerInfo }>
+          <div className={ classes.infoContainer } >
+            <Typography variant={'h3'}>Tokens Minted</Typography>
+            <Typography variant={'h3'}>{ maxTokens.toFixed(4) + ' '+asset.insuredSymbol }</Typography>
+          </div>
+          <div className={ classes.infoContainer } >
+            <Typography variant={'h5'}>Cost per token</Typography>
+            <Typography variant={'h4'}>{ (asset.tokenPrice).toFixed(4) + ' ETH' }</Typography>
+          </div>
+          <div className={ classes.infoContainer } >
+            <Typography variant={'h5'}>Collateralization Ratio</Typography>
+            <Typography variant={'h4'}>{'200%'}</Typography>
+          </div>
+          <div className={ classes.infoContainer } >
+            <Typography variant={'h5'}>Minimum Collateralization Ratio</Typography>
+            <Typography variant={'h4'}>{'160%'}</Typography>
+          </div>
+        </div>
+      </div>
     </div>)
   };
 
   onChange = (event) => {
 
     if(event.target.id === 'amount') {
-      if(isNaN(event.target.value) || event.target.value <= 0) {
-        return false
-      }
+      if(event.target.value === '') {
+        this.setState({ pricePerInsurance: 0 })
+      } else {
+        if(isNaN(event.target.value) || event.target.value < 0) {
+          return false
+        }
 
-      dispatcher.dispatch({ type: CALCULATE_INSURANCE_COST, content: { amount: event.target.value, asset: this.props.asset } })
+        dispatcher.dispatch({ type: CALCULATE_INSURANCE_COST, content: { amount: event.target.value, asset: this.props.asset } })
+      }
+    }
+
+    if(event.target.id === 'ethAmount') {
+      if(event.target.value === '') {
+        this.setState({ maxTokens: 0 })
+      } else {
+        if(isNaN(event.target.value) || event.target.value < 0) {
+          return false
+        }
+
+        dispatcher.dispatch({ type: CALCULATE_MAX_TOKENS, content: { amount: event.target.value, asset: this.props.asset } })
+      }
     }
 
     let val = []
@@ -371,6 +494,21 @@ class Asset extends Component {
 
     this.setState({ loading: true })
     dispatcher.dispatch({ type: BUY_INSURANCE, content: { amount: amount, asset: asset } })
+  }
+
+  onMint = () => {
+    this.setState({ ethAmountError: false })
+
+    const { ethAmount, ethBalance } = this.state
+    const { asset } = this.props
+
+    if(!ethAmount || isNaN(ethAmount) || ethAmount <= 0 || ethAmount > ethBalance) {
+      this.setState({ ethAmountError: true })
+      return false
+    }
+
+    this.setState({ loading: true })
+    dispatcher.dispatch({ type: MINT_INSURANCE, content: { amount: ethAmount, asset: asset } })
   }
 
   onClaim = () => {
@@ -406,6 +544,20 @@ class Asset extends Component {
     this.setState({ amount: amount.toFixed(0) })
 
     dispatcher.dispatch({ type: CALCULATE_INSURANCE_COST, content: { amount: amount.toFixed(0), asset: this.props.asset } })
+  }
+
+  setEthAmount = (percent) => {
+    if(this.state.loading) {
+      return
+    }
+
+    const balance = this.state.ethBalance
+    let amount = balance*percent/100
+
+    amount = amount*10000/10000;
+    this.setState({ ethAmount: amount.toFixed(4) })
+
+    dispatcher.dispatch({ type: CALCULATE_MAX_TOKENS, content: { amount: amount.toFixed(4), asset: this.props.asset } })
   }
 }
 

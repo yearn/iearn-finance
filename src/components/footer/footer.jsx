@@ -89,15 +89,15 @@ class Footer extends Component {
           <Link to={"/"} className={ classes.link }>
             <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Home') }</Typography>
           </Link>
-          <Link to={"/zap"} className={ classes.link }>
+          {/*<Link to={"/zap"} className={ classes.link }>
             <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Zap') }</Typography>
           </Link>
-          {/*<Link to={"/insure"} className={ classes.link }>
+          <Link to={"/insure"} className={ classes.link }>
             <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Insure') }</Typography>
-          </Link>*/}
+          </Link>
           <Link to={"/apr"} className={ classes.link }>
             <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Yield') }</Typography>
-          </Link>
+          </Link>*/}
           <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.About') }</Typography>
           <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Docs') }</Typography>
           <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Code') }</Typography>

@@ -47,5 +47,11 @@
   "Insure.InsuredYield": "Insured Yield",
   "Insure.BuyInsurance": "Purchase Cover",
   "Insure.Disabled": "Disabled",
-  "Insure.ClaimInsurance": "Claim"
+  "Insure.ClaimInsurance": "Claim",
+  "Insure.MintInsurance": "Mint Insurance",
+
+  "Home.Earn": "Earn",
+  "Home.Zap": "Zap",
+  "Home.Apr": "APR",
+  "Home.Cover": "Cover"
 }

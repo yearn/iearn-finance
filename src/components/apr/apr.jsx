@@ -5,12 +5,8 @@ import {
   Typography,
   TextField,
   Card,
-  Select,
-  MenuItem,
-  FormControl
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
-import { colors } from '../../theme'
 
 import {
   GET_AGGREGATED_YIELD,
@@ -215,8 +211,6 @@ class APR extends Component {
       amountError,
       amount,
       loading,
-      language,
-      languages
     } = this.state
 
     return (

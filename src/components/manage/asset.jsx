@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
-  Slide,
   Typography,
   TextField,
   Button
@@ -173,8 +172,6 @@ class Asset extends Component {
     this.state = {
       amount: '',
       amountError: false,
-      redeemAmount: '',
-      redeemAmountError: false,
       account: store.getStore('account'),
     }
   }
@@ -209,8 +206,6 @@ class Asset extends Component {
       account,
       amount,
       amountError,
-      redeemAmount,
-      redeemAmountError,
       loading
     } = this.state
 
@@ -350,7 +345,6 @@ class Asset extends Component {
   onRedeem = () => {
     this.setState({ redeemAmountError: false })
 
-    const { redeemAmount } = this.state
     const { asset, startLoading  } = this.props
 
     this.setState({ loading: true })

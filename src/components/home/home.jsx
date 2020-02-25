@@ -4,11 +4,6 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   Card,
   Typography,
-  Button,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Switch
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
@@ -16,9 +11,6 @@ import FlashOnIcon from '@material-ui/icons/FlashOn';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import SecurityIcon from '@material-ui/icons/Security';
 import BarChartIcon from '@material-ui/icons/BarChart';
-import {
-  Link
-} from "react-router-dom";
 
 const styles = theme => ({
   root: {
@@ -42,6 +34,7 @@ const styles = theme => ({
     flexDirection: 'column',
     cursor: 'pointer',
     borderRadius: '0px',
+    transition: 'background-color 0.2s linear',
     [theme.breakpoints.up('sm')]: {
       height: '100vh',
       minWidth: '20%',
@@ -148,29 +141,25 @@ class Home extends Component {
   }
 
   render() {
-    console.log(this.props)
     const { classes, t } = this.props;
-    const {
-      account,
-    } = this.state
 
     return (
       <div className={ classes.root }>
         <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav('/earn') } }>
           <AttachMoneyIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>Earn</Typography>
+          <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Earn") }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav('/zap') } }>
           <FlashOnIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>Zap</Typography>
+          <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Zap") }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('/apr') } }>
           <BarChartIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>APR</Typography>
+          <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Apr") }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { this.nav('/cover') }}>
           <SecurityIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h1'} className={ `${classes.title} title` }>Cover</Typography>
+          <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Cover") }</Typography>
         </Card>
       </div>
     )

@@ -26,7 +26,6 @@ import {
   GET_AGGREGATED_YIELD,
   GET_AGGREGATED_YIELD_RETURNED,
   GET_UNISWAP_COMPARRISONS,
-  GET_UNISWAP_COMPARRISONS_RETURNED,
   GET_CONTRACT_EVENTS,
   GET_CONTRACT_EVENTS_RETURNED,
   ZAP,
@@ -40,13 +39,19 @@ import {
   BUY_INSURANCE,
   BUY_INSURANCE_RETURNED,
   CLAIM_INSURANCE,
-  CLAIM_INSURANCE_RETURNED,
+  // CLAIM_INSURANCE_RETURNED,
+  MINT_INSURANCE,
+  MINT_INSURANCE_RETURNED,
   GET_INSURANCE_BALANCES,
   GET_INSURANCE_BALANCES_RETURNED,
   CALCULATE_INSURANCE_COST,
   CALCULATE_INSURANCE_COST_RETURNED,
   GET_ETH_PRICE,
-  GET_ETH_PRICE_RETURNED
+  GET_ETH_PRICE_RETURNED,
+  GET_ETH_BALANCE,
+  GET_ETH_BALANCE_RETURNED,
+  CALCULATE_MAX_TOKENS,
+  CALCULATE_MAX_TOKENS_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 import createLedgerSubprovider from "@ledgerhq/web3-subprovider";
@@ -684,11 +689,12 @@ class Store {
         {
           id: 'oCurve.fi',
           symbol: '$Curve.fi',
-          insuredSymbol: 'oCurve.fi',
+          insuredSymbol: 'oCRV',
           name: 'oCurve.fi',
           description: 'yDAI/yUSDC/yUSDT/yTUSD',
           erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
           insuranceAddress: '0x4BA8C6Ce0e855C051e65DfC37883360efAf7c82B',
+          insuranceABI:  config.insuranceABI,
           uniswapInsuranceAddress: '0x21f5e9d4ec20571402a5396084b1634314a68c97',
           uniswapInsuranceABI: config.uniswapInsuranceABI,
           decimals: 18,
@@ -697,9 +703,11 @@ class Store {
           insuredBalance: 0,
           apr: 0,
           insuredApr: 0,
-          pricePerInsurance: 0
+          pricePerInsurance: 0,
+          tokenPrice: 0
         }
-      ]
+      ],
+      ethBalance: 0
     }
 
     dispatcher.register(
@@ -762,14 +770,23 @@ class Store {
           case CLAIM_INSURANCE:
             this.claimInsurance(payload)
             break;
+          case MINT_INSURANCE:
+            this.mintInsurance(payload)
+            break;
           case GET_INSURANCE_BALANCES:
             this.getInsuranceBalances(payload)
             break;
           case CALCULATE_INSURANCE_COST:
             this.calculateInsuranceCost(payload)
             break;
+          case CALCULATE_MAX_TOKENS:
+            this.calculateMaxTokens(payload)
+            break;
           case GET_ETH_PRICE:
             this.getEthPrice(payload)
+            break;
+          case GET_ETH_BALANCE:
+            this.getEthBalance(payload)
             break;
           default: {
           }
@@ -922,10 +939,10 @@ class Store {
           We check to see if the allowance is > 0. If > 0 set to 0 before we set it to the correct amount.
         */
         if(['Curve.fi V1', 'Curve.fi V2', 'Curve.fi V3', 'USDT'].includes(asset.symbol) && ethAllowance > 0) {
-          const allowanceSetTo0 = await erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+          await erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         }
 
-        const allowanceSet = await erc20Contract.methods.approve(contract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+        await erc20Contract.methods.approve(contract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         callback()
       } else {
         callback()
@@ -1252,8 +1269,6 @@ class Store {
       return callback(null, 0)
     }
     try {
-      let value = 0
-
       let block = await web3.eth.getBlockNumber();
       let earn = new web3.eth.Contract(config.IEarnABI, asset.iEarnContract);
       let balance = await earn.methods.getPricePerFullShare().call();
@@ -1762,10 +1777,8 @@ class Store {
   }
 
   swap = (payload) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
-
     const account = store.getStore('account')
-    const { sendAsset, receiveAsset, amount } = payload.content
+    const { sendAsset, amount } = payload.content
 
     this._checkApproval(sendAsset, account, amount, config.yCurveZapSwapAddress, (err) => {
       if(err) {
@@ -1833,8 +1846,6 @@ class Store {
   }
 
   zap = (payload) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
-
     const account = store.getStore('account')
     const { sendAsset, receiveAsset, amount } = payload.content
 
@@ -1934,8 +1945,6 @@ class Store {
   }
 
   idai = (payload) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
-
     const account = store.getStore('account')
     const { sendAsset, receiveAsset, amount } = payload.content
 
@@ -2044,12 +2053,6 @@ class Store {
 
       const sendEth = await uniswapContract.methods.getEthToTokenOutputPrice(tokensBought).call({ from: account.address })
 
-      console.log(asset.uniswapInsuranceAddress)
-      console.log(account.address)
-      console.log(deadline)
-      console.log(tokensBought)
-      console.log(sendEth)
-
       uniswapContract.methods.ethToTokenSwapOutput(tokensBought, deadline).send({ from: account.address, value: sendEth, gasPrice: web3.utils.toWei('6', 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
@@ -2085,6 +2088,80 @@ class Store {
 
   }
 
+  mintInsurance = (payload) => {
+    const account = store.getStore('account')
+    const { asset, amount } = payload.content
+
+    this._callMintInsurance(asset, account, amount, (err, mintInsuranceResult) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(MINT_INSURANCE_RETURNED, mintInsuranceResult)
+    })
+  }
+
+  _callMintInsurance = async (asset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let insuranceContract = new web3.eth.Contract(asset.insuranceABI, asset.insuranceAddress)
+
+    const ethAmount = web3.utils.toWei(amount, 'ether')
+
+    var maxTokens = await insuranceContract.methods.maxOTokensIssuable(ethAmount).call({ from: account.address });
+    //160/200 collateralization ration.
+    maxTokens = (maxTokens*4/5).toFixed(0)
+
+    insuranceContract.methods.createETHCollateralOption(maxTokens, account.address).send({ from: account.address, value: ethAmount, gasPrice: web3.utils.toWei('6', 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  calculateMaxTokens = (payload) => {
+    const account = store.getStore('account')
+    const { asset, amount } = payload.content
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+
+    this._getMaxOTokensIssuable(web3, asset, account, amount, (err, maxTokens) => {
+      return emitter.emit(CALCULATE_MAX_TOKENS_RETURNED, maxTokens)
+    })
+  }
+
+  _getMaxOTokensIssuable = async (web3, asset, account, amount, callback) => {
+    let insuranceContract = new web3.eth.Contract(asset.insuranceABI, asset.insuranceAddress)
+
+    var maxTokens = await insuranceContract.methods.maxOTokensIssuable(web3.utils.toWei(amount, 'ether')).call({ from: account.address });
+
+    //160/200 collateralization ration, 16 decimals.
+    maxTokens = (maxTokens*4/5)/1e15
+    callback(null, maxTokens)
+  }
+
   calculateInsuranceCost = (payload) => {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
@@ -2108,11 +2185,13 @@ class Store {
         (callbackInner) => { this._getInsuredBalance(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getExpiryBlock(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getPricePerInsurance(web3, asset, account, 1000, callbackInner) },
+        (callbackInner) => { this._getMaxOTokensIssuable(web3, asset, account, '1000', callbackInner) }
       ], (err, data) => {
         asset.balance = data[0]
         asset.insuredBalance = data[1]
         asset.expiryBlock = data[2]
         asset.pricePerInsurance = data[3]
+        asset.tokenPrice = 1000/data[4]
 
         callback(null, asset)
       })
@@ -2166,11 +2245,20 @@ class Store {
     };
 
     rp(requestOptions).then(response => {
-      console.log(response.ethereum.usd)
       callback(null, response.ethereum.usd);
     }).catch((err) => {
       callback(err.message);
     });
+  }
+
+  getEthBalance = async (payload) => {
+    const account = store.getStore('account')
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+
+    const ethBalance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
+    store.setStore({ ethBalance: parseFloat(ethBalance) })
+
+    return emitter.emit(GET_ETH_BALANCE_RETURNED, parseFloat(ethBalance))
   }
 }
 

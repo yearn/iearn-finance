@@ -7,7 +7,6 @@ import {
   Dialog,
   Slide,
   Typography,
-  TextField,
   Button
 } from '@material-ui/core';
 import config from '../../config'
@@ -86,8 +85,6 @@ class InvestAllModal extends Component {
 
     this.state = {
       ethBalance: store.getStore('ethBalance'),
-      amount: '',
-      amountError: false,
       account: store.getStore('account'),
     }
   }
@@ -114,8 +111,6 @@ class InvestAllModal extends Component {
   render() {
     const { classes, closeModal, assets } = this.props;
     const {
-      amount,
-      amountError,
       loading
     } = this.state
 
@@ -128,7 +123,7 @@ class InvestAllModal extends Component {
             { assets ? assets.filter((asset) => {
                 return asset.version !== 1
               }).filter((asset) => {
-                return asset.version == 2 || (asset.version == 1 && (asset.investedBalance).toFixed(4) > 0)
+                return asset.version === 2 || (asset.version === 1 && (asset.investedBalance).toFixed(4) > 0)
               }).map((asset) => {
                 return (
                   <InvestAllAsset asset={ asset } />
