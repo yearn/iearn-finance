@@ -12,10 +12,10 @@ import {
 //   BALANCES_RETURNED
 // } from '../../constants'
 
-import Store from "../../stores";
+// import Store from "../../stores";
 // const emitter = Store.emitter
 // const dispatcher = Store.dispatcher
-const store = Store.store
+// const store = Store.store
 
 const styles = theme => ({
   root: {
@@ -74,8 +74,7 @@ class Want extends Component {
     const { classes, receiveAsset } = this.props;
     const {
       assetOptions,
-      asset,
-      assetError
+      asset
     } = this.state;
 
     return (
@@ -135,7 +134,7 @@ class Want extends Component {
 
   renderAssetSelect = (id, value, options, error) => {
 
-    const { classes, loading } = this.props
+    const { loading } = this.props
 
     return (
       <TextField

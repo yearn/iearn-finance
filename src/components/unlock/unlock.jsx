@@ -9,48 +9,22 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import { withNamespaces } from 'react-i18next';
 
-import Web3 from 'web3'
 import {
   Web3ReactProvider,
   useWeb3React,
-  UnsupportedChainIdError
 } from "@web3-react/core";
-import {
-  NoEthereumProviderError,
-  UserRejectedRequestError as UserRejectedRequestErrorInjected
-} from "@web3-react/injected-connector";
-import {
-  URI_AVAILABLE,
-  UserRejectedRequestError as UserRejectedRequestErrorWalletConnect
-} from "@web3-react/walletconnect-connector";
-import { UserRejectedRequestError as UserRejectedRequestErrorFrame } from "@web3-react/frame-connector";
 import { Web3Provider } from "@ethersproject/providers";
-import { formatEther } from "@ethersproject/units";
 import { useEagerConnect, useInactiveListener } from "./hooks";
 
 import {
-  walletconnect,
-  fortmatic,
-  portis,
-  torus,
-} from "../../stores/connectors";
-
-import {
   ERROR,
-  // CONNECT_METAMASK,
-  // METAMASK_CONNECTED,
-  // CONNECT_LEDGER,
-  // LEDGER_CONNECTED,
   CONNECTION_DISCONNECTED,
   CONNECTION_CONNECTED
 } from '../../constants'
 
 import Store from "../../stores";
-const dispatcher = Store.dispatcher
 const emitter = Store.emitter
 const store = Store.store
-
-
 
 const styles = theme => ({
   root: {
@@ -206,7 +180,6 @@ class Unlock extends Component {
 
   render() {
     const { classes, closeModal, t } = this.props;
-    const { metamaskLoading, ledgerLoading } = this.state;
 
     return (
       <div className={ classes.root }>
@@ -219,23 +192,6 @@ class Unlock extends Component {
       </div>
     )
   };
-}
-
-function getErrorMessage(error) {
-  if (error instanceof NoEthereumProviderError) {
-    return "No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.";
-  } else if (error instanceof UnsupportedChainIdError) {
-    return "You're connected to an unsupported network.";
-  } else if (
-    error instanceof UserRejectedRequestErrorInjected ||
-    error instanceof UserRejectedRequestErrorWalletConnect ||
-    error instanceof UserRejectedRequestErrorFrame
-  ) {
-    return "Please authorize this website to access your Ethereum account.";
-  } else {
-    console.error(error);
-    return "An unknown error occurred. Check the console for more details.";
-  }
 }
 
 function getLibrary(provider) {
@@ -273,7 +229,6 @@ function MyComponent(props) {
   const {
     connector,
     library,
-    chainId,
     account,
     activate,
     deactivate,
@@ -296,7 +251,7 @@ function MyComponent(props) {
       store.setStore({ account: { address: account }, web3context: context })
       emitter.emit(CONNECTION_CONNECTED)
     }
-  }, [account, active, closeModal]);
+  }, [account, active, closeModal, context, library]);
 
   // React.useEffect(() => {
   //   if (storeContext && storeContext.active && !active) {
@@ -386,7 +341,7 @@ function MyComponent(props) {
                   width: '30px',
                   height: '30px'
                 }
-              } src={url}/> }
+              } src={url} alt=""/> }
               { activating && <CircularProgress size={ 15 } style={{marginRight: '10px'}} /> }
               { (!activating && connected) && <div style={{ background: '#4caf50', borderRadius: '10px', width: '10px', height: '10px', marginRight: '10px' }}></div> }
             </Button>
