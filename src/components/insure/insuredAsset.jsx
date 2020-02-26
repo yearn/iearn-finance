@@ -338,19 +338,19 @@ class Asset extends Component {
       <div className={ `${classes.tradeContainer}` }>
         <div className={ classes.tradeContainerInfo }>
           <div className={ classes.infoContainer } >
-            <Typography variant={'h3'}>Total Cost</Typography>
+            <Typography variant={'h3'}>{ t('Insure.TotalCost') }</Typography>
             <Typography variant={'h3'}>{ (amount*(pricePerInsurance !== null ? pricePerInsurance : asset.pricePerInsurance)).toFixed(4) + ' ETH' }</Typography>
           </div>
           <div className={ classes.infoContainer } >
-            <Typography variant={'h5'}>Expiration</Typography>
-            <Typography variant={'h4'}>{asset.expiryBlock ? moment(asset.expiryBlock, 'X').fromNow() : 'Unknown'}</Typography>
+            <Typography variant={'h5'}>{ t('Insure.Expiration') }</Typography>
+            <Typography variant={'h4'}>{asset.expiryBlock ? moment(asset.expiryBlock, 'X').fromNow() : t('Insure.Unknown')}</Typography>
           </div>
           <div className={ classes.infoContainer } >
-            <Typography variant={'h5'}>Premium</Typography>
+            <Typography variant={'h5'}>{ t('Insure.Premium') }</Typography>
             <Typography variant={'h4'} className={ expectedReturn > 10 ? classes.positive : (expectedReturn > 5 ? classes.warning : classes.error) }>{ '' + (yearlyPremium).toFixed(4) + '%' }</Typography>
           </div>
           <div className={ classes.infoContainer } >
-            <Typography variant={'h5'}>Expected Returns</Typography>
+            <Typography variant={'h5'}>{ t('Insure.ExpectedReturns') }</Typography>
             <Typography variant={'h4'} className={ expectedReturn > 10 ? classes.positive : (expectedReturn > 5 ? classes.warning : classes.error) }>{ '' + (expectedReturn).toFixed(4) + '%' }</Typography>
           </div>
         </div>
@@ -358,7 +358,7 @@ class Asset extends Component {
       <div className={ classes.sectionSeparator }></div>
       <div className={ `${classes.tradeContainer} ${classes.tradeContainerCapture}` }>
         {!asset.disabled && <div className={ classes.balances }>
-          <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setEthAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (ethBalance ? ethBalance.toFixed(4) : '0.0000') } { 'ETH' }</Typography>
+          <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setEthAmount(100) } } className={ classes.value } noWrap>{ t('Insure.Balance') + (ethBalance ? ethBalance.toFixed(4) : '0.0000') } { 'ETH' }</Typography>
         </div>}
         <div className={ classes.amountContainer }>
           <TextField
@@ -424,19 +424,19 @@ class Asset extends Component {
       <div className={ `${classes.tradeContainer}` }>
         <div className={ classes.tradeContainerInfo }>
           <div className={ classes.infoContainer } >
-            <Typography variant={'h3'}>Tokens Minted</Typography>
+            <Typography variant={'h3'}>{ t('Insure.TokensMinted') }</Typography>
             <Typography variant={'h3'}>{ maxTokens.toFixed(4) + ' '+asset.insuredSymbol }</Typography>
           </div>
           <div className={ classes.infoContainer } >
-            <Typography variant={'h5'}>Cost per token</Typography>
+            <Typography variant={'h5'}>{ t('Insure.CostPerToken') }</Typography>
             <Typography variant={'h4'}>{ (asset.tokenPrice).toFixed(4) + ' ETH' }</Typography>
           </div>
           <div className={ classes.infoContainer } >
-            <Typography variant={'h5'}>Collateralization Ratio</Typography>
+            <Typography variant={'h5'}>{ t('Insure.CollateralizationRatio') }</Typography>
             <Typography variant={'h4'}>{'200%'}</Typography>
           </div>
           <div className={ classes.infoContainer } >
-            <Typography variant={'h5'}>Minimum Collateralization Ratio</Typography>
+            <Typography variant={'h5'}>{ t('Insure.MinimumCollateralizationRatio') }</Typography>
             <Typography variant={'h4'}>{'160%'}</Typography>
           </div>
         </div>

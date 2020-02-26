@@ -7,6 +7,7 @@ import {
   TextField
 } from '@material-ui/core';
 
+import { withNamespaces } from 'react-i18next';
 // import {
 //   BALANCES_RETURNED
 // } from '../../constants'
@@ -102,7 +103,7 @@ class Have extends Component {
   }
 
   render() {
-    const { classes, sendAsset } = this.props;
+    const { classes, sendAsset, t } = this.props;
     const {
       asset,
       assetOptions,
@@ -112,7 +113,7 @@ class Have extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.inputCard }>
-          <Typography variant='h3' className={ classes.inputCardHeading }>I have</Typography>
+          <Typography variant='h3' className={ classes.inputCardHeading }>{ t("Zap.IHave") }</Typography>
           <div className={ classes.tradeContainer }>
             { sendAsset && <div className={ classes.balances }>
                 <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.props.setSendAmountPercent(100) } } className={ classes.value } noWrap>{ 'Balance: '+ ( sendAsset.balance ? sendAsset.balance.toFixed(4) : '0.0000') } { sendAsset.tokenSymbol ? sendAsset.tokenSymbol : sendAsset.symbol }</Typography>
@@ -202,4 +203,4 @@ class Have extends Component {
   }
 }
 
-export default withRouter(withStyles(styles)(Have));
+export default withNamespaces()(withRouter(withStyles(styles)(Have)));

@@ -258,13 +258,15 @@ class Insure extends Component {
   connectionConnected = () => {
     this.setState({ account: store.getStore('account') })
 
+    const { t } = this.props
+
     dispatcher.dispatch({ type: GET_INSURANCE_BALANCES, content: {} });
     dispatcher.dispatch({ type: GET_ETH_BALANCE, content: {} });
     dispatcher.dispatch({ type: GET_ETH_PRICE, content: {} });
 
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: 'Wallet succesfully connected.', snackbarType: 'Info' }
+      const snackbarObj = { snackbarMessage: t("Unlock.WalletConnected"), snackbarType: 'Info' }
       that.setState(snackbarObj)
     })
   };
