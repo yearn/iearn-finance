@@ -220,14 +220,20 @@ class InvestSimple extends Component {
   constructor(props) {
     super()
 
+    const account = store.getStore('account')
+
     this.state = {
       assets: store.getStore('assets'),
-      account: store.getStore('account'),
+      account: account,
       modalOpen: false,
       modalInvestAllOpen: false,
       snackbarType: null,
       snackbarMessage: null,
       hideV1: true
+    }
+
+    if(account && account.address) {
+      dispatcher.dispatch({ type: GET_BALANCES, content: {} })
     }
   }
   componentWillMount() {
@@ -260,13 +266,14 @@ class InvestSimple extends Component {
   };
 
   connectionConnected = () => {
+    const { t } = this.props
     this.setState({ account: store.getStore('account') })
 
     dispatcher.dispatch({ type: GET_BALANCES, content: {} })
 
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: 'Wallet succesfully connected.', snackbarType: 'Info' }
+      const snackbarObj = { snackbarMessage: t("Unlock.WalletConnected"), snackbarType: 'Info' }
       that.setState(snackbarObj)
     })
   };

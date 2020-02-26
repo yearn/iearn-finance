@@ -180,14 +180,22 @@ class Insure extends Component {
   constructor(props) {
     super()
 
+    const account = store.getStore('account')
+
     this.state = {
       assets: store.getStore('insuranceAssets'),
-      account: store.getStore('account'),
+      account: account,
       modalOpen: false,
       modalInvestAllOpen: false,
       snackbarType: null,
       snackbarMessage: null,
       expanded: 'oCurve.fi'
+    }
+
+    if(account && account.address) {
+      dispatcher.dispatch({ type: GET_INSURANCE_BALANCES, content: {} });
+      dispatcher.dispatch({ type: GET_ETH_BALANCE, content: {} });
+      dispatcher.dispatch({ type: GET_ETH_PRICE, content: {} });
     }
   }
   componentWillMount() {
@@ -250,13 +258,15 @@ class Insure extends Component {
   connectionConnected = () => {
     this.setState({ account: store.getStore('account') })
 
+    const { t } = this.props
+
     dispatcher.dispatch({ type: GET_INSURANCE_BALANCES, content: {} });
     dispatcher.dispatch({ type: GET_ETH_BALANCE, content: {} });
     dispatcher.dispatch({ type: GET_ETH_PRICE, content: {} });
 
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: 'Wallet succesfully connected.', snackbarType: 'Info' }
+      const snackbarObj = { snackbarMessage: t("Unlock.WalletConnected"), snackbarType: 'Info' }
       that.setState(snackbarObj)
     })
   };

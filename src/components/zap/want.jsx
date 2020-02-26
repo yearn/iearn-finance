@@ -8,6 +8,7 @@ import {
   InputAdornment
 } from '@material-ui/core';
 
+import { withNamespaces } from 'react-i18next';
 // import {
 //   BALANCES_RETURNED
 // } from '../../constants'
@@ -71,7 +72,7 @@ class Want extends Component {
   }
 
   render() {
-    const { classes, receiveAsset } = this.props;
+    const { classes, receiveAsset, sendAsset, t } = this.props;
     const {
       assetOptions,
       asset
@@ -80,10 +81,11 @@ class Want extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.inputCard }>
-          <Typography variant='h3' className={ classes.inputCardHeading }>I will receive</Typography>
-          { (!receiveAsset || (receiveAsset.symbol !== 'Curve.fi' && receiveAsset.symbol !== 'Curve.fi V3')) && this.renderAssetSelect('asset', asset, assetOptions) }
+          <Typography variant='h3' className={ classes.inputCardHeading }>{ t("Zap.IWillReceive") }</Typography>
+          { ((!receiveAsset || (receiveAsset.symbol !== 'Curve.fi' && receiveAsset.symbol !== 'Curve.fi V3')) && !(sendAsset && sendAsset.symbol === 'ETH')) && this.renderAssetSelect('asset', asset, assetOptions) }
           { (receiveAsset && receiveAsset.symbol === 'Curve.fi') && this.renderAsset('Curve.fi') }
           { (receiveAsset && receiveAsset.symbol === 'Curve.fi V3') && this.renderAsset('Curve.fi V3') }
+          { (sendAsset && sendAsset.symbol === 'ETH') && this.renderAsset('DAI') }
         </div>
       </div>
     )
@@ -157,7 +159,6 @@ class Want extends Component {
   renderAssetOption = (option) => {
 
     const { classes } = this.props
-    console.log(option);
     return (
       <MenuItem key={ option.symbol } value={ option.symbol } className={ classes.assetSelectMenu }>
         <React.Fragment>
@@ -177,4 +178,4 @@ class Want extends Component {
   }
 }
 
-export default withRouter(withStyles(styles)(Want));
+export default withNamespaces()(withRouter(withStyles(styles)(Want)));

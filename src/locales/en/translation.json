@@ -13,6 +13,7 @@
   "Asset.Claim": "Claim",
 
   "Unlock.Deactivate": "Deactivate",
+  "Unlock.WalletConnected": "Wallet successfully connected.",
 
   "APR.HowMuch": "How much do you want to invest?",
 
@@ -25,6 +26,7 @@
   "Zap.Intro": "Zap In & Out. Simple.",
   "Zap.Zap": "Zap",
   "Zap.Swap": "Swap",
+  "Zap.Trade": "Trade",
 
   "IDai.Intro": "Simple iDAI to DAI.",
   "IDai.Swap": "Swap",
@@ -49,9 +51,24 @@
   "Insure.Disabled": "Disabled",
   "Insure.ClaimInsurance": "Claim",
   "Insure.MintInsurance": "Mint Insurance",
+  "Insure.TotalCost": "Total Cost",
+  "Insure.Expiration": "Expiration",
+  "Insure.Premium": "Premium",
+  "Insure.ExpectedReturns": "Expected Returns",
+  "Insure.Unknown": "Unknown",
+  "Insure.TotalCost": "Total Cost",
+  "Insure.Balance": "Balance: ",
+  "Insure.TokensMinted": "Tokens Minted",
+  "Insure.CostPerToken": "Cost Per Token",
+  "Insure.CollateralizationRatio": "Collateralization Ratio",
+  "Insure.MinimumCollateralizationRatio": "Minimum Collateralization Ratio",
 
   "Home.Earn": "Earn",
   "Home.Zap": "Zap",
   "Home.Apr": "APR",
-  "Home.Cover": "Cover"
+  "Home.Cover": "Cover",
+
+  "Zap.IWillReceive": "I will receive",
+  "Zap.IHave": "I have",
+  "Zap.SendAmount": "Send amount"
 }

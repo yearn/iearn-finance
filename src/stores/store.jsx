@@ -1,14 +1,11 @@
 import config from "../config";
 import async from 'async';
 import * as moment from 'moment';
-
 import {
   ERROR,
   CONNECT_LEDGER,
-  LEDGER_CONNECTED,
   CONNECT_METAMASK,
   CONNECT_METAMASK_PASSIVE,
-  METAMASK_CONNECTED,
   GET_BALANCES,
   BALANCES_RETURNED,
   INVEST,
@@ -34,6 +31,8 @@ import {
   IDAI_RETURNED,
   SWAP,
   SWAP_RETURNED,
+  TRADE,
+  TRADE_RETURNED,
   GET_CURV_BALANCE,
   GET_CURV_BALANCE_RETURNED,
   BUY_INSURANCE,
@@ -54,10 +53,6 @@ import {
   CALCULATE_MAX_TOKENS_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
-import createLedgerSubprovider from "@ledgerhq/web3-subprovider";
-import TransportU2F from "@ledgerhq/hw-transport-u2f";
-import ProviderEngine from "web3-provider-engine";
-import RpcSubprovider from "web3-provider-engine/subproviders/rpc";
 
 import {
   injected,
@@ -74,6 +69,7 @@ import {
 } from "./connectors";
 
 const rp = require('request-promise');
+const ethers = require('ethers');
 
 const Dispatcher = require('flux').Dispatcher;
 const Emitter = require('events').EventEmitter;
@@ -517,7 +513,7 @@ class Store {
           disabled: true,
           invest: 'invest',
           redeem: 'redeem',
-          curve: false,
+          curve: true,
         },
         {
           id: 'iDAIv1',
@@ -761,6 +757,9 @@ class Store {
           case SWAP:
             this.swap(payload)
             break;
+          case TRADE:
+            this.trade(payload)
+            break;
           case GET_CURV_BALANCE:
             this.getCurveBalances(payload)
             break;
@@ -804,97 +803,6 @@ class Store {
     // console.log(this.store)
     return emitter.emit('StoreUpdated');
   };
-
-  connectLedger(payload) {
-    const engine = new ProviderEngine();
-    const getTransport = () => TransportU2F.create();
-    const ledger = createLedgerSubprovider(getTransport, {
-      accountsLength: 5
-    });
-    engine.addProvider(ledger);
-    engine.addProvider(new RpcSubprovider({ rpcUrl: config.infuraProvider }));
-    engine.start();
-    const web3 = new Web3(engine);
-
-    try {
-
-      web3.eth.getAccounts(function(err, accounts){
-        if (err != null) {
-          return emitter.emit(ERROR, err);
-        } else if (accounts.length === 0) {
-          return emitter.emit(ERROR, 'No accounts found via Ledger!');
-        } else {
-          store.setStore({ account: { address: accounts[0] }})
-          store.setStore({ web3: web3 })
-
-          dispatcher.dispatch({ type: GET_BALANCES, content: {} })
-
-          return emitter.emit(LEDGER_CONNECTED)
-        }
-      });
-    } catch (e) {
-      return emitter.emit(ERROR, 'Access denied. Please allow access via your Ledger device!');
-    }
-  }
-
-  async connectMetamask(payload) {
-    let web3 = null
-
-    if (typeof window.ethereum !== 'undefined') {
-      web3 = new Web3(window.ethereum);
-
-      try {
-        // Request account access if needed
-        await window.ethereum.enable();
-
-        web3.eth.getAccounts(function(err, accounts){
-          if (err != null) {
-            return emitter.emit(ERROR, err);
-          } else if (accounts.length === 0) {
-            return emitter.emit(ERROR, 'MetaMask is locked. Please allow access via the Metamask Extension!');
-          } else {
-            store.setStore({ account: { address: accounts[0] }})
-            store.setStore({ web3: web3 })
-
-            return emitter.emit(METAMASK_CONNECTED)
-          }
-        });
-
-      } catch (error) {
-        return emitter.emit(ERROR, 'Access denied. Please allow access via the Metamask Extension!');
-      }
-    } else {
-      return emitter.emit(ERROR, 'No web3? You should consider trying MetaMask!');
-    }
-  }
-
-  async connectMetamaskPassive(payload) {
-    let web3 = null
-
-    if (typeof window.ethereum !== 'undefined') {
-      web3 = new Web3(window.ethereum);
-
-      try {
-        web3.eth.getAccounts(function(err, accounts){
-          if (err != null) {
-
-          } else if (accounts.length === 0) {
-
-          } else {
-            store.setStore({ account: { address: accounts[0] }})
-            store.setStore({ web3: web3 })
-
-            dispatcher.dispatch({ type: GET_BALANCES, content: {} })
-
-            return emitter.emit(METAMASK_CONNECTED)
-          }
-        });
-
-      } catch (error) {
-
-      }
-    }
-  }
 
   invest = (payload) => {
     const account = store.getStore('account')
@@ -1155,7 +1063,7 @@ class Store {
     const account = store.getStore('account')
     const assets = store.getStore('assets')
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const web3 = new Web3(store.getStore('web3context').library.provider);
 
     async.map(assets, (asset, callback) => {
       async.parallel([
@@ -1296,7 +1204,7 @@ class Store {
       let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
       let value = 0
 
-      if(asset.erc20address === 'Ethereum') {
+      if(asset.erc20address === 'Ethereum' || asset.id === 'CRVv1') {
         value = 0;
       } else {
         value = await iEarnContract.methods.provider().call({ from: account.address });
@@ -1317,13 +1225,14 @@ class Store {
       let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
       let value = 0
 
-      if(asset.erc20address === 'Ethereum') {
+      if(asset.erc20address === 'Ethereum' || asset.id === 'CRVv1') {
         value = 0;
       } else {
         value = await iEarnContract.methods.recommend().call({ from: account.address });
       }
       callback(null, parseFloat(value))
     } catch (e) {
+      console.log(asset)
       console.log(e)
       callback(null, 0)
     }
@@ -1421,7 +1330,7 @@ class Store {
 
   getYield = (payload) => {
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const getCalls = config.APROracleABI.filter((call) => {
       if(!call.name || ['getPrice', 'getLiquidity', 'getAaveCore'].includes(call.name)) {
@@ -1472,7 +1381,7 @@ class Store {
   }
 
   getUniswapLiquidity = (payload, cb) => {
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const web3 = new Web3(store.getStore('web3context').library.provider);
     const limit = 50;
 
     const getCalls = config.uniswapLiquidityABI.filter((call) => {
@@ -1525,7 +1434,7 @@ class Store {
   }
 
   getUniswapYield = (payload) => {
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const getCalls = config.uniswapAPRABI.filter((call) => {
       if(!call.name || call.inputs.length > 0) {
@@ -1568,7 +1477,7 @@ class Store {
   }
 
   getAggregatedYield = (payload) => {
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const getCalls = config.aggregatedContractABI.filter((call) => {
       if(!call.name ||  call.name === 'getAPROptions') {
@@ -1704,7 +1613,7 @@ class Store {
   }
 
   getContractEvents = (payload) => {
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const web3 = new Web3(store.getStore('web3context').library.provider);
     let iEarnContract = new web3.eth.Contract(config.IEarnABI, config.iEarnContract)
 
     iEarnContract.getPastEvents('allEvents', { fromBlock: 1, toBlock: 'latest' })
@@ -1843,6 +1752,100 @@ class Store {
           callback(error)
         }
       })
+  }
+
+  trade = (payload) => {
+    const account = store.getStore('account')
+    const { sendAsset, receiveAsset, amount } = payload.content
+
+    this._callTrade(sendAsset, receiveAsset, account, amount, (err, tradeResult) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(TRADE_RETURNED, tradeResult)
+    })
+  }
+
+  _callTrade = async (sendAsset, receiveAsset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let trade = await this._getDexAgTrade(sendAsset, receiveAsset, account, amount);
+    // await this._approveToken(trade.metadata.input.address, trade.metadata.input.spender, trade.metadata.input.amount, account, web3);
+
+    try {
+      const tx = await this._sendTrade(trade, account, web3);
+      return callback(null, tx.transactionHash)
+    } catch(ex) {
+      return callback(ex.message)
+    }
+  }
+
+  _getDexAgTrade = async (sendAsset, receiveAsset, account, amount) => {
+    const url = 'https://api-v2.dex.ag/trade?from='+sendAsset.symbol.toLowerCase()+'&to='+receiveAsset.symbol.toLowerCase()+'&fromAmount='+amount+'&dex=best'
+    let trade = await rp(url);
+    return JSON.parse(trade);
+  }
+
+  _approveToken = async (token, spender, amount, account, web3) => {
+    // First 4 bytes of the hash of "fee()" for the sighash selector
+    let funcHash = ethers.utils.hexDataSlice(ethers.utils.id('approve(address,uint256)'), 0, 4);
+
+    let abi = new ethers.utils.AbiCoder();
+    let inputs = [{
+      name: 'spender',
+      type: 'address'
+    }, {
+      name: 'amount',
+      type: 'uint256'
+    }];
+
+    let params = [spender, amount];
+    let bytes = abi.encode(inputs, params).substr(2);
+
+    // construct approval data from function hash and parameters
+    let inputData = `${funcHash}${bytes}`;
+
+    // let nonce = await infuraProvider.getTransactionCount(ethersWallet.address);
+    let nonce = await web3.eth.getTransactionCount(account.address)
+
+    // You will want to get the real gas price from https://ethgasstation.info/json/ethgasAPI.json
+    let gasPrice = web3.utils.toWei('6', 'gwei');
+
+    let transaction = {
+      to: token,
+      nonce: nonce,
+      gasLimit: 500000, // You will want to use estimateGas instead for real apps
+      gasPrice: gasPrice,
+      data: inputData,
+      from: account.address
+    }
+
+    // let tx = await ethersWallet.sendTransaction(transaction);
+    let tx = await web3.eth.sendTransaction(transaction)
+    console.log(tx);
+  }
+
+  _sendTrade = async (trade, account, web3) => {
+    // let nonce = await infuraProvider.getTransactionCount(ethersWallet.address);
+    let nonce = await web3.eth.getTransactionCount(account.address)
+
+    // You will want to get the real gas price from https://ethgasstation.info/json/ethgasAPI.json
+    let gasPrice = web3.utils.toWei('6', 'gwei');;
+    if (trade.metadata.gasPrice) {
+        // Use the contract gas price if specified (Bancor)
+        gasPrice = trade.metadata.gasPrice
+    }
+
+    let transaction = trade.trade;
+    transaction.nonce = nonce;
+    transaction.gasPrice = Number(gasPrice);
+    transaction.gasLimit = 500000; // You will want to use estimateGas instead for real apps
+    transaction.value = Number(transaction.value);
+    transaction.from = account.address
+    // let tx = await ethersWallet.sendTransaction(transaction);
+    let tx = await web3.eth.sendTransaction(transaction)
+    return tx
   }
 
   zap = (payload) => {
@@ -2006,7 +2009,7 @@ class Store {
   getCurveBalances = (payload) => {
     const account = store.getStore('account')
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const web3 = new Web3(store.getStore('web3context').library.provider);
     const curveContracts = store.getStore('curveContracts')
 
     async.map(curveContracts, (curv, callback) => {
@@ -2145,7 +2148,7 @@ class Store {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const web3 = new Web3(store.getStore('web3context').library.provider);
 
     this._getMaxOTokensIssuable(web3, asset, account, amount, (err, maxTokens) => {
       return emitter.emit(CALCULATE_MAX_TOKENS_RETURNED, maxTokens)
@@ -2166,7 +2169,7 @@ class Store {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const web3 = new Web3(store.getStore('web3context').library.provider);
 
     this._getPricePerInsurance(web3, asset, account, amount, (err, price) => {
       return emitter.emit(CALCULATE_INSURANCE_COST_RETURNED, price)
@@ -2177,7 +2180,7 @@ class Store {
     const account = store.getStore('account')
     const assets = store.getStore('insuranceAssets')
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const web3 = new Web3(store.getStore('web3context').library.provider);
 
     async.map(assets, (asset, callback) => {
       async.parallel([
@@ -2253,7 +2256,7 @@ class Store {
 
   getEthBalance = async (payload) => {
     const account = store.getStore('account')
-    const web3 = new Web3(new Web3.providers.HttpProvider(config.infuraProvider));
+    const web3 = new Web3(store.getStore('web3context').library.provider);
 
     const ethBalance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
     store.setStore({ ethBalance: parseFloat(ethBalance) })
