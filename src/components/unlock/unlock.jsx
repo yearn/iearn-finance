@@ -306,7 +306,7 @@ function MyComponent(props) {
         }
 
         return (
-          <div style={{ padding: '12px 0px', display: 'flex', justifyContent: 'space-between'  }}>
+          <div key={name} style={{ padding: '12px 0px', display: 'flex', justifyContent: 'space-between'  }}>
             <Button style={ {
                 padding: '16px',
                 backgroundColor: 'white',

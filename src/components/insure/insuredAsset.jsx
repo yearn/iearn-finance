@@ -331,7 +331,7 @@ class Asset extends Component {
           disabled={ loading || !account.address || asset.disabled || expectedReturn <= 0 }
           onClick={ this.onBuy }
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.BuyInsurance')}</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'primary':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.BuyInsurance')}</Typography>
         </Button>
       </div>
       <div className={ classes.separator }></div>
@@ -417,7 +417,7 @@ class Asset extends Component {
           disabled={ loading || !account.address || asset.disabled }
           onClick={ this.onMint }
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.MintInsurance')}</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'primary':'secondary'}>{asset.disabled? t('Insure.Disabled'):t('Insure.MintInsurance')}</Typography>
         </Button>
       </div>
       <div className={ classes.separator }></div>

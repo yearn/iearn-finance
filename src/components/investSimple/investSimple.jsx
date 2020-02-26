@@ -220,14 +220,20 @@ class InvestSimple extends Component {
   constructor(props) {
     super()
 
+    const account = store.getStore('account')
+
     this.state = {
       assets: store.getStore('assets'),
-      account: store.getStore('account'),
+      account: account,
       modalOpen: false,
       modalInvestAllOpen: false,
       snackbarType: null,
       snackbarMessage: null,
       hideV1: true
+    }
+
+    if(account && account.address) {
+      dispatcher.dispatch({ type: GET_BALANCES, content: {} })
     }
   }
   componentWillMount() {
