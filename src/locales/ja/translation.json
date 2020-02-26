@@ -1,15 +1,8 @@
 {
-  "InvestSimple.Intro": "Earn interest. Simple. JA.",
+  "InvestSimple.Intro": "Earn interest. Simple.",
   "InvestSimple.Connect": "Connect wallet",
   "InvestSimple.Show": "Show V1",
   "InvestSimple.Hide": "Hide V1",
-  "InvestSimple.Home": "home",
-  "InvestSimple.About": "about",
-  "InvestSimple.Docs": "docs",
-  "InvestSimple.Code": "code",
-  "InvestSimple.Telegram": "telegram",
-  "InvestSimple.Yield": "yield",
-  "InvestSimple.BuiltWith": "builtwith",
   "InvestSimple.InterestRate": "Interest Rate",
   "InvestSimple.AvailableBalance": "Available Balance",
 
@@ -20,6 +13,7 @@
   "Asset.Claim": "Claim",
 
   "Unlock.Deactivate": "Deactivate",
+  "Unlock.WalletConnected": "Wallet successfully connected.",
 
   "APR.HowMuch": "How much do you want to invest?",
 
@@ -27,5 +21,54 @@
   "Snackbar.Warning": "Warning",
   "Snackbar.Info": "Info",
   "Snackbar.Succecss": "Success",
-  "Snackbar.Hash": "Hash"
+  "Snackbar.Hash": "Hash",
+
+  "Zap.Intro": "Zap In & Out. Simple.",
+  "Zap.Zap": "Zap",
+  "Zap.Swap": "Swap",
+  "Zap.Trade": "Trade",
+
+  "IDai.Intro": "Simple iDAI to DAI.",
+  "IDai.Swap": "Swap",
+
+  "Footer.Home": "home",
+  "Footer.About": "about",
+  "Footer.Docs": "docs",
+  "Footer.Code": "code",
+  "Footer.Telegram": "telegram",
+  "Footer.Yield": "yield",
+  "Footer.BuiltWith": "builtwith",
+  "Footer.Zap": "zap",
+  "Footer.Insure": "insure",
+
+  "Insure.Intro": "Cover. Simple.",
+  "Insure.Connect": "Connect wallet",
+  "Insure.Balance": "Current Balance",
+  "Insure.Insured": "Insured Percent",
+  "Insure.UninsuredYield": "Uninsured Yield",
+  "Insure.InsuredYield": "Insured Yield",
+  "Insure.BuyInsurance": "Purchase Cover",
+  "Insure.Disabled": "Disabled",
+  "Insure.ClaimInsurance": "Claim",
+  "Insure.MintInsurance": "Mint Insurance",
+  "Insure.TotalCost": "Total Cost",
+  "Insure.Expiration": "Expiration",
+  "Insure.Premium": "Premium",
+  "Insure.ExpectedReturns": "Expected Returns",
+  "Insure.Unknown": "Unknown",
+  "Insure.TotalCost": "Total Cost",
+  "Insure.Balance": "Balance: ",
+  "Insure.TokensMinted": "Tokens Minted",
+  "Insure.CostPerToken": "Cost Per Token",
+  "Insure.CollateralizationRatio": "Collateralization Ratio",
+  "Insure.MinimumCollateralizationRatio": "Minimum Collateralization Ratio",
+
+  "Home.Earn": "Earn",
+  "Home.Zap": "Zap",
+  "Home.Apr": "APR",
+  "Home.Cover": "Cover",
+
+  "Zap.IWillReceive": "I will receive",
+  "Zap.IHave": "I have",
+  "Zap.SendAmount": "Send amount"
 }

@@ -8,6 +8,7 @@ import {
   Button
 } from '@material-ui/core';
 
+import { withNamespaces } from 'react-i18next';
 // import {
 //   BALANCES_RETURNED
 // } from '../../constants'
@@ -68,12 +69,12 @@ class Sending extends Component {
   }
 
   render() {
-    const { classes, sendAsset, sendAmount, loading } = this.props;
+    const { classes, sendAsset, sendAmount, loading, t } = this.props;
 
     return (
       <div className={ classes.root }>
         <div className={ classes.inputCard }>
-          <Typography variant='h3' className={ classes.inputCardHeading }>Send amount</Typography>
+          <Typography variant='h3' className={ classes.inputCardHeading }>{ t("Zap.SendAmount") }</Typography>
           { this.renderAmountInput('amount', sendAmount, false, 'Amount', '0.00', (sendAsset ? sendAsset.symbol : '')) }
           <div className={ classes.scaleContainer }>
             <Button
@@ -144,4 +145,4 @@ class Sending extends Component {
   }
 }
 
-export default withRouter(withStyles(styles)(Sending));
+export default withNamespaces()(withRouter(withStyles(styles)(Sending)));

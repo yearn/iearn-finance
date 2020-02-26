@@ -238,7 +238,7 @@ class Asset extends Component {
           disabled={ loading || !account.address || asset.disabled }
           onClick={ this.onInvest }
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Asset.Disabled'):t('Asset.Earn')}</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'primary':'secondary'}>{asset.disabled? t('Asset.Disabled'):t('Asset.Earn')}</Typography>
         </Button>
       </div>
       <div className={ classes.sepperator }></div>

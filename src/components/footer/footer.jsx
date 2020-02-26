@@ -115,7 +115,7 @@ class Footer extends Component {
               fullWidth
             >
               { languages.map((language) => {
-                return <MenuItem value={ language.code }>{ language.language }</MenuItem>
+                return <MenuItem key={ language.code } value={ language.code }>{ language.language }</MenuItem>
               })}
             </Select>
           </FormControl>

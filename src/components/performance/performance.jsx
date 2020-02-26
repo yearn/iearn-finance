@@ -6,15 +6,15 @@ import {
   Card
 } from '@material-ui/core';
 
-import {
-  LineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-} from 'recharts'
+// import {
+//   LineChart,
+//   Line,
+//   CartesianGrid,
+//   XAxis,
+//   YAxis,
+//   Tooltip,
+//   Legend,
+// } from 'recharts'
 
 import {
   GET_CONTRACT_EVENTS,
@@ -141,20 +141,21 @@ class Performance extends Component {
   };
 
   renderGraph() {
-    const { events } = this.state
+    // const { events } = this.state
 
-    return (
-      <LineChart width={600} height={400} data={events}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="blockNumber" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        {/*<Line type="monotone" dataKey="growth" stroke="#8884d8" />*/}
-        <Line type="linear" dataKey="ethRatio" stroke="#82ca9d" />
-      </LineChart>
-    )
+    return null
+    // return (
+    //   <LineChart width={600} height={400} data={events}
+    //     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+    //     <CartesianGrid strokeDasharray="3 3" />
+    //     <XAxis dataKey="blockNumber" />
+    //     <YAxis />
+    //     <Tooltip />
+    //     <Legend />
+    //     {/*<Line type="monotone" dataKey="growth" stroke="#8884d8" />*/}
+    //     <Line type="linear" dataKey="ethRatio" stroke="#82ca9d" />
+    //   </LineChart>
+    // )
   }
 
   renderHeader = () => {

@@ -29,7 +29,9 @@ import {
   GET_CURV_BALANCE,
   GET_CURV_BALANCE_RETURNED,
   SWAP,
-  SWAP_RETURNED
+  SWAP_RETURNED,
+  TRADE,
+  TRADE_RETURNED
 } from '../../constants'
 
 import { withNamespaces } from 'react-i18next';
@@ -176,14 +178,21 @@ class Zap extends Component {
   constructor() {
     super()
 
+    const account = store.getStore('account')
+
     this.state = {
-      account: store.getStore('account'),
+      account: account,
       assets: store.getStore('assets').filter((asset) => asset.curve === true),
       curveContracts: store.getStore('curveContracts'),
       sendAsset: null,
       receiveAsset: null,
       sendAmount: "",
       // receiveAmount: ""
+    }
+
+    if(account && account.address) {
+      dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+      dispatcher.dispatch({ type: GET_CURV_BALANCE, content: {} })
     }
   }
 
@@ -194,6 +203,7 @@ class Zap extends Component {
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(ZAP_RETURNED, this.zapReturned);
     emitter.on(SWAP_RETURNED, this.swapReturned);
+    emitter.on(TRADE_RETURNED, this.tradeReturned);
     emitter.on(GET_CURV_BALANCE_RETURNED, this.getCurvBalanceReturned);
   }
 
@@ -204,6 +214,7 @@ class Zap extends Component {
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(ZAP_RETURNED, this.zapReturned);
     emitter.removeListener(SWAP_RETURNED, this.swapReturned);
+    emitter.removeListener(TRADE_RETURNED, this.tradeReturned);
     emitter.removeListener(GET_CURV_BALANCE_RETURNED, this.getCurvBalanceReturned);
   };
 
@@ -229,6 +240,17 @@ class Zap extends Component {
     })
   }
 
+  tradeReturned = (txHash) => {
+    const snackbarObj = { snackbarMessage: null, snackbarType: null }
+    this.setState(snackbarObj)
+    this.setState({ loading: false, sendAmount: '', sendAsset: null, receiveAsset: null })
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
+      that.setState(snackbarObj)
+    })
+  }
+
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('assets').filter((asset) => asset.curve === true) })
     this.setSendAsset(store.getStore('assets').filter((asset) => asset.curve === true)[0])
@@ -244,6 +266,8 @@ class Zap extends Component {
   }
 
   connectionConnected = () => {
+    const { t } = this.props
+
     this.setState({ account: store.getStore('account') })
 
     dispatcher.dispatch({ type: GET_BALANCES, content: {} })
@@ -251,7 +275,7 @@ class Zap extends Component {
 
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: 'Wallet succesfully connected.', snackbarType: 'Info' }
+      const snackbarObj = { snackbarMessage: t("Unlock.WalletConnected"), snackbarType: 'Info' }
       that.setState(snackbarObj)
     })
   };
@@ -325,9 +349,9 @@ class Zap extends Component {
               <Have assets={ assets } curveContracts={ curveContracts } setSendAsset={ this.setSendAsset } sendAsset={ sendAsset } setSendAmountPercent={ this.setSendAmountPercent } loading={ loading } />
               <Sending sendAsset={ sendAsset } sendAmount={ sendAmount } setSendAmount={ this.setSendAmount } setSendAmountPercent={ this.setSendAmountPercent } loading={ loading }  />
               <div className={ classes.sepperator }></div>
-              <Want assets={ assets } curveContracts={ curveContracts } receiveAsset={ receiveAsset } setReceiveAsset={ this.setReceiveAsset } loading={ loading }  />
+              <Want assets={ assets } curveContracts={ curveContracts } receiveAsset={ receiveAsset } setReceiveAsset={ this.setReceiveAsset } sendAsset={ sendAsset } loading={ loading }  />
               <div className={ classes.sepperator }></div>
-              { (!receiveAsset || receiveAsset.symbol !== 'Curve.fi V3') && <Button
+              { (!(sendAsset && sendAsset.symbol === 'ETH') && (!receiveAsset || receiveAsset.symbol !== 'Curve.fi V3')) && <Button
                 className={ classes.actionButton }
                 variant="outlined"
                 color="primary"
@@ -337,7 +361,7 @@ class Zap extends Component {
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Zap.Zap') }</Typography>
               </Button> }
-              { (receiveAsset && receiveAsset.symbol === 'Curve.fi V3') && <Button
+              { (!(sendAsset && sendAsset.symbol === 'ETH') && receiveAsset && receiveAsset.symbol === 'Curve.fi V3') && <Button
                 className={ classes.actionButton }
                 variant="outlined"
                 color="primary"
@@ -346,6 +370,16 @@ class Zap extends Component {
                 fullWidth
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Zap.Swap') }</Typography>
+              </Button> }
+              { (sendAsset && sendAsset.symbol === 'ETH') && <Button
+                className={ classes.actionButton }
+                variant="outlined"
+                color="primary"
+                disabled={ loading || !sendAsset || !receiveAsset || !sendAmount || sendAmount === '' }
+                onClick={ this.onTrade }
+                fullWidth
+                >
+                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Zap.Trade') }</Typography>
               </Button> }
             </Card>
             <div className={ classes.introCenter }>
@@ -388,6 +422,20 @@ class Zap extends Component {
     dispatcher.dispatch({ type: SWAP, content: { amount: sendAmount, sendAsset: sendAsset, receiveAsset: receiveAsset } })
   }
 
+  onTrade = () => {
+    this.setState({ amountError: false })
+
+    const { sendAmount, sendAsset, receiveAsset } = this.state
+
+    if(!sendAmount || isNaN(sendAmount) || sendAmount <= 0 || parseFloat(sendAmount) > sendAsset.balance) {
+      this.setState({ amountError: true })
+      return false
+    }
+
+    this.setState({ loading: true })
+    dispatcher.dispatch({ type: TRADE, content: { amount: sendAmount, sendAsset: sendAsset, receiveAsset: receiveAsset } })
+  }
+
   setReceiveAsset = (receiveAsset) => {
     this.setState({ receiveAsset })
   }
@@ -411,6 +459,11 @@ class Zap extends Component {
       receiveAsset = null
     }
 
+    if(['ETH'].includes(sendAsset.symbol)) {
+      receiveAsset = store.getStore('assets').filter((asset) => { return asset.id === 'DAIv2'})[0]
+      // dispatcher.dispatch({ type: GET_BEST_PRICE, content: { amount: sendAsset.balance, sendAsset: sendAsset, receiveAsset: receiveAsset }})
+    }
+
     const balance = sendAsset.balance
     let sendAmount = balance*100/100
 
@@ -427,10 +480,20 @@ class Zap extends Component {
 
     sendAmount = Math.floor(sendAmount*10000)/10000;
     this.setState({ sendAmount: sendAmount.toFixed(4) })
+
+    // if(['ETH'].includes(sendAsset.symbol)) {
+    //   dispatcher.dispatch({ type: GET_BEST_PRICE, content: { amount: sendAmount, sendAsset: sendAsset, receiveAsset: receiveAsset }})
+    // }
   }
 
   setSendAmount = (amount) => {
     this.setState({ sendAmount: amount })
+
+    // const { sendAsset, receiveAsset } = this.state
+    //
+    // if(['ETH'].includes(sendAsset.symbol)) {
+    //   dispatcher.dispatch({ type: GET_BEST_PRICE, content: { amount: amount, sendAsset: sendAsset, receiveAsset: receiveAsset }})
+    // }
   }
 
   renderModal = () => {
