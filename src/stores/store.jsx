@@ -248,7 +248,7 @@ class Store {
           disabled: false,
           invest: 'deposit',
           redeem: 'withdraw',
-          curve: true
+          curve: false
         },
         {
           id: 'USDTv3',
@@ -270,7 +270,7 @@ class Store {
           disabled: false,
           invest: 'deposit',
           redeem: 'withdraw',
-          curve: true,
+          curve: false,
         },
         {
           id: 'BUSDv3',
@@ -750,7 +750,7 @@ class Store {
       curveContracts: [
         {
           id: 'crvV1',
-          symbol: 'cDAIUSDC',
+          symbol: 'compound.curve.fi',
           version: 1,
           erc20address: '0x3740fb63ab7a09891d7c0d4299442a551d06f5fd',
           decimals: 18,
@@ -758,7 +758,7 @@ class Store {
         },
         {
           id: 'crvV2',
-          symbol: 'cDAI+cUSDC+USDT',
+          symbol: 'usdt.curve.fi',
           version: 2,
           erc20address: '0x9fc689ccada600b6df723d9e47d84d76664a1f23',
           decimals: 18,
@@ -766,7 +766,7 @@ class Store {
         },
         {
           id: 'crvV3',
-          symbol: 'yDAI+yUSDC+yUSDT+yTUSD',
+          symbol: 'y.curve.fi',
           version: 3,
           erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
           decimals: 18,
@@ -774,7 +774,7 @@ class Store {
         },
         {
           id: 'crvV4',
-          symbol: 'yDAI+yUSDC+yUSDT+bUSDT',
+          symbol: 'busd.curve.fi',
           version: 4,
           erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
           decimals: 18,

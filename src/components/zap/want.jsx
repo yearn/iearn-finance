@@ -78,6 +78,42 @@ class Want extends Component {
     }
   }
 
+  componentWillReceiveProps(props) {
+    console.log(props);
+    if(props.assets && props.curveContracts) {
+
+
+      const a = props.assets
+      const b = props.curveContracts
+      const assetOptions = [...a, ...b]
+
+      const _assetOption = assetOptions.filter((option) => {
+
+        if(props.sendAsset && ['crvV1', 'crvV2'].includes(props.sendAsset.id)) {
+          return ['crvV3'].includes(option.id) === true
+        }
+        if(props.sendAsset && ['crvV3'].includes(props.sendAsset.id)) {
+          return ['crvV1', 'crvV2', 'crvV3', 'ETHv1'].includes(option.id) === false
+        }
+        if(props.sendAsset && ['crvV4'].includes(props.sendAsset.id)) {
+          return ['crvV1', 'crvV2', 'crvV3', 'crvV4', 'ETHv1'].includes(option.id) === false
+        }
+        if(props.sendAsset && ['BUSDv3'].includes(props.sendAsset.id)) {
+          return ['crvV4'].includes(option.id) === true
+        }
+        if(props.sendAsset && ['TUSDv2'].includes(props.sendAsset.id)) {
+          return ['crvV3'].includes(option.id) === true
+        }
+
+        return ['crvV4', 'crvV3'].includes(option.id) === true
+      })[0]
+
+      const _asset = this.state.asset?this.state.asset:_assetOption.symbol
+
+      this.setState({ assetOptions: assetOptions, assets: props.assets, curveContracts: props.curveContracts, asset: _asset })
+    }
+  }
+
   render() {
     const { classes, receiveAsset, sendAsset, t, bestPrice, sendAmount } = this.props;
     const {
@@ -120,7 +156,10 @@ class Want extends Component {
       }
     }
 
-    this.props.setReceiveAsset(asset)
+    var that = this;
+    setTimeout(() => {
+      that.props.setReceiveAsset(asset)
+    })
   };
 
   renderAsset = (id, amount) => {
@@ -169,16 +208,22 @@ class Want extends Component {
       >
         { options ? options.filter((option) => {
             if(sendAsset && ['crvV1', 'crvV2'].includes(sendAsset.id)) {
-              return ['crvV3', 'crvV4'].includes(option.id) === true
+              return ['crvV3'].includes(option.id) === true
             }
             if(sendAsset && ['crvV3'].includes(sendAsset.id)) {
-              return ['crvV1', 'crvV2', 'crvV3', 'ETHv1'].includes(option.id) === false
+              return ['crvV1', 'crvV2', 'crvV3', 'ETHv1', 'BUSDv3'].includes(option.id) === false
             }
             if(sendAsset && ['crvV4'].includes(sendAsset.id)) {
-              return ['crvV1', 'crvV2', 'crvV3', 'crvV4', 'ETHv1'].includes(option.id) === false
+              return ['crvV1', 'crvV2', 'crvV3', 'crvV4', 'ETHv1', 'TUSDv2'].includes(option.id) === false
+            }
+            if(sendAsset && ['BUSDv3'].includes(sendAsset.id)) {
+              return ['crvV4'].includes(option.id) === true
+            }
+            if(sendAsset && ['TUSDv2'].includes(sendAsset.id)) {
+              return ['crvV3'].includes(option.id) === true
             }
 
-            return ['crvV3', 'crvV4'].includes(option.id) === true
+            return ['crvV4', 'crvV3'].includes(option.id) === true
           }).map(this.renderAssetOption) : null }
       </TextField>
     )
@@ -200,24 +245,6 @@ class Want extends Component {
           <div className={ classes.assetSelectIconName }>
             <Typography variant='h2'>{ option.symbol }</Typography>
           </div>
-          {
-            (sendAsset && sendAsset.id === 'crvV3' && option.id === 'crvV4') &&(
-              <React.Fragment>
-              <div className={ classes.assetSelectPlus }>
-                <Typography variant='h2'>{ '+' }</Typography>
-              </div>
-              <div className={ classes.assetSelectIcon }>
-                <img
-                  alt=""
-                  src={ require('../../assets/TUSD-logo.png') }
-                  height="30px"
-                />
-              </div>
-              <div className={ classes.assetSelectIconName }>
-                <Typography variant='h2'>{ 'TUSD' }</Typography>
-              </div>
-            </React.Fragment>)
-          }
         </React.Fragment>
       </MenuItem>
     )
