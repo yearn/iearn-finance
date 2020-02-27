@@ -326,6 +326,8 @@ class Zap extends Component {
       address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
     }
 
+    console.log(receiveAsset)
+
     return (
       <div className={ classes.root }>
         { !account.address &&
@@ -364,7 +366,7 @@ class Zap extends Component {
               }
               <Want assets={ assets } curveContracts={ curveContracts } receiveAsset={ receiveAsset } setReceiveAsset={ this.setReceiveAsset } sendAsset={ sendAsset } loading={ loading } bestPrice={ bestPrice } sendAmount={ sendAmount } />
               <div className={ classes.sepperator }></div>
-              { (!(sendAsset && sendAsset.symbol === 'ETH') && (!receiveAsset || receiveAsset.symbol !== 'Curve.fi V3')) && <Button
+              { (sendAsset && receiveAsset && !(['crvV3', 'crvV4'].includes(receiveAsset.id) && ['crvV1', 'crvV2', 'crvV3'].includes(sendAsset.id)) && !(sendAsset && sendAsset.symbol === 'ETH')) && <Button
                 className={ classes.actionButton }
                 variant="outlined"
                 color="primary"
@@ -374,7 +376,7 @@ class Zap extends Component {
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Zap.Zap') }</Typography>
               </Button> }
-              { (!(sendAsset && sendAsset.symbol === 'ETH') && receiveAsset && receiveAsset.symbol === 'Curve.fi V3') && <Button
+              { (sendAsset && receiveAsset && ['crvV3', 'crvV4'].includes(receiveAsset.id) && ['crvV1', 'crvV2', 'crvV3'].includes(sendAsset.id)) && <Button
                 className={ classes.actionButton }
                 variant="outlined"
                 color="primary"
@@ -454,23 +456,7 @@ class Zap extends Component {
   }
 
   setSendAsset = (sendAsset) => {
-    let receiveAsset = null
-    if(sendAsset && sendAsset.symbol !== 'Curve.fi') {
-      receiveAsset = {
-        id: 'CRV',
-        name: 'Curve.fi yDAI+yUSDC+yUSDT+yTUSD',
-        symbol: 'Curve.fi',
-        balance: store.getStore('curvBalance')
-      }
-    }
-
-    if(['Curve.fi V1', 'Curve.fi V2'].includes(sendAsset.symbol)) {
-      receiveAsset = store.getStore('curveContracts').filter((contract) => { return contract.symbol === 'Curve.fi V3'})[0]
-    }
-
-    if(['Curve.fi V3'].includes(sendAsset.symbol)) {
-      receiveAsset = null
-    }
+    let receiveAsset = this.state.receiveAsset
 
     if(['ETH'].includes(sendAsset.symbol) && sendAsset.balance > 0) {
       receiveAsset = store.getStore('assets').filter((asset) => { return asset.id === 'DAIv2'})[0]
