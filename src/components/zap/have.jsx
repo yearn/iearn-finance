@@ -81,8 +81,11 @@ class Have extends Component {
   constructor(props) {
     super()
 
-    const a = props.assets.filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
-    const b = props.curveContracts.filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
+    // const a = props.assets.filter((asset) => { return asset.balance > 0 })
+    // const b = props.curveContracts.filter((asset) => { return asset.balance > 0 })
+
+    const a = props.assets
+    const b = props.curveContracts
 
     this.state = {
       asset: '',
@@ -96,8 +99,12 @@ class Have extends Component {
   componentWillReceiveProps(props) {
     if(props.assets && props.curveContracts) {
       const _asset = this.state.asset?this.state.asset:props.assets[0].symbol
-      const a = props.assets.filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
-      const b = props.curveContracts.filter((asset) => { return asset.balance > 0 }).map((asset) => asset.symbol)
+      // const a = props.assets.filter((asset) => { return asset.balance > 0 })
+      // const b = props.curveContracts.filter((asset) => { return asset.balance > 0 })
+
+      const a = props.assets
+      const b = props.curveContracts
+
       this.setState({ assetOptions: [...a, ...b], assets: props.assets, curveContracts: props.curveContracts, asset: _asset })
     }
   }
@@ -141,9 +148,9 @@ class Have extends Component {
         asset = asset[0]
       } else {
         asset = {
-          id: 'CRV',
+          id: 'crvV4',
           name: 'Curve.fi yDAI+yUSDC+yUSDT+yTUSD',
-          symbol: 'Curve.fi',
+          symbol: 'Curve.fi V4',
           balance: store.getStore('curvBalance')
         }
       }
@@ -185,17 +192,17 @@ class Have extends Component {
     const { classes } = this.props
 
     return (
-      <MenuItem key={option} value={option} className={ classes.assetSelectMenu }>
+      <MenuItem key={option.id} value={option.symbol} className={ classes.assetSelectMenu }>
         <React.Fragment>
           <div className={ classes.assetSelectIcon }>
             <img
               alt=""
-              src={ require('../../assets/'+(['Curve.fi V1', 'Curve.fi V2', 'Curve.fi V3'].includes(option) ? 'CRV' : option)+'-logo.png') }
+              src={ require('../../assets/'+(['crvV1', 'crvV2', 'crvV3', 'crvV4'].includes(option.id) ? 'CRV' : option.symbol)+'-logo.png') }
               height="30px"
             />
           </div>
           <div className={ classes.assetSelectIconName }>
-            <Typography variant='h2'>{ option }</Typography>
+            <Typography variant='h2'>{ option.symbol }</Typography>
           </div>
         </React.Fragment>
       </MenuItem>

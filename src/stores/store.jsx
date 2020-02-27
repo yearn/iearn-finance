@@ -662,22 +662,33 @@ class Store {
       curvBalance: 0,
       curveContracts: [
         {
-          symbol: 'Curve.fi V1',
+          id: 'crvV1',
+          symbol: 'cDAIUSDC',
           version: 1,
           erc20address: '0x3740fb63ab7a09891d7c0d4299442a551d06f5fd',
           decimals: 18,
           balance: 0
         },
         {
-          symbol: 'Curve.fi V2',
+          id: 'crvV2',
+          symbol: 'cDAI+cUSDC+USDT',
           version: 2,
           erc20address: '0x9fc689ccada600b6df723d9e47d84d76664a1f23',
           decimals: 18,
           balance: 0
         },
         {
-          symbol: 'Curve.fi V3',
+          id: 'crvV3',
+          symbol: 'yDAI+yUSDC+yUSDT+yTUSD',
           version: 3,
+          erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
+          decimals: 18,
+          balance: 0
+        },
+        {
+          id: 'crvV4',
+          symbol: 'yDAI+yUSDC+yUSDT+bUSDT',
+          version: 4,
           erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
           decimals: 18,
           balance: 0
@@ -850,7 +861,7 @@ class Store {
           code to accomodate for "assert _value == 0 or self.allowances[msg.sender][_spender] == 0" in contract
           We check to see if the allowance is > 0. If > 0 set to 0 before we set it to the correct amount.
         */
-        if(['Curve.fi V1', 'Curve.fi V2', 'Curve.fi V3', 'USDT'].includes(asset.symbol) && ethAllowance > 0) {
+        if(['crvV1', 'crvV2', 'crvV3', 'crvV4', 'USDTv1', 'USDTv2'].includes(asset.id) && ethAllowance > 0) {
           await erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         }
 
@@ -1657,8 +1668,6 @@ class Store {
 
           const trxs = transactions.map(async (tx) => {
             //console.log(tx.address)
-            //TODO: Figure out how to merge the values into 1
-
             const balance = await this._getIEthBalance(web3, iEarnContract, tx.address)
 
             tx.ethRedeem = (parseFloat(pricePerFullShare)*parseFloat(balance))
@@ -1718,11 +1727,11 @@ class Store {
 
     let call = ''
 
-    switch (sendAsset.symbol) {
-      case 'Curve.fi V1':
+    switch (sendAsset.id) {
+      case 'crvV1':
         call = 'swapv1tov3'
         break;
-      case 'Curve.fi V2':
+      case 'crvV2':
         call = 'swapv2tov3'
         break;
       default:
@@ -1879,9 +1888,19 @@ class Store {
     const account = store.getStore('account')
     const { sendAsset, receiveAsset, amount } = payload.content
 
-    let contractAddress = config.yCurveZapAddress
-    if(sendAsset.symbol === 'Curve.fi V3') {
+    let contractAddress = ''
+
+    if(receiveAsset.id === 'crvV3') {
+      contractAddress = config.yCurveZapAddress
+    }
+    if(receiveAsset.id === 'crvV4') {
+      contractAddress = config.yCurveZapV4Address
+    }
+    if(sendAsset.id === 'crvV3') {
       contractAddress = config.yCurveZapOutAddress
+    }
+    if(sendAsset.id === 'crvV4') {
+      contractAddress = config.yCurveZapOutV4Address
     }
 
     this._checkApproval(sendAsset, account, amount, contractAddress, (err) => {
@@ -1907,35 +1926,44 @@ class Store {
       amountToSend = amount*10**sendAsset.decimals;
     }
 
-    let yCurveZapContract = new web3.eth.Contract(config.yCurveZapABI, config.yCurveZapAddress)
+    let yCurveZapContract = null
+    if(receiveAsset.id === 'crvV3') {
+      yCurveZapContract = new web3.eth.Contract(config.yCurveZapABI, config.yCurveZapAddress)
+    } else if(receiveAsset.id === 'crvV4') {
+      yCurveZapContract = new web3.eth.Contract(config.yCurveZapV4ABI, config.yCurveZapV4Address)
+    } else if(sendAsset.id === 'crvV3') {
+      yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutABI, config.yCurveZapOutAddress)
+    } else if(sendAsset.id === 'crvV4') {
+      yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutV4ABI, config.yCurveZapOutV4Address)
+    }
     let call = ''
 
-    switch (sendAsset.symbol) {
-      case 'DAI':
+    switch (sendAsset.id) {
+      case 'DAIv2':
         call = 'depositDAI'
         break;
-      case 'USDC':
+      case 'USDCv2':
         call = 'depositUSDC'
         break;
-      case 'USDT':
+      case 'USDTv2':
         call = 'depositUSDT'
         break;
-      case 'TUSD':
+      case 'TUSDv2':
         call = 'depositTUSD'
         break;
-      case 'Curve.fi V3':
-        yCurveZapContract = new web3.eth.Contract(config.yCurveZapOutABI, config.yCurveZapOutAddress)
-        switch (receiveAsset.symbol) {
-          case 'DAI':
+      case 'crvV3':
+      case 'crvV4':
+        switch (receiveAsset.id) {
+          case 'DAIv2':
             call = 'withdrawDAI'
             break;
-          case 'USDC':
+          case 'USDCv2':
             call = 'withdrawUSDC'
             break;
-          case 'USDT':
+          case 'USDTv2':
             call = 'withdrawUSDT'
             break;
-          case 'TUSD':
+          case 'TUSDv2':
             call = 'withdrawTUSD'
             break;
           default:
