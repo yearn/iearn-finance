@@ -72,11 +72,16 @@ class Want extends Component {
   }
 
   render() {
-    const { classes, receiveAsset, sendAsset, t } = this.props;
+    const { classes, receiveAsset, sendAsset, t, bestPrice, sendAmount } = this.props;
     const {
       assetOptions,
       asset
     } = this.state;
+
+    let amount = null
+    if(bestPrice && bestPrice.price > 0 && sendAmount && sendAmount > 0) {
+      amount = (parseFloat(bestPrice.price) * parseFloat(sendAmount)).toFixed(4)
+    }
 
     return (
       <div className={ classes.root }>
@@ -85,7 +90,7 @@ class Want extends Component {
           { ((!receiveAsset || (receiveAsset.symbol !== 'Curve.fi' && receiveAsset.symbol !== 'Curve.fi V3')) && !(sendAsset && sendAsset.symbol === 'ETH')) && this.renderAssetSelect('asset', asset, assetOptions) }
           { (receiveAsset && receiveAsset.symbol === 'Curve.fi') && this.renderAsset('Curve.fi') }
           { (receiveAsset && receiveAsset.symbol === 'Curve.fi V3') && this.renderAsset('Curve.fi V3') }
-          { (sendAsset && sendAsset.symbol === 'ETH') && this.renderAsset('DAI') }
+          { (sendAsset && sendAsset.symbol === 'ETH') && this.renderAsset('DAI', amount) }
         </div>
       </div>
     )
@@ -107,7 +112,7 @@ class Want extends Component {
     this.props.setReceiveAsset(asset)
   };
 
-  renderAsset = (id) => {
+  renderAsset = (id, amount) => {
 
     const { classes } = this.props
 
@@ -115,7 +120,7 @@ class Want extends Component {
       <TextField
         id={ id }
         name={ id }
-        value={ id }
+        value={ amount ? (amount + ' ' + id) : id }
         variant="outlined"
         disabled
         InputProps={{

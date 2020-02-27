@@ -11,7 +11,7 @@ import Have from './have'
 import Want from './want'
 import Sending from './sending'
 //import Receiving from './receiving'
-// import ConversionRatios from './conversionRatios'
+import ConversionRatios from './conversionRatios'
 // import Fees from './fees'
 import Loader from '../loader'
 import BuiltWithModal from '../builtwith/builtwithModal.jsx'
@@ -31,7 +31,9 @@ import {
   SWAP,
   SWAP_RETURNED,
   TRADE,
-  TRADE_RETURNED
+  TRADE_RETURNED,
+  GET_BEST_PRICE,
+  GET_BEST_PRICE_RETURNED
 } from '../../constants'
 
 import { withNamespaces } from 'react-i18next';
@@ -188,6 +190,7 @@ class Zap extends Component {
       receiveAsset: null,
       sendAmount: "",
       // receiveAmount: ""
+      bestPrice: 0
     }
 
     if(account && account.address) {
@@ -205,6 +208,7 @@ class Zap extends Component {
     emitter.on(SWAP_RETURNED, this.swapReturned);
     emitter.on(TRADE_RETURNED, this.tradeReturned);
     emitter.on(GET_CURV_BALANCE_RETURNED, this.getCurvBalanceReturned);
+    emitter.on(GET_BEST_PRICE_RETURNED, this.getBestPriceReturned);
   }
 
   componentWillUnmount() {
@@ -216,6 +220,7 @@ class Zap extends Component {
     emitter.removeListener(SWAP_RETURNED, this.swapReturned);
     emitter.removeListener(TRADE_RETURNED, this.tradeReturned);
     emitter.removeListener(GET_CURV_BALANCE_RETURNED, this.getCurvBalanceReturned);
+    emitter.removeListener(GET_BEST_PRICE_RETURNED, this.getBestPriceReturned);
   };
 
   swapReturned = (txHash) => {
@@ -258,6 +263,10 @@ class Zap extends Component {
 
   getCurvBalanceReturned = (balance) => {
     this.setState({ curveContracts: store.getStore('curveContracts') })
+  };
+
+  getBestPriceReturned = (price) => {
+    this.setState({ bestPrice: price })
   };
 
   refresh() {
@@ -308,7 +317,8 @@ class Zap extends Component {
       loading,
       modalOpen,
       modalBuiltWithOpen,
-      snackbarMessage
+      snackbarMessage,
+      bestPrice
     } = this.state
 
     var address = null;
@@ -349,7 +359,10 @@ class Zap extends Component {
               <Have assets={ assets } curveContracts={ curveContracts } setSendAsset={ this.setSendAsset } sendAsset={ sendAsset } setSendAmountPercent={ this.setSendAmountPercent } loading={ loading } />
               <Sending sendAsset={ sendAsset } sendAmount={ sendAmount } setSendAmount={ this.setSendAmount } setSendAmountPercent={ this.setSendAmountPercent } loading={ loading }  />
               <div className={ classes.sepperator }></div>
-              <Want assets={ assets } curveContracts={ curveContracts } receiveAsset={ receiveAsset } setReceiveAsset={ this.setReceiveAsset } sendAsset={ sendAsset } loading={ loading }  />
+              { (sendAsset && sendAsset.symbol === 'ETH') &&
+                <ConversionRatios bestPrice={ bestPrice } sendAsset={ sendAsset } receiveAsset={ receiveAsset } />
+              }
+              <Want assets={ assets } curveContracts={ curveContracts } receiveAsset={ receiveAsset } setReceiveAsset={ this.setReceiveAsset } sendAsset={ sendAsset } loading={ loading } bestPrice={ bestPrice } sendAmount={ sendAmount } />
               <div className={ classes.sepperator }></div>
               { (!(sendAsset && sendAsset.symbol === 'ETH') && (!receiveAsset || receiveAsset.symbol !== 'Curve.fi V3')) && <Button
                 className={ classes.actionButton }
@@ -459,9 +472,9 @@ class Zap extends Component {
       receiveAsset = null
     }
 
-    if(['ETH'].includes(sendAsset.symbol)) {
+    if(['ETH'].includes(sendAsset.symbol) && sendAsset.balance > 0) {
       receiveAsset = store.getStore('assets').filter((asset) => { return asset.id === 'DAIv2'})[0]
-      // dispatcher.dispatch({ type: GET_BEST_PRICE, content: { amount: sendAsset.balance, sendAsset: sendAsset, receiveAsset: receiveAsset }})
+      dispatcher.dispatch({ type: GET_BEST_PRICE, content: { amount: sendAsset.balance, sendAsset: sendAsset, receiveAsset: receiveAsset }})
     }
 
     const balance = sendAsset.balance
@@ -473,7 +486,7 @@ class Zap extends Component {
   }
 
   setSendAmountPercent = (percent) => {
-    const { sendAsset } = this.state
+    const { sendAsset, receiveAsset } = this.state
 
     const balance = sendAsset.balance
     let sendAmount = balance*percent/100
@@ -481,19 +494,19 @@ class Zap extends Component {
     sendAmount = Math.floor(sendAmount*10000)/10000;
     this.setState({ sendAmount: sendAmount.toFixed(4) })
 
-    // if(['ETH'].includes(sendAsset.symbol)) {
-    //   dispatcher.dispatch({ type: GET_BEST_PRICE, content: { amount: sendAmount, sendAsset: sendAsset, receiveAsset: receiveAsset }})
-    // }
+    if(['ETH'].includes(sendAsset.symbol) && sendAmount > 0) {
+      dispatcher.dispatch({ type: GET_BEST_PRICE, content: { amount: sendAmount, sendAsset: sendAsset, receiveAsset: receiveAsset }})
+    }
   }
 
   setSendAmount = (amount) => {
     this.setState({ sendAmount: amount })
 
-    // const { sendAsset, receiveAsset } = this.state
-    //
-    // if(['ETH'].includes(sendAsset.symbol)) {
-    //   dispatcher.dispatch({ type: GET_BEST_PRICE, content: { amount: amount, sendAsset: sendAsset, receiveAsset: receiveAsset }})
-    // }
+    const { sendAsset, receiveAsset } = this.state
+
+    if(['ETH'].includes(sendAsset.symbol) && amount > 0) {
+      dispatcher.dispatch({ type: GET_BEST_PRICE, content: { amount: amount, sendAsset: sendAsset, receiveAsset: receiveAsset }})
+    }
   }
 
   renderModal = () => {
