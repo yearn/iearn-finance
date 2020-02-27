@@ -4,7 +4,10 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   Card,
   Typography,
+  Divider,
   Button,
+  Tabs,
+  Tab,
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
@@ -215,6 +218,33 @@ const styles = theme => ({
   }
 });
 
+const StyledTabs = withStyles({
+  indicator: {
+    display: 'flex',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
+    '& > div': {
+      maxWidth: 40,
+      width: '100%',
+      backgroundColor: '#DC6BE5',
+    },
+  },
+})(props => <Tabs {...props} TabIndicatorProps={{ children: <div /> }} />);
+
+
+const StyledTab = withStyles(theme => ({
+  root: {
+    textTransform: 'none',
+    fontWeight: theme.typography.fontWeightRegular,
+    fontSize: theme.typography.pxToRem(15),
+    marginRight: '1px',
+    '&:focus': {
+      color: '#DC6BE5',
+      opacity: 1,
+    },
+  },
+}))(props => <Tab disableRipple {...props} />);
+
 class InvestSimple extends Component {
 
   constructor(props) {
@@ -229,7 +259,8 @@ class InvestSimple extends Component {
       modalInvestAllOpen: false,
       snackbarType: null,
       snackbarMessage: null,
-      hideV1: true
+      hideV1: true,
+      value: 1
     }
 
     if(account && account.address) {
@@ -324,6 +355,7 @@ class InvestSimple extends Component {
       modalInvestAllOpen,
       snackbarMessage,
       hideV1,
+      value,
     } = this.state
     var address = null;
     if (account.address) {
@@ -333,16 +365,13 @@ class InvestSimple extends Component {
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
           { account.address &&
+
             <div className={ classes.intro }>
-              { account.address && <div className={ classes.versionToggle }>
-                <Switch
-                  id='hideV1'
-                  checked={ hideV1 }
-                  onChange={ this.onChange }
-                  value={ 'hideV1' } />
-                <Typography variant={ 'h6'}>{ t('InvestSimple.Show') }</Typography>
-              </div> }
-              <Typography variant='h2' className={ classes.introText }>{ t('InvestSimple.Intro') }</Typography>
+              <StyledTabs value={value} onChange={this.handleTabChange} aria-label="styled tabs example">
+                <StyledTab label="v1" />
+                <StyledTab label="y.curve.fi" />
+                <StyledTab label="busd.curve.fi" />
+              </StyledTabs>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
                 <Typography variant={ 'h5'} noWrap>{ address }</Typography>
                 <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
@@ -368,7 +397,9 @@ class InvestSimple extends Component {
               </Button>
             </div>
           }
-          { account.address && this.renderAssetBlocks() }
+          { account.address && value == 0 && this.renderAssetBlocksv1() }
+          { account.address && value == 1 && this.renderAssetBlocksv2() }
+          { account.address && value == 2 && this.renderAssetBlocksv3() }
           {/* account.address && <div className={ classes.investAllContainer }>
             <Button
               className={ classes.actionButton }
@@ -389,6 +420,11 @@ class InvestSimple extends Component {
     )
   };
 
+  handleTabChange = (event, newValue) => {
+    console.log(newValue);
+    this.setState({value:newValue})
+  };
+
   onChange = (event) => {
     let val = []
     val[event.target.id] = event.target.checked
@@ -396,6 +432,20 @@ class InvestSimple extends Component {
   };
 
   renderAssetBlocks = () => {
+    const { classes, t } = this.props
+    const {
+      value,
+    } = this.state
+    return (
+      <StyledTabs value={value} onChange={this.handleTabChange} aria-label="styled tabs example">
+        <StyledTab label="v1" />
+        <StyledTab label="y.curve.fi" />
+        <StyledTab label="busd.curve.fi" />
+      </StyledTabs>
+    )
+  }
+
+  renderAssetBlocksv1 = () => {
     const { assets, expanded, hideV1 } = this.state
     const { classes, t } = this.props
     const width = window.innerWidth
@@ -403,11 +453,9 @@ class InvestSimple extends Component {
     return assets.filter((asset) => {
       return (hideV1 === true || asset.version !== 1)
     }).filter((asset) => {
-      return asset.version === 2 || (asset.version === 1 && (asset.investedBalance).toFixed(4) > 0)
+      return (asset.version === 1 && (asset.investedBalance).toFixed(4) > 0)
     }).filter((asset) => {
       return !(asset.symbol === "iDAI")
-    }).sort((a, b) => {
-      return parseFloat(b.balance) - parseFloat(a.balance)
     }).map((asset) => {
       return (
         <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
@@ -428,7 +476,107 @@ class InvestSimple extends Component {
                 </div>
                 <div>
                   <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' }>{ asset.version === 1?asset.description+' - v'+asset.version+'':asset.description }</Typography>
+                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                </div>
+              </div>
+              <div className={classes.heading}>
+                <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
+                <Typography variant={ 'h5' }>{ t('InvestSimple.InterestRate') }</Typography>
+              </div>
+              <div className={classes.heading}>
+                <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
+                <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
+              </div>
+            </div>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <Asset asset={ asset } startLoading={ this.startLoading } />
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+      )
+    })
+  }
+
+  renderAssetBlocksv2 = () => {
+    const { assets, expanded, hideV1 } = this.state
+    const { classes, t } = this.props
+    const width = window.innerWidth
+
+    return assets.filter((asset) => {
+      return (asset.version === 2)
+    }).filter((asset) => {
+      return !(asset.symbol === "iDAI")
+    }).map((asset) => {
+      return (
+        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+          <ExpansionPanelSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1bh-content"
+            id="panel1bh-header"
+          >
+            <div className={ classes.assetSummary }>
+              <div className={classes.headingName}>
+                <div className={ classes.assetIcon }>
+                  <img
+                    alt=""
+                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                    height={ width > 600 ? '40px' : '30px'}
+                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
+                  />
+                </div>
+                <div>
+                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
+                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                </div>
+              </div>
+              <div className={classes.heading}>
+                <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
+                <Typography variant={ 'h5' }>{ t('InvestSimple.InterestRate') }</Typography>
+              </div>
+              <div className={classes.heading}>
+                <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
+                <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
+              </div>
+            </div>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <Asset asset={ asset } startLoading={ this.startLoading } />
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+      )
+    })
+  }
+
+  renderAssetBlocksv3 = () => {
+    const { assets, expanded, hideV1 } = this.state
+    const { classes, t } = this.props
+    const width = window.innerWidth
+
+    return assets.filter((asset) => {
+      return (asset.version === 3)
+    }).filter((asset) => {
+      return !(asset.symbol === "iDAI")
+    }).map((asset) => {
+      return (
+        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+          <ExpansionPanelSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1bh-content"
+            id="panel1bh-header"
+          >
+            <div className={ classes.assetSummary }>
+              <div className={classes.headingName}>
+                <div className={ classes.assetIcon }>
+                  <img
+                    alt=""
+                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                    height={ width > 600 ? '40px' : '30px'}
+                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
+                  />
+                </div>
+                <div>
+                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
+                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
                 </div>
               </div>
               <div className={classes.heading}>
