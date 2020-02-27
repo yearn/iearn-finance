@@ -51,6 +51,8 @@ import {
   GET_ETH_BALANCE_RETURNED,
   CALCULATE_MAX_TOKENS,
   CALCULATE_MAX_TOKENS_RETURNED,
+  GET_BEST_PRICE,
+  GET_BEST_PRICE_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 
@@ -874,6 +876,8 @@ class Store {
           case GET_ETH_BALANCE:
             this.getEthBalance(payload)
             break;
+          case GET_BEST_PRICE:
+            this.getBestPrice(payload)
           default: {
           }
         }
@@ -1839,6 +1843,29 @@ class Store {
           callback(error)
         }
       })
+  }
+
+  getBestPrice = (payload) => {
+    const account = store.getStore('account')
+    const { sendAsset, receiveAsset, amount } = payload.content
+
+    this._getBestPrice(sendAsset, receiveAsset, account, amount, (err, price) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(GET_BEST_PRICE_RETURNED, price)
+    })
+  }
+
+  _getBestPrice = async (sendAsset, receiveAsset, account, amount, callback) => {
+    try {
+      const url = 'https://api-v2.dex.ag/price?from='+sendAsset.symbol.toLowerCase()+'&to='+receiveAsset.symbol.toLowerCase()+'&fromAmount='+amount+'&dex=ag&tradable=true'
+      let price = await rp(url);
+      callback(null, JSON.parse(price));
+    } catch(e) {
+      callback(null, {})
+    }
   }
 
   trade = (payload) => {
