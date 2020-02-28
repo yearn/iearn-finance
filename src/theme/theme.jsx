@@ -196,6 +196,42 @@ const iswapTheme =  {
           padding: '0 24px 0 24px',
         }
       }
+    },
+    MuiToggleButton: {
+      root: {
+        borderRadius: '0.75rem',
+        textTransform: 'none',
+        minWidth:  '100px',
+        border: 'none',
+        '& > span > h3': {
+          color: '#555',
+        },
+        '&:hover': {
+          backgroundColor: "rgba(47,128,237, 0.2)",
+        },
+        "&$selected": {
+          backgroundColor: '#2f80ed',
+          '& > span > h3': {
+            color: '#fff',
+          },
+          '&:hover': {
+            backgroundColor: "rgba(47,128,237, 0.2)",
+            '& > span > h3': {
+              color: '#000',
+            },
+          },
+        }
+      }
+    },
+    MuiToggleButtonGroup: {
+      root: {
+        borderRadius: '0.75rem',
+        boxShadow: '0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)',
+        border: 'none',
+      },
+      groupedSizeSmall: {
+        padding: '0px 15px 0px 15px'
+      }
     }
   },
   palette: {

@@ -5,8 +5,9 @@
   "dependencies": {
     "@ethersproject/providers": "^5.0.0-beta.153",
     "@ethersproject/units": "^5.0.0-beta.132",
-    "@material-ui/core": "^3.9.4",
+    "@material-ui/core": "^4.9.4",
     "@material-ui/icons": "^3.0.2",
+    "@material-ui/lab": "^4.0.0-alpha.44",
     "@web3-react/authereum-connector": "^6.0.8",
     "@web3-react/core": "^6.0.7",
     "@web3-react/fortmatic-connector": "^6.0.7",
