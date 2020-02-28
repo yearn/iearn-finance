@@ -13,6 +13,8 @@ import {
   ExpansionPanelSummary,
   Switch
 } from '@material-ui/core';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withNamespaces } from 'react-i18next';
 
@@ -84,6 +86,7 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingBottom: '20px'
   },
   introCenter: {
     maxWidth: '500px',
@@ -367,11 +370,22 @@ class InvestSimple extends Component {
           { account.address &&
 
             <div className={ classes.intro }>
-              <StyledTabs value={value} onChange={this.handleTabChange} aria-label="styled tabs example">
+              {/*<StyledTabs value={value} onChange={this.handleTabChange} aria-label="styled tabs example">
                 <StyledTab label="v1" />
                 <StyledTab label="y.curve.fi" />
                 <StyledTab label="busd.curve.fi" />
-              </StyledTabs>
+              </StyledTabs>*/}
+              <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
+                <ToggleButton value={0} aria-label="v1">
+                  <Typography variant={ 'h3' }>v1</Typography>
+                </ToggleButton>
+                <ToggleButton value={1} aria-label="v2">
+                  <Typography variant={ 'h3' }>y.curve.fi</Typography>
+                </ToggleButton>
+                <ToggleButton value={2} aria-label="v3">
+                  <Typography variant={ 'h3' }>busd.curve.fi</Typography>
+                </ToggleButton>
+              </ToggleButtonGroup>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
                 <Typography variant={ 'h5'} noWrap>{ address }</Typography>
                 <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
