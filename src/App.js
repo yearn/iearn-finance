@@ -43,9 +43,9 @@ class App extends Component {
               <Route path="/earn">
                 <InvestSimple />
               </Route>
-              <Route path="/zap">
+              {/*<Route path="/zap">
                 <Zap />
-              </Route>
+              </Route>*/}
               <Route path="/idai">
                 <IDai />
               </Route>

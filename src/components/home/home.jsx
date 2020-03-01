@@ -64,14 +64,24 @@ const styles = theme => ({
     '&:hover': {
       backgroundColor: colors.blue,
       '& .title': {
-        color: colors.white
+        color: colors.white,
+        display: 'none'
+      },
+      '& .soon': {
+        color: colors.white,
+        display: 'block'
       },
       '& .icon': {
         color: colors.white
       }
     },
     '& .title': {
-      color: colors.blue
+      color: colors.blue,
+      display: 'block'
+    },
+    '& .soon': {
+      color: colors.blue,
+      display: 'none'
     },
     '& .icon': {
       color: colors.blue
@@ -149,9 +159,10 @@ class Home extends Component {
           <AttachMoneyIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Earn") }</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav('/zap') } }>
+        <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { /*this.nav('/zap')*/ } }>
           <FlashOnIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Zap") }</Typography>
+          <Typography variant={'h1'} className={ `${classes.title} title soon` }>Disabled</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('/apr') } }>
           <BarChartIcon className={ `${classes.icon} icon` } />
