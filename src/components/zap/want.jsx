@@ -129,6 +129,7 @@ class Want extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.inputCard }>
+        
           <Typography variant='h3' className={ classes.inputCardHeading }>{ t("Zap.IWillReceive") }</Typography>
           { (sendAsset && sendAsset.symbol === 'ETH') && this.renderAsset('DAI', amount) }
           { (!sendAsset || sendAsset.symbol !== 'ETH') && this.renderAssetSelect('asset', asset, assetOptions, null, sendAsset) }
