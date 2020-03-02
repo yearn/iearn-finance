@@ -235,7 +235,7 @@ class Store {
           description: 'USD//C',
           investSymbol: 'yUSDC',
           erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-          iEarnContract: '0xf7c9C5B31F12701dD2dD65AAdF6116ee6aB81BB4',
+          iEarnContract: '0x26EA744E5B887E5205727f55dFBE8685e3b21951',
           apr: 0,
           maxApr: 0,
           balance: 0,
@@ -776,7 +776,7 @@ class Store {
           id: 'crvV4',
           symbol: 'busd.curve.fi',
           version: 4,
-          erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
+          erc20address: '0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B',
           decimals: 18,
           balance: 0
         }
@@ -948,7 +948,7 @@ class Store {
           code to accomodate for "assert _value == 0 or self.allowances[msg.sender][_spender] == 0" in contract
           We check to see if the allowance is > 0. If > 0 set to 0 before we set it to the correct amount.
         */
-        if(['crvV1', 'crvV2', 'crvV3', 'crvV4', 'USDTv1', 'USDTv2'].includes(asset.id) && ethAllowance > 0) {
+        if(['crvV1', 'crvV2', 'crvV3', 'crvV4', 'USDTv1', 'USDTv2', 'USDTv3'].includes(asset.id) && ethAllowance > 0) {
           await erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
         }
 
@@ -1789,7 +1789,12 @@ class Store {
     const account = store.getStore('account')
     const { sendAsset, amount } = payload.content
 
-    this._checkApproval(sendAsset, account, amount, config.yCurveZapSwapAddress, (err) => {
+    let yCurveZapSwapContract = config.yCurveZapSwapAddress
+    if (sendAsset.id == 'crvV3') {
+      yCurveZapSwapContract = config.yCurveZapSwapV4Address
+    }
+
+    this._checkApproval(sendAsset, account, amount, yCurveZapSwapContract, (err) => {
       if(err) {
         return emitter.emit(ERROR, err);
       }
@@ -1821,10 +1826,16 @@ class Store {
       case 'crvV2':
         call = 'swapv2tov3'
         break;
+      case 'crvV3':
+        call = 'swapv3tov4'
+        break;
       default:
     }
 
     let yCurveZapSwapContract = new web3.eth.Contract(config.yCurveZapSwapABI, config.yCurveZapSwapAddress)
+    if (sendAsset.id == 'crvV3') {
+      yCurveZapSwapContract = new web3.eth.Contract(config.yCurveZapSwapV4ABI, config.yCurveZapSwapV4Address)
+    }
     yCurveZapSwapContract.methods[call](amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
@@ -2027,31 +2038,43 @@ class Store {
 
     switch (sendAsset.id) {
       case 'DAIv2':
+      case 'DAIv3':
         call = 'depositDAI'
         break;
       case 'USDCv2':
+      case 'USDCv3':
         call = 'depositUSDC'
         break;
       case 'USDTv2':
+      case 'USDTv3':
         call = 'depositUSDT'
         break;
       case 'TUSDv2':
         call = 'depositTUSD'
         break;
+      case 'BUSDv3':
+        call = 'depositBUSD'
+        break;
       case 'crvV3':
       case 'crvV4':
         switch (receiveAsset.id) {
           case 'DAIv2':
+          case 'DAIv3':
             call = 'withdrawDAI'
             break;
           case 'USDCv2':
+          case 'USDCv3':
             call = 'withdrawUSDC'
             break;
           case 'USDTv2':
+          case 'USDTv3':
             call = 'withdrawUSDT'
             break;
           case 'TUSDv2':
             call = 'withdrawTUSD'
+            break;
+          case 'BUSDv3':
+            call = 'withdrawBUSD'
             break;
           default:
 
