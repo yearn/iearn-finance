@@ -172,6 +172,12 @@ const styles = theme => ({
       width: '100px',
       marginRight: '24px',
     }
+  },
+  disaclaimer: {
+    padding: '12px',
+    border: '1px solid rgb(174, 174, 174)',
+    borderRadius: '0.75rem',
+    marginBottom: '24px',
   }
 });
 
@@ -303,7 +309,8 @@ class Insure extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.insuranceContainer }>
-          { account.address &&
+        <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+        { account.address &&
             <div className={ classes.intro }>
               <div className={ classes.placeholder }>
               </div>

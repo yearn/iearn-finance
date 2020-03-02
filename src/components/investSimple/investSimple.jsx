@@ -218,6 +218,12 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'flex-end',
     width: '100%'
+  },
+  disaclaimer: {
+    padding: '12px',
+    border: '1px solid rgb(174, 174, 174)',
+    borderRadius: '0.75rem',
+    marginBottom: '24px',
   }
 });
 
@@ -254,6 +260,7 @@ class InvestSimple extends Component {
     super()
 
     const account = store.getStore('account')
+    const disclaimerClosed = localStorage.getItem('iearn-disclaimer-closed')
 
     this.state = {
       assets: store.getStore('assets'),
@@ -263,7 +270,8 @@ class InvestSimple extends Component {
       snackbarType: null,
       snackbarMessage: null,
       hideV1: true,
-      value: 1
+      value: 1,
+      disclaimerClosed: disclaimerClosed
     }
 
     if(account && account.address) {
@@ -359,6 +367,7 @@ class InvestSimple extends Component {
       snackbarMessage,
       hideV1,
       value,
+      disclaimerClosed
     } = this.state
     var address = null;
     if (account.address) {
@@ -367,6 +376,9 @@ class InvestSimple extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
+
+          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+
           { account.address &&
 
             <div className={ classes.intro }>
@@ -397,7 +409,6 @@ class InvestSimple extends Component {
               <Typography variant='h2'>{ t('InvestSimple.Intro') }</Typography>
             </div>
           }
-
           {!account.address &&
             <div className={ classes.connectContainer }>
               <Button
@@ -654,6 +665,11 @@ class InvestSimple extends Component {
   closeInvestAllModal = () => {
     this.setState({ modalInvestAllOpen: false })
   }
+
+  // closeDisclaimer = () => {
+  //   localStorage.setItem('iearn-disclaimer-closed', '1')
+  //   this.setState({ disclaimerClosed: '1' })
+  // }
 }
 
 export default withNamespaces()(withRouter(withStyles(styles)(InvestSimple)));
