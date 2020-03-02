@@ -336,27 +336,28 @@ class Zap extends Component {
 
     return (
       <div className={ classes.root }>
-        <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
         { !account.address &&
           <div className={ classes.investedContainer }>
-              <div className={ classes.introCenter }>
-                <Typography variant='h2'>{ t('Zap.Intro') }</Typography>
-              </div>
-              <div className={ classes.connectContainer }>
-                <Button
-                  className={ classes.actionButton }
-                  variant="outlined"
-                  color="primary"
-                  disabled={ loading }
-                  onClick={ this.overlayClicked }
-                  >
-                  <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('InvestSimple.Connect') }</Typography>
-                </Button>
-              </div>
+            <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+            <div className={ classes.introCenter }>
+              <Typography variant='h2'>{ t('Zap.Intro') }</Typography>
+            </div>
+            <div className={ classes.connectContainer }>
+              <Button
+                className={ classes.actionButton }
+                variant="outlined"
+                color="primary"
+                disabled={ loading }
+                onClick={ this.overlayClicked }
+                >
+                <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('InvestSimple.Connect') }</Typography>
+              </Button>
+            </div>
           </div>
         }
         { account.address &&
           <div className={ classes.card }>
+            <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.intro }>
               <Typography variant='h2' className={ classes.introText }>{ t('Zap.Intro') }</Typography>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
