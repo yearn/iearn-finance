@@ -173,6 +173,12 @@ const styles = theme => ({
       width: '100%'
     }
   },
+  disaclaimer: {
+    padding: '12px',
+    border: '1px solid rgb(174, 174, 174)',
+    borderRadius: '0.75rem',
+    marginBottom: '24px',
+  }
 });
 
 class Zap extends Component {
@@ -330,6 +336,7 @@ class Zap extends Component {
 
     return (
       <div className={ classes.root }>
+        <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
         { !account.address &&
           <div className={ classes.investedContainer }>
               <div className={ classes.introCenter }>
