@@ -129,7 +129,7 @@ class Want extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.inputCard }>
-        
+
           <Typography variant='h3' className={ classes.inputCardHeading }>{ t("Zap.IWillReceive") }</Typography>
           { (sendAsset && sendAsset.symbol === 'ETH') && this.renderAsset('DAI', amount) }
           { (!sendAsset || sendAsset.symbol !== 'ETH') && this.renderAssetSelect('asset', asset, assetOptions, null, sendAsset) }
@@ -246,6 +246,24 @@ class Want extends Component {
           <div className={ classes.assetSelectIconName }>
             <Typography variant='h2'>{ option.symbol }</Typography>
           </div>
+          {
+            (sendAsset && sendAsset.id === 'crvV3' && option.id === 'crvV4') &&(
+              <React.Fragment>
+              <div className={ classes.assetSelectPlus }>
+                <Typography variant='h2'>{ '+' }</Typography>
+              </div>
+              <div className={ classes.assetSelectIcon }>
+                <img
+                  alt=""
+                  src={ require('../../assets/TUSD-logo.png') }
+                  height="30px"
+                />
+              </div>
+              <div className={ classes.assetSelectIconName }>
+                <Typography variant='h2'>{ 'TUSD' }</Typography>
+              </div>
+            </React.Fragment>)
+          }
         </React.Fragment>
       </MenuItem>
     )
