@@ -146,23 +146,25 @@ class Home extends Component {
   }
 
   render() {
-    const { classes, t } = this.props;
+    const { classes, t, location } = this.props;
+
+    console.log(location)
 
     return (
       <div className={ classes.root }>
-        <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav('/earn') } }>
+        <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav(location.pathname+'earn') } }>
           <AttachMoneyIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Earn") }</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav('/zap') } }>
+        <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav(location.pathname+'zap') } }>
           <FlashOnIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Zap") }</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('/apr') } }>
+        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav(location.pathname+'apr') } }>
           <BarChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Apr") }</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { this.nav('/cover') }}>
+        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { this.nav(location.pathname+'cover') }}>
           <SecurityIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Cover") }</Typography>
         </Card>
