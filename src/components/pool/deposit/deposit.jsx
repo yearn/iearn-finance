@@ -19,7 +19,9 @@ import {
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED,
   DEPOSIT_POOL,
-  DEPOSIT_POOL_RETURNED
+  DEPOSIT_POOL_RETURNED,
+  GET_DEPOSIT_PRICE,
+  DEPOSIT_PRICE_RETURNED
 } from '../../../constants'
 
 import { withNamespaces } from 'react-i18next';
@@ -190,7 +192,8 @@ class Deposit extends Component {
 
     this.state = {
       account: account,
-      assets: store.getStore('poolAssets')
+      assets: store.getStore('poolAssets'),
+      amount: ''
     }
 
     if(account && account.address) {
@@ -204,6 +207,7 @@ class Deposit extends Component {
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(DEPOSIT_POOL_RETURNED, this.depositPoolReturned);
+    emitter.on(DEPOSIT_PRICE_RETURNED, this.depositPriceReturned);
   }
 
   componentWillUnmount() {
@@ -212,6 +216,12 @@ class Deposit extends Component {
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(DEPOSIT_POOL_RETURNED, this.depositPoolReturned);
+    emitter.removeListener(DEPOSIT_PRICE_RETURNED, this.depositPriceReturned);
+  };
+
+  depositPriceReturned = (price) => {
+    console.log(price)
+    this.setState({ amount: price ? parseFloat(price).toFixed(4) : '0.0000' })
   };
 
   depositPoolReturned  = (txHash) => {
@@ -370,6 +380,25 @@ class Deposit extends Component {
     let val = []
     val[event.target.name] = event.target.value
     this.setState(val)
+
+    let { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = this.state
+    if(event.target.name === 'daiAmount') {
+      daiAmount = event.target.value
+    }
+    if(event.target.name === 'usdcAmount') {
+      usdcAmount = event.target.value
+    }
+    if(event.target.name === 'usdtAmount') {
+      usdtAmount = event.target.value
+    }
+    if(event.target.name === 'tusdAmount') {
+      tusdAmount = event.target.value
+    }
+    if(event.target.name === 'susdAmount') {
+      susdAmount = event.target.value
+    }
+
+    dispatcher.dispatch({ type: GET_DEPOSIT_PRICE, content: { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount }})
   };
 
   renderAmountInput = (id, value, error, label, placeholder, inputAdornment, disabled) => {

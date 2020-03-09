@@ -20,7 +20,9 @@ import {
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED,
   WITHDRAW_POOL,
-  WITHDRAW_POOL_RETURNED
+  WITHDRAW_POOL_RETURNED,
+  GET_WITHDRAW_PRICE,
+  WITHDRAW_PRICE_RETURNED
 } from '../../../constants'
 
 import { withNamespaces } from 'react-i18next';
@@ -205,7 +207,9 @@ class Withdraw extends Component {
     emitter.on(POOL_BALANCES_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-    emitter.on(WITHDRAW_POOL_RETURNED, this.withdrawPoolReturned);
+    emitter.on(WITHDRAW_POOL_RETURNED, this.withdrawPoolReturned);-
+    emitter.on(WITHDRAW_PRICE_RETURNED, this.withdrawPriceReturned);-
+
   }
 
   componentWillUnmount() {
@@ -214,6 +218,12 @@ class Withdraw extends Component {
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(WITHDRAW_POOL_RETURNED, this.withdrawPoolReturned);
+    emitter.removeListener(WITHDRAW_PRICE_RETURNED, this.withdrawPriceReturned);
+  };
+
+  withdrawPriceReturned = (price) => {
+    console.log(price)
+    this.setState({ receiveAmount: price ? parseFloat(price).toFixed(4) : '0.0000' })
   };
 
   withdrawPoolReturned  = (txHash) => {
@@ -409,6 +419,8 @@ class Withdraw extends Component {
     let val = []
     val[event.target.name] = event.target.value
     this.setState(val)
+
+    dispatcher.dispatch({ type: GET_WITHDRAW_PRICE, content: { sendAmount: event.target.value }})
   };
 
   renderAmountInput = (id, value, error, label, placeholder, inputAdornment, disabled) => {

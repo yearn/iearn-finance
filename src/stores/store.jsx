@@ -63,6 +63,10 @@ import {
   EXCHANGE_POOL_RETURNED,
   GET_EXCHANGE_PRICE,
   EXCHANGE_PRICE_RETURNED,
+  GET_DEPOSIT_PRICE,
+  DEPOSIT_PRICE_RETURNED,
+  GET_WITHDRAW_PRICE,
+  WITHDRAW_PRICE_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 
@@ -986,6 +990,12 @@ class Store {
             break;
           case GET_EXCHANGE_PRICE:
             this.getExchangePrice(payload)
+            break;
+          case GET_DEPOSIT_PRICE:
+            this.getDepositPrice(payload)
+            break;
+          case GET_WITHDRAW_PRICE:
+            this.getWithdrawPrice(payload)
             break;
           default: {
           }
