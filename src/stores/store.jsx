@@ -63,6 +63,10 @@ import {
   EXCHANGE_POOL_RETURNED,
   GET_EXCHANGE_PRICE,
   EXCHANGE_PRICE_RETURNED,
+  GET_DEPOSIT_PRICE,
+  DEPOSIT_PRICE_RETURNED,
+  GET_WITHDRAW_PRICE,
+  WITHDRAW_PRICE_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 
@@ -986,6 +990,12 @@ class Store {
             break;
           case GET_EXCHANGE_PRICE:
             this.getExchangePrice(payload)
+            break;
+          case GET_DEPOSIT_PRICE:
+            this.getDepositPrice(payload)
+            break;
+          case GET_WITHDRAW_PRICE:
+            this.getWithdrawPrice(payload)
             break;
           default: {
           }
@@ -2555,14 +2565,15 @@ class Store {
 
   depositPool = (payload) => {
     const account = store.getStore('account')
+    const poolAssets = store.getStore('poolAssets')
     const { asset, daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = payload.content
 
     //check approval on all balances > 0
     const amounts = [daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount]
     async.map(amounts, (amount, callbackInner) => {
-      this._checkApproval(asset, account, amount, config.exchangeContractAddress, callbackInner)
+      this._checkApproval(poolAssets[0], account, amount, config.exchangeContractAddress, callbackInner)
     }, (err, data) => {
-      this._callDepositPool(asset, account, payload.content, (err, res) => {
+      this._callDepositPool(account, payload.content, (err, res) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
@@ -2572,7 +2583,7 @@ class Store {
     })
   }
 
-  _callDepositPool = async (asset, account, content, callback) => {
+  _callDepositPool = async (account, content, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
     const poolAssets = store.getStore('poolAssets')
 
@@ -2794,6 +2805,72 @@ class Store {
         }
         callback(error)
       })
+  }
+
+  getWithdrawPrice = async (payload) => {
+    const account = store.getStore('account')
+    const { sendAmount } = payload.content
+    const poolAssets = store.getStore('poolAssets')
+
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+    const exchangeContract = new web3.eth.Contract(config.exchangeContractABI, config.exchangeContractAddress)
+
+    let amount = web3.utils.toWei(sendAmount, "ether")
+    let prices = await exchangeContract.methods.calc_withdraw_amount(amount).call({ from: account.address })
+
+    console.log(prices)
+    let returnPrices = []
+    for (var i = 0; i < prices.length; i++) {
+      if(poolAssets[i].decimals === 18) {
+        returnPrices.push(parseFloat(web3.utils.fromWei(prices[i], "ether")))
+      } else {
+        console.log(prices[i])
+        console.log(poolAssets[i].decimals)
+        returnPrices.push((parseFloat(prices[i])/(10**poolAssets[i].decimals)))
+      }
+    }
+
+    console.log(returnPrices)
+
+    return emitter.emit(WITHDRAW_PRICE_RETURNED, returnPrices)
+  }
+
+  getDepositPrice = async (payload) => {
+    const account = store.getStore('account')
+    const poolAssets = store.getStore('poolAssets')
+
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const exchangeContract = new web3.eth.Contract(config.exchangeContractABI, config.exchangeContractAddress)
+
+    const amounts = poolAssets.map((asset) => {
+      switch (asset.id) {
+        case 'DAI':
+          return web3.utils.toWei(payload.content.daiAmount, "ether")
+          break;
+        case 'USDC':
+          return (payload.content.usdcAmount * 10**asset.decimals) + ''
+          break;
+        case 'USDT':
+          return (payload.content.usdtAmount * 10**asset.decimals) + ''
+          break;
+        case 'TUSD':
+          return web3.utils.toWei(payload.content.tusdAmount, "ether")
+          break;
+        case 'SUSD':
+          return web3.utils.toWei(payload.content.susdAmount, "ether")
+          break;
+        default:
+
+      }
+    })
+
+    console.log(amounts)
+    let minMintAmount = await exchangeContract.methods.calc_deposit_amount(amounts).call({ from: account.address })
+    console.log(minMintAmount)
+    minMintAmount = web3.utils.fromWei(minMintAmount, "ether")
+    console.log(minMintAmount)
+    return emitter.emit(DEPOSIT_PRICE_RETURNED, minMintAmount)
   }
 }
 

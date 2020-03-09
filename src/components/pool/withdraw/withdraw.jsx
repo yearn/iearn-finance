@@ -20,7 +20,9 @@ import {
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED,
   WITHDRAW_POOL,
-  WITHDRAW_POOL_RETURNED
+  WITHDRAW_POOL_RETURNED,
+  GET_WITHDRAW_PRICE,
+  WITHDRAW_PRICE_RETURNED
 } from '../../../constants'
 
 import { withNamespaces } from 'react-i18next';
@@ -206,6 +208,8 @@ class Withdraw extends Component {
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(WITHDRAW_POOL_RETURNED, this.withdrawPoolReturned);
+    emitter.on(WITHDRAW_PRICE_RETURNED, this.withdrawPriceReturned);
+
   }
 
   componentWillUnmount() {
@@ -214,6 +218,11 @@ class Withdraw extends Component {
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(WITHDRAW_POOL_RETURNED, this.withdrawPoolReturned);
+    emitter.removeListener(WITHDRAW_PRICE_RETURNED, this.withdrawPriceReturned);
+  };
+
+  withdrawPriceReturned = (prices) => {
+    this.setState({ daiAmount: prices[0].toFixed(4), usdcAmount: prices[1].toFixed(4), usdtAmount: prices[2].toFixed(4), tusdAmount: prices[3].toFixed(4), susdAmount: prices[4].toFixed(4) })
   };
 
   withdrawPoolReturned  = (txHash) => {
@@ -228,33 +237,7 @@ class Withdraw extends Component {
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('poolAssets') })
 
-    this.setDefaultValues(store.getStore('poolAssets'))
   };
-
-  setDefaultValues = (assets) => {
-    let that = this
-
-    assets.map((asset) => {
-      switch (asset.id) {
-        case 'DAI':
-          that.setState({ daiAmount: asset.investedBalance.toFixed(4) })
-          break;
-        case 'USDC':
-          that.setState({ usdcAmount: asset.investedBalance.toFixed(4) })
-          break;
-        case 'USDT':
-          that.setState({ usdtAmount: asset.investedBalance.toFixed(4) })
-          break;
-        case 'TUSD':
-          that.setState({ tusdAmount: asset.investedBalance.toFixed(4) })
-          break;
-        case 'SUSD':
-          that.setState({ susdAmount: asset.investedBalance.toFixed(4) })
-          break;
-        default:
-      }
-    })
-  }
 
   refresh() {
     dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
@@ -409,6 +392,8 @@ class Withdraw extends Component {
     let val = []
     val[event.target.name] = event.target.value
     this.setState(val)
+
+    dispatcher.dispatch({ type: GET_WITHDRAW_PRICE, content: { sendAmount: event.target.value === '' ? '0' : event.target.value }})
   };
 
   renderAmountInput = (id, value, error, label, placeholder, inputAdornment, disabled) => {
