@@ -53,6 +53,16 @@ import {
   CALCULATE_MAX_TOKENS_RETURNED,
   GET_BEST_PRICE,
   GET_BEST_PRICE_RETURNED,
+  GET_POOL_BALANCES,
+  POOL_BALANCES_RETURNED,
+  DEPOSIT_POOL,
+  DEPOSIT_POOL_RETURNED,
+  WITHDRAW_POOL,
+  WITHDRAW_POOL_RETURNED,
+  EXCHANGE_POOL,
+  EXCHANGE_POOL_RETURNED,
+  GET_EXCHANGE_PRICE,
+  EXCHANGE_PRICE_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 
@@ -803,7 +813,79 @@ class Store {
           tokenPrice: 0
         }
       ],
-      ethBalance: 0
+      ethBalance: 0,
+      poolAssets: [
+        {
+          id: 'DAI',
+          name: 'DAI',
+          symbol: 'DAI',
+          description: 'DAI Stablecoin',
+          investSymbol: 'yDAI',
+          erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          iEarnContract: '0xC2cB1040220768554cf699b0d863A3cd4324ce32',
+          balance: 0,
+          investedBalance: 0,
+          decimals: 18,
+          abi: config.IEarnErc20ABIv2,
+          index: 0,
+        },
+        {
+          id: 'USDC',
+          name: 'USD Coin',
+          symbol: 'USDC',
+          description: 'USD//C',
+          investSymbol: 'yUSDC',
+          erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          iEarnContract: '0x26EA744E5B887E5205727f55dFBE8685e3b21951',
+          balance: 0,
+          investedBalance: 0,
+          decimals: 6,
+          abi: config.IEarnErc20ABIv2,
+          index: 1,
+        },
+        {
+          id: 'USDT',
+          name: 'USDT',
+          symbol: 'USDT',
+          description: 'Tether USD',
+          investSymbol: 'yUSDT',
+          erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+          iEarnContract: '0xE6354ed5bC4b393a5Aad09f21c46E101e692d447',
+          balance: 0,
+          investedBalance: 0,
+          decimals: 6,
+          abi: config.IEarnErc20ABIv2,
+          index: 2,
+        },
+        {
+          id: 'TUSD',
+          name: 'TUSD',
+          symbol: 'TUSD',
+          description: 'TrueUSD',
+          investSymbol: 'yTUSD',
+          erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
+          iEarnContract: '0x73a052500105205d34Daf004eAb301916DA8190f',
+          balance: 0,
+          investedBalance: 0,
+          decimals: 18,
+          abi: config.IEarnErc20ABIv2,
+          index: 3,
+        },
+        {
+          id: 'SUSD',
+          name: 'SUSD',
+          symbol: 'SUSD',
+          description: 'Synth sUSD',
+          investSymbol: 'ySUSD',
+          erc20address: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
+          iEarnContract: '0xF61718057901F84C4eEC4339EF8f0D86D2B45600',
+          balance: 0,
+          investedBalance: 0,
+          decimals: 18,
+          abi: config.IEarnErc20ABIv2,
+          index: 4,
+        },
+      ]
     }
 
     dispatcher.register(
@@ -889,6 +971,22 @@ class Store {
             break;
           case GET_BEST_PRICE:
             this.getBestPrice(payload)
+            break;
+          case GET_POOL_BALANCES:
+            this.getPoolBalances(payload);
+            break;
+          case DEPOSIT_POOL:
+            this.depositPOol(payload)
+            break;
+          case WITHDRAW_POOL:
+            this.withdrawPOol(payload)
+            break;
+          case EXCHANGE_POOL:
+            this.exchangePool(payload)
+            break;
+          case GET_EXCHANGE_PRICE:
+            this.getExchangePrice(payload)
+            break;
           default: {
           }
         }
@@ -2427,6 +2525,285 @@ class Store {
     store.setStore({ ethBalance: parseFloat(ethBalance) })
 
     return emitter.emit(GET_ETH_BALANCE_RETURNED, parseFloat(ethBalance))
+  }
+
+  getPoolBalances = async () => {
+    const account = store.getStore('account')
+    const assets = store.getStore('poolAssets')
+
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    async.map(assets, (asset, callback) => {
+      async.parallel([
+        (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getInvestedBalance(web3, asset, account, callbackInner) },
+      ], (err, data) => {
+        asset.balance = data[0]
+        asset.investedBalance = data[1]
+
+        callback(null, asset)
+      })
+    }, (err, assets) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+
+      store.setStore({ poolAssets: assets })
+      return emitter.emit(POOL_BALANCES_RETURNED, assets)
+    })
+  }
+
+  depositPool = (payload) => {
+    const account = store.getStore('account')
+    const { asset, daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = payload.content
+
+    //check approval on all balances > 0
+    const amounts = [daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount]
+    async.map(amounts, (amount, callbackInner) => {
+      this._checkApproval(asset, account, amount, config.exchangeContractAddress, callbackInner)
+    }, (err, data) => {
+      this._callDepositPool(asset, account, payload.content, (err, res) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(DEPOSIT_POOL_RETURNED, res)
+      })
+    })
+  }
+
+  _callDepositPool = async (asset, account, content, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+    const poolAssets = store.getStore('poolAssets')
+
+    const exchangeContractABI = new web3.eth.Contract(config.exchangeContractABI, config.exchangeContractAddress)
+
+    const amounts = poolAssets.map((asset) => {
+      switch (asset.id) {
+        case 'DAI':
+          return content.daiAmount * 10**asset.decimals
+          break;
+        case 'USDC':
+          return content.usdcAmount * 10**asset.decimals
+          break;
+        case 'USDT':
+          return content.usdtAmount * 10**asset.decimals
+          break;
+        case 'TUSD':
+          return content.tusdAmount * 10**asset.decimals
+          break;
+        case 'SUSD':
+          return content.susdAmount * 10**asset.decimals
+          break;
+        default:
+
+      }
+    })
+
+    const minMintAmount = await exchangeContractABI.methods.calc_deposit_amount(amounts).call({ from: account.address })
+
+    exchangeContractABI.methods.add_liquidity_underlying(amounts, minMintAmount).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  withdrawPool = (payload) => {
+    const account = store.getStore('account')
+    const { asset } = payload.content
+
+    this._callWithdrawPool(asset, account, payload.content, (err, res) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(DEPOSIT_POOL_RETURNED, res)
+    })
+  }
+
+  _callWithdrawPool = async (asset, account, content, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+    const poolAssets = store.getStore('poolAssets')
+
+    const exchangeContractABI = new web3.eth.Contract(config.exchangeContractABI, config.exchangeContractAddress)
+
+    let amount = web3.utils.toWei(content.amount, "ether")
+    let withdrawAmounts = await exchangeContractABI.methods.calc_withdraw_amount(amount).call({ from: account.address })
+
+    exchangeContractABI.methods.remove_liquidity_underlying(amount, withdrawAmounts).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  getExchangePrice = async (payload) => {
+    const account = store.getStore('account')
+    const { sendAsset, receiveAsset, sendAmount } = payload.content
+    const poolAssets = store.getStore('poolAssets')
+
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+    const exchangeContract = new web3.eth.Contract(config.exchangeContractABI, config.exchangeContractAddress)
+
+    const assetToSend = poolAssets.filter((asset) => { return asset.id === sendAsset})[0]
+    const assetToReceive = poolAssets.filter((asset) => { return asset.id === receiveAsset})[0]
+
+    const sendIndex = assetToSend.index
+    const receiveIndex = assetToReceive.index
+
+    let amount = 0
+    if(assetToSend.decimals === 18) {
+      amount = web3.utils.toWei(sendAmount, "ether")
+    } else {
+      amount = sendAmount*10**assetToSend.decimals
+    }
+    let price = await exchangeContract.methods.get_dy_underlying(sendIndex, receiveIndex, amount).call({ from: account.address })
+
+    if(assetToReceive.decimals === 18) {
+      price = web3.utils.fromWei(price, "ether")
+    } else {
+      price = price/(10**assetToReceive.decimals)
+    }
+
+    return emitter.emit(EXCHANGE_PRICE_RETURNED, price)
+  }
+
+  exchangePool = (payload) => {
+    const account = store.getStore('account')
+    const { sendAsset, receiveAsset, sendAmount } = payload.content
+    const poolAssets = store.getStore('poolAssets')
+
+    const asset = poolAssets.filter((asset) => { return asset.id === sendAsset})[0]
+
+    this._checkApproval(asset, account, sendAmount, config.exchangeContractAddress, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callExchangePool(sendAsset, receiveAsset, sendAmount, account, (err, res) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(DEPOSIT_POOL_RETURNED, res)
+      })
+    })
+  }
+
+  _callExchangePool = async (sendAsset, receiveAsset, sendAmount, account, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+    const poolAssets = store.getStore('poolAssets')
+
+    console.log(config.exchangeContractABI)
+    console.log(config.exchangeContractAddress)
+
+    const exchangeContract = new web3.eth.Contract(config.exchangeContractABI, config.exchangeContractAddress)
+
+    const assetToSend = poolAssets.filter((asset) => { return asset.id === sendAsset})[0]
+    const assetToReceive = poolAssets.filter((asset) => { return asset.id === receiveAsset})[0]
+
+    const sendIndex = assetToSend.index
+    const receiveIndex = assetToReceive.index
+
+    let amount = 0
+    if(assetToSend.decimals === 18) {
+      amount = web3.utils.toWei(sendAmount, "ether")
+    } else {
+      amount = sendAmount*10**assetToSend.decimals
+    }
+
+    console.log(exchangeContract.methods.get_dy_underlying)
+    console.log(sendIndex)
+    console.log(receiveIndex)
+    console.log(amount)
+
+
+    const price = await exchangeContract.methods.get_dy_underlying(sendIndex, receiveIndex, amount).call({ from: account.address })
+
+    // let sendPrice = 0
+    // if(assetToReceive.decimals === 18) {
+    //   sendPrice = web3.utils.toWei(price, "ether")
+    // } else {
+    //   sendPrice = price*10**assetToReceive.decimals
+    // }
+
+    console.log((price*0.99).toFixed(0))
+    // console.log(sendPrice)
+    console.log(exchangeContract.methods.exchange_underlying)
+
+    exchangeContract.methods.exchange_underlying(sendIndex, receiveIndex, sendAmount, (price*0.99).toFixed(0)).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+        callback(error)
+      })
   }
 }
 

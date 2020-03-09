@@ -19,6 +19,10 @@ import IDai from './components/idai';
 import Insure from './components/insure';
 import Footer from './components/footer';
 import Home from './components/home';
+import Pool from './components/pool';
+// import PoolDeposit from './components/pool/deposit';
+// import PoolWithdraw from './components/pool/withdraw';
+// import PoolExchange from './components/pool/exchange';
 
 class App extends Component {
 
@@ -57,6 +61,9 @@ class App extends Component {
               </Route>
               <Route path="/cover">
                 <Insure />
+              </Route>
+              <Route path="/pool">
+                <Pool />
               </Route>
               <Route path="/">
                 <Home />
