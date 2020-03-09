@@ -190,8 +190,6 @@ class Asset extends Component {
             error={ amountError }
             onChange={ this.onChange }
             disabled={ loading || asset.disabled }
-            label=""
-            size="small"
             placeholder="0.00"
             variant="outlined"
             onKeyDown={ this.inputKeyDown }
@@ -255,7 +253,6 @@ class Asset extends Component {
             error={ redeemAmountError }
             onChange={ this.onChange }
             disabled={ loading }
-            label=""
             placeholder="0.00"
             variant="outlined"
             onKeyDown={ this.inputRedeemKeyDown }

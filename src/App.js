@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import {
-  BrowserRouter as Router,
   Switch,
   Route
 } from "react-router-dom";
+import IpfsRouter from 'ipfs-react-router'
 
 import './i18n';
 import interestTheme from './theme';
@@ -19,6 +19,10 @@ import IDai from './components/idai';
 import Insure from './components/insure';
 import Footer from './components/footer';
 import Home from './components/home';
+import Pool from './components/pool';
+// import PoolDeposit from './components/pool/deposit';
+// import PoolWithdraw from './components/pool/withdraw';
+// import PoolExchange from './components/pool/exchange';
 
 class App extends Component {
 
@@ -27,7 +31,7 @@ class App extends Component {
     return (
       <MuiThemeProvider theme={ createMuiTheme(interestTheme) }>
         <CssBaseline />
-        <Router>
+        <IpfsRouter>
           <div style={{
             display: 'flex',
             flexDirection: 'column',
@@ -58,12 +62,15 @@ class App extends Component {
               <Route path="/cover">
                 <Insure />
               </Route>
+              <Route path="/pool">
+                <Pool />
+              </Route>
               <Route path="/">
                 <Home />
               </Route>
             </Switch>
           </div>
-        </Router>
+        </IpfsRouter>
       </MuiThemeProvider>
     );
   }

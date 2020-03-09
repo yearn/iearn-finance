@@ -67,8 +67,29 @@
   "Home.Zap": "Zap",
   "Home.Apr": "APR",
   "Home.Cover": "Cover",
+  "Home.Pool": "Pool",
 
   "Zap.IWillReceive": "I will receive",
   "Zap.IHave": "I have",
-  "Zap.SendAmount": "Send amount"
+  "Zap.SendAmount": "Send amount",
+
+  "PoolDeposit.Intro": "Deposit. Simple.",
+  "PoolDeposit.Connect": "Connect wallet",
+  "PoolDeposit.Deposit": "Deposit",
+  "PoolDeposit.IWillReceive": "I will receive",
+
+  "PoolWithdraw.Intro": "Withdraw. Simple.",
+  "PoolWithdraw.Connect": "Connect wallet",
+  "PoolWithdraw.Withdraw": "Withdraw",
+  "PoolWithdraw.IWillReceive": "I will receive",
+
+  "PoolExchange.Intro": "Exchange. Simple.",
+  "PoolExchange.Connect": "Connect wallet",
+  "PoolExchange.Exchange": "Exchange",
+  "PoolExchange.From": "From",
+  "PoolExchange.To": "To",
+
+  "Pool.Intro": "Pooling. Simple.",
+  "Pool.Connect": "Connect wallet"
+
 }

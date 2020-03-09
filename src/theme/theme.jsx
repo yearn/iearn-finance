@@ -14,6 +14,7 @@ export const colors = {
   orange: 'orange',
   pink: '#DC6BE5',
   compoundGreen: '#00d395',
+  tomato: '#e56b73'
 };
 
 const breakpoints = createBreakpoints({
@@ -231,6 +232,11 @@ const iswapTheme =  {
       },
       groupedSizeSmall: {
         padding: '0px 15px 0px 15px'
+      }
+    },
+    MuiFormControlLabel: {
+      label: {
+        color: colors.darkBlack
       }
     }
   },
