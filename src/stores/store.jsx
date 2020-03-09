@@ -976,10 +976,10 @@ class Store {
             this.getPoolBalances(payload);
             break;
           case DEPOSIT_POOL:
-            this.depositPOol(payload)
+            this.depositPool(payload)
             break;
           case WITHDRAW_POOL:
-            this.withdrawPOol(payload)
+            this.withdrawPool(payload)
             break;
           case EXCHANGE_POOL:
             this.exchangePool(payload)
@@ -2601,7 +2601,7 @@ class Store {
     })
 
     const minMintAmount = await exchangeContractABI.methods.calc_deposit_amount(amounts).call({ from: account.address })
-
+    console.log(minMintAmount);
     exchangeContractABI.methods.add_liquidity_underlying(amounts, minMintAmount).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
@@ -2764,19 +2764,9 @@ class Store {
 
 
     const price = await exchangeContract.methods.get_dy_underlying(sendIndex, receiveIndex, amount).call({ from: account.address })
+    console.log(price)
 
-    // let sendPrice = 0
-    // if(assetToReceive.decimals === 18) {
-    //   sendPrice = web3.utils.toWei(price, "ether")
-    // } else {
-    //   sendPrice = price*10**assetToReceive.decimals
-    // }
-
-    console.log((price*0.99).toFixed(0))
-    // console.log(sendPrice)
-    console.log(exchangeContract.methods.exchange_underlying)
-
-    exchangeContract.methods.exchange_underlying(sendIndex, receiveIndex, sendAmount, (price*0.99).toFixed(0)).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+    exchangeContract.methods.exchange_underlying(sendIndex, receiveIndex, amount, price).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
