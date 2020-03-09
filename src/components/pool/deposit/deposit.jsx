@@ -383,19 +383,19 @@ class Deposit extends Component {
 
     let { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = this.state
     if(event.target.name === 'daiAmount') {
-      daiAmount = event.target.value
+      daiAmount = event.target.value === '' ? '0' : event.target.value
     }
     if(event.target.name === 'usdcAmount') {
-      usdcAmount = event.target.value
+      usdcAmount = event.target.value === '' ? '0' : event.target.value
     }
     if(event.target.name === 'usdtAmount') {
-      usdtAmount = event.target.value
+      usdtAmount = event.target.value === '' ? '0' : event.target.value
     }
     if(event.target.name === 'tusdAmount') {
-      tusdAmount = event.target.value
+      tusdAmount = event.target.value === '' ? '0' : event.target.value
     }
     if(event.target.name === 'susdAmount') {
-      susdAmount = event.target.value
+      susdAmount = event.target.value === '' ? '0' : event.target.value
     }
 
     dispatcher.dispatch({ type: GET_DEPOSIT_PRICE, content: { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount }})
