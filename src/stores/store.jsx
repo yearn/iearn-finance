@@ -2572,9 +2572,28 @@ class Store {
     const { asset, daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = payload.content
 
     //check approval on all balances > 0
-    const amounts = [daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount]
-    async.map(amounts, (amount, callbackInner) => {
-      this._checkApproval(poolAssets[0], account, amount, config.exchangeContractAddress, callbackInner)
+    async.map(poolAssets, (asset, callbackInner) => {
+      let amount = 0
+      switch (asset.id) {
+        case 'DAI':
+          amount = daiAmount
+          break;
+        case 'USDC':
+          amount = usdcAmount
+          break;
+        case 'USDT':
+          amount = usdtAmount
+          break;
+        case 'TUSD':
+          amount = tusdAmount
+          break;
+        case 'SUSD':
+          amount = susdAmount
+          break;
+        default:
+
+      }
+      this._checkApproval(asset, account, amount, config.exchangeContractAddress, callbackInner)
     }, (err, data) => {
       this._callDepositPool(account, payload.content, (err, res) => {
         if(err) {
@@ -2886,6 +2905,22 @@ class Store {
     minMintAmount = web3.utils.fromWei(minMintAmount, "ether")
     console.log(minMintAmount)
     return emitter.emit(DEPOSIT_PRICE_RETURNED, minMintAmount)
+  }
+
+  getSPoolBalance = (payload) => {
+    const account = store.getStore('account')
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const asset = {}
+
+    this._getERC20Balance(web3, curv, account, (err, balance) => {
+      if(err) {
+        return callback(err)
+      }
+      curv.balance = balance
+
+      callback(null, curv)
+    })
   }
 }
 
