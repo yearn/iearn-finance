@@ -2668,7 +2668,7 @@ class Store {
     const account = store.getStore('account')
     const asset = {
       id: 'sUSD',
-      erc20address: '0x57ab1ec28d129707052df4df418d58a2d46d5f51'
+      erc20address: '0x2b645a6a426f22fb7954dc15e583e3737b8d1434'
     }
 
     this._checkApproval(asset, account, payload.content.amount, config.exchangeContractAddress, (err) => {
