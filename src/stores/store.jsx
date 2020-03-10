@@ -2628,8 +2628,27 @@ class Store {
     const poolAssets = store.getStore('poolAssets')
     const { asset, daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = payload.content
 
-    //check approval on all balances > 0
-    async.mapLimit(poolAssets, 1, (asset, callbackInner) => {
+    const needToCall = poolAssets.filter((asset) => {
+      switch (asset.id) {
+        case 'DAI':
+          return daiAmount > 0
+        case 'USDC':
+          return usdcAmount > 0
+        case 'USDT':
+          return usdtAmount > 0
+        case 'TUSD':
+          return tusdAmount > 0
+        case 'SUSD':
+          return susdAmount > 0
+        default:
+
+      }
+    })
+
+    console.log('Sending balances for:')
+    console.log(needToCall)
+
+    async.map(needToCall, (asset, callback) => {
       let amount = 0
       switch (asset.id) {
         case 'DAI':
@@ -2650,16 +2669,135 @@ class Store {
         default:
 
       }
-      this._checkApprovalWaitForConfirmation(asset, account, amount, config.exchangeContractAddress, callbackInner)
-    }, (err, data) => {
-      this._callDepositPool(account, payload.content, (err, res) => {
-        if(err) {
-          return emitter.emit(ERROR, err);
-        }
 
-        return emitter.emit(DEPOSIT_POOL_RETURNED, res)
+      this._checkIfApprovalIsNeeded(asset, account, amount, config.exchangeContractAddress, callback)
+    }, (err, data) => {
+      console.log('Approval checks returned for:')
+      console.log(data)
+
+      let approvalSubmit = data.filter((asset) => {
+        return asset !== false
+      })
+
+      let lastId = 0
+      if(approvalSubmit.length > 0) {
+        lastId = approvalSubmit[approvalSubmit.length-1].id
+      }
+
+      async.mapLimit(approvalSubmit, 1, (asset, callback) => {
+        let last = false
+        if(asset.id === lastId) {
+          last = true
+        }
+        this._callApproval(asset, account, asset.amount, config.exchangeContractAddress, last, callback)
+      }, (err, result) => {
+        console.log('Depositing into pool:')
+        this._callDepositPool(account, payload.content, (err, res) => {
+          if(err) {
+            return emitter.emit(ERROR, err);
+          }
+
+          return emitter.emit(DEPOSIT_POOL_RETURNED, res)
+        })
       })
     })
+
+    // //check approval on all balances > 0
+    // async.mapLimit(needToCall, 1, (asset, callbackInner) => {
+    //   let amount = 0
+    //   switch (asset.id) {
+    //     case 'DAI':
+    //       amount = daiAmount
+    //       break;
+    //     case 'USDC':
+    //       amount = usdcAmount
+    //       break;
+    //     case 'USDT':
+    //       amount = usdtAmount
+    //       break;
+    //     case 'TUSD':
+    //       amount = tusdAmount
+    //       break;
+    //     case 'SUSD':
+    //       amount = susdAmount
+    //       break;
+    //     default:
+    //
+    //   }
+    //   this._checkApprovalWaitForConfirmation(asset, account, amount, config.exchangeContractAddress, callbackInner)
+    // }, (err, data) => {
+    //   this._callDepositPool(account, payload.content, (err, res) => {
+    //     if(err) {
+    //       return emitter.emit(ERROR, err);
+    //     }
+    //
+    //     return emitter.emit(DEPOSIT_POOL_RETURNED, res)
+    //   })
+    // })
+  }
+
+  _checkIfApprovalIsNeeded = async (asset, account, amount, contract, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+    let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
+    const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
+
+    const ethAllowance = web3.utils.fromWei(allowance, "ether")
+    console.log(ethAllowance)
+    console.log(amount)
+    if(parseFloat(ethAllowance) < parseFloat(amount)) {
+      asset.amount = amount
+      callback(null, asset)
+    } else {
+      callback(null, false)
+    }
+  }
+
+  _callApproval = async (asset, account, amount, contract, last, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+    let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
+    try {
+      if(['crvV1', 'crvV2', 'crvV3', 'crvV4', 'USDTv1', 'USDTv2', 'USDTv3', 'USDT'].includes(asset.id)) {
+        const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
+        const ethAllowance = web3.utils.fromWei(allowance, "ether")
+        if(ethAllowance > 0) {
+          erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+            .on('transactionHash', function(hash){
+              //success...
+            })
+            .on('error', function(error) {
+              if (!error.toString().includes("-32601")) {
+                if(error.message) {
+                  return callback(error.message)
+                }
+                callback(error)
+              }
+            })
+        }
+      }
+
+      if(last) {
+        await erc20Contract.methods.approve(contract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+        callback()
+      } else {
+        erc20Contract.methods.approve(contract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+          .on('transactionHash', function(hash){
+            callback()
+          })
+          .on('error', function(error) {
+            if (!error.toString().includes("-32601")) {
+              if(error.message) {
+                return callback(error.message)
+              }
+              callback(error)
+            }
+          })
+      }
+    } catch(error) {
+      if(error.message) {
+        return callback(error.message)
+      }
+      callback(error)
+    }
   }
 
   _callDepositPool = async (account, content, callback) => {
