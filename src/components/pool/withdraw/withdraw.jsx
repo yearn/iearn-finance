@@ -22,7 +22,9 @@ import {
   WITHDRAW_POOL,
   WITHDRAW_POOL_RETURNED,
   GET_WITHDRAW_PRICE,
-  WITHDRAW_PRICE_RETURNED
+  WITHDRAW_PRICE_RETURNED,
+  GET_SPOOL_BALANCE,
+  SPOOL_BALANCE_RETURNED
 } from '../../../constants'
 
 import { withNamespaces } from 'react-i18next';
@@ -183,6 +185,9 @@ const styles = theme => ({
     width: '100%',
     padding: '12px 0px 12px 20px'
   },
+  placceholder: {
+    marginBottom: '12px'
+  }
 });
 
 class Withdraw extends Component {
@@ -194,11 +199,13 @@ class Withdraw extends Component {
 
     this.state = {
       account: account,
-      assets: store.getStore('poolAssets')
+      assets: store.getStore('poolAssets'),
+      sCrvBalance: 0
     }
 
     if(account && account.address) {
       dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
+      dispatcher.dispatch({ type: GET_SPOOL_BALANCE, content: {} })
     }
   }
 
@@ -209,7 +216,7 @@ class Withdraw extends Component {
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(WITHDRAW_POOL_RETURNED, this.withdrawPoolReturned);
     emitter.on(WITHDRAW_PRICE_RETURNED, this.withdrawPriceReturned);
-
+    emitter.on(SPOOL_BALANCE_RETURNED, this.spoolBalanceReturned);
   }
 
   componentWillUnmount() {
@@ -219,6 +226,7 @@ class Withdraw extends Component {
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(WITHDRAW_POOL_RETURNED, this.withdrawPoolReturned);
     emitter.removeListener(WITHDRAW_PRICE_RETURNED, this.withdrawPriceReturned);
+    emitter.removeListener(SPOOL_BALANCE_RETURNED, this.spoolBalanceReturned);
   };
 
   withdrawPriceReturned = (prices) => {
@@ -234,13 +242,17 @@ class Withdraw extends Component {
     })
   };
 
+  spoolBalanceReturned = (balances) => {
+    this.setState({ sCrvBalance: store.getStore('sCrvBalance') })
+  };
+
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('poolAssets') })
-
   };
 
   refresh() {
     dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_SPOOL_BALANCE, content: {} })
   }
 
   connectionConnected = () => {
@@ -249,6 +261,7 @@ class Withdraw extends Component {
     this.setState({ account: store.getStore('account') })
 
     dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_SPOOL_BALANCE, content: {} })
 
     const that = this
     setTimeout(() => {
@@ -284,7 +297,8 @@ class Withdraw extends Component {
       usdtAmount,
       tusdAmount,
       susdAmount,
-      amount
+      amount,
+      sCrvBalance
     } = this.state
 
     var address = null;
@@ -325,13 +339,13 @@ class Withdraw extends Component {
             </div>
             <Card className={ classes.inputContainer }>
               <Typography variant='h3' className={ classes.inputCardHeading }>{ t("PoolWithdraw.Withdraw") }</Typography>
-              { this.renderAmountInput('amount', amount, false, 'CRV', '0.00', 'CRV', false) }
+              { this.renderAmountInput('amount', amount, false, 'CRV', '0.00', 'CRV', false, false, sCrvBalance) }
               <Typography variant='h3' className={ classes.inputCardHeading }>{ t("PoolWithdraw.IWillReceive") }</Typography>
-              { this.renderAmountInput('daiAmount', daiAmount, false, 'DAI', '0.00', 'DAI', true) }
-              { this.renderAmountInput('usdcAmount', usdcAmount, false, 'USDC', '0.00', 'USDC', true) }
-              { this.renderAmountInput('usdtAmount', usdtAmount, false, 'USDT', '0.00', 'USDT', true) }
-              { this.renderAmountInput('tusdAmount', tusdAmount, false, 'TUSD', '0.00', 'TUSD', true) }
-              { this.renderAmountInput('susdAmount', susdAmount, false, 'SUSD', '0.00', 'SUSD', true) }
+              { this.renderAmountInput('daiAmount', daiAmount, false, 'DAI', '0.00', 'DAI', true, true) }
+              { this.renderAmountInput('usdcAmount', usdcAmount, false, 'USDC', '0.00', 'USDC', true, true) }
+              { this.renderAmountInput('usdtAmount', usdtAmount, false, 'USDT', '0.00', 'USDT', true, true) }
+              { this.renderAmountInput('tusdAmount', tusdAmount, false, 'TUSD', '0.00', 'TUSD', true, true) }
+              { this.renderAmountInput('susdAmount', susdAmount, false, 'SUSD', '0.00', 'SUSD', true, true) }
               <Button
                 className={ classes.actionButton }
                 variant="outlined"
@@ -396,7 +410,7 @@ class Withdraw extends Component {
     dispatcher.dispatch({ type: GET_WITHDRAW_PRICE, content: { sendAmount: event.target.value === '' ? '0' : event.target.value }})
   };
 
-  renderAmountInput = (id, value, error, label, placeholder, inputAdornment, disabled) => {
+  renderAmountInput = (id, value, error, label, placeholder, inputAdornment, disabled, hideBalance, sCrvBalance) => {
     const { classes, loading } = this.props
     const { assets } =  this.state
 
@@ -404,6 +418,11 @@ class Withdraw extends Component {
 
     return (
       <div className={ classes.valContainer }>
+        <div className={ classes.balances }>
+          <Typography variant='h3' className={ classes.title }></Typography>
+          <Typography variant='h4' onClick={ () => { if(hideBalance) { return; } this.setAmount(id, (sCrvBalance ? sCrvBalance : 0)) } } className={ classes.value } noWrap>{ !hideBalance ? ('Balance: '+ ( sCrvBalance ? sCrvBalance.toFixed(4) : '0.0000')) : '' } { !hideBalance ? (sendAsset ? sendAsset.symbol : '') : '' }</Typography>
+          { hideBalance && <div className={ classes.placceholder }></div> }
+        </div>
         <div>
           <TextField
             fullWidth

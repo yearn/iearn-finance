@@ -181,6 +181,9 @@ const styles = theme => ({
     width: '100%',
     padding: '12px 0px 12px 20px'
   },
+  placceholder: {
+    marginBottom: '12px'
+  }
 });
 
 class Deposit extends Component {
@@ -348,7 +351,7 @@ class Deposit extends Component {
             { this.renderAmountInput('tusdAmount', tusdAmount, false, 'TUSD', '0.00', 'TUSD') }
             { this.renderAmountInput('susdAmount', susdAmount, false, 'SUSD', '0.00', 'SUSD') }
             <Typography variant='h3' className={ classes.inputCardHeading }>{ t("PoolDeposit.IWillReceive") }</Typography>
-            { this.renderAmountInput('amount', amount, false, 'CRV', '0.00', 'CRV', true) }
+            { this.renderAmountInput('amount', amount, false, 'CRV', '0.00', 'CRV', true, true) }
             <Button
               className={ classes.actionButton }
               variant="outlined"
@@ -414,7 +417,7 @@ class Deposit extends Component {
     dispatcher.dispatch({ type: GET_DEPOSIT_PRICE, content: { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount }})
   };
 
-  renderAmountInput = (id, value, error, label, placeholder, inputAdornment, disabled) => {
+  renderAmountInput = (id, value, error, label, placeholder, inputAdornment, disabled, hideBalance) => {
     const { classes, loading } = this.props
     const { assets } =  this.state
 
@@ -424,7 +427,8 @@ class Deposit extends Component {
       <div className={ classes.valContainer }>
         <div className={ classes.balances }>
           <Typography variant='h3' className={ classes.title }></Typography>
-          <Typography variant='h4' onClick={ () => { this.setAmount(id, (sendAsset ? sendAsset.balance : 0)) } } className={ classes.value } noWrap>{ 'Balance: '+ ( sendAsset && sendAsset.balance ? sendAsset.balance.toFixed(4) : '0.0000') } { sendAsset ? sendAsset.symbol : '' }</Typography>
+          <Typography variant='h4' onClick={ () => { if(hideBalance) { return; } this.setAmount(id, (sendAsset ? sendAsset.balance : 0)) } } className={ classes.value } noWrap>{ !hideBalance ? ('Balance: '+ ( sendAsset && sendAsset.balance ? sendAsset.balance.toFixed(4) : '0.0000')) : '' } { !hideBalance ? (sendAsset ? sendAsset.symbol : '') : '' }</Typography>
+          { hideBalance && <div className={ classes.placceholder }></div> }
         </div>
         <div>
           <TextField
