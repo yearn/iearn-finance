@@ -21,7 +21,9 @@ import {
   DEPOSIT_POOL,
   DEPOSIT_POOL_RETURNED,
   GET_DEPOSIT_PRICE,
-  DEPOSIT_PRICE_RETURNED
+  DEPOSIT_PRICE_RETURNED,
+  GET_SPOOL_RATIO,
+  GET_SPOOL_RATIO_RETURNED
 } from '../../../constants'
 
 import { withNamespaces } from 'react-i18next';
@@ -183,6 +185,9 @@ const styles = theme => ({
   },
   placceholder: {
     marginBottom: '12px'
+  },
+  ratios: {
+    marginBottom: '12px'
   }
 });
 
@@ -196,11 +201,13 @@ class Deposit extends Component {
     this.state = {
       account: account,
       assets: store.getStore('poolAssets'),
-      amount: ''
+      amount: '',
+      ratio: { ratioCurve: '50', ratioIearn: '50' }
     }
 
     if(account && account.address) {
       dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
+      dispatcher.dispatch({ type: GET_SPOOL_RATIO, content: {} })
     }
   }
 
@@ -211,6 +218,7 @@ class Deposit extends Component {
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(DEPOSIT_POOL_RETURNED, this.depositPoolReturned);
     emitter.on(DEPOSIT_PRICE_RETURNED, this.depositPriceReturned);
+    emitter.on(GET_SPOOL_RATIO_RETURNED, this.ratioReturned);
   }
 
   componentWillUnmount() {
@@ -220,6 +228,7 @@ class Deposit extends Component {
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(DEPOSIT_POOL_RETURNED, this.depositPoolReturned);
     emitter.removeListener(DEPOSIT_PRICE_RETURNED, this.depositPriceReturned);
+    emitter.removeListener(GET_SPOOL_RATIO_RETURNED, this.ratioReturned);
   };
 
   depositPriceReturned = (price) => {
@@ -239,6 +248,10 @@ class Deposit extends Component {
     const poolAssets = store.getStore('poolAssets')
     this.setState({ assets: poolAssets })
     this.setDefaultValues(poolAssets)
+  };
+
+  ratioReturned = (ratio) => {
+    this.setState({ ratio: ratio })
   };
 
   setDefaultValues = (assets) => {
@@ -323,7 +336,8 @@ class Deposit extends Component {
       usdtAmount,
       tusdAmount,
       susdAmount,
-      amount
+      amount,
+      ratio
     } = this.state
 
     var address = null;
@@ -331,6 +345,11 @@ class Deposit extends Component {
       address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
     }
 
+    const curveSum = parseFloat(daiAmount != '' ? daiAmount : 0) + parseFloat(usdcAmount != '' ? usdcAmount : 0) + parseFloat(usdtAmount != '' ? usdtAmount : 0) + parseFloat(tusdAmount != '' ? tusdAmount : 0)
+    const susdSum = parseFloat(susdAmount != '' ? susdAmount : 0)
+
+    const ratioCurve = (curveSum * 100 / (curveSum + susdSum)).toFixed(0)
+    const ratioIearn = (susdSum * 100 / (curveSum + susdSum)).toFixed(0)
 
     return (
       <div className={ classes.root }>
@@ -352,6 +371,10 @@ class Deposit extends Component {
             { this.renderAmountInput('susdAmount', susdAmount, false, 'SUSD', '0.00', 'SUSD') }
             <Typography variant='h3' className={ classes.inputCardHeading }>{ t("PoolDeposit.IWillReceive") }</Typography>
             { this.renderAmountInput('amount', amount, false, 'CRV', '0.00', 'CRV', true, true) }
+            <div className={ classes.ratios }>
+              <Typography> { 'Optimal ratio: ' + ratio.ratioCurve + ' CRV / ' + ratio.ratioIearn + ' sUSD' }</Typography>
+              <Typography> { 'Your ratio: ' + ratioCurve + ' CRV / ' + ratioIearn + ' sUSD' }</Typography>
+            </div>
             <Button
               className={ classes.actionButton }
               variant="outlined"
@@ -393,6 +416,11 @@ class Deposit extends Component {
   };
 
   onChange = (event) => {
+
+    if(event.target.value !== '' && (!event.target.value || isNaN(event.target.value) || event.target.value < 0)) {
+      return false
+    }
+
     let val = []
     val[event.target.name] = event.target.value
     this.setState(val)

@@ -68,7 +68,9 @@ import {
   GET_WITHDRAW_PRICE,
   WITHDRAW_PRICE_RETURNED,
   GET_SPOOL_BALANCE,
-  SPOOL_BALANCE_RETURNED
+  SPOOL_BALANCE_RETURNED,
+  GET_SPOOL_RATIO,
+  GET_SPOOL_RATIO_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 
@@ -1002,6 +1004,9 @@ class Store {
             break;
           case GET_SPOOL_BALANCE:
             this.getSPoolBalance(payload)
+            break;
+          case GET_SPOOL_RATIO:
+            this.getSPoolRatio(payload)
             break;
           default: {
           }
@@ -3116,6 +3121,37 @@ class Store {
       store.setStore({ sCrvBalance: balance })
       console.log(balance)
       return emitter.emit(SPOOL_BALANCE_RETURNED, balance)
+    })
+  }
+
+  getSPoolRatio = (payload) => {
+    const account = { address: '0xeDf54bC005bc2Df0Cc6A675596e843D28b16A966' }
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const curveFi = {
+      id: 'curveFiV3',
+      erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
+      decimals: '18'
+    }
+
+    const iearnSUSD = {
+      id: 'iearnSUSD',
+      erc20address: '0xf61718057901f84c4eec4339ef8f0d86d2b45600',
+      decimals: '18'
+    }
+
+    async.parallel([
+      (callback) => { this._getERC20Balance(web3, curveFi, account, callback) },
+      (callback) => { this._getERC20Balance(web3, iearnSUSD, account, callback) },
+    ], (err, balances) => {
+
+      const ratioCurve = (balances[0]*100/(balances[0]+balances[1])).toFixed(0)
+      const ratioIearn = (balances[1]*100/(balances[0]+balances[1])).toFixed(0)
+
+      console.log(ratioCurve)
+      console.log(ratioIearn)
+
+      return emitter.emit(GET_SPOOL_RATIO_RETURNED, { ratioCurve, ratioIearn })
     })
   }
 }
