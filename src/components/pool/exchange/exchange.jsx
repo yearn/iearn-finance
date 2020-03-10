@@ -382,16 +382,18 @@ class Exchange extends Component {
 
   onChange = (event) => {
 
-    if(!event.target.value || isNaN(event.target.value) || event.target.value < 0) {
-      this.setState({ amountError: true })
-      return false
+    if(event.target.value !== '') {
+      if(!event.target.value || isNaN(event.target.value) || event.target.value < 0) {
+        this.setState({ amountError: true })
+        return false
+      }
     }
 
     let val = []
     val[event.target.name] = event.target.value
     this.setState(val)
 
-    dispatcher.dispatch({ type: GET_EXCHANGE_PRICE, content: { sendAsset: this.state.sendAsset, receiveAsset: this.state.receiveAsset, sendAmount: event.target.value }})
+    dispatcher.dispatch({ type: GET_EXCHANGE_PRICE, content: { sendAsset: this.state.sendAsset, receiveAsset: this.state.receiveAsset, sendAmount: event.target.value !== '' ? event.target.value : '0' }})
   };
 
   renderAmountInput = (id, value, error, label, placeholder, disabled) => {
@@ -434,7 +436,7 @@ class Exchange extends Component {
       receiveAsset = event.target.value
     }
 
-    dispatcher.dispatch({ type: GET_EXCHANGE_PRICE, content: { sendAsset: sendAsset, receiveAsset: receiveAsset, sendAmount: this.state.sendAmount }})
+    dispatcher.dispatch({ type: GET_EXCHANGE_PRICE, content: { sendAsset: sendAsset, receiveAsset: receiveAsset, sendAmount: this.state.sendAmount ? this.state.sendAmount : '0' }})
   }
 
 }
