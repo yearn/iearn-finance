@@ -67,6 +67,8 @@ import {
   DEPOSIT_PRICE_RETURNED,
   GET_WITHDRAW_PRICE,
   WITHDRAW_PRICE_RETURNED,
+  GET_SPOOL_BALANCE,
+  SPOOL_BALANCE_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 
@@ -889,7 +891,8 @@ class Store {
           abi: config.IEarnErc20ABIv2,
           index: 4,
         },
-      ]
+      ],
+      sCrvBalance:  0
     }
 
     dispatcher.register(
@@ -996,6 +999,9 @@ class Store {
             break;
           case GET_WITHDRAW_PRICE:
             this.getWithdrawPrice(payload)
+            break;
+          case GET_SPOOL_BALANCE:
+            this.getSPoolBalance(payload)
             break;
           default: {
           }
@@ -2667,7 +2673,7 @@ class Store {
   withdrawPool = (payload) => {
     const account = store.getStore('account')
     const asset = {
-      id: 'sUSD',
+      id: 'sCRV',
       erc20address: '0x2b645a6a426f22fb7954dc15e583e3737b8d1434'
     }
 
@@ -2911,15 +2917,16 @@ class Store {
     const account = store.getStore('account')
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    const asset = {}
+    const asset = {
+      id: 'sCRV',
+      erc20address: '0x2b645a6a426f22fb7954dc15e583e3737b8d1434',
+      decimals: 18
+    }
 
-    this._getERC20Balance(web3, curv, account, (err, balance) => {
-      if(err) {
-        return callback(err)
-      }
-      curv.balance = balance
-
-      callback(null, curv)
+    this._getERC20Balance(web3, asset, account, (err, balance) => {
+      store.setStore({ sCrvBalance: balance })
+      console.log(balance)
+      return emitter.emit(SPOOL_BALANCE_RETURNED, balance)
     })
   }
 }
