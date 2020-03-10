@@ -2578,7 +2578,7 @@ class Store {
     const { asset, daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = payload.content
 
     //check approval on all balances > 0
-    async.map(poolAssets, (asset, callbackInner) => {
+    async.mapLimit(poolAssets, 1, (asset, callbackInner) => {
       let amount = 0
       switch (asset.id) {
         case 'DAI':

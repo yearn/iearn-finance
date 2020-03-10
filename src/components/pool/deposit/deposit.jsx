@@ -356,7 +356,7 @@ class Deposit extends Component {
               className={ classes.actionButton }
               variant="outlined"
               color="primary"
-              disabled={ loading }
+              disabled={ loading || !(daiAmount > 0 || usdcAmount > 0 || usdtAmount > 0 || tusdAmount > 0) }
               onClick={ this.onDeposit }
               fullWidth
               >
