@@ -233,33 +233,47 @@ class Deposit extends Component {
   };
 
   balancesReturned = (balances) => {
-    this.setState({ assets: store.getStore('poolAssets') })
-    this.setDefaultValues(store.getStore('poolAssets'))
+    const poolAssets = store.getStore('poolAssets')
+    this.setState({ assets: poolAssets })
+    this.setDefaultValues(poolAssets)
   };
 
   setDefaultValues = (assets) => {
     let that = this
 
+    let daiAmount = 0
+    let usdcAmount = 0
+    let usdtAmount = 0
+    let tusdAmount = 0
+    let susdAmount = 0
+
     assets.map((asset) => {
       switch (asset.id) {
         case 'DAI':
           that.setState({ daiAmount: asset.balance.toFixed(4) })
+          daiAmount = asset.balance.toFixed(4)
           break;
         case 'USDC':
           that.setState({ usdcAmount: asset.balance.toFixed(4) })
+          usdcAmount = asset.balance.toFixed(4)
           break;
         case 'USDT':
           that.setState({ usdtAmount: asset.balance.toFixed(4) })
+          usdtAmount = asset.balance.toFixed(4)
           break;
         case 'TUSD':
           that.setState({ tusdAmount: asset.balance.toFixed(4) })
+          tusdAmount = asset.balance.toFixed(4)
           break;
         case 'SUSD':
           that.setState({ susdAmount: asset.balance.toFixed(4) })
+          susdAmount = asset.balance.toFixed(4)
           break;
         default:
       }
     })
+
+    dispatcher.dispatch({ type: GET_DEPOSIT_PRICE, content: { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount }})
   }
 
   refresh() {

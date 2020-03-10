@@ -2662,7 +2662,7 @@ class Store {
           return emitter.emit(ERROR, err);
         }
 
-        return emitter.emit(DEPOSIT_POOL_RETURNED, res)
+        return emitter.emit(WITHDRAW_POOL_RETURNED, res)
       })
     })
   }
@@ -2756,7 +2756,7 @@ class Store {
           return emitter.emit(ERROR, err);
         }
 
-        return emitter.emit(DEPOSIT_POOL_RETURNED, res)
+        return emitter.emit(EXCHANGE_POOL_RETURNED, res)
       })
     })
   }
