@@ -325,7 +325,7 @@ class Exchange extends Component {
                 <FormControlLabel value="USDC" control={<Radio />} label="USDC" />
                 <FormControlLabel value="USDT" control={<Radio />} label="USDT" />
                 <FormControlLabel value="TUSD" control={<Radio />} label="TUSD" />
-                <FormControlLabel value="SUSD" control={<Radio />} label="SUSD" />
+                <FormControlLabel value="SUSD" control={<Radio />} label="sUSD" />
               </RadioGroup>
             </div>
             <div className={ classes.sepperator }>
@@ -339,7 +339,7 @@ class Exchange extends Component {
                 <FormControlLabel value="USDC" control={<Radio />} label="USDC" />
                 <FormControlLabel value="USDT" control={<Radio />} label="USDT" />
                 <FormControlLabel value="TUSD" control={<Radio />} label="TUSD" />
-                <FormControlLabel value="SUSD" control={<Radio />} label="SUSD" />
+                <FormControlLabel value="SUSD" control={<Radio />} label="sUSD" />
               </RadioGroup>
             </div>
             <Button
