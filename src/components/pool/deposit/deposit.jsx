@@ -220,7 +220,6 @@ class Deposit extends Component {
   };
 
   depositPriceReturned = (price) => {
-    console.log(price)
     this.setState({ amount: price ? parseFloat(price).toFixed(4) : '0.0000' })
   };
 

@@ -1051,6 +1051,9 @@ class Store {
 
       const ethAllowance = web3.utils.fromWei(allowance, "ether")
 
+      console.log(ethAllowance)
+      console.log(amount)
+
       if(parseFloat(ethAllowance) < parseFloat(amount)) {
         /*
           code to accomodate for "assert _value == 0 or self.allowances[msg.sender][_spender] == 0" in contract
@@ -2592,19 +2595,19 @@ class Store {
     const amounts = poolAssets.map((asset) => {
       switch (asset.id) {
         case 'DAI':
-          return content.daiAmount * 10**asset.decimals
+          return web3.utils.toWei(content.daiAmount, "ether")
           break;
         case 'USDC':
-          return content.usdcAmount * 10**asset.decimals
+          return (content.usdcAmount * 10**asset.decimals) + ''
           break;
         case 'USDT':
-          return content.usdtAmount * 10**asset.decimals
+          return (content.usdtAmount * 10**asset.decimals) + ''
           break;
         case 'TUSD':
-          return content.tusdAmount * 10**asset.decimals
+          return web3.utils.toWei(content.tusdAmount, "ether")
           break;
         case 'SUSD':
-          return content.susdAmount * 10**asset.decimals
+          return web3.utils.toWei(content.susdAmount, "ether")
           break;
         default:
 
@@ -2644,14 +2647,23 @@ class Store {
 
   withdrawPool = (payload) => {
     const account = store.getStore('account')
-    const { asset } = payload.content
+    const asset = {
+      id: 'sUSD',
+      erc20address: '0x57ab1ec28d129707052df4df418d58a2d46d5f51'
+    }
 
-    this._callWithdrawPool(asset, account, payload.content, (err, res) => {
+    this._checkApproval(asset, account, payload.content.amount, config.exchangeContractAddress, (err) => {
       if(err) {
         return emitter.emit(ERROR, err);
       }
 
-      return emitter.emit(DEPOSIT_POOL_RETURNED, res)
+      this._callWithdrawPool(asset, account, payload.content, (err, res) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(DEPOSIT_POOL_RETURNED, res)
+      })
     })
   }
 
@@ -2663,6 +2675,9 @@ class Store {
 
     let amount = web3.utils.toWei(content.amount, "ether")
     let withdrawAmounts = await exchangeContractABI.methods.calc_withdraw_amount(amount).call({ from: account.address })
+
+    console.log(amount)
+    console.log(withdrawAmounts)
 
     exchangeContractABI.methods.remove_liquidity_underlying(amount, withdrawAmounts).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
       .on('transactionHash', function(hash){
