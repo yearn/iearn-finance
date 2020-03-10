@@ -1082,6 +1082,57 @@ class Store {
     }
   }
 
+  _checkApprovalWaitForConfirmation = async (asset, account, amount, contract, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+    let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
+    const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
+
+    const ethAllowance = web3.utils.fromWei(allowance, "ether")
+
+    if(parseFloat(ethAllowance) < parseFloat(amount)) {
+      if(['crvV1', 'crvV2', 'crvV3', 'crvV4', 'USDTv1', 'USDTv2', 'USDTv3'].includes(asset.id) && ethAllowance > 0) {
+        erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+          .on('transactionHash', function(hash){
+            erc20Contract.methods.approve(contract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+              .on('transactionHash', function(hash){
+                callback()
+              })
+              .on('error', function(error) {
+                if (!error.toString().includes("-32601")) {
+                  if(error.message) {
+                    return callback(error.message)
+                  }
+                  callback(error)
+                }
+              })
+          })
+          .on('error', function(error) {
+            if (!error.toString().includes("-32601")) {
+              if(error.message) {
+                return callback(error.message)
+              }
+              callback(error)
+            }
+          })
+      } else {
+        erc20Contract.methods.approve(contract, web3.utils.toWei(amount, "ether")).send({ from: account.address, gasPrice: web3.utils.toWei('6', 'gwei') })
+          .on('transactionHash', function(hash){
+            callback()
+          })
+          .on('error', function(error) {
+            if (!error.toString().includes("-32601")) {
+              if(error.message) {
+                return callback(error.message)
+              }
+              callback(error)
+            }
+          })
+      }
+    } else {
+      callback()
+    }
+  }
+
   _callInvest = async (asset, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
@@ -2599,7 +2650,7 @@ class Store {
         default:
 
       }
-      this._checkApproval(asset, account, amount, config.exchangeContractAddress, callbackInner)
+      this._checkApprovalWaitForConfirmation(asset, account, amount, config.exchangeContractAddress, callbackInner)
     }, (err, data) => {
       this._callDepositPool(account, payload.content, (err, res) => {
         if(err) {
