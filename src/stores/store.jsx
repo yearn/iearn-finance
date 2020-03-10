@@ -67,6 +67,8 @@ import {
   DEPOSIT_PRICE_RETURNED,
   GET_WITHDRAW_PRICE,
   WITHDRAW_PRICE_RETURNED,
+  GET_SPOOL_BALANCE,
+  SPOOL_BALANCE_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 
@@ -889,7 +891,8 @@ class Store {
           abi: config.IEarnErc20ABIv2,
           index: 4,
         },
-      ]
+      ],
+      sCrvBalance:  0
     }
 
     dispatcher.register(
@@ -996,6 +999,9 @@ class Store {
             break;
           case GET_WITHDRAW_PRICE:
             this.getWithdrawPrice(payload)
+            break;
+          case GET_SPOOL_BALANCE:
+            this.getSPoolBalance(payload)
             break;
           default: {
           }
@@ -2572,9 +2578,28 @@ class Store {
     const { asset, daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = payload.content
 
     //check approval on all balances > 0
-    const amounts = [daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount]
-    async.map(amounts, (amount, callbackInner) => {
-      this._checkApproval(poolAssets[0], account, amount, config.exchangeContractAddress, callbackInner)
+    async.map(poolAssets, (asset, callbackInner) => {
+      let amount = 0
+      switch (asset.id) {
+        case 'DAI':
+          amount = daiAmount
+          break;
+        case 'USDC':
+          amount = usdcAmount
+          break;
+        case 'USDT':
+          amount = usdtAmount
+          break;
+        case 'TUSD':
+          amount = tusdAmount
+          break;
+        case 'SUSD':
+          amount = susdAmount
+          break;
+        default:
+
+      }
+      this._checkApproval(asset, account, amount, config.exchangeContractAddress, callbackInner)
     }, (err, data) => {
       this._callDepositPool(account, payload.content, (err, res) => {
         if(err) {
@@ -2648,7 +2673,7 @@ class Store {
   withdrawPool = (payload) => {
     const account = store.getStore('account')
     const asset = {
-      id: 'sUSD',
+      id: 'sCRV',
       erc20address: '0x2b645a6a426f22fb7954dc15e583e3737b8d1434'
     }
 
@@ -2886,6 +2911,23 @@ class Store {
     minMintAmount = web3.utils.fromWei(minMintAmount, "ether")
     console.log(minMintAmount)
     return emitter.emit(DEPOSIT_PRICE_RETURNED, minMintAmount)
+  }
+
+  getSPoolBalance = (payload) => {
+    const account = store.getStore('account')
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const asset = {
+      id: 'sCRV',
+      erc20address: '0x2b645a6a426f22fb7954dc15e583e3737b8d1434',
+      decimals: 18
+    }
+
+    this._getERC20Balance(web3, asset, account, (err, balance) => {
+      store.setStore({ sCrvBalance: balance })
+      console.log(balance)
+      return emitter.emit(SPOOL_BALANCE_RETURNED, balance)
+    })
   }
 }
 
