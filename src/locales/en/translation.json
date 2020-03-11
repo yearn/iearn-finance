@@ -77,6 +77,7 @@
   "PoolDeposit.Connect": "Connect wallet",
   "PoolDeposit.Deposit": "Deposit",
   "PoolDeposit.IWillReceive": "I will receive",
+  "PoolDeposit.Ideal": "Recommended split",
 
   "PoolWithdraw.Intro": "Withdraw. Simple.",
   "PoolWithdraw.Connect": "Connect wallet",

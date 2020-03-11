@@ -22,8 +22,8 @@ import {
   DEPOSIT_POOL_RETURNED,
   GET_DEPOSIT_PRICE,
   DEPOSIT_PRICE_RETURNED,
-  GET_SPOOL_RATIO,
-  GET_SPOOL_RATIO_RETURNED
+  GET_WITHDRAW_PRICE,
+  WITHDRAW_PRICE_RETURNED,
 } from '../../../constants'
 
 import { withNamespaces } from 'react-i18next';
@@ -121,7 +121,7 @@ const styles = theme => ({
     width: '100%',
     display: 'flex',
     flexWrap: 'wrap',
-    maxWidth: '400px',
+    maxWidth: '800px',
     justifyContent: 'center',
     padding: '12px',
     flexDirection: 'column',
@@ -133,8 +133,10 @@ const styles = theme => ({
     flexWrap: 'wrap',
     padding: '12px',
     borderRadius: '1.25em',
-    justifyContent: 'center',
-    marginTop: '20px',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    margin: '20px',
     [theme.breakpoints.up('md')]: {
       padding: '24px',
     }
@@ -175,7 +177,6 @@ const styles = theme => ({
     cursor: 'pointer'
   },
   valContainer: {
-    flex: 1,
     display: 'flex',
     flexDirection: 'column',
   },
@@ -188,6 +189,12 @@ const styles = theme => ({
   },
   ratios: {
     marginBottom: '12px'
+  },
+  idealHolder: {
+    display: 'flex'
+  },
+  disabledAdornment: {
+    color: 'rgb(170, 170, 170)'
   }
 });
 
@@ -202,12 +209,10 @@ class Deposit extends Component {
       account: account,
       assets: store.getStore('poolAssets'),
       amount: '',
-      ratio: { ratioCurve: '50', ratioIearn: '50' }
     }
 
     if(account && account.address) {
       dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
-      dispatcher.dispatch({ type: GET_SPOOL_RATIO, content: {} })
     }
   }
 
@@ -218,7 +223,7 @@ class Deposit extends Component {
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(DEPOSIT_POOL_RETURNED, this.depositPoolReturned);
     emitter.on(DEPOSIT_PRICE_RETURNED, this.depositPriceReturned);
-    emitter.on(GET_SPOOL_RATIO_RETURNED, this.ratioReturned);
+    emitter.on(WITHDRAW_PRICE_RETURNED, this.withdrawPriceReturned);
   }
 
   componentWillUnmount() {
@@ -228,11 +233,23 @@ class Deposit extends Component {
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(DEPOSIT_POOL_RETURNED, this.depositPoolReturned);
     emitter.removeListener(DEPOSIT_PRICE_RETURNED, this.depositPriceReturned);
-    emitter.removeListener(GET_SPOOL_RATIO_RETURNED, this.ratioReturned);
+    emitter.removeListener(WITHDRAW_PRICE_RETURNED, this.withdrawPriceReturned);
   };
 
   depositPriceReturned = (price) => {
     this.setState({ amount: price ? parseFloat(price).toFixed(4) : '0.0000' })
+
+    dispatcher.dispatch({ type: GET_WITHDRAW_PRICE, content: { sendAmount: price }})
+  };
+
+  withdrawPriceReturned = (prices) => {
+    this.setState({
+      idealDAIAmount: prices[0].toFixed(4),
+      idealUSDCAmount: prices[1].toFixed(4),
+      idealUSDTAmount: prices[2].toFixed(4),
+      idealTUSDAmount: prices[3].toFixed(4),
+      idealSUSDAmount: prices[4].toFixed(4)
+    })
   };
 
   depositPoolReturned  = (txHash) => {
@@ -336,8 +353,12 @@ class Deposit extends Component {
       usdtAmount,
       tusdAmount,
       susdAmount,
+      idealDAIAmount,
+      idealUSDCAmount,
+      idealUSDTAmount,
+      idealTUSDAmount,
+      idealSUSDAmount,
       amount,
-      ratio
     } = this.state
 
     var address = null;
@@ -347,9 +368,6 @@ class Deposit extends Component {
 
     const curveSum = parseFloat(daiAmount != '' ? daiAmount : 0) + parseFloat(usdcAmount != '' ? usdcAmount : 0) + parseFloat(usdtAmount != '' ? usdtAmount : 0) + parseFloat(tusdAmount != '' ? tusdAmount : 0)
     const susdSum = parseFloat(susdAmount != '' ? susdAmount : 0)
-
-    const ratioCurve = (curveSum * 100 / (curveSum + susdSum)).toFixed(0)
-    const ratioIearn = (susdSum * 100 / (curveSum + susdSum)).toFixed(0)
 
     return (
       <div className={ classes.root }>
@@ -362,30 +380,36 @@ class Deposit extends Component {
               <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
             </Card>
           </div>
-          <Card className={ classes.inputContainer }>
-            <Typography variant='h3' className={ classes.inputCardHeading }>{ t("PoolDeposit.Deposit") }</Typography>
-            { this.renderAmountInput('daiAmount', daiAmount, false, 'DAI', '0.00', 'DAI') }
-            { this.renderAmountInput('usdcAmount', usdcAmount, false, 'USDC', '0.00', 'USDC') }
-            { this.renderAmountInput('usdtAmount', usdtAmount, false, 'USDT', '0.00', 'USDT') }
-            { this.renderAmountInput('tusdAmount', tusdAmount, false, 'TUSD', '0.00', 'TUSD') }
-            { this.renderAmountInput('susdAmount', susdAmount, false, 'SUSD', '0.00', 'SUSD') }
-            <Typography variant='h3' className={ classes.inputCardHeading }>{ t("PoolDeposit.IWillReceive") }</Typography>
-            { this.renderAmountInput('amount', amount, false, 'CRV', '0.00', 'CRV', true, true) }
-            <div className={ classes.ratios }>
-              <Typography> { 'Optimal ratio: ' + ratio.ratioCurve + ' CRV / ' + ratio.ratioIearn + ' sUSD' }</Typography>
-              <Typography> { 'Your ratio: ' + ratioCurve + ' CRV / ' + ratioIearn + ' sUSD' }</Typography>
-            </div>
-            <Button
-              className={ classes.actionButton }
-              variant="outlined"
-              color="primary"
-              disabled={ loading || !(daiAmount > 0 || usdcAmount > 0 || usdtAmount > 0 || tusdAmount > 0) }
-              onClick={ this.onDeposit }
-              fullWidth
-              >
-              <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('PoolDeposit.Deposit') }</Typography>
-            </Button>
-          </Card>
+          <div className={ classes.idealHolder }>
+            <Card className={ classes.inputContainer }>
+              <Typography variant='h3' className={ classes.inputCardHeading }>{ t("PoolDeposit.Deposit") }</Typography>
+              { this.renderAmountInput('daiAmount', daiAmount, false, 'DAI', '0.00', 'DAI') }
+              { this.renderAmountInput('usdcAmount', usdcAmount, false, 'USDC', '0.00', 'USDC') }
+              { this.renderAmountInput('usdtAmount', usdtAmount, false, 'USDT', '0.00', 'USDT') }
+              { this.renderAmountInput('tusdAmount', tusdAmount, false, 'TUSD', '0.00', 'TUSD') }
+              { this.renderAmountInput('susdAmount', susdAmount, false, 'SUSD', '0.00', 'SUSD') }
+              <Typography variant='h3' className={ classes.inputCardHeading }>{ t("PoolDeposit.IWillReceive") }</Typography>
+              { this.renderAmountInput('amount', amount, false, 'CRV', '0.00', 'CRV', true, true) }
+              <Button
+                className={ classes.actionButton }
+                variant="outlined"
+                color="primary"
+                disabled={ loading || !(daiAmount > 0 || usdcAmount > 0 || usdtAmount > 0 || tusdAmount > 0) }
+                onClick={ this.onDeposit }
+                fullWidth
+                >
+                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('PoolDeposit.Deposit') }</Typography>
+              </Button>
+            </Card>
+            <Card className={ classes.inputContainer }>
+              <Typography variant='h3' className={ classes.inputCardHeading }>{ t("PoolDeposit.Ideal") }</Typography>
+              { this.renderAmountInput('daiAmount', idealDAIAmount, false, 'DAI', '0.00', 'DAI', true, true, true) }
+              { this.renderAmountInput('usdcAmount', idealUSDCAmount, false, 'USDC', '0.00', 'USDC', true, true, true) }
+              { this.renderAmountInput('usdtAmount', idealUSDTAmount, false, 'USDT', '0.00', 'USDT', true, true, true) }
+              { this.renderAmountInput('tusdAmount', idealTUSDAmount, false, 'TUSD', '0.00', 'TUSD', true, true, true) }
+              { this.renderAmountInput('susdAmount', idealSUSDAmount, false, 'SUSD', '0.00', 'SUSD', true, true, true) }
+            </Card>
+          </div>
         </div>
         { snackbarMessage && this.renderSnackbar() }
         { loading && <Loader /> }
@@ -445,7 +469,7 @@ class Deposit extends Component {
     dispatcher.dispatch({ type: GET_DEPOSIT_PRICE, content: { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount }})
   };
 
-  renderAmountInput = (id, value, error, label, placeholder, inputAdornment, disabled, hideBalance) => {
+  renderAmountInput = (id, value, error, label, placeholder, inputAdornment, disabled, hideBalance, disabledAdornment) => {
     const { classes, loading } = this.props
     const { assets } =  this.state
 
@@ -471,7 +495,7 @@ class Deposit extends Component {
             placeholder={ placeholder }
             variant="outlined"
             InputProps={{
-              endAdornment: <InputAdornment position="end" className={ classes.inputAdornment }><Typography variant='h3'>{ inputAdornment }</Typography></InputAdornment>,
+              endAdornment: <InputAdornment position="end" className={ classes.inputAdornment }><Typography variant='h3' className={ disabledAdornment ? classes.disabledAdornment : '' }>{ inputAdornment }</Typography></InputAdornment>,
               startAdornment: <InputAdornment position="end" className={ classes.inputAdornment }>
                 <div className={ classes.assetIcon }>
                   <img
