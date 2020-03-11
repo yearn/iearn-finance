@@ -1790,6 +1790,7 @@ class Store {
         return emitter.emit(ERROR, err)
       }
       //get all headers
+      console.log(yields[0])
       const headers = Object.keys(yields[0].apr)
       store.setStore({ aggregatedYields: yields, aggregatedHeaders: headers })
       return emitter.emit(GET_AGGREGATED_YIELD_RETURNED, yields)
@@ -1820,7 +1821,7 @@ class Store {
 
       for(let i = 0; i < vals.length; i++) {
         const keys = Object.keys(vals[i])
-        if (keys[0] === '_unifulcrum'||keys[0] === '_uniaave'||keys[0] === '_unicompound'||keys[0] === '_lendf'||keys[0] === '_fulcrum') {
+        if (keys[0] === '_unifulcrum'||keys[0] === '_uniaave'||keys[0] === '_unicompound'||keys[0] === '_uniswap') {
           // skip
         } else {
           output[keys[0]] = vals[i][keys[0]]

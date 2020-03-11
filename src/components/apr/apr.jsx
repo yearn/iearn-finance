@@ -332,7 +332,7 @@ class APR extends Component {
     } else if (name.startsWith('_ddex')) {
       return 'ddex';
     } else if (name.startsWith('_lendf')) {
-      return 'Lendf';
+      return 'dForce';
     } else {
       return name;
     }
