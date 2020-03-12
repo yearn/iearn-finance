@@ -48,7 +48,7 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    maxWidth: '400px'
+    maxWidth: '726px'
   },
   introCenter: {
     minWidth: '100%',
@@ -244,11 +244,11 @@ class Deposit extends Component {
 
   withdrawPriceReturned = (prices) => {
     this.setState({
-      idealDAIAmount: prices[0].toFixed(4),
-      idealUSDCAmount: prices[1].toFixed(4),
-      idealUSDTAmount: prices[2].toFixed(4),
-      idealTUSDAmount: prices[3].toFixed(4),
-      idealSUSDAmount: prices[4].toFixed(4)
+      idealDAIAmount: (Math.floor(prices[0]*10000)/10000).toFixed(4),
+      idealUSDCAmount: (Math.floor(prices[1]*10000)/10000).toFixed(4),
+      idealUSDTAmount: (Math.floor(prices[2]*10000)/10000).toFixed(4),
+      idealTUSDAmount: (Math.floor(prices[3]*10000)/10000).toFixed(4),
+      idealSUSDAmount: (Math.floor(prices[4]*10000)/10000).toFixed(4)
     })
   };
 
@@ -283,24 +283,24 @@ class Deposit extends Component {
     assets.map((asset) => {
       switch (asset.id) {
         case 'DAI':
-          that.setState({ daiAmount: asset.balance.toFixed(4) })
-          daiAmount = asset.balance.toFixed(4)
+          that.setState({ daiAmount: (Math.floor(asset.balance*10000)/10000).toFixed(4) })
+          daiAmount = (Math.floor(asset.balance*10000)/10000).toFixed(4)
           break;
         case 'USDC':
-          that.setState({ usdcAmount: asset.balance.toFixed(4) })
-          usdcAmount = asset.balance.toFixed(4)
+          that.setState({ usdcAmount: (Math.floor(asset.balance*10000)/10000).toFixed(4) })
+          usdcAmount = (Math.floor(asset.balance*10000)/10000).toFixed(4)
           break;
         case 'USDT':
-          that.setState({ usdtAmount: asset.balance.toFixed(4) })
-          usdtAmount = asset.balance.toFixed(4)
+          that.setState({ usdtAmount: (Math.floor(asset.balance*10000)/10000).toFixed(4) })
+          usdtAmount = (Math.floor(asset.balance*10000)/10000).toFixed(4)
           break;
         case 'TUSD':
-          that.setState({ tusdAmount: asset.balance.toFixed(4) })
-          tusdAmount = asset.balance.toFixed(4)
+          that.setState({ tusdAmount: (Math.floor(asset.balance*10000)/10000).toFixed(4) })
+          tusdAmount = (Math.floor(asset.balance*10000)/10000).toFixed(4)
           break;
         case 'SUSD':
-          that.setState({ susdAmount: asset.balance.toFixed(4) })
-          susdAmount = asset.balance.toFixed(4)
+          that.setState({ susdAmount: (Math.floor(asset.balance*10000)/10000).toFixed(4) })
+          susdAmount = (Math.floor(asset.balance*10000)/10000).toFixed(4)
           break;
         default:
       }
@@ -420,12 +420,13 @@ class Deposit extends Component {
   onDeposit = () => {
     this.setState({ amountError: false })
 
-    const { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = this.state
+    let { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = this.state
 
-    // if(!amount || isNaN(amount) || amount <= 0 || amount > asset.balance) {
-    //   this.setState({ amountError: true })
-    //   return false
-    // }
+    daiAmount = daiAmount === '' ? '0' : daiAmount
+    usdcAmount = usdcAmount === '' ? '0' : usdcAmount
+    usdtAmount = usdtAmount === '' ? '0' : usdtAmount
+    tusdAmount = tusdAmount === '' ? '0' : tusdAmount
+    susdAmount = susdAmount === '' ? '0' : susdAmount
 
     this.setState({ loading: true })
     dispatcher.dispatch({ type: DEPOSIT_POOL, content: { daiAmount: daiAmount, usdcAmount: usdcAmount, usdtAmount: usdtAmount, tusdAmount: tusdAmount, susdAmount: susdAmount } })
@@ -440,7 +441,6 @@ class Deposit extends Component {
   };
 
   onChange = (event) => {
-
     if(event.target.value !== '' && (!event.target.value || isNaN(event.target.value) || event.target.value < 0)) {
       return false
     }
@@ -450,20 +450,29 @@ class Deposit extends Component {
     this.setState(val)
 
     let { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = this.state
+
+    const bal = event.target.value === '' ? '0' : event.target.value
+
+    daiAmount = daiAmount === '' ? '0' : daiAmount
+    usdcAmount = usdcAmount === '' ? '0' : usdcAmount
+    usdtAmount = usdtAmount === '' ? '0' : usdtAmount
+    tusdAmount = tusdAmount === '' ? '0' : tusdAmount
+    susdAmount = susdAmount === '' ? '0' : susdAmount
+
     if(event.target.name === 'daiAmount') {
-      daiAmount = event.target.value === '' ? '0' : event.target.value
+      daiAmount = bal
     }
     if(event.target.name === 'usdcAmount') {
-      usdcAmount = event.target.value === '' ? '0' : event.target.value
+      usdcAmount = bal
     }
     if(event.target.name === 'usdtAmount') {
-      usdtAmount = event.target.value === '' ? '0' : event.target.value
+      usdtAmount = bal
     }
     if(event.target.name === 'tusdAmount') {
-      tusdAmount = event.target.value === '' ? '0' : event.target.value
+      tusdAmount = bal
     }
     if(event.target.name === 'susdAmount') {
-      susdAmount = event.target.value === '' ? '0' : event.target.value
+      susdAmount = bal
     }
 
     dispatcher.dispatch({ type: GET_DEPOSIT_PRICE, content: { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount }})
@@ -479,7 +488,7 @@ class Deposit extends Component {
       <div className={ classes.valContainer }>
         <div className={ classes.balances }>
           <Typography variant='h3' className={ classes.title }></Typography>
-          <Typography variant='h4' onClick={ () => { if(hideBalance) { return; } this.setAmount(id, (sendAsset ? sendAsset.balance : 0)) } } className={ classes.value } noWrap>{ !hideBalance ? ('Balance: '+ ( sendAsset && sendAsset.balance ? sendAsset.balance.toFixed(4) : '0.0000')) : '' } { !hideBalance ? (sendAsset ? sendAsset.symbol : '') : '' }</Typography>
+          <Typography variant='h4' onClick={ () => { if(hideBalance) { return; } this.setAmount(id, (sendAsset ? sendAsset.balance : 0)) } } className={ classes.value } noWrap>{ !hideBalance ? ('Balance: '+ ( sendAsset && sendAsset.balance ? (Math.floor(sendAsset.balance*10000)/10000).toFixed(4) : '0.0000')) : '' } { !hideBalance ? (sendAsset ? sendAsset.symbol : '') : '' }</Typography>
           { hideBalance && <div className={ classes.placceholder }></div> }
         </div>
         <div>
@@ -513,9 +522,36 @@ class Deposit extends Component {
   }
 
   setAmount(id, balance) {
+    const bal = (Math.floor((balance === '' ? '0' : balance)*10000)/10000).toFixed(4)
     let val = []
-    val[id] = balance.toFixed(4)
+    val[id] = bal
     this.setState(val)
+
+    let { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount } = this.state
+
+    daiAmount = daiAmount === '' ? '0' : daiAmount
+    usdcAmount = usdcAmount === '' ? '0' : usdcAmount
+    usdtAmount = usdtAmount === '' ? '0' : usdtAmount
+    tusdAmount = tusdAmount === '' ? '0' : tusdAmount
+    susdAmount = susdAmount === '' ? '0' : susdAmount
+
+    if(id === 'daiAmount') {
+      daiAmount = bal
+    }
+    if(id === 'usdcAmount') {
+      usdcAmount = bal
+    }
+    if(id === 'usdtAmount') {
+      usdtAmount = bal
+    }
+    if(id === 'tusdAmount') {
+      tusdAmount = bal
+    }
+    if(id === 'susdAmount') {
+      susdAmount = bal
+    }
+
+    dispatcher.dispatch({ type: GET_DEPOSIT_PRICE, content: { daiAmount, usdcAmount, usdtAmount, tusdAmount, susdAmount }})
   }
 
 }
