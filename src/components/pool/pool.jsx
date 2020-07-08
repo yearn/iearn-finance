@@ -31,7 +31,8 @@ const styles = theme => ({
     maxWidth: '1200px',
     width: '100%',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: '40px'
   },
   intro: {
     width: '100%',
@@ -94,9 +95,9 @@ const styles = theme => ({
   card: {
     width: '100%',
     display: 'flex',
-      flexWrap: 'wrap',
+    flexWrap: 'wrap',
     justifyContent: 'center',
-    padding: '12px',
+    paddingBottom: '20px',
     flexDirection: 'column',
     alignItems: 'center',
   },
@@ -190,7 +191,7 @@ class Pool extends Component {
           <div className={ classes.investedContainer }>
             <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.introCenter }>
-              <Typography variant='h2'>{ t('Pool.Intro') }</Typography>
+              <Typography variant='h3'>{ t('Pool.Intro') }</Typography>
             </div>
             <div className={ classes.connectContainer }>
               <Button

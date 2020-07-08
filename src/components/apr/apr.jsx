@@ -7,6 +7,7 @@ import {
   Card,
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
+import { colors } from '../../theme'
 
 import {
   GET_AGGREGATED_YIELD,
@@ -48,9 +49,10 @@ const styles = theme => ({
     width: '100%',
   },
   pairs: {
-    borderRadius: '20px',
-    padding: '24px',
-    height: 'max-content'
+    padding: '42px 36px',
+    borderRadius: '50px',
+    border: '1px solid ' + colors.borderBlue,
+    marginTop: '40px',
   },
   pair: {
     display: 'flex',

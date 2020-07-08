@@ -31,59 +31,36 @@ const styles = theme => ({
     fontSize: '0.5rem'
   },
   balances: {
-    marginBottom: '-25px',
-    marginRight: '30px',
-    zIndex: '900',
-    display: 'flex',
-    alignItems: 'center',
     width: '100%',
-    justifyContent: 'space-between'
+    textAlign: 'right',
+    paddingRight: '20px',
+    cursor: 'pointer'
   },
   actionsContainer: {
     paddingBottom: '12px',
     display: 'flex',
-    justifyContent: 'space-between',
-    maxWidth: '100%',
-    flexWrap: 'wrap',
-    flexDirection: 'column',
-    [theme.breakpoints.up('sm')]: {
-      width: '750px',
-      padding: '12px',
-      flexWrap: 'nowrap',
-      flexDirection: 'row',
-    }
+    flex: '1',
   },
   title: {
     paddingRight: '24px'
   },
   actionButton: {
-    padding: '12px',
-    backgroundColor: 'white',
-    borderRadius: '1rem',
-    border: '1px solid #E1E1E1',
-    fontWeight: 500,
-    [theme.breakpoints.up('sm')]: {
-      padding: '15px',
-    }
+    height: '47px'
   },
   tradeContainer: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    padding: '24px 12px 24px 12px',
-    alignItems: 'center',
-    [theme.breakpoints.up('sm')]: {
-      padding: '0px 12px 24px 12px',
-    }
+    alignItems: 'center'
   },
   sepperator: {
     borderBottom: '1px solid #E1E1E1',
     [theme.breakpoints.up('sm')]: {
-      display: 'none'
+      width: '40px',
+      borderBottom: 'none'
     }
   },
   scaleContainer: {
-    width: '250px',
     display: 'flex',
     justifyContent: 'space-between',
     padding: '0px 0px 12px 0px',
@@ -167,34 +144,22 @@ class Asset extends Component {
     } = this.state
 
     return (<div className={ classes.actionsContainer }>
-      <div className={ classes.headingContainer }>
-        <div className={classes.heading}>
-          <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
-          <Typography variant={ 'h5' }>{ t('Asset.InterestRate') }</Typography>
-        </div>
-        <div className={ `${classes.heading} ${classes.right}`}>
-          <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
-          <Typography variant={ 'h5' }>{ t('Asset.AvailableBalance') }</Typography>
-        </div>
-      </div>
       <div className={ classes.tradeContainer }>
         {!asset.disabled && <div className={ classes.balances }>
             <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
         </div>}
-        <div className={ classes.amountContainer }>
-          <TextField
-            fullWidth
-            className={ classes.actionInput }
-            id='amount'
-            value={ amount }
-            error={ amountError }
-            onChange={ this.onChange }
-            disabled={ loading || asset.disabled }
-            placeholder="0.00"
-            variant="outlined"
-            onKeyDown={ this.inputKeyDown }
-          />
-        </div>
+        <TextField
+          fullWidth
+          className={ classes.actionInput }
+          id='amount'
+          value={ amount }
+          error={ amountError }
+          onChange={ this.onChange }
+          disabled={ loading || asset.disabled }
+          placeholder="0.00"
+          variant="outlined"
+          onKeyDown={ this.inputKeyDown }
+        />
         <div className={ classes.scaleContainer }>
           <Button
             className={ classes.scale }
@@ -235,6 +200,7 @@ class Asset extends Component {
           color="primary"
           disabled={ loading || !account.address || asset.disabled }
           onClick={ this.onInvest }
+          fullWidth
           >
           <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Asset.Disabled'):t('Asset.Earn')}</Typography>
         </Button>
@@ -244,20 +210,18 @@ class Asset extends Component {
         <div className={ classes.balances }>
           <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ asset.investedBalance ? asset.investedBalance.toFixed(4) : '0.0000' } { asset.investSymbol } ({ asset.investedBalance ? (parseFloat(asset.investedBalance)*parseFloat(asset.price)).toFixed(4) : '0' }  { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol } )</Typography>
         </div>
-        <div className={ classes.amountContainer }>
-          <TextField
-            fullWidth
-            className={ classes.actionInput }
-            id='redeemAmount'
-            value={ redeemAmount }
-            error={ redeemAmountError }
-            onChange={ this.onChange }
-            disabled={ loading }
-            placeholder="0.00"
-            variant="outlined"
-            onKeyDown={ this.inputRedeemKeyDown }
-          />
-        </div>
+        <TextField
+          fullWidth
+          className={ classes.actionInput }
+          id='redeemAmount'
+          value={ redeemAmount }
+          error={ redeemAmountError }
+          onChange={ this.onChange }
+          disabled={ loading }
+          placeholder="0.00"
+          variant="outlined"
+          onKeyDown={ this.inputRedeemKeyDown }
+        />
         <div className={ classes.scaleContainer }>
           <Button
             className={ classes.scale }
@@ -298,6 +262,7 @@ class Asset extends Component {
           color="primary"
           disabled={ loading || !account.address }
           onClick={ this.onRedeem }
+          fullWidth
           >
           <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.Claim') }</Typography>
         </Button>

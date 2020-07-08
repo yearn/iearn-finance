@@ -21,13 +21,20 @@ import Footer from './components/footer';
 import Home from './components/home';
 import Pool from './components/pool';
 import Balancer from './components/balancer';
-// import PoolDeposit from './components/pool/deposit';
-// import PoolWithdraw from './components/pool/withdraw';
-// import PoolExchange from './components/pool/exchange';
+import Header from './components/header';
 
 class App extends Component {
+  state = {
+    headerValue: null
+  };
+
+  setHeaderValue = (newValue) => {
+    this.setState({ headerValue: newValue })
+  };
 
   render() {
+
+    const { headerValue } = this.state
 
     return (
       <MuiThemeProvider theme={ createMuiTheme(interestTheme) }>
@@ -40,15 +47,17 @@ class App extends Component {
             alignItems: 'center',
             background: "#f9fafb"
           }}>
-            <Footer />
             <Switch>
               <Route path="/apr">
+                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <APR />
               </Route>
               <Route path="/earn">
+                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <InvestSimple />
               </Route>
               <Route path="/zap">
+                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <Zap />
               </Route>
               <Route path="/idai">
@@ -61,9 +70,11 @@ class App extends Component {
                 <Manage />
               </Route>
               <Route path="/cover">
+                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <Insure />
               </Route>
               <Route path="/pool">
+                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <Pool />
               </Route>
               <Route path="/balancer">
@@ -73,6 +84,7 @@ class App extends Component {
                 <Home />
               </Route>
             </Switch>
+            <Footer />
           </div>
         </IpfsRouter>
       </MuiThemeProvider>

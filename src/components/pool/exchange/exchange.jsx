@@ -15,6 +15,7 @@ import {
 import Loader from '../../loader'
 import Snackbar from '../../snackbar'
 
+import { colors } from '../../../theme'
 import {
   ERROR,
   GET_POOL_BALANCES,
@@ -40,8 +41,11 @@ const styles = theme => ({
     flexDirection: 'column',
     maxWidth: '1200px',
     width: '100%',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center'
+  },
+  introText: {
+    flex: 1
   },
   intro: {
     width: '100%',
@@ -62,7 +66,6 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '12px',
     minWidth: '100%',
     [theme.breakpoints.up('md')]: {
       minWidth: '800px',
@@ -104,17 +107,17 @@ const styles = theme => ({
   addressContainer: {
     display: 'flex',
     justifyContent: 'space-between',
-    maxWidth: '100px',
     overflow: 'hidden',
+    flex: 1,
     whiteSpace: 'nowrap',
     fontSize: '0.83rem',
     textOverflow:'ellipsis',
     cursor: 'pointer',
-    padding: '10px',
-    borderRadius: '0.75rem',
-    height: 'max-content',
+    padding: '28px 30px',
+    borderRadius: '50px',
+    border: '1px solid '+colors.borderBlue,
+    alignItems: 'center',
     [theme.breakpoints.up('md')]: {
-      maxWidth: '130px',
       width: '100%'
     }
   },
@@ -124,7 +127,6 @@ const styles = theme => ({
     flexWrap: 'wrap',
     maxWidth: '800px',
     justifyContent: 'center',
-    padding: '12px',
     flexDirection: 'column',
     alignItems: 'center',
   },
@@ -132,13 +134,11 @@ const styles = theme => ({
     flex: 1,
     display: 'flex',
     flexWrap: 'wrap',
-    padding: '12px',
-    borderRadius: '1.25em',
+    padding: '42px 30px',
+    borderRadius: '50px',
     justifyContent: 'flex-start',
-    marginTop: '20px',
-    [theme.breakpoints.up('md')]: {
-      padding: '24px',
-    }
+    marginTop: '40px',
+    border: '1px solid '+colors.borderBlue,
   },
   actionInput: {
     padding: '0px 0px 12px 0px',
@@ -159,15 +159,10 @@ const styles = theme => ({
     marginRight: '16px'
   },
   balances: {
-    marginTop: '9px',
-    marginBottom: '-23px',
-    marginRight: '30px',
-    paddingRight: '14px',
-    zIndex: '900',
-    display: 'flex',
-    alignItems: 'center',
     width: '100%',
-    justifyContent: 'space-between'
+    textAlign: 'right',
+    paddingRight: '20px',
+    cursor: 'pointer'
   },
   title: {
     paddingRight: '24px'
@@ -182,7 +177,8 @@ const styles = theme => ({
   },
   inputCardHeading: {
     width: '100%',
-    padding: '12px 0px 12px 20px'
+    padding: '12px 0px 12px 20px',
+    color: colors.darkGray
   },
   radioGroup: {
     padding: '12px 0px 24px 20px'
@@ -196,7 +192,14 @@ const styles = theme => ({
   },
   receiveContainer:  {
     flex: 1,
-  }
+  },
+  walletAddress: {
+    padding: '0px 12px'
+  },
+  walletTitle: {
+    flex: 1,
+    color: colors.darkGray
+  },
 });
 
 class Exchange extends Component {
@@ -310,9 +313,10 @@ class Exchange extends Component {
         <div className={ classes.card }>
           <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
           <div className={ classes.intro }>
-            <Typography variant='h2' className={ classes.introText }>{ t('PoolExchange.Intro') }</Typography>
+            <Typography variant='h3' className={ classes.introText }>{ t('PoolExchange.Intro') }</Typography>
             <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-              <Typography variant={ 'h5'} noWrap>{ address }</Typography>
+              <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
+              <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
               <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
             </Card>
           </div>

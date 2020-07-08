@@ -41,58 +41,37 @@ const styles = theme => ({
     fontSize: '0.5rem'
   },
   balances: {
-    marginBottom: '-25px',
-    marginRight: '30px',
-    zIndex: '900',
-    display: 'flex',
-    alignItems: 'center',
     width: '100%',
-    justifyContent: 'space-between'
+    textAlign: 'right',
+    paddingRight: '20px',
+    cursor: 'pointer'
   },
   actionsContainer: {
     paddingBottom: '12px',
     display: 'flex',
-    justifyContent: 'space-between',
-    maxWidth: '100%',
-    flexWrap: 'wrap',
-    flexDirection: 'column',
-    [theme.breakpoints.up('sm')]: {
-      width: '750px',
-      padding: '12px',
-      flexDirection: 'row',
-    }
+    flex: '1',
+    flexWrap: 'wrap'
   },
   title: {
     paddingRight: '24px'
   },
   actionButton: {
-    padding: '12px',
-    backgroundColor: 'white',
-    borderRadius: '1rem',
-    border: '1px solid #E1E1E1',
-    fontWeight: 500,
-    [theme.breakpoints.up('sm')]: {
-      padding: '15px',
-    }
+    height: '47px'
   },
   tradeContainer: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    padding: '24px 12px 24px 12px',
-    alignItems: 'center',
-    [theme.breakpoints.up('sm')]: {
-      padding: '0px 12px 24px 12px',
-    }
+    alignItems: 'center'
   },
   separator: {
     borderBottom: '1px solid #E1E1E1',
     [theme.breakpoints.up('sm')]: {
-      display: 'none'
+      width: '40px',
+      borderBottom: 'none'
     }
   },
   scaleContainer: {
-    width: '250px',
     display: 'flex',
     justifyContent: 'space-between',
     padding: '0px 0px 12px 0px',
@@ -137,13 +116,10 @@ const styles = theme => ({
     padding: '18px 18px 6px 18px',
     borderRadius: '1.25em',
     width: '100%',
-    marginBottom: '12px',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: '24px',
-    }
+    marginTop: '12px'
   },
   tradeContainerCapture: {
-    padding: '12px 0px'
+    padding: '0px 0px'
   },
   positive: {
     color: colors.green
@@ -156,10 +132,13 @@ const styles = theme => ({
   },
   sectionSeparator: {
     borderBottom: '1px solid #DEDEDE',
-    width: '100%',
+    minWidth: '100%',
     marginBottom: '36px',
     marginTop: '24px'
-  }
+  },
+  grey: {
+    color: colors.darkGray
+  },
 });
 
 
@@ -260,36 +239,23 @@ class Asset extends Component {
     }
 
     return (<div className={ classes.actionsContainer }>
-      <div className={ classes.headingContainer }>
-        <div className={classes.heading}>
-          <Typography variant={ 'h3' }>{ ( asset.balance ? (asset.balance).toFixed(4) : '0.0000')+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol ) }</Typography>
-          <Typography variant={ 'h5' }>{ t('Insure.Balance') }</Typography>
-        </div>
-        <div className={`${classes.heading} ${classes.right}`}>
-          <Typography variant={ 'h3' }>{ (asset.balance > 0 ? (asset.insuredBalance  * 100 / (asset.insuredBalance + asset.balance)).toFixed(4) : '0.0000')+'%'}</Typography>
-          <Typography variant={ 'h5' }>{ t('Insure.Insured') }</Typography>
-        </div>
-      </div>
       <div className={ `${classes.tradeContainer} ${classes.tradeContainerCapture}` }>
         {!asset.disabled && <div className={ classes.balances }>
           <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
         </div>}
-        <div className={ classes.amountContainer }>
-          <TextField
-            fullWidth
-            className={ classes.actionInput }
-            id='amount'
-            value={ amount }
-            error={ amountError }
-            onChange={ this.onChange }
-            disabled={ loading || asset.disabled }
-            label=""
-            size="small"
-            placeholder="0.00"
-            variant="outlined"
-            onKeyDown={ this.inputKeyDown }
-          />
-        </div>
+        <TextField
+          fullWidth
+          className={ classes.actionInput }
+          id='amount'
+          value={ amount }
+          error={ amountError }
+          onChange={ this.onChange }
+          disabled={ loading || asset.disabled }
+          size="small"
+          placeholder="0.00"
+          variant="outlined"
+          onKeyDown={ this.inputKeyDown }
+        />
         <div className={ classes.scaleContainer }>
           <Button
             className={ classes.scale }
@@ -325,6 +291,7 @@ class Asset extends Component {
           </Button>
         </div>
         <Button
+          fullWidth
           className={ classes.actionButton }
           variant="outlined"
           color="primary"
@@ -360,22 +327,19 @@ class Asset extends Component {
         {!asset.disabled && <div className={ classes.balances }>
           <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setEthAmount(100) } } className={ classes.value } noWrap>{ t('Insure.Balance') + (ethBalance ? ethBalance.toFixed(4) : '0.0000') } { 'ETH' }</Typography>
         </div>}
-        <div className={ classes.amountContainer }>
-          <TextField
-            fullWidth
-            className={ classes.actionInput }
-            id='ethAmount'
-            value={ ethAmount }
-            error={ ethAmountError }
-            onChange={ this.onChange }
-            disabled={ loading || asset.disabled }
-            label=""
-            size="small"
-            placeholder="0.00"
-            variant="outlined"
-            onKeyDown={ this.inputKeyDown }
-          />
-        </div>
+        <TextField
+          fullWidth
+          className={ classes.actionInput }
+          id='ethAmount'
+          value={ ethAmount }
+          error={ ethAmountError }
+          onChange={ this.onChange }
+          disabled={ loading || asset.disabled }
+          size="small"
+          placeholder="0.00"
+          variant="outlined"
+          onKeyDown={ this.inputKeyDown }
+        />
         <div className={ classes.scaleContainer }>
           <Button
             className={ classes.scale }
@@ -411,6 +375,7 @@ class Asset extends Component {
           </Button>
         </div>
         <Button
+          fullWidth
           className={ classes.actionButton }
           variant="outlined"
           color="primary"

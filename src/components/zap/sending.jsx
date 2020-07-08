@@ -7,6 +7,7 @@ import {
   InputAdornment,
   Button
 } from '@material-ui/core';
+import { colors } from '../../theme'
 
 import { withNamespaces } from 'react-i18next';
 // import {
@@ -32,7 +33,8 @@ const styles = theme => ({
   },
   inputCardHeading: {
     width: '100%',
-    padding: '12px 0px 12px 20px'
+    padding: '12px 0px 12px 20px',
+    color: colors.darkGray
   },
   inputAdornment: {
     fontWeight: '600',

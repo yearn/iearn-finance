@@ -17,6 +17,7 @@ import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withNamespaces } from 'react-i18next';
+import { colors } from '../../theme'
 
 import InvestAllModal from './investAllModal.jsx'
 import UnlockModal from '../unlock/unlockModal.jsx'
@@ -58,10 +59,10 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '12px',
     minWidth: '100%',
+    marginTop: '40px',
     [theme.breakpoints.up('md')]: {
-      minWidth: '800px',
+      minWidth: '900px',
     }
   },
   balancesContainer: {
@@ -89,7 +90,7 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: '20px'
+    paddingBottom: '32px'
   },
   introCenter: {
     maxWidth: '500px',
@@ -106,7 +107,6 @@ const styles = theme => ({
     },
     padding: '12px',
     backgroundColor: "#2F80ED",
-    borderRadius: '1rem',
     border: '1px solid #E1E1E1',
     fontWeight: 500,
     [theme.breakpoints.up('md')]: {
@@ -187,19 +187,22 @@ const styles = theme => ({
   addressContainer: {
     display: 'flex',
     justifyContent: 'space-between',
-    maxWidth: '100px',
     overflow: 'hidden',
+    flex: 1,
     whiteSpace: 'nowrap',
     fontSize: '0.83rem',
     textOverflow:'ellipsis',
     cursor: 'pointer',
-    padding: '10px',
-    borderRadius: '0.75rem',
-    height: 'max-content',
+    padding: '28px 30px',
+    borderRadius: '50px',
+    border: '1px solid '+colors.borderBlue,
+    alignItems: 'center',
     [theme.breakpoints.up('md')]: {
-      maxWidth: '130px',
       width: '100%'
     }
+  },
+  between: {
+    width: '40px'
   },
   expansionPanel: {
     maxWidth: 'calc(100vw - 24px)',
@@ -227,7 +230,17 @@ const styles = theme => ({
     border: '1px solid rgb(174, 174, 174)',
     borderRadius: '0.75rem',
     marginBottom: '24px',
-  }
+  },
+  walletAddress: {
+    padding: '0px 12px'
+  },
+  walletTitle: {
+    flex: 1,
+    color: colors.darkGray
+  },
+  grey: {
+    color: colors.darkGray
+  },
 });
 
 const StyledTabs = withStyles({
@@ -273,7 +286,7 @@ class InvestSimple extends Component {
       snackbarType: null,
       snackbarMessage: null,
       hideV1: true,
-      value: 3,
+      value: 1,
     }
 
     if(account && account.address) {
@@ -399,27 +412,30 @@ class InvestSimple extends Component {
               </StyledTabs>*/}
               <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
                 <ToggleButton value={0} aria-label="v1">
-                  <Typography variant={ 'h3' }>v1</Typography>
+                  <Typography variant={ 'h4' }>v1</Typography>
                 </ToggleButton>
                 <ToggleButton value={1} aria-label="v2">
-                  <Typography variant={ 'h3' }>y.curve.fi</Typography>
+                  <Typography variant={ 'h4' }>y.curve.fi</Typography>
                 </ToggleButton>
                 <ToggleButton value={2} aria-label="v3">
-                  <Typography variant={ 'h3' }>busd.curve.fi</Typography>
+                  <Typography variant={ 'h4' }>busd.curve.fi</Typography>
                 </ToggleButton>
-                <ToggleButton value={3} aria-label="v3">
+                {/*<ToggleButton value={3} aria-label="v3">
                   <Typography variant={ 'h3' }>balancer</Typography>
-                </ToggleButton>
+                </ToggleButton>*/}
               </ToggleButtonGroup>
+              <div className={ classes.between }>
+              </div>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-                <Typography variant={ 'h5'} noWrap>{ address }</Typography>
+                <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
+                <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
                 <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
               </Card>
             </div>
           }
           { !account.address &&
             <div className={ classes.introCenter }>
-              <Typography variant='h2'>{ t('InvestSimple.Intro') }</Typography>
+              <Typography variant='h3'>{ t('InvestSimple.Intro') }</Typography>
             </div>
           }
           {!account.address &&
@@ -565,16 +581,16 @@ class InvestSimple extends Component {
                 </div>
                 <div>
                   <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>{ asset.description }</Typography>
                 </div>
               </div>
               <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
-                <Typography variant={ 'h5' }>{ t('InvestSimple.InterestRate') }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ t('InvestSimple.InterestRate') }</Typography>
               </div>
               <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
-                <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ t('InvestSimple.AvailableBalance') }</Typography>
               </div>
             </div>
           </ExpansionPanelSummary>

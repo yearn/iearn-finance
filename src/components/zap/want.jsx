@@ -7,6 +7,7 @@ import {
   MenuItem,
   InputAdornment
 } from '@material-ui/core';
+import { colors } from '../../theme'
 
 import { withNamespaces } from 'react-i18next';
 // import {
@@ -32,7 +33,8 @@ const styles = theme => ({
   },
   inputCardHeading: {
     width: '100%',
-    padding: '12px 0px 12px 20px'
+    padding: '12px 0px 12px 20px',
+    color: colors.darkGray
   },
   assetSelectRoot: {
     borderRadius: '1.25rem'
@@ -244,13 +246,13 @@ class Want extends Component {
             />
           </div>
           <div className={ classes.assetSelectIconName }>
-            <Typography variant='h2'>{ option.symbol }</Typography>
+            <Typography variant='h4'>{ option.symbol }</Typography>
           </div>
           {
             (sendAsset && sendAsset.id === 'crvV3' && option.id === 'crvV4') &&(
               <React.Fragment>
               <div className={ classes.assetSelectPlus }>
-                <Typography variant='h2'>{ '+' }</Typography>
+                <Typography variant='h4'>{ '+' }</Typography>
               </div>
               <div className={ classes.assetSelectIcon }>
                 <img
@@ -260,7 +262,7 @@ class Want extends Component {
                 />
               </div>
               <div className={ classes.assetSelectIconName }>
-                <Typography variant='h2'>{ 'TUSD' }</Typography>
+                <Typography variant='h4'>{ 'TUSD' }</Typography>
               </div>
             </React.Fragment>)
           }

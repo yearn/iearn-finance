@@ -51,16 +51,6 @@ const styles = theme => ({
   unlockCard: {
     padding: '24px'
   },
-  metamaskIcon: {
-    backgroundImage: 'url('+require('../../assets/icn-metamask.svg')+')',
-    width: '30px',
-    height: '30px'
-  },
-  ledgerIcon: {
-    backgroundImage: 'url('+require('../../assets/icn-ledger.svg')+')',
-    width: '30px',
-    height: '30px'
-  },
   buttonText: {
     marginLeft: '12px',
     fontWeight: '700',
@@ -69,17 +59,6 @@ const styles = theme => ({
     maxWidth: '400px',
     marginBottom: '32px',
     marginTop: '32px'
-  },
-  metamask: {
-    backgroundImage: 'url('+require('../../assets/metamask.svg')+')',
-    width: '200px',
-    height: '200px'
-  },
-  ledger: {
-    backgroundImage: 'url('+require('../../assets/icn-ledger.svg')+')',
-    backgroundSize: '100%',
-    width: '200px',
-    height: '200px'
   },
   actionButton: {
     padding: '12px',
@@ -311,11 +290,11 @@ function MyComponent(props) {
                 padding: '16px',
                 backgroundColor: 'white',
                 borderRadius: '1rem',
-
                 border: '1px solid #E1E1E1',
                 fontWeight: 500,
                 display: 'flex',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                minWidth: '250px'
               } }
               variant='outlined'
               color='primary'
@@ -355,7 +334,8 @@ function MyComponent(props) {
             backgroundColor: 'white',
             borderRadius: '20px',
             border: '1px solid #E1E1E1',
-            fontWeight: 500
+            fontWeight: 500,
+            minWidth: '250px'
           } }
           variant='outlined'
           color='primary'

@@ -356,7 +356,7 @@ class Manage extends Component {
         <div className={ classes.investedContainer }>
           { account.address &&
             <div className={ classes.intro }>
-              <Typography variant='h2'>Management. Simplified.</Typography>
+              <Typography variant='h3'>Management. Simplified.</Typography>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
                 <Typography variant={ 'h5'} noWrap>{ address }</Typography>
                 <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
@@ -365,7 +365,7 @@ class Manage extends Component {
           }
           { !account.address &&
             <div className={ classes.introCenter }>
-              <Typography variant='h2'>Management. Simplified.</Typography>
+              <Typography variant='h3'>Management. Simplified.</Typography>
             </div>
           }
           <div className={ classes.balancesContainer }>

@@ -232,7 +232,7 @@ class Balancer extends Component {
           <div className={ classes.investedContainer }>
             <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.introCenter }>
-              <Typography variant='h2'>{ t('Balancer.Intro') }</Typography>
+              <Typography variant='h3'>{ t('Balancer.Intro') }</Typography>
             </div>
             <div className={ classes.connectContainer }>
               <Button
@@ -251,7 +251,7 @@ class Balancer extends Component {
           <div className={ classes.card }>
             <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.intro }>
-              <Typography variant='h2' className={ classes.introText }>{ t('Balancer.Intro') }</Typography>
+              <Typography variant='h3' className={ classes.introText }>{ t('Balancer.Intro') }</Typography>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
                 <Typography variant={ 'h5'} noWrap>{ address }</Typography>
                 <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>

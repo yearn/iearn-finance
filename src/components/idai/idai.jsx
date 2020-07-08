@@ -234,7 +234,7 @@ class IDai extends Component {
         { !account.address &&
           <div className={ classes.investedContainer }>
               <div className={ classes.introCenter }>
-                <Typography variant='h2'>{ t('IDai.Intro') }</Typography>
+                <Typography variant='h3'>{ t('IDai.Intro') }</Typography>
               </div>
               <div className={ classes.connectContainer }>
                 <Button
@@ -252,7 +252,7 @@ class IDai extends Component {
         { account.address &&
           <div className={ classes.card }>
             <div className={ classes.introCenter }>
-              <Typography variant='h2'>{ t('IDai.Intro') }</Typography>
+              <Typography variant='h3'>{ t('IDai.Intro') }</Typography>
             </div>
             <Card className={ classes.iHaveContainer }>
               <Have assets={ assets } curveContracts={ curveContracts } setSendAsset={ this.setSendAsset } sendAsset={ sendAsset } setSendAmountPercent={ this.setSendAmountPercent } loading={ loading } />

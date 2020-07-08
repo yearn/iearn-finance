@@ -17,6 +17,7 @@ import Loader from '../loader'
 import BuiltWithModal from '../builtwith/builtwithModal.jsx'
 import UnlockModal from '../unlock/unlockModal.jsx'
 import Snackbar from '../snackbar'
+import { colors } from '../../theme'
 
 import {
   ERROR,
@@ -50,20 +51,18 @@ const styles = theme => ({
     maxWidth: '1200px',
     width: '100%',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: '40px'
   },
   iHaveContainer: {
     flex: 1,
     display: 'flex',
     flexWrap: 'wrap',
-    padding: '12px',
-    borderRadius: '1.25em',
-    maxWidth: '400px',
+    padding: '42px 30px',
+    borderRadius: '50px',
+    maxWidth: '500px',
     justifyContent: 'center',
-    marginTop: '20px',
-    [theme.breakpoints.up('md')]: {
-      padding: '24px',
-    }
+    border: '1px solid '+colors.borderBlue,
   },
   iWantContainer: {
     flex: 1,
@@ -89,14 +88,12 @@ const styles = theme => ({
   card: {
     width: '100%',
     display: 'flex',
-    marginTop: '60px',
     flexWrap: 'wrap',
     maxWidth: '400px',
     justifyContent: 'center',
-    padding: '12px',
     minWidth: '100%',
     flexDirection: 'column',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   intro: {
     width: '100%',
@@ -104,7 +101,11 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    maxWidth: '400px'
+    paddingBottom: '32px',
+    maxWidth: '500px'
+  },
+  actualIntro: {
+    paddingBottom: '32px',
   },
   introCenter: {
     minWidth: '100%',
@@ -159,17 +160,17 @@ const styles = theme => ({
   addressContainer: {
     display: 'flex',
     justifyContent: 'space-between',
-    maxWidth: '100px',
     overflow: 'hidden',
+    flex: 1,
     whiteSpace: 'nowrap',
     fontSize: '0.83rem',
     textOverflow:'ellipsis',
     cursor: 'pointer',
-    padding: '10px',
-    borderRadius: '0.75rem',
-    height: 'max-content',
+    padding: '28px 30px',
+    borderRadius: '50px',
+    border: '1px solid '+colors.borderBlue,
+    alignItems: 'center',
     [theme.breakpoints.up('md')]: {
-      maxWidth: '130px',
       width: '100%'
     }
   },
@@ -178,7 +179,17 @@ const styles = theme => ({
     border: '1px solid rgb(174, 174, 174)',
     borderRadius: '0.75rem',
     marginBottom: '24px',
-  }
+  },
+  walletAddress: {
+    padding: '0px 12px'
+  },
+  walletTitle: {
+    flex: 1,
+    color: colors.darkGray
+  },
+  grey: {
+    color: colors.darkGray
+  },
 });
 
 class Zap extends Component {
@@ -340,7 +351,7 @@ class Zap extends Component {
           <div className={ classes.investedContainer }>
             <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.introCenter }>
-              <Typography variant='h2'>{ t('Zap.Intro') }</Typography>
+              <Typography variant='h3'>{ t('Zap.Intro') }</Typography>
             </div>
             <div className={ classes.connectContainer }>
               <Button
@@ -359,11 +370,14 @@ class Zap extends Component {
           <div className={ classes.card }>
             <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.intro }>
-              <Typography variant='h2' className={ classes.introText }>{ t('Zap.Intro') }</Typography>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-                <Typography variant={ 'h5'} noWrap>{ address }</Typography>
+                <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
+                <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
                 <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
               </Card>
+            </div>
+            <div className={ classes.actualIntro }>
+              <Typography variant='h3'>{ t('Zap.Intro') }</Typography>
             </div>
             <Card className={ classes.iHaveContainer }>
               <Have assets={ assets } curveContracts={ curveContracts } setSendAsset={ this.setSendAsset } sendAsset={ sendAsset } setSendAmountPercent={ this.setSendAmountPercent } loading={ loading } />

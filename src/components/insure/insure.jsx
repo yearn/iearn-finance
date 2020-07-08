@@ -11,6 +11,7 @@ import {
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withNamespaces } from 'react-i18next';
+import { colors } from '../../theme'
 
 import UnlockModal from '../unlock/unlockModal.jsx'
 import Snackbar from '../snackbar'
@@ -40,10 +41,11 @@ const styles = theme => ({
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    maxWidth: '1200px',
+    maxWidth: '900px',
     width: '100%',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: '40px'
   },
   insuranceContainer: {
     display: 'flex',
@@ -51,7 +53,6 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '12px',
     minWidth: '100%',
     [theme.breakpoints.up('md')]: {
       minWidth: '900px',
@@ -63,6 +64,7 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingBottom: '32px'
   },
   introCenter: {
     maxWidth: '500px',
@@ -71,6 +73,7 @@ const styles = theme => ({
     padding: '48px 0px'
   },
   introText: {
+    flex: 1
   },
   placeholder: {
     display: 'none',
@@ -82,19 +85,22 @@ const styles = theme => ({
   addressContainer: {
     display: 'flex',
     justifyContent: 'space-between',
-    maxWidth: '100px',
     overflow: 'hidden',
+    flex: 1,
     whiteSpace: 'nowrap',
     fontSize: '0.83rem',
     textOverflow:'ellipsis',
     cursor: 'pointer',
-    padding: '10px',
-    borderRadius: '0.75rem',
-    height: 'max-content',
+    padding: '28px 30px',
+    borderRadius: '50px',
+    border: '1px solid '+colors.borderBlue,
+    alignItems: 'center',
     [theme.breakpoints.up('md')]: {
-      maxWidth: '130px',
       width: '100%'
     }
+  },
+  between: {
+    width: '40px'
   },
   connectContainer: {
     padding: '12px',
@@ -178,6 +184,19 @@ const styles = theme => ({
     border: '1px solid rgb(174, 174, 174)',
     borderRadius: '0.75rem',
     marginBottom: '24px',
+  },
+  walletAddress: {
+    padding: '0px 12px'
+  },
+  walletTitle: {
+    flex: 1,
+    color: colors.darkGray
+  },
+  grey: {
+    color: colors.darkGray
+  },
+  actualIntro: {
+    paddingBottom: '20px'
   }
 });
 
@@ -314,16 +333,22 @@ class Insure extends Component {
             <div className={ classes.intro }>
               <div className={ classes.placeholder }>
               </div>
-              <Typography variant='h2' className={ classes.introText }>{ t('Insure.Intro') }</Typography>
+              <Typography variant='h3' className={ classes.introText }></Typography>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-                <Typography variant={ 'h5'} noWrap>{ address }</Typography>
+                <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
+                <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
                 <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
               </Card>
             </div>
           }
+          { account.address &&
+            <div className={ classes.actualIntro }>
+              <Typography variant='h3'>{ t('Zap.Intro') }</Typography>
+            </div>
+          }
           { !account.address &&
             <div className={ classes.introCenter }>
-              <Typography variant='h2'>{ t('Insure.Intro') }</Typography>
+              <Typography variant='h3'>{ t('Insure.Intro') }</Typography>
             </div>
           }
 
@@ -380,16 +405,16 @@ class Insure extends Component {
                 </div>
                 <div>
                   <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>{ asset.description }</Typography>
                 </div>
               </div>
               <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{ (asset.balance ? (asset.balance).toFixed(4) : '0.0000')+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol ) }</Typography>
-                <Typography variant={ 'h5' }>{ t('Insure.Balance') }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ t('Insure.Balance') }</Typography>
               </div>
               <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{ (asset.balance > 0 ? (asset.insuredBalance  * 100 / (asset.insuredBalance + asset.balance)).toFixed(4) : '0.0000')+' %'}</Typography>
-                <Typography variant={ 'h5' }>{ t('Insure.Insured') }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ t('Insure.Insured') }</Typography>
               </div>
             </div>
           </ExpansionPanelSummary>
