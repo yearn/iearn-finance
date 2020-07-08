@@ -22,6 +22,7 @@ import InvestAllModal from './investAllModal.jsx'
 import UnlockModal from '../unlock/unlockModal.jsx'
 import Snackbar from '../snackbar'
 import Asset from './asset'
+import CompAsset from './compAsset'
 import Loader from '../loader'
 
 import {
@@ -31,7 +32,9 @@ import {
   INVEST_RETURNED,
   REDEEM_RETURNED,
   CONNECTION_CONNECTED,
-  CONNECTION_DISCONNECTED
+  CONNECTION_DISCONNECTED,
+  GET_BALANCER_BALANCES,
+  BALANCER_BALANCES_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -260,22 +263,22 @@ class InvestSimple extends Component {
     super()
 
     const account = store.getStore('account')
-    const disclaimerClosed = localStorage.getItem('iearn-disclaimer-closed')
 
     this.state = {
       assets: store.getStore('assets'),
+      balancerAssets: store.getStore('balancerAssets'),
       account: account,
       modalOpen: false,
       modalInvestAllOpen: false,
       snackbarType: null,
       snackbarMessage: null,
       hideV1: true,
-      value: 1,
-      disclaimerClosed: disclaimerClosed
+      value: 3,
     }
 
     if(account && account.address) {
       dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+      dispatcher.dispatch({ type: GET_BALANCER_BALANCES, content: {} })
     }
   }
   componentWillMount() {
@@ -285,6 +288,7 @@ class InvestSimple extends Component {
     emitter.on(BALANCES_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
+    emitter.on(BALANCER_BALANCES_RETURNED, this.balancerBalancesReturned);
 
   }
 
@@ -296,6 +300,7 @@ class InvestSimple extends Component {
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
 
     emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
+    emitter.removeListener(BALANCER_BALANCES_RETURNED, this.balancerBalancesReturned);
   };
 
   refresh() {
@@ -307,11 +312,17 @@ class InvestSimple extends Component {
     setTimeout(this.refresh,5000);
   };
 
+  balancerBalancesReturned = (balances) => {
+    console.log(store.getStore('balancerAssets'))
+    this.setState({ balancerAssets: store.getStore('balancerAssets') })
+  };
+
   connectionConnected = () => {
     const { t } = this.props
     this.setState({ account: store.getStore('account') })
 
     dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_BALANCER_BALANCES, content: {} })
 
     const that = this
     setTimeout(() => {
@@ -367,7 +378,6 @@ class InvestSimple extends Component {
       snackbarMessage,
       hideV1,
       value,
-      disclaimerClosed
     } = this.state
     var address = null;
     if (account.address) {
@@ -397,6 +407,9 @@ class InvestSimple extends Component {
                 <ToggleButton value={2} aria-label="v3">
                   <Typography variant={ 'h3' }>busd.curve.fi</Typography>
                 </ToggleButton>
+                <ToggleButton value={3} aria-label="v3">
+                  <Typography variant={ 'h3' }>balancer</Typography>
+                </ToggleButton>
               </ToggleButtonGroup>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
                 <Typography variant={ 'h5'} noWrap>{ address }</Typography>
@@ -425,6 +438,7 @@ class InvestSimple extends Component {
           { account.address && value == 0 && this.renderAssetBlocksv1() }
           { account.address && value == 1 && this.renderAssetBlocksv2() }
           { account.address && value == 2 && this.renderAssetBlocksv3() }
+          { account.address && value == 3 && this.renderAssetBlocksv4() }
           {/* account.address && <div className={ classes.investAllContainer }>
             <Button
               className={ classes.actionButton }
@@ -622,6 +636,51 @@ class InvestSimple extends Component {
     })
   }
 
+  renderAssetBlocksv4 = () => {
+    const { balancerAssets, expanded, hideV1 } = this.state
+    const { classes, t } = this.props
+    const width = window.innerWidth
+
+    return balancerAssets.map((asset) => {
+      return (
+        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+          <ExpansionPanelSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1bh-content"
+            id="panel1bh-header"
+          >
+            <div className={ classes.assetSummary }>
+              <div className={classes.headingName}>
+                <div className={ classes.assetIcon }>
+                  <img
+                    alt=""
+                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                    height={ width > 600 ? '40px' : '30px'}
+                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
+                  />
+                </div>
+                <div>
+                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
+                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                </div>
+              </div>
+              <div className={classes.heading}>
+
+              </div>
+              <div className={classes.heading}>
+                <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
+                <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
+              </div>
+            </div>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <CompAsset asset={ asset } startLoading={ this.startLoading } />
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+      )
+    })
+  }
+
   handleChange = (id) => {
     this.setState({ expanded: this.state.expanded === id ? null : id })
   }
@@ -665,11 +724,6 @@ class InvestSimple extends Component {
   closeInvestAllModal = () => {
     this.setState({ modalInvestAllOpen: false })
   }
-
-  // closeDisclaimer = () => {
-  //   localStorage.setItem('iearn-disclaimer-closed', '1')
-  //   this.setState({ disclaimerClosed: '1' })
-  // }
 }
 
 export default withNamespaces()(withRouter(withStyles(styles)(InvestSimple)));

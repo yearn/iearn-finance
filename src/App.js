@@ -20,6 +20,7 @@ import Insure from './components/insure';
 import Footer from './components/footer';
 import Home from './components/home';
 import Pool from './components/pool';
+import Balancer from './components/balancer';
 // import PoolDeposit from './components/pool/deposit';
 // import PoolWithdraw from './components/pool/withdraw';
 // import PoolExchange from './components/pool/exchange';
@@ -47,9 +48,9 @@ class App extends Component {
               <Route path="/earn">
                 <InvestSimple />
               </Route>
-              {<Route path="/zap">
+              <Route path="/zap">
                 <Zap />
-              </Route>}
+              </Route>
               <Route path="/idai">
                 <IDai />
               </Route>
@@ -64,6 +65,9 @@ class App extends Component {
               </Route>
               <Route path="/pool">
                 <Pool />
+              </Route>
+              <Route path="/balancer">
+                <Balancer />
               </Route>
               <Route path="/">
                 <Home />

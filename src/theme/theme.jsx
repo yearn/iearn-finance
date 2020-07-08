@@ -14,7 +14,8 @@ export const colors = {
   orange: 'orange',
   pink: '#DC6BE5',
   compoundGreen: '#00d395',
-  tomato: '#e56b73'
+  tomato: '#e56b73',
+  purple: '#935dff'
 };
 
 const breakpoints = createBreakpoints({

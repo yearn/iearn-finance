@@ -10,10 +10,12 @@ import { withNamespaces } from 'react-i18next';
 
 import {
   ERROR,
-  INVEST,
-  INVEST_RETURNED,
-  REDEEM,
-  REDEEM_RETURNED,
+  BALANCER_CLAIM,
+  BALANCER_CLAIM_RETURNED,
+  BALANCER_DEPOSIT,
+  BALANCER_DEPOSIT_RETURNED,
+  BALANCER_WITHDRAW,
+  BALANCER_WITHDRAW_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -49,7 +51,7 @@ const styles = theme => ({
     [theme.breakpoints.up('sm')]: {
       width: '750px',
       padding: '12px',
-      flexWrap: 'nowrap',
+      flexWrap: 'wrap',
       flexDirection: 'row',
     }
   },
@@ -113,6 +115,10 @@ const styles = theme => ({
   },
   right: {
     textAlign: 'right'
+  },
+  fullWidth: {
+    minWidth: '100%',
+    padding: '0px 12px'
   }
 });
 
@@ -132,23 +138,29 @@ class Asset extends Component {
   }
 
   componentWillMount() {
-    emitter.on(INVEST_RETURNED, this.investReturned);
-    emitter.on(REDEEM_RETURNED, this.redeemReturned);
+    emitter.on(BALANCER_DEPOSIT_RETURNED, this.depositReturned);
+    emitter.on(BALANCER_WITHDRAW_RETURNED, this.withdrawReturned);
+    emitter.on(BALANCER_CLAIM_RETURNED, this.claimReturned);
     emitter.on(ERROR, this.errorReturned);
   }
 
   componentWillUnmount() {
-    emitter.removeListener(INVEST_RETURNED, this.investReturned);
-    emitter.removeListener(REDEEM_RETURNED, this.redeemReturned);
+    emitter.removeListener(BALANCER_DEPOSIT_RETURNED, this.depositReturned);
+    emitter.removeListener(BALANCER_WITHDRAW_RETURNED, this.withdrawReturned);
+    emitter.removeListener(BALANCER_CLAIM_RETURNED, this.claimReturned);
     emitter.removeListener(ERROR, this.errorReturned);
   };
 
-  investReturned = () => {
+  depositReturned = () => {
     this.setState({ loading: false, amount: '' })
   };
 
-  redeemReturned = (txHash) => {
+  withdrawReturned = (txHash) => {
     this.setState({ loading: false, redeemAmount: '' })
+  };
+
+  claimReturned = (txHash) => {
+    this.setState({ loading: false })
   };
 
   errorReturned = (error) => {
@@ -167,16 +179,6 @@ class Asset extends Component {
     } = this.state
 
     return (<div className={ classes.actionsContainer }>
-      <div className={ classes.headingContainer }>
-        <div className={classes.heading}>
-          <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
-          <Typography variant={ 'h5' }>{ t('Asset.InterestRate') }</Typography>
-        </div>
-        <div className={ `${classes.heading} ${classes.right}`}>
-          <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
-          <Typography variant={ 'h5' }>{ t('Asset.AvailableBalance') }</Typography>
-        </div>
-      </div>
       <div className={ classes.tradeContainer }>
         {!asset.disabled && <div className={ classes.balances }>
             <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
@@ -234,9 +236,10 @@ class Asset extends Component {
           variant="outlined"
           color="primary"
           disabled={ loading || !account.address || asset.disabled }
-          onClick={ this.onInvest }
+          onClick={ this.onDeposit }
+          fullWidth
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Asset.Disabled'):t('Asset.Earn')}</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Asset.Disabled'):t('Asset.Deposit')}</Typography>
         </Button>
       </div>
       <div className={ classes.sepperator }></div>
@@ -297,9 +300,23 @@ class Asset extends Component {
           variant="outlined"
           color="primary"
           disabled={ loading || !account.address }
-          onClick={ this.onRedeem }
+          onClick={ this.onWithdraw }
+          fullWidth
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.Claim') }</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.Withdraw') }</Typography>
+        </Button>
+      </div>
+      <div className={ classes.sepperator }></div>
+      <div className={classes.fullWidth}>
+        <Button
+          className={ classes.actionButton }
+          variant="outlined"
+          color="primary"
+          disabled={ loading || !account.address }
+          onClick={ this.onClaim }
+          fullWidth
+          >
+          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.ClaimRewards') }</Typography>
         </Button>
       </div>
     </div>)
@@ -313,11 +330,11 @@ class Asset extends Component {
 
   inputKeyDown = (event) => {
     if (event.which === 13) {
-      this.onInvest();
+      this.onDeposit();
     }
   }
 
-  onInvest = () => {
+  onDeposit = () => {
     this.setState({ amountError: false })
 
     const { amount } = this.state
@@ -330,10 +347,10 @@ class Asset extends Component {
 
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: INVEST, content: { amount: amount, asset: asset } })
+    dispatcher.dispatch({ type: BALANCER_DEPOSIT, content: { amount: amount, asset: asset } })
   }
 
-  onRedeem = () => {
+  onWithdraw = () => {
     this.setState({ redeemAmountError: false })
 
     const { redeemAmount } = this.state
@@ -347,7 +364,16 @@ class Asset extends Component {
     this.setState({ loading: true })
     startLoading()
 
-    dispatcher.dispatch({ type: REDEEM, content: { amount: redeemAmount, asset: asset } })
+    dispatcher.dispatch({ type: BALANCER_WITHDRAW, content: { amount: redeemAmount, asset: asset } })
+  }
+
+  onClaim = () => {
+    const { asset, startLoading  } = this.props
+
+    this.setState({ loading: true })
+    startLoading()
+
+    dispatcher.dispatch({ type: BALANCER_CLAIM, content: { asset: asset } })
   }
 
   setAmount = (percent) => {

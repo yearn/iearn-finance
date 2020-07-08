@@ -12,6 +12,7 @@ import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import SecurityIcon from '@material-ui/icons/Security';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PieChartIcon from '@material-ui/icons/PieChart';
+import DetailsIcon from '@material-ui/icons/Details';
 
 const styles = theme => ({
   root: {
@@ -38,7 +39,7 @@ const styles = theme => ({
     transition: 'background-color 0.2s linear',
     [theme.breakpoints.up('sm')]: {
       height: '100vh',
-      minWidth: '20%',
+      minWidth: '16.6%',
       minHeight: '50vh',
     }
   },
@@ -137,6 +138,24 @@ const styles = theme => ({
       color: colors.tomato
     },
   },
+  balancer: {
+    backgroundColor: colors.white,
+    '&:hover': {
+      backgroundColor: colors.purple,
+      '& .title': {
+        color: colors.white,
+      },
+      '& .icon': {
+        color: colors.white
+      }
+    },
+    '& .title': {
+      color: colors.purple,
+    },
+    '& .icon': {
+      color: colors.purple
+    },
+  },
   title: {
     padding: '24px',
     paddingBottom: '0px',
@@ -190,6 +209,10 @@ class Home extends Component {
         <Card className={ `${classes.card} ${classes.pool}` } onClick={ () => { this.nav(location.pathname+'pool') }}>
           <PieChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Pool") }</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.balancer}` } onClick={ () => { this.nav(location.pathname+'balancer') }}>
+          <DetailsIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h1'} className={ `${classes.title} title` }>{ t("Home.Balancer") }</Typography>
         </Card>
       </div>
     )

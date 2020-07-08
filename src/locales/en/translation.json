@@ -11,6 +11,9 @@
   "Asset.Disabled": "Disabled",
   "Asset.Earn": "Earn",
   "Asset.Claim": "Claim",
+  "Asset.Deposit": "Deposit",
+  "Asset.Withdraw": "Withdraw",
+  "Asset.ClaimRewards": "Claim Rewards",
 
   "Unlock.Deactivate": "Deactivate",
   "Unlock.WalletConnected": "Wallet successfully connected.",
@@ -68,6 +71,7 @@
   "Home.Apr": "APR",
   "Home.Cover": "Cover",
   "Home.Pool": "Pool",
+  "Home.Balancer": "Balancer",
 
   "Zap.IWillReceive": "I will receive",
   "Zap.IHave": "I have",
@@ -91,6 +95,9 @@
   "PoolExchange.To": "To",
 
   "Pool.Intro": "Pooling. Simple.",
-  "Pool.Connect": "Connect wallet"
+  "Pool.Connect": "Connect wallet",
+
+  "Balancer.Intro": "Balancer. Simple.",
+  "Balancer.Connect": "Connect wallet"
 
 }
