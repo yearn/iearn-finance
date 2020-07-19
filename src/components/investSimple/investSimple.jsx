@@ -17,11 +17,13 @@ import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withNamespaces } from 'react-i18next';
+import { colors } from '../../theme'
 
 import InvestAllModal from './investAllModal.jsx'
 import UnlockModal from '../unlock/unlockModal.jsx'
 import Snackbar from '../snackbar'
 import Asset from './asset'
+import CompAsset from './compAsset'
 import Loader from '../loader'
 
 import {
@@ -31,7 +33,9 @@ import {
   INVEST_RETURNED,
   REDEEM_RETURNED,
   CONNECTION_CONNECTED,
-  CONNECTION_DISCONNECTED
+  CONNECTION_DISCONNECTED,
+  GET_BALANCER_BALANCES,
+  BALANCER_BALANCES_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -55,10 +59,10 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '12px',
     minWidth: '100%',
+    marginTop: '40px',
     [theme.breakpoints.up('md')]: {
-      minWidth: '800px',
+      minWidth: '900px',
     }
   },
   balancesContainer: {
@@ -86,7 +90,7 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: '20px'
+    paddingBottom: '32px'
   },
   introCenter: {
     maxWidth: '500px',
@@ -103,7 +107,6 @@ const styles = theme => ({
     },
     padding: '12px',
     backgroundColor: "#2F80ED",
-    borderRadius: '1rem',
     border: '1px solid #E1E1E1',
     fontWeight: 500,
     [theme.breakpoints.up('md')]: {
@@ -184,19 +187,22 @@ const styles = theme => ({
   addressContainer: {
     display: 'flex',
     justifyContent: 'space-between',
-    maxWidth: '100px',
     overflow: 'hidden',
+    flex: 1,
     whiteSpace: 'nowrap',
     fontSize: '0.83rem',
     textOverflow:'ellipsis',
     cursor: 'pointer',
-    padding: '10px',
-    borderRadius: '0.75rem',
-    height: 'max-content',
+    padding: '28px 30px',
+    borderRadius: '50px',
+    border: '1px solid '+colors.borderBlue,
+    alignItems: 'center',
     [theme.breakpoints.up('md')]: {
-      maxWidth: '130px',
       width: '100%'
     }
+  },
+  between: {
+    width: '40px'
   },
   expansionPanel: {
     maxWidth: 'calc(100vw - 24px)',
@@ -224,7 +230,17 @@ const styles = theme => ({
     border: '1px solid rgb(174, 174, 174)',
     borderRadius: '0.75rem',
     marginBottom: '24px',
-  }
+  },
+  walletAddress: {
+    padding: '0px 12px'
+  },
+  walletTitle: {
+    flex: 1,
+    color: colors.darkGray
+  },
+  grey: {
+    color: colors.darkGray
+  },
 });
 
 const StyledTabs = withStyles({
@@ -260,10 +276,10 @@ class InvestSimple extends Component {
     super()
 
     const account = store.getStore('account')
-    const disclaimerClosed = localStorage.getItem('iearn-disclaimer-closed')
 
     this.state = {
       assets: store.getStore('assets'),
+      balancerAssets: store.getStore('balancerAssets'),
       account: account,
       modalOpen: false,
       modalInvestAllOpen: false,
@@ -271,11 +287,11 @@ class InvestSimple extends Component {
       snackbarMessage: null,
       hideV1: true,
       value: 1,
-      disclaimerClosed: disclaimerClosed
     }
 
     if(account && account.address) {
       dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+      dispatcher.dispatch({ type: GET_BALANCER_BALANCES, content: {} })
     }
   }
   componentWillMount() {
@@ -285,6 +301,7 @@ class InvestSimple extends Component {
     emitter.on(BALANCES_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
+    emitter.on(BALANCER_BALANCES_RETURNED, this.balancerBalancesReturned);
 
   }
 
@@ -296,6 +313,7 @@ class InvestSimple extends Component {
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
 
     emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
+    emitter.removeListener(BALANCER_BALANCES_RETURNED, this.balancerBalancesReturned);
   };
 
   refresh() {
@@ -307,11 +325,17 @@ class InvestSimple extends Component {
     setTimeout(this.refresh,5000);
   };
 
+  balancerBalancesReturned = (balances) => {
+    console.log(store.getStore('balancerAssets'))
+    this.setState({ balancerAssets: store.getStore('balancerAssets') })
+  };
+
   connectionConnected = () => {
     const { t } = this.props
     this.setState({ account: store.getStore('account') })
 
     dispatcher.dispatch({ type: GET_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_BALANCER_BALANCES, content: {} })
 
     const that = this
     setTimeout(() => {
@@ -367,7 +391,6 @@ class InvestSimple extends Component {
       snackbarMessage,
       hideV1,
       value,
-      disclaimerClosed
     } = this.state
     var address = null;
     if (account.address) {
@@ -389,24 +412,30 @@ class InvestSimple extends Component {
               </StyledTabs>*/}
               <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
                 <ToggleButton value={0} aria-label="v1">
-                  <Typography variant={ 'h3' }>v1</Typography>
+                  <Typography variant={ 'h4' }>v1</Typography>
                 </ToggleButton>
                 <ToggleButton value={1} aria-label="v2">
-                  <Typography variant={ 'h3' }>y.curve.fi</Typography>
+                  <Typography variant={ 'h4' }>y.curve.fi</Typography>
                 </ToggleButton>
                 <ToggleButton value={2} aria-label="v3">
-                  <Typography variant={ 'h3' }>busd.curve.fi</Typography>
+                  <Typography variant={ 'h4' }>busd.curve.fi</Typography>
                 </ToggleButton>
+                {/*<ToggleButton value={3} aria-label="v3">
+                  <Typography variant={ 'h3' }>balancer</Typography>
+                </ToggleButton>*/}
               </ToggleButtonGroup>
+              <div className={ classes.between }>
+              </div>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-                <Typography variant={ 'h5'} noWrap>{ address }</Typography>
+                <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
+                <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
                 <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
               </Card>
             </div>
           }
           { !account.address &&
             <div className={ classes.introCenter }>
-              <Typography variant='h2'>{ t('InvestSimple.Intro') }</Typography>
+              <Typography variant='h3'>{ t('InvestSimple.Intro') }</Typography>
             </div>
           }
           {!account.address &&
@@ -425,6 +454,7 @@ class InvestSimple extends Component {
           { account.address && value == 0 && this.renderAssetBlocksv1() }
           { account.address && value == 1 && this.renderAssetBlocksv2() }
           { account.address && value == 2 && this.renderAssetBlocksv3() }
+          { account.address && value == 3 && this.renderAssetBlocksv4() }
           {/* account.address && <div className={ classes.investAllContainer }>
             <Button
               className={ classes.actionButton }
@@ -551,16 +581,16 @@ class InvestSimple extends Component {
                 </div>
                 <div>
                   <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>{ asset.description }</Typography>
                 </div>
               </div>
               <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
-                <Typography variant={ 'h5' }>{ t('InvestSimple.InterestRate') }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ t('InvestSimple.InterestRate') }</Typography>
               </div>
               <div className={classes.heading}>
                 <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
-                <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>{ t('InvestSimple.AvailableBalance') }</Typography>
               </div>
             </div>
           </ExpansionPanelSummary>
@@ -622,6 +652,51 @@ class InvestSimple extends Component {
     })
   }
 
+  renderAssetBlocksv4 = () => {
+    const { balancerAssets, expanded, hideV1 } = this.state
+    const { classes, t } = this.props
+    const width = window.innerWidth
+
+    return balancerAssets.map((asset) => {
+      return (
+        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+          <ExpansionPanelSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1bh-content"
+            id="panel1bh-header"
+          >
+            <div className={ classes.assetSummary }>
+              <div className={classes.headingName}>
+                <div className={ classes.assetIcon }>
+                  <img
+                    alt=""
+                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                    height={ width > 600 ? '40px' : '30px'}
+                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
+                  />
+                </div>
+                <div>
+                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
+                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                </div>
+              </div>
+              <div className={classes.heading}>
+
+              </div>
+              <div className={classes.heading}>
+                <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
+                <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
+              </div>
+            </div>
+          </ExpansionPanelSummary>
+          <ExpansionPanelDetails>
+            <CompAsset asset={ asset } startLoading={ this.startLoading } />
+          </ExpansionPanelDetails>
+        </ExpansionPanel>
+      )
+    })
+  }
+
   handleChange = (id) => {
     this.setState({ expanded: this.state.expanded === id ? null : id })
   }
@@ -665,11 +740,6 @@ class InvestSimple extends Component {
   closeInvestAllModal = () => {
     this.setState({ modalInvestAllOpen: false })
   }
-
-  // closeDisclaimer = () => {
-  //   localStorage.setItem('iearn-disclaimer-closed', '1')
-  //   this.setState({ disclaimerClosed: '1' })
-  // }
 }
 
 export default withNamespaces()(withRouter(withStyles(styles)(InvestSimple)));

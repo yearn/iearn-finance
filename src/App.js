@@ -16,17 +16,25 @@ import Manage from './components/manage';
 import Performance from './components/performance';
 import Zap from './components/zap';
 import IDai from './components/idai';
-import Insure from './components/insure';
+// import Insure from './components/insure';
 import Footer from './components/footer';
 import Home from './components/home';
-import Pool from './components/pool';
-// import PoolDeposit from './components/pool/deposit';
-// import PoolWithdraw from './components/pool/withdraw';
-// import PoolExchange from './components/pool/exchange';
+// import Pool from './components/pool';
+// import Balancer from './components/balancer';
+import Header from './components/header';
 
 class App extends Component {
+  state = {
+    headerValue: null
+  };
+
+  setHeaderValue = (newValue) => {
+    this.setState({ headerValue: newValue })
+  };
 
   render() {
+
+    const { headerValue } = this.state
 
     return (
       <MuiThemeProvider theme={ createMuiTheme(interestTheme) }>
@@ -39,17 +47,19 @@ class App extends Component {
             alignItems: 'center',
             background: "#f9fafb"
           }}>
-            <Footer />
             <Switch>
               <Route path="/apr">
+                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <APR />
               </Route>
               <Route path="/earn">
+                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <InvestSimple />
               </Route>
-              {<Route path="/zap">
+              <Route path="/zap">
+                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <Zap />
-              </Route>}
+              </Route>
               <Route path="/idai">
                 <IDai />
               </Route>
@@ -59,16 +69,22 @@ class App extends Component {
               <Route path="/manage">
                 <Manage />
               </Route>
-              <Route path="/cover">
+              {/*<Route path="/cover">
+                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <Insure />
               </Route>
               <Route path="/pool">
+                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <Pool />
               </Route>
+              <Route path="/balancer">
+                <Balancer />
+              </Route>*/}
               <Route path="/">
                 <Home />
               </Route>
             </Switch>
+            <Footer />
           </div>
         </IpfsRouter>
       </MuiThemeProvider>

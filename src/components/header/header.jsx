@@ -1,239 +1,241 @@
-import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
+import React from 'react'
 import { withStyles } from '@material-ui/core/styles';
-import { Typography } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-
-import UnlockModal from '../unlock/unlockModal.jsx'
-
 import {
-  CONNECT_METAMASK,
-  CONNECT_METAMASK_PASSIVE,
-  METAMASK_CONNECTED
-} from '../../constants'
-
+  Tabs,
+  Tab,
+  Typography
+} from '@material-ui/core';
+import { withRouter } from "react-router-dom";
 import { colors } from '../../theme'
-
-import Store from "../../stores";
-const dispatcher = Store.dispatcher
-const emitter = Store.emitter
-const store = Store.store
 
 const styles = theme => ({
   root: {
-    display: 'flex',
-    justifyContent: 'space-around',
-    background: colors.blue,
-    borderBottom: '1px solid #aaa',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+    verticalAlign: 'top',
     width: '100%',
-  },
-  header: {
-    maxWidth: '1200px',
-    flex: 1,
     display: 'flex',
-    padding: '20px 12px',
+  },
+  earn: {
+    flex: '1',
+    height: '75px',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
     alignItems: 'center',
-    [theme.breakpoints.up('lg')]: {
-      padding: '30px 0px',
-    }
-  },
-  brandingContainer: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center'
-  },
-  brandingName: {
-    paddingLeft: '12px',
-    cursor: 'pointer'
-  },
-  brandingIcon: {
-    border: '1px solid '+colors.white,
-    cursor: 'pointer'
-  },
-  linksContainer: {
-    flex: 1,
-    display: 'none',
-    [theme.breakpoints.up('md')]: {
-      maxWidth: '500px',
-      listStyleType: 'none',
-      margin: 0,
-      padding: 0,
-      display: 'flex',
-      justifyContent: 'space-evenly',
-    }
-  },
-  linksContainerMobile: {
-    position: 'absolute',
-    top: '66px',
-    left: '0px',
-    right: '0px',
-    backgroundColor: '#fff',
-    boxShadow: '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    zIndex: 99,
-    [theme.breakpoints.up('md')]: {
-      display: 'none',
-    }
-  },
-  link: {
     cursor: 'pointer',
-    padding: '6px',
-    borderBottom: '2px solid rgba(0, 0, 0, 0)',
-    width: 'fit-content',
+    backgroundColor: colors.pink,
     '&:hover': {
-      borderBottom: '2px solid #aaa'
-    }
+      backgroundColor: "#f9fafb",
+      '& .title': {
+        color: colors.pink
+      },
+      '& .titleActive': {
+        color: colors.pink,
+        borderBottom: '4px solid '+colors.pink,
+        padding: '10px 0px'
+      },
+      '& .icon': {
+        color: colors.pink
+      }
+    },
+    '& .title': {
+      color: colors.white
+    },
+    '& .titleActive': {
+      color: colors.white,
+      borderBottom: '4px solid white',
+      padding: '10px 0px'
+    },
+    '& .icon': {
+      color: colors.white
+    },
   },
-  link_active: {
-    borderBottom: '2px solid '+colors.blue,
-    [theme.breakpoints.up('md')]: {
-      borderBottom: '2px solid '+colors.white,
-    }
-  },
-  addressContainer: {
-    maxWidth: '100px',
-    padding: '6px 12px',
-    background: '#fbfbfb',
-    cursor: 'pointer',
-    [theme.breakpoints.up('md')]: {
-      maxWidth: '300px',
-    }
-  },
-  menuIconContainer: {
-    padding: '0px 0px 0px 6px',
+  zap: {
+    flex: '1',
+    height: '75px',
+    width: '100%',
     display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
     cursor: 'pointer',
-    [theme.breakpoints.up('md')]: {
-      display: 'none',
-      padding: '0px 20px'
+    backgroundColor: colors.lightBlue,
+    '&:hover': {
+      backgroundColor: "#f9fafb",
+      '& .title': {
+        color: colors.lightBlue,
+      },
+      '& .titleActive': {
+        color: colors.lightBlue,
+        borderBottom: '4px solid '+colors.lightBlue,
+        padding: '10px 0px'
+      },
+      '& .icon': {
+        color: colors.lightBlue
+      }
+    },
+    '& .title': {
+      color: colors.white
+    },
+    '& .titleActive': {
+      color: colors.white,
+      borderBottom: '4px solid white',
+      padding: '10px 0px'
+    },
+    '& .icon': {
+      color: colors.white
+    },
+  },
+  apr: {
+    flex: '1',
+    height: '75px',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    backgroundColor: colors.lightBlack,
+    '&:hover': {
+      backgroundColor: "#f9fafb",
+      '& .title': {
+        color: colors.lightBlack
+      },
+      '& .titleActive': {
+        color: colors.lightBlack,
+        borderBottom: '4px solid '+colors.lightBlack,
+        padding: '10px 0px'
+      },
+      '& .icon': {
+        color: colors.lightBlack
+      }
+    },
+    '& .title': {
+      color: colors.white
+    },
+    '& .titleActive': {
+      color: colors.white,
+      borderBottom: '4px solid white',
+      padding: '10px 0px'
+    },
+    '& .icon': {
+      color: colors.white
     }
   },
-  menuIcon: {
-    color: colors.white
-  }
+  cover: {
+    flex: '1',
+    height: '75px',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    backgroundColor: colors.compoundGreen,
+    '&:hover': {
+      backgroundColor: "#f9fafb",
+      '& .title': {
+        color: colors.compoundGreen
+      },
+      '& .titleActive': {
+        color: colors.compoundGreen,
+        borderBottom: '4px solid '+colors.compoundGreen,
+        padding: '10px 0px'
+      },
+      '& .icon': {
+        color: colors.compoundGreen
+      }
+    },
+    '& .title': {
+      color: colors.white
+    },
+    '& .titleActive': {
+      color: colors.white,
+      borderBottom: '4px solid white',
+      padding: '10px 0px'
+    },
+    '& .icon': {
+      color: colors.white
+    }
+  },
+  pool: {
+    flex: '1',
+    height: '75px',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    cursor: 'pointer',
+    backgroundColor: colors.tomato,
+    '&:hover': {
+      backgroundColor: "#f9fafb",
+      '& .title': {
+        color: colors.tomato
+      },
+      '& .titleActive': {
+        color: colors.tomato,
+        borderBottom: '4px solid '+colors.tomato,
+        padding: '10px 0px'
+      },
+      '& .icon': {
+        color: colors.tomato
+      }
+    },
+    '& .title': {
+      color: colors.white
+    },
+    '& .titleActive': {
+      color: colors.white,
+      borderBottom: '4px solid white',
+      padding: '10px 0px'
+    },
+    '& .icon': {
+      color: colors.white
+    }
+  },
 });
 
-class Header extends Component {
-  constructor(props) {
-    super();
+function Header(props) {
+  const {
+    classes,
+    setHeaderValue,
+    headerValue,
+    location
+  } = props;
 
-    dispatcher.dispatch({ type: CONNECT_METAMASK_PASSIVE, content: {} })
+  const [value, setValue] = React.useState(0);
 
-    this.state = {
-      address: null,
-      modalOpen: false,
-      menuOpen: false
-    }
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+    setHeaderValue(newValue)
+  };
+
+  const nav = (screen) => {
+    props.history.push('/'+screen)
   }
 
-  componentWillMount() {
-    emitter.on(METAMASK_CONNECTED, this.metamaskUnlocked);
-
-    this.menuRef = React.createRef();
-    this.menuOpenRef = React.createRef();
-    document.addEventListener("mousedown", this.clickListener);
-  };
-
-  componentWillUnmount() {
-    emitter.removeListener(METAMASK_CONNECTED, this.metamaskUnlocked);
-  };
-
-  clickListener = (event) => {
-    if (!this.menuRef.current || this.menuRef.current.contains(event.target) || this.menuOpenRef.current.contains(event.target)) {
-      return;
-    } else {
-      this.closeMenu()
-    }
-  };
-
-  metamaskUnlocked = () => {
-    const account = store.getStore('account')
-    this.setState({ address: account.address })
-  };
-
-  render() {
-    const { classes, location } = this.props;
-    const {
-      modalOpen,
-      address,
-      menuOpen
-    } = this.state
-
-    return (
-      <div className={ classes.root }>
-        <div className={ classes.header }>
-          <div className={ classes.brandingContainer }>
-            <div className={ classes.brandingIcon } onClick={ this.navigateHome }><Typography variant={ 'body1' } color='secondary'>icon</Typography></div>
-            <div className={ classes.brandingName } onClick={ this.navigateHome }>
-              <Typography variant={ 'h1' } color='secondary'>iearn</Typography>
-            </div>
-          </div>
-          <div className={ classes.linksContainer }>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>iswap</Typography></div>
-            <div className={ `${classes.link} ${classes.link_active}` }><Typography variant={ 'body1' } color='secondary'>iearn</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>ireward</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>iam</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>irefer</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>faq</Typography></div>
-            <div className={ classes.link }><Typography variant={ 'body1' } color='secondary'>what</Typography></div>
-          </div>
-          { address && <div className={ classes.addressContainer } onClick={this.onAddressClick}>
-            <Typography variant={ 'h2' } noWrap>{ address }</Typography>
-          </div>}
-          { !address &&  <div className={ classes.addressContainer } onClick={this.onAddressClick}>
-            <Typography variant={ 'h2' } noWrap>Connect Wallet</Typography>
-          </div> }
-          <div className={ classes.menuIconContainer } ref={this.menuOpenRef}>
-            <MenuIcon onClick={ !menuOpen ? this.toggleMenu : this.closeMenu } className={ classes.menuIcon } />
-          </div>
-          {
-            menuOpen && (<div className={ classes.linksContainerMobile } ref={this.menuRef} >
-              <div className={ classes.link }><Typography variant={ 'body1' }>iswap</Typography></div>
-              <div className={ `${classes.link} ${classes.link_active}` }><Typography variant={ 'body1' }>iearn</Typography></div>
-              <div className={ classes.link }><Typography variant={ 'body1' }>ireward</Typography></div>
-              <div className={ classes.link }><Typography variant={ 'body1' }>iam</Typography></div>
-              <div className={ classes.link }><Typography variant={ 'body1' }>irefer</Typography></div>
-              <div className={ classes.link }><Typography variant={ 'body1' }>faq</Typography></div>
-              <div className={ classes.link }><Typography variant={ 'body1' }>what</Typography></div>
-            </div>)
-          }
-        </div>
-
-        { modalOpen && this.renderModal() }
+  return (
+    <div className={ classes.root }>
+      <div className={ `${classes.earn}` } onClick={ () => { nav('earn') } }>
+        <Typography variant={'h3'} className={ headerValue===0?`titleActive`:`title` }>Earn</Typography>
       </div>
-    )
+      <div className={ `${classes.zap}` } onClick={ () => { nav('zap') } }>
+        <Typography variant={'h3'} className={ headerValue===1?`titleActive`:`title` }>Zap</Typography>
+      </div>
+      <div className={ `${classes.apr}` } onClick={ () => { nav('apr') } }>
+        <Typography variant={'h3'} className={ headerValue===2?`titleActive`:`title` }>APR</Typography>
+      </div>
+      <div className={ `${classes.cover}` } onClick={ () => { return; nav('cover') } }>
+        <Typography variant={'h3'} className={ headerValue===3?`titleActive`:`title` }>Cover</Typography>
+      </div>
+      <div className={ `${classes.pool}` } onClick={ () => { return; nav('pool') } }>
+        <Typography variant={'h3'} className={ headerValue===4?`titleActive`:`title` }>Pool</Typography>
+      </div>
+    </div>
+  )
+}
+
+function a11yProps(index) {
+  return {
+    id: `full-width-tab-${index}`,
+    'aria-controls': `full-width-tabpanel-${index}`,
   };
-
-  navigateHome = () => {
-    this.props.history.push('/')
-  }
-
-  onAddressClick = () => {
-    this.setState({ modalOpen: true })
-  }
-
-  closeModal = () => {
-    this.setState({ modalOpen: false })
-  }
-
-  renderModal = () => {
-    return (
-      <UnlockModal closeModal={ this.closeModal } />
-    )
-  }
-
-  closeMenu = () => {
-    console.log('closing menu')
-    this.setState({ menuOpen: false })
-  }
-
-  toggleMenu = () => {
-    console.log('opening menu')
-    this.setState({ menuOpen: true })
-  }
 }
 
 export default withRouter(withStyles(styles)(Header));

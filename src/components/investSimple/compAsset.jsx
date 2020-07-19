@@ -10,10 +10,12 @@ import { withNamespaces } from 'react-i18next';
 
 import {
   ERROR,
-  INVEST,
-  INVEST_RETURNED,
-  REDEEM,
-  REDEEM_RETURNED,
+  BALANCER_CLAIM,
+  BALANCER_CLAIM_RETURNED,
+  BALANCER_DEPOSIT,
+  BALANCER_DEPOSIT_RETURNED,
+  BALANCER_WITHDRAW,
+  BALANCER_WITHDRAW_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -31,36 +33,59 @@ const styles = theme => ({
     fontSize: '0.5rem'
   },
   balances: {
+    marginBottom: '-25px',
+    marginRight: '30px',
+    zIndex: '900',
+    display: 'flex',
+    alignItems: 'center',
     width: '100%',
-    textAlign: 'right',
-    paddingRight: '20px',
-    cursor: 'pointer'
+    justifyContent: 'space-between'
   },
   actionsContainer: {
     paddingBottom: '12px',
     display: 'flex',
-    flex: '1',
+    justifyContent: 'space-between',
+    maxWidth: '100%',
+    flexWrap: 'wrap',
+    flexDirection: 'column',
+    [theme.breakpoints.up('sm')]: {
+      width: '750px',
+      padding: '12px',
+      flexWrap: 'wrap',
+      flexDirection: 'row',
+    }
   },
   title: {
     paddingRight: '24px'
   },
   actionButton: {
-    height: '47px'
+    padding: '12px',
+    backgroundColor: 'white',
+    borderRadius: '1rem',
+    border: '1px solid #E1E1E1',
+    fontWeight: 500,
+    [theme.breakpoints.up('sm')]: {
+      padding: '15px',
+    }
   },
   tradeContainer: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center'
+    padding: '24px 12px 24px 12px',
+    alignItems: 'center',
+    [theme.breakpoints.up('sm')]: {
+      padding: '0px 12px 24px 12px',
+    }
   },
   sepperator: {
     borderBottom: '1px solid #E1E1E1',
     [theme.breakpoints.up('sm')]: {
-      width: '40px',
-      borderBottom: 'none'
+      display: 'none'
     }
   },
   scaleContainer: {
+    width: '250px',
     display: 'flex',
     justifyContent: 'space-between',
     padding: '0px 0px 12px 0px',
@@ -90,6 +115,10 @@ const styles = theme => ({
   },
   right: {
     textAlign: 'right'
+  },
+  fullWidth: {
+    minWidth: '100%',
+    padding: '0px 12px'
   }
 });
 
@@ -109,23 +138,29 @@ class Asset extends Component {
   }
 
   componentWillMount() {
-    emitter.on(INVEST_RETURNED, this.investReturned);
-    emitter.on(REDEEM_RETURNED, this.redeemReturned);
+    emitter.on(BALANCER_DEPOSIT_RETURNED, this.depositReturned);
+    emitter.on(BALANCER_WITHDRAW_RETURNED, this.withdrawReturned);
+    emitter.on(BALANCER_CLAIM_RETURNED, this.claimReturned);
     emitter.on(ERROR, this.errorReturned);
   }
 
   componentWillUnmount() {
-    emitter.removeListener(INVEST_RETURNED, this.investReturned);
-    emitter.removeListener(REDEEM_RETURNED, this.redeemReturned);
+    emitter.removeListener(BALANCER_DEPOSIT_RETURNED, this.depositReturned);
+    emitter.removeListener(BALANCER_WITHDRAW_RETURNED, this.withdrawReturned);
+    emitter.removeListener(BALANCER_CLAIM_RETURNED, this.claimReturned);
     emitter.removeListener(ERROR, this.errorReturned);
   };
 
-  investReturned = () => {
+  depositReturned = () => {
     this.setState({ loading: false, amount: '' })
   };
 
-  redeemReturned = (txHash) => {
+  withdrawReturned = (txHash) => {
     this.setState({ loading: false, redeemAmount: '' })
+  };
+
+  claimReturned = (txHash) => {
+    this.setState({ loading: false })
   };
 
   errorReturned = (error) => {
@@ -148,18 +183,20 @@ class Asset extends Component {
         {!asset.disabled && <div className={ classes.balances }>
             <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
         </div>}
-        <TextField
-          fullWidth
-          className={ classes.actionInput }
-          id='amount'
-          value={ amount }
-          error={ amountError }
-          onChange={ this.onChange }
-          disabled={ loading || asset.disabled }
-          placeholder="0.00"
-          variant="outlined"
-          onKeyDown={ this.inputKeyDown }
-        />
+        <div className={ classes.amountContainer }>
+          <TextField
+            fullWidth
+            className={ classes.actionInput }
+            id='amount'
+            value={ amount }
+            error={ amountError }
+            onChange={ this.onChange }
+            disabled={ loading || asset.disabled }
+            placeholder="0.00"
+            variant="outlined"
+            onKeyDown={ this.inputKeyDown }
+          />
+        </div>
         <div className={ classes.scaleContainer }>
           <Button
             className={ classes.scale }
@@ -199,10 +236,10 @@ class Asset extends Component {
           variant="outlined"
           color="primary"
           disabled={ loading || !account.address || asset.disabled }
-          onClick={ this.onInvest }
+          onClick={ this.onDeposit }
           fullWidth
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Asset.Disabled'):t('Asset.Earn')}</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Asset.Disabled'):t('Asset.Deposit')}</Typography>
         </Button>
       </div>
       <div className={ classes.sepperator }></div>
@@ -210,18 +247,20 @@ class Asset extends Component {
         <div className={ classes.balances }>
           <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ asset.investedBalance ? asset.investedBalance.toFixed(4) : '0.0000' } { asset.investSymbol } ({ asset.investedBalance ? (parseFloat(asset.investedBalance)*parseFloat(asset.price)).toFixed(4) : '0' }  { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol } )</Typography>
         </div>
-        <TextField
-          fullWidth
-          className={ classes.actionInput }
-          id='redeemAmount'
-          value={ redeemAmount }
-          error={ redeemAmountError }
-          onChange={ this.onChange }
-          disabled={ loading }
-          placeholder="0.00"
-          variant="outlined"
-          onKeyDown={ this.inputRedeemKeyDown }
-        />
+        <div className={ classes.amountContainer }>
+          <TextField
+            fullWidth
+            className={ classes.actionInput }
+            id='redeemAmount'
+            value={ redeemAmount }
+            error={ redeemAmountError }
+            onChange={ this.onChange }
+            disabled={ loading }
+            placeholder="0.00"
+            variant="outlined"
+            onKeyDown={ this.inputRedeemKeyDown }
+          />
+        </div>
         <div className={ classes.scaleContainer }>
           <Button
             className={ classes.scale }
@@ -261,10 +300,23 @@ class Asset extends Component {
           variant="outlined"
           color="primary"
           disabled={ loading || !account.address }
-          onClick={ this.onRedeem }
+          onClick={ this.onWithdraw }
           fullWidth
           >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.Claim') }</Typography>
+          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.Withdraw') }</Typography>
+        </Button>
+      </div>
+      <div className={ classes.sepperator }></div>
+      <div className={classes.fullWidth}>
+        <Button
+          className={ classes.actionButton }
+          variant="outlined"
+          color="primary"
+          disabled={ loading || !account.address }
+          onClick={ this.onClaim }
+          fullWidth
+          >
+          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.ClaimRewards') }</Typography>
         </Button>
       </div>
     </div>)
@@ -278,11 +330,11 @@ class Asset extends Component {
 
   inputKeyDown = (event) => {
     if (event.which === 13) {
-      this.onInvest();
+      this.onDeposit();
     }
   }
 
-  onInvest = () => {
+  onDeposit = () => {
     this.setState({ amountError: false })
 
     const { amount } = this.state
@@ -295,10 +347,10 @@ class Asset extends Component {
 
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: INVEST, content: { amount: amount, asset: asset } })
+    dispatcher.dispatch({ type: BALANCER_DEPOSIT, content: { amount: amount, asset: asset } })
   }
 
-  onRedeem = () => {
+  onWithdraw = () => {
     this.setState({ redeemAmountError: false })
 
     const { redeemAmount } = this.state
@@ -312,7 +364,16 @@ class Asset extends Component {
     this.setState({ loading: true })
     startLoading()
 
-    dispatcher.dispatch({ type: REDEEM, content: { amount: redeemAmount, asset: asset } })
+    dispatcher.dispatch({ type: BALANCER_WITHDRAW, content: { amount: redeemAmount, asset: asset } })
+  }
+
+  onClaim = () => {
+    const { asset, startLoading  } = this.props
+
+    this.setState({ loading: true })
+    startLoading()
+
+    dispatcher.dispatch({ type: BALANCER_CLAIM, content: { asset: asset } })
   }
 
   setAmount = (percent) => {

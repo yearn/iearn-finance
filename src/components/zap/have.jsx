@@ -8,9 +8,7 @@ import {
 } from '@material-ui/core';
 
 import { withNamespaces } from 'react-i18next';
-// import {
-//   BALANCES_RETURNED
-// } from '../../constants'
+import { colors } from '../../theme'
 
 import Store from "../../stores";
 // const emitter = Store.emitter
@@ -31,7 +29,8 @@ const styles = theme => ({
   },
   inputCardHeading: {
     width: '100%',
-    padding: '12px 0px 12px 20px'
+    paddingLeft: '20px',
+    color: colors.darkGray
   },
   assetSelectRoot: {
     borderRadius: '1.25rem'
@@ -63,13 +62,10 @@ const styles = theme => ({
     alignItems: 'center'
   },
   balances: {
-    marginBottom: '-25px',
-    marginRight: '30px',
-    zIndex: '900',
-    display: 'flex',
-    alignItems: 'center',
     width: '100%',
-    justifyContent: 'space-between'
+    textAlign: 'right',
+    paddingRight: '20px',
+    cursor: 'pointer'
   },
   title: {
     paddingRight: '24px'
@@ -165,7 +161,7 @@ class Have extends Component {
 
   renderAssetSelect = (id, value, options, error) => {
 
-    const { loading } = this.props
+    const { loading, classes } = this.props
 
     return (
       <TextField
@@ -180,6 +176,7 @@ class Have extends Component {
         variant="outlined"
         fullWidth
         disabled={ loading }
+        className={ classes.assetSelectRoot }
       >
         { /* this.renderAssetOption('CRV') */ }
         { options ? options.map(this.renderAssetOption) : null }
@@ -202,7 +199,7 @@ class Have extends Component {
             />
           </div>
           <div className={ classes.assetSelectIconName }>
-            <Typography variant='h2'>{ option.symbol }</Typography>
+            <Typography variant='h4'>{ option.symbol }</Typography>
           </div>
         </React.Fragment>
       </MenuItem>

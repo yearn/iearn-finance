@@ -1,5 +1,21 @@
 import createBreakpoints from '@material-ui/core/styles/createBreakpoints'
 
+import WorkSansTTF from '../assets/fonts/WorkSans-VariableFont_wght.ttf';
+
+const WorkSans = {
+  fontFamily: 'Work Sans Thin',
+  fontStyle: 'normal',
+  fontDisplay: 'swap',
+  fontWeight: 400,
+  src: `
+    local('Work Sans Thin'),
+    local('Work Sans Thin'),
+    url(${WorkSansTTF}) format('truetype')
+  `,
+  unicodeRange:
+    'U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF',
+};
+
 export const colors = {
   white: "#fff",
   black: '#000',
@@ -14,7 +30,14 @@ export const colors = {
   orange: 'orange',
   pink: '#DC6BE5',
   compoundGreen: '#00d395',
-  tomato: '#e56b73'
+  tomato: '#e56b73',
+  purple: '#935dff',
+
+  text: "#212529",
+  lightBlue: "#2F80ED",
+  topaz: "#0b8f92",
+  darkGray: "rgba(43,57,84,.5)",
+  borderBlue: 'rgba(25, 101, 233, 0.5)'
 };
 
 const breakpoints = createBreakpoints({
@@ -30,119 +53,124 @@ const breakpoints = createBreakpoints({
 
 const iswapTheme =  {
   typography: {
-    fontFamily: ['Open Sans', 'sans-serif'].join(","),
-    lineHeight: '1rem',
-    fontWeight: '700',
-    useNextVariants: true,
+    fontFamily: [
+      '"Work Sans Thin"',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
     h1: {
-      fontSize: '1.0rem',
-      fontWeight: 'bold',
-      [breakpoints.up('md')]: {
-        fontSize: '1.5rem',
-      }
+      fontSize: '48px',
+      fontWeight: '600',
+      WebkitFontSmoothing: "antialiased",
+      MozOsxFontSmoothing: "grayscale",
+      lineHeight: 1.2
     },
     h2: {
-      fontSize: '1rem',
-      fontWeight: '500',
+      fontSize: '36px',
+      fontWeight: '600',
+      WebkitFontSmoothing: "antialiased",
+      MozOsxFontSmoothing: "grayscale",
+      lineHeight: 1.2
     },
     h3: {
-      fontSize: '1rem',
-      fontWeight: '500',
-      color: 'rgb(1, 1, 1)',
+      fontSize: '24px',
+      fontWeight: '600',
+      WebkitFontSmoothing: "antialiased",
+      MozOsxFontSmoothing: "grayscale",
+      lineHeight: 1.2
     },
     h4: {
-      fontSize: '0.75rem',
-      fontWeight: '500',
-      color: '#DC6BE5',
+      fontSize: '16px',
+      fontWeight: '600',
+      WebkitFontSmoothing: "antialiased",
+      MozOsxFontSmoothing: "grayscale",
+      lineHeight: 1.2
     },
     h5: {
-      fontSize: '0.8rem',
-      fontWeight: '500',
-      color: 'rgb(174, 174, 174)',
+      fontSize: '14px',
+      fontWeight: '600',
+      WebkitFontSmoothing: "antialiased",
+      MozOsxFontSmoothing: "grayscale",
+      lineHeight: 1.2
     },
-    h6: {
-      fontSize: '0.825rem',
-      color: '#DC6BE5',
+    body1: {
+      fontSize: '16px',
+      fontWeight: '300',
+      WebkitFontSmoothing: "antialiased",
+      MozOsxFontSmoothing: "grayscale",
+    },
+    body2: {
+      fontSize: '16px',
+      fontWeight: '300',
+      WebkitFontSmoothing: "antialiased",
+      MozOsxFontSmoothing: "grayscale",
     },
   },
   type: 'light',
   overrides: {
+    MuiCssBaseline: {
+      '@global': {
+        '@font-face': [WorkSans],
+      },
+    },
     MuiSelect: {
-      selectMenu: {
-      },
       select: {
+        padding: '9px'
       },
-      icon: {
-        right: '8px'
+      selectMenu: {
+        minHeight: '30px',
+        display: 'flex',
+        alignItems: 'center'
+      }
+    },
+    MuiButton: {
+      root: {
+        borderRadius: '50px',
+        padding: '10px 24px'
+      },
+      outlined: {
+        padding: '10px 24px',
+        borderWidth: '2px !important'
+      },
+      text: {
+        padding: '10px 24px'
+      },
+      label: {
+        textTransform: 'none',
+        fontSize: '1rem'
       }
     },
     MuiInputBase: {
-      root: {
-        color: '#010101',
-        fontSize: '1.5rem',
-        background: 'none',
+      input: {
+        fontSize: '16px',
         fontWeight: '600',
-        borderRadius: '1.25rem',
-        [breakpoints.up('md')]: {
-          fontSize: '1.5rem',
-        }
-      }
-    },
-    MuiExpansionPanel: {
-      root: {
-        padding: '10px',
-        marginTop: '10px',
-        '&:before': {
-          display: 'none',
-        },
-        borderRadius: '20px',
-        backgroundColor: 'white',
-      },
-      rounded: {
-        //borderRadius: '20px',
-      }
-    },
-    MuiInputLabel: {
-      outlined: {
-        transform: 'translate(16px, 21px) scale(1)',
-        [breakpoints.up('md')]: {
-          transform: 'translate(28px, 31px) scale(1)',
-        }
-      }
-    },
-    MuiFormLabel: {
-      root: {
-        fontSize: '1.1rem',
-        [breakpoints.up('md')]: {
-          fontSize: '1.3rem',
-        }
+        WebkitFontSmoothing: "antialiased",
+        MozOsxFontSmoothing: "grayscale",
+        lineHeight: 1.2
       }
     },
     MuiOutlinedInput: {
       input: {
-        padding: '20px',
-        [breakpoints.up('md')]: {
-          padding: '20px',
-        }
+        "&::placeholder": {
+          color: colors.text
+        },
+        color: colors.text,
+        padding: '14px',
+        borderRadius: '50px'
+      },
+      root: {
+        // border: "none !important",
+        borderRadius: '50px'
       },
       notchedOutline: {
-        borderRadius: '1.25rem',
-      }
-    },
-    MuiPrivateNotchedOutline: {
-      root: {
-      }
-    },
-    MuiButton: {
-      label: {
-        fontSize: '1rem',
-        fontWeight: '700',
-        textTransform: 'none'
-      },
-      outlined: {
-        fontWeight: '700',
-        fontSize: '1rem',
-        minWidth: '250px'
+        // border: "none !important"
       }
     },
     MuiSnackbar : {
@@ -174,37 +202,40 @@ const iswapTheme =  {
         marginRight: '0px'
       }
     },
-    MuiDialogContent: {
+    MuiExpansionPanel: {
       root: {
-        padding: '0 12px 12px',
-        '@media (min-width: 960px)': {
-          padding: '0 24px 24px',
-        }
+        border: '1px solid '+colors.borderBlue,
+        borderRadius: '50px',
+        margin: '8px 0px',
+        '&:before': { //underline color when textfield is inactive
+          backgroundColor: 'none',
+          height: '0px'
+        },
       }
     },
     MuiExpansionPanelSummary: {
       root: {
-        padding: '0 12px 0 12px',
-        '@media (min-width: 960px)': {
-          padding: '0 24px 0 24px',
-        }
+        padding: '30px 42px'
+      },
+      content: {
+        margin: '0px !important'
       }
     },
     MuiExpansionPanelDetails: {
       root: {
-        padding: '0 12px 0 12px',
+        padding: '0 12px 15px 12px',
         '@media (min-width: 960px)': {
-          padding: '0 24px 0 24px',
+          padding: '0 24px 30px 24px',
         }
       }
     },
     MuiToggleButton: {
       root: {
-        borderRadius: '0.75rem',
+        borderRadius: '50px',
         textTransform: 'none',
         minWidth:  '100px',
         border: 'none',
-        '& > span > h3': {
+        '& > span > h4': {
           color: '#555',
         },
         '&:hover': {
@@ -212,26 +243,30 @@ const iswapTheme =  {
         },
         "&$selected": {
           backgroundColor: '#2f80ed',
-          '& > span > h3': {
+          '& > span > h4': {
             color: '#fff',
           },
           '&:hover': {
             backgroundColor: "rgba(47,128,237, 0.2)",
-            '& > span > h3': {
+            '& > span > h4': {
               color: '#000',
             },
           },
         }
       }
     },
+    MuiPaper: {
+      elevation1: {
+        boxShadow: 'none'
+      }
+    },
     MuiToggleButtonGroup: {
       root: {
-        borderRadius: '0.75rem',
-        boxShadow: '0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)',
-        border: 'none',
+        border: '1px solid '+colors.borderBlue,
+        borderRadius: '50px',
       },
       groupedSizeSmall: {
-        padding: '0px 15px 0px 15px'
+        padding: '42px 30px'
       }
     },
     MuiFormControlLabel: {
@@ -242,18 +277,14 @@ const iswapTheme =  {
   },
   palette: {
     primary: {
-      main: colors.blue,
-      contrastText: colors.white
-    },
-    secondary: {
       main: colors.blue
     },
-    background:{
-      paper: colors.white,
-      default: colors.white
+    secondary: {
+      main: colors.topaz
     },
     text: {
-      primary: colors.pink
+      primary: colors.text,
+      secondary: colors.text
     }
   },
   breakpoints: breakpoints
