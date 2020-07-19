@@ -221,10 +221,10 @@ function Header(props) {
       <div className={ `${classes.apr}` } onClick={ () => { nav('apr') } }>
         <Typography variant={'h3'} className={ headerValue===2?`titleActive`:`title` }>APR</Typography>
       </div>
-      <div className={ `${classes.cover}` } onClick={ () => { nav('cover') } }>
+      <div className={ `${classes.cover}` } onClick={ () => { return; nav('cover') } }>
         <Typography variant={'h3'} className={ headerValue===3?`titleActive`:`title` }>Cover</Typography>
       </div>
-      <div className={ `${classes.pool}` } onClick={ () => { nav('pool') } }>
+      <div className={ `${classes.pool}` } onClick={ () => { return; nav('pool') } }>
         <Typography variant={'h3'} className={ headerValue===4?`titleActive`:`title` }>Pool</Typography>
       </div>
     </div>

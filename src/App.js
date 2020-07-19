@@ -16,11 +16,11 @@ import Manage from './components/manage';
 import Performance from './components/performance';
 import Zap from './components/zap';
 import IDai from './components/idai';
-import Insure from './components/insure';
+// import Insure from './components/insure';
 import Footer from './components/footer';
 import Home from './components/home';
-import Pool from './components/pool';
-import Balancer from './components/balancer';
+// import Pool from './components/pool';
+// import Balancer from './components/balancer';
 import Header from './components/header';
 
 class App extends Component {
@@ -69,7 +69,7 @@ class App extends Component {
               <Route path="/manage">
                 <Manage />
               </Route>
-              <Route path="/cover">
+              {/*<Route path="/cover">
                 <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <Insure />
               </Route>
@@ -79,7 +79,7 @@ class App extends Component {
               </Route>
               <Route path="/balancer">
                 <Balancer />
-              </Route>
+              </Route>*/}
               <Route path="/">
                 <Home />
               </Route>

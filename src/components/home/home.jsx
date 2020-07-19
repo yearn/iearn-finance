@@ -108,6 +108,11 @@ const styles = theme => ({
       backgroundColor: colors.compoundGreen,
       '& .title': {
         color: colors.white,
+        display: 'none'
+      },
+      '& .soon': {
+        color: colors.white,
+        display: 'block'
       },
       '& .icon': {
         color: colors.white
@@ -115,6 +120,10 @@ const styles = theme => ({
     },
     '& .title': {
       color: colors.compoundGreen,
+    },
+    '& .soon': {
+      color: colors.compoundGreen,
+      display: 'none'
     },
     '& .icon': {
       color: colors.compoundGreen
@@ -126,6 +135,11 @@ const styles = theme => ({
       backgroundColor: colors.tomato,
       '& .title': {
         color: colors.white,
+        display: 'none'
+      },
+      '& .soon': {
+        color: colors.white,
+        display: 'block'
       },
       '& .icon': {
         color: colors.white
@@ -133,6 +147,10 @@ const styles = theme => ({
     },
     '& .title': {
       color: colors.tomato,
+    },
+    '& .soon': {
+      color: colors.tomato,
+      display: 'none'
     },
     '& .icon': {
       color: colors.tomato
@@ -186,8 +204,6 @@ class Home extends Component {
   render() {
     const { classes, t, location } = this.props;
 
-    console.log(location)
-
     return (
       <div className={ classes.root }>
         <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav(location.pathname+'earn') } }>
@@ -202,15 +218,16 @@ class Home extends Component {
           <BarChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Apr") }</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { this.nav(location.pathname+'cover') }}>
+        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { return; this.nav(location.pathname+'cover') }}>
           <SecurityIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Cover") }</Typography>
+          <Typography variant={'h3'} className={ `${classes.title} title soon` }>Disabled</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.pool}` } onClick={ () => { this.nav(location.pathname+'pool') }}>
+        <Card className={ `${classes.card} ${classes.pool}` } onClick={ () => { return; this.nav(location.pathname+'pool') }}>
           <PieChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Pool") }</Typography>
+          <Typography variant={'h3'} className={ `${classes.title} title soon` }>Disabled</Typography>
         </Card>
-
       </div>
     )
   };
