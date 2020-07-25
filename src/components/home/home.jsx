@@ -9,10 +9,8 @@ import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
 import FlashOnIcon from '@material-ui/icons/FlashOn';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
-import SecurityIcon from '@material-ui/icons/Security';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PieChartIcon from '@material-ui/icons/PieChart';
-import DetailsIcon from '@material-ui/icons/Details';
 
 const styles = theme => ({
   root: {
@@ -135,12 +133,12 @@ const styles = theme => ({
       backgroundColor: colors.tomato,
       '& .title': {
         color: colors.white,
-        display: 'none'
+        // display: 'none'
       },
-      '& .soon': {
-        color: colors.white,
-        display: 'block'
-      },
+      // '& .soon': {
+      //   color: colors.white,
+      //   display: 'block'
+      // },
       '& .icon': {
         color: colors.white
       }
@@ -148,10 +146,10 @@ const styles = theme => ({
     '& .title': {
       color: colors.tomato,
     },
-    '& .soon': {
-      color: colors.tomato,
-      display: 'none'
-    },
+    // '& .soon': {
+    //   color: colors.tomato,
+    //   display: 'none'
+    // },
     '& .icon': {
       color: colors.tomato
     },
@@ -218,15 +216,9 @@ class Home extends Component {
           <BarChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Apr") }</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { return; this.nav(location.pathname+'cover') }}>
-          <SecurityIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Cover") }</Typography>
-          <Typography variant={'h3'} className={ `${classes.title} title soon` }>Disabled</Typography>
-        </Card>
-        <Card className={ `${classes.card} ${classes.pool}` } onClick={ () => { return; this.nav(location.pathname+'pool') }}>
+        <Card className={ `${classes.card} ${classes.pool}` } onClick={ () => { this.nav(location.pathname+'vaults') }}>
           <PieChartIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Pool") }</Typography>
-          <Typography variant={'h3'} className={ `${classes.title} title soon` }>Disabled</Typography>
+          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Vaults") }</Typography>
         </Card>
       </div>
     )

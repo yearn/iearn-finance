@@ -1,8 +1,6 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core/styles';
 import {
-  Tabs,
-  Tab,
   Typography
 } from '@material-ui/core';
 import { withRouter } from "react-router-dom";
@@ -194,17 +192,8 @@ const styles = theme => ({
 function Header(props) {
   const {
     classes,
-    setHeaderValue,
-    headerValue,
-    location
+    headerValue
   } = props;
-
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-    setHeaderValue(newValue)
-  };
 
   const nav = (screen) => {
     props.history.push('/'+screen)
@@ -221,21 +210,11 @@ function Header(props) {
       <div className={ `${classes.apr}` } onClick={ () => { nav('apr') } }>
         <Typography variant={'h3'} className={ headerValue===2?`titleActive`:`title` }>APR</Typography>
       </div>
-      <div className={ `${classes.cover}` } onClick={ () => { return; nav('cover') } }>
-        <Typography variant={'h3'} className={ headerValue===3?`titleActive`:`title` }>Cover</Typography>
-      </div>
-      <div className={ `${classes.pool}` } onClick={ () => { return; nav('pool') } }>
-        <Typography variant={'h3'} className={ headerValue===4?`titleActive`:`title` }>Pool</Typography>
+      <div className={ `${classes.pool}` } onClick={ () => { nav('vaults') } }>
+        <Typography variant={'h3'} className={ headerValue===4?`titleActive`:`title` }>Vaults</Typography>
       </div>
     </div>
   )
-}
-
-function a11yProps(index) {
-  return {
-    id: `full-width-tab-${index}`,
-    'aria-controls': `full-width-tabpanel-${index}`,
-  };
 }
 
 export default withRouter(withStyles(styles)(Header));

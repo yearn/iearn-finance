@@ -14,7 +14,6 @@ import {
   useWeb3React,
 } from "@web3-react/core";
 import { Web3Provider } from "@ethersproject/providers";
-import { useEagerConnect, useInactiveListener } from "./hooks";
 
 import {
   ERROR,
@@ -240,10 +239,10 @@ function MyComponent(props) {
   // }, [active, storeContext]);
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
-  const triedEager = useEagerConnect();
+  // const triedEager = useEagerConnect();
 
   // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
-  useInactiveListener(!triedEager || !!activatingConnector);
+  // useInactiveListener(!triedEager || !!activatingConnector);
   const width = window.innerWidth
 
   return (
@@ -253,7 +252,7 @@ function MyComponent(props) {
         const activating = currentConnector === activatingConnector;
         const connected = (currentConnector === connector||currentConnector === localConnector);
         const disabled =
-          !triedEager || !!activatingConnector || !!error;
+           !!activatingConnector || !!error;
 
         var url;
         var display = name;

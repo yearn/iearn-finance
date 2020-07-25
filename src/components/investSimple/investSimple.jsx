@@ -4,14 +4,10 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   Card,
   Typography,
-  Divider,
   Button,
-  Tabs,
-  Tab,
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
-  Switch
 } from '@material-ui/core';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
@@ -23,7 +19,6 @@ import InvestAllModal from './investAllModal.jsx'
 import UnlockModal from '../unlock/unlockModal.jsx'
 import Snackbar from '../snackbar'
 import Asset from './asset'
-import CompAsset from './compAsset'
 import Loader from '../loader'
 
 import {
@@ -34,8 +29,6 @@ import {
   REDEEM_RETURNED,
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED,
-  GET_BALANCER_BALANCES,
-  BALANCER_BALANCES_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -243,33 +236,6 @@ const styles = theme => ({
   },
 });
 
-const StyledTabs = withStyles({
-  indicator: {
-    display: 'flex',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-    '& > div': {
-      maxWidth: 40,
-      width: '100%',
-      backgroundColor: '#DC6BE5',
-    },
-  },
-})(props => <Tabs {...props} TabIndicatorProps={{ children: <div /> }} />);
-
-
-const StyledTab = withStyles(theme => ({
-  root: {
-    textTransform: 'none',
-    fontWeight: theme.typography.fontWeightRegular,
-    fontSize: theme.typography.pxToRem(15),
-    marginRight: '1px',
-    '&:focus': {
-      color: '#DC6BE5',
-      opacity: 1,
-    },
-  },
-}))(props => <Tab disableRipple {...props} />);
-
 class InvestSimple extends Component {
 
   constructor(props) {
@@ -279,7 +245,6 @@ class InvestSimple extends Component {
 
     this.state = {
       assets: store.getStore('assets'),
-      balancerAssets: store.getStore('balancerAssets'),
       account: account,
       modalOpen: false,
       modalInvestAllOpen: false,
@@ -291,7 +256,6 @@ class InvestSimple extends Component {
 
     if(account && account.address) {
       dispatcher.dispatch({ type: GET_BALANCES, content: {} })
-      dispatcher.dispatch({ type: GET_BALANCER_BALANCES, content: {} })
     }
   }
   componentWillMount() {
@@ -301,7 +265,6 @@ class InvestSimple extends Component {
     emitter.on(BALANCES_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-    emitter.on(BALANCER_BALANCES_RETURNED, this.balancerBalancesReturned);
 
   }
 
@@ -311,9 +274,7 @@ class InvestSimple extends Component {
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-
     emitter.removeListener(BALANCES_RETURNED, this.balancesReturned);
-    emitter.removeListener(BALANCER_BALANCES_RETURNED, this.balancerBalancesReturned);
   };
 
   refresh() {
@@ -325,17 +286,11 @@ class InvestSimple extends Component {
     setTimeout(this.refresh,5000);
   };
 
-  balancerBalancesReturned = (balances) => {
-    console.log(store.getStore('balancerAssets'))
-    this.setState({ balancerAssets: store.getStore('balancerAssets') })
-  };
-
   connectionConnected = () => {
     const { t } = this.props
     this.setState({ account: store.getStore('account') })
 
     dispatcher.dispatch({ type: GET_BALANCES, content: {} })
-    dispatcher.dispatch({ type: GET_BALANCER_BALANCES, content: {} })
 
     const that = this
     setTimeout(() => {
@@ -389,7 +344,6 @@ class InvestSimple extends Component {
       modalOpen,
       modalInvestAllOpen,
       snackbarMessage,
-      hideV1,
       value,
     } = this.state
     var address = null;
@@ -405,11 +359,6 @@ class InvestSimple extends Component {
           { account.address &&
 
             <div className={ classes.intro }>
-              {/*<StyledTabs value={value} onChange={this.handleTabChange} aria-label="styled tabs example">
-                <StyledTab label="v1" />
-                <StyledTab label="y.curve.fi" />
-                <StyledTab label="busd.curve.fi" />
-              </StyledTabs>*/}
               <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
                 <ToggleButton value={0} aria-label="v1">
                   <Typography variant={ 'h4' }>v1</Typography>
@@ -420,9 +369,6 @@ class InvestSimple extends Component {
                 <ToggleButton value={2} aria-label="v3">
                   <Typography variant={ 'h4' }>busd.curve.fi</Typography>
                 </ToggleButton>
-                {/*<ToggleButton value={3} aria-label="v3">
-                  <Typography variant={ 'h3' }>balancer</Typography>
-                </ToggleButton>*/}
               </ToggleButtonGroup>
               <div className={ classes.between }>
               </div>
@@ -451,21 +397,9 @@ class InvestSimple extends Component {
               </Button>
             </div>
           }
-          { account.address && value == 0 && this.renderAssetBlocksv1() }
-          { account.address && value == 1 && this.renderAssetBlocksv2() }
-          { account.address && value == 2 && this.renderAssetBlocksv3() }
-          { account.address && value == 3 && this.renderAssetBlocksv4() }
-          {/* account.address && <div className={ classes.investAllContainer }>
-            <Button
-              className={ classes.actionButton }
-              variant="outlined"
-              color="primary"
-              disabled={ loading }
-              onClick={ this.investAllClicked }
-              >
-              <Typography className={ classes.buttonText } variant={ 'h5'}>{ 'Earn All' }</Typography>
-            </Button>
-          </div> */}
+          { account.address && value === 0 && this.renderAssetBlocksv1() }
+          { account.address && value === 1 && this.renderAssetBlocksv2() }
+          { account.address && value === 2 && this.renderAssetBlocksv3() }
         </div>
         { loading && <Loader /> }
         { modalOpen && this.renderModal() }
@@ -476,7 +410,6 @@ class InvestSimple extends Component {
   };
 
   handleTabChange = (event, newValue) => {
-    console.log(newValue);
     this.setState({value:newValue})
   };
 
@@ -485,20 +418,6 @@ class InvestSimple extends Component {
     val[event.target.id] = event.target.checked
     this.setState(val)
   };
-
-  renderAssetBlocks = () => {
-    const { classes, t } = this.props
-    const {
-      value,
-    } = this.state
-    return (
-      <StyledTabs value={value} onChange={this.handleTabChange} aria-label="styled tabs example">
-        <StyledTab label="v1" />
-        <StyledTab label="y.curve.fi" />
-        <StyledTab label="busd.curve.fi" />
-      </StyledTabs>
-    )
-  }
 
   renderAssetBlocksv1 = () => {
     const { assets, expanded, hideV1 } = this.state
@@ -553,7 +472,7 @@ class InvestSimple extends Component {
   }
 
   renderAssetBlocksv2 = () => {
-    const { assets, expanded, hideV1 } = this.state
+    const { assets, expanded } = this.state
     const { classes, t } = this.props
     const width = window.innerWidth
 
@@ -603,7 +522,7 @@ class InvestSimple extends Component {
   }
 
   renderAssetBlocksv3 = () => {
-    const { assets, expanded, hideV1 } = this.state
+    const { assets, expanded } = this.state
     const { classes, t } = this.props
     const width = window.innerWidth
 
@@ -646,51 +565,6 @@ class InvestSimple extends Component {
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Asset asset={ asset } startLoading={ this.startLoading } />
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
-      )
-    })
-  }
-
-  renderAssetBlocksv4 = () => {
-    const { balancerAssets, expanded, hideV1 } = this.state
-    const { classes, t } = this.props
-    const width = window.innerWidth
-
-    return balancerAssets.map((asset) => {
-      return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
-          <ExpansionPanelSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1bh-content"
-            id="panel1bh-header"
-          >
-            <div className={ classes.assetSummary }>
-              <div className={classes.headingName}>
-                <div className={ classes.assetIcon }>
-                  <img
-                    alt=""
-                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
-                    height={ width > 600 ? '40px' : '30px'}
-                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
-                  />
-                </div>
-                <div>
-                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
-                </div>
-              </div>
-              <div className={classes.heading}>
-
-              </div>
-              <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
-                <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
-              </div>
-            </div>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
-            <CompAsset asset={ asset } startLoading={ this.startLoading } />
           </ExpansionPanelDetails>
         </ExpansionPanel>
       )

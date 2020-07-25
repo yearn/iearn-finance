@@ -117,7 +117,7 @@ class Want extends Component {
   }
 
   render() {
-    const { classes, receiveAsset, sendAsset, t, bestPrice, sendAmount } = this.props;
+    const { classes, sendAsset, t, bestPrice, sendAmount } = this.props;
     const {
       assetOptions,
       asset

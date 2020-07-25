@@ -16,12 +16,21 @@ import Manage from './components/manage';
 import Performance from './components/performance';
 import Zap from './components/zap';
 import IDai from './components/idai';
-// import Insure from './components/insure';
 import Footer from './components/footer';
 import Home from './components/home';
-// import Pool from './components/pool';
-// import Balancer from './components/balancer';
 import Header from './components/header';
+import Vaults from './components/pool';
+
+
+import { injected } from "./stores/connectors";
+
+import {
+  CONNECTION_CONNECTED,
+} from './constants'
+
+import Store from "./stores";
+const emitter = Store.emitter
+const store = Store.store
 
 class App extends Component {
   state = {
@@ -32,8 +41,25 @@ class App extends Component {
     this.setState({ headerValue: newValue })
   };
 
-  render() {
+  componentWillMount() {
+    injected.isAuthorized().then(isAuthorized => {
+      if (isAuthorized) {
+        injected.activate()
+        .then((a) => {
+          store.setStore({ account: { address: a.account }, web3context: { library: { provider: a.provider } } })
+          emitter.emit(CONNECTION_CONNECTED)
+          console.log(a)
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+      } else {
 
+      }
+    });
+  }
+
+  render() {
     const { headerValue } = this.state
 
     return (
@@ -69,17 +95,10 @@ class App extends Component {
               <Route path="/manage">
                 <Manage />
               </Route>
-              {/*<Route path="/cover">
+              <Route path="/vaults">
                 <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
-                <Insure />
+                <Vaults />
               </Route>
-              <Route path="/pool">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
-                <Pool />
-              </Route>
-              <Route path="/balancer">
-                <Balancer />
-              </Route>*/}
               <Route path="/">
                 <Home />
               </Route>

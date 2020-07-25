@@ -233,7 +233,6 @@ class APR extends Component {
                 helperText={ t("APR.HowMuch")}
                 placeholder="0.00"
                 variant="outlined"
-                onKeyDown={ this.inputKeyDown }
               />
               <table className={ classes.tableContainer }>
                 { this.renderAggregatedHeader() }
@@ -312,12 +311,6 @@ class APR extends Component {
     val[event.target.id] = event.target.value
     this.setState(val)
     setTimeout(this.dispatch(event.target.value));
-  }
-
-  inputKeyDown = (event) => {
-    if (event.which === 13) {
-      this.onInvest();
-    }
   }
 
   renderTableHeader = (name) => {
