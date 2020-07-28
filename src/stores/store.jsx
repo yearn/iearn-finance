@@ -802,6 +802,10 @@ class Store {
         {
           language: 'Chinese',
           code: 'zh'
+        },
+        {
+          language: 'Farsi',
+          code: 'fa'
         }
       ],
       curvBalance: 0,

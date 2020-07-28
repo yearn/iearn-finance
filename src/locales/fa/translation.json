@@ -1,0 +1,103 @@
+{
+  "InvestSimple.Intro": "به سادگی سود کسب کنید",
+  "InvestSimple.Connect": "کیف پول وصل کنید",
+  "InvestSimple.Show": "V1 نمایش",
+  "InvestSimple.Hide": "V1 مخفی کردن",
+  "InvestSimple.InterestRate": "نرخ بهره",
+  "InvestSimple.AvailableBalance": "موجودی",
+
+  "Asset.InterestRate": "نرخ بهره",
+  "Asset.AvailableBalance": "موجودی",
+  "Asset.Disabled": "غیر فعال",
+  "Asset.Earn": "درآمد",
+  "Asset.Claim": "مطالبه",
+  "Asset.Deposit": "سپرده",
+  "Asset.Withdraw": "برداشت",
+  "Asset.ClaimRewards": "مطالبه پاداش",
+
+  "Unlock.Deactivate": "غیر‌فعال",
+  "Unlock.WalletConnected": "کیف پول با موفقیت متصل شد.",
+
+  "APR.HowMuch": "چقدر می خواهید سرمایه گذاری کنید؟",
+
+  "Snackbar.Error": "خطا",
+  "Snackbar.Warning": "هشدار",
+  "Snackbar.Info": "اطلاعات",
+  "Snackbar.Succecss": "موفقیت",
+  "Snackbar.Hash": "هش",
+
+  "Zap.Intro": "به سادگی زپ کنید",
+  "Zap.Zap": "زپ",
+  "Zap.Swap": "تعویض",
+  "Zap.Trade": "مبادله",
+
+  "IDai.Intro": "iDAI به DAI.",
+  "IDai.Swap": "تعویض",
+
+  "Footer.Home": "خانه",
+  "Footer.About": "درباره",
+  "Footer.Docs": "اسناد",
+  "Footer.Code": "کد",
+  "Footer.Telegram": "تلگرام",
+  "Footer.Yield": "بازده",
+  "Footer.BuiltWith": "ساخته شده با",
+  "Footer.Zap": "زپ",
+  "Footer.Insure": "بیمه شده",
+
+  "Insure.Intro": "پوشش",
+  "Insure.Connect": "کیف پول وصل کنید",
+  "Insure.Balance": "موجودی",
+  "Insure.Insured": "درصد بیمه شده",
+  "Insure.UninsuredYield": "بازده بیمه نشده",
+  "Insure.InsuredYield": "بازده بیمه شده",
+  "Insure.BuyInsurance": "Purchase Cover",
+  "Insure.Disabled": "غیر فعال",
+  "Insure.ClaimInsurance": "مطالبه",
+  "Insure.MintInsurance": "ایجاد بیمه",
+  "Insure.TotalCost": "هزینه کلی",
+  "Insure.Expiration": "انقضا",
+  "Insure.Premium": "حق بیمه",
+  "Insure.ExpectedReturns": "بازده مورد انتظار",
+  "Insure.Unknown": "ناشناس",
+  "Insure.Balance": "موجودی: ",
+  "Insure.TokensMinted": "توکن‌ها ایجاد شدند",
+  "Insure.CostPerToken": "هزینه هر توکن",
+  "Insure.CollateralizationRatio": "نسبت وثیقه",
+  "Insure.MinimumCollateralizationRatio": "حداقل نسبت وثیقه",
+
+  "Home.Earn": "درآمد",
+  "Home.Zap": "زپ",
+  "Home.Apr": "سود سالیانه",
+  "Home.Cover": "پوشش",
+  "Home.Pool": "استخر",
+  "Home.Vaults": "گاوصندق",
+  "Home.Balancer": "بالانسر",
+
+  "Zap.IWillReceive": "دریافتی من",
+  "Zap.IHave": "داریی من",
+  "Zap.SendAmount": "مبلغ ارسالی",
+
+  "PoolDeposit.Intro": "سپرده. به سادگی",
+  "PoolDeposit.Connect": "کیف پول وصل کنید",
+  "PoolDeposit.Deposit": "سپرده",
+  "PoolDeposit.IWillReceive": "دریافتی من",
+  "PoolDeposit.Ideal": "تقسیم پیشنهادی",
+
+  "PoolWithdraw.Intro": "برداشت٫ به سادگی",
+  "PoolWithdraw.Connect": "کیف پول وصل کنید",
+  "PoolWithdraw.Withdraw": "برداشت",
+  "PoolWithdraw.IWillReceive": "دریافتی من",
+
+  "PoolExchange.Intro": "تبادل٫ به سادگی",
+  "PoolExchange.Connect": "کیف پول وصل کنید",
+  "PoolExchange.Exchange": "تبادل",
+  "PoolExchange.From": "از",
+  "PoolExchange.To": "به",
+
+  "Pool.Intro": "استخر٫ به سادگی",
+  "Pool.Connect": "کیف پول وصل کنید",
+
+  "Balancer.Intro": "بالانسر٫ به سادگی",
+  "Balancer.Connect": "کیف پول وصل کنید"
+
+}
