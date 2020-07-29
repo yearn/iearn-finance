@@ -98,8 +98,8 @@ class Footer extends Component {
           <Link to={"/apr"} className={ classes.link }>
             <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Yield') }</Typography>
           </Link>*/}
-          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.About') }</Typography>
-          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Docs') }</Typography>
+          <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.About') }</Typography>
+          <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Docs') }</Typography>
           <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Code') }</Typography>
           <Typography onClick={()=> window.open("https://t.me/iearnfinance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Telegram') }</Typography>
           <Typography onClick={ this.builtWithOverlayClicked } className={ classes.footerText } variant={ 'h6'}>{ t('Footer.BuiltWith') }</Typography>

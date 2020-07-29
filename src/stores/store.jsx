@@ -883,7 +883,7 @@ class Store {
           description: 'USD//C',
           poolSymbol: 'yUSDC',
           erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-          vaultContractAddress: '0x8f40B15dDfD3d32A7Ab7B13b06d828d56A28d6cE',
+          vaultContractAddress: '0x597aD1e0c13Bfe8025993D9e79C69E1c0233522e',
           vaultContractABI: config.vaultContractABI,
           balance: 0,
           pooledBalance: 0,
