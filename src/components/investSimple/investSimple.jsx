@@ -83,7 +83,10 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: '32px'
+    paddingBottom: '32px',
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column-reverse',
+    }
   },
   introCenter: {
     maxWidth: '500px',
@@ -190,12 +193,16 @@ const styles = theme => ({
     borderRadius: '50px',
     border: '1px solid '+colors.borderBlue,
     alignItems: 'center',
+    maxWidth: 'calc(100vw - 24px)',
+    width: '100%',
     [theme.breakpoints.up('md')]: {
-      width: '100%'
+      width: '100%',
+      maxWidth: 'auto'
     }
   },
   between: {
-    width: '40px'
+    width: '40px',
+    height: '40px'
   },
   expansionPanel: {
     maxWidth: 'calc(100vw - 24px)',
@@ -449,7 +456,7 @@ class InvestSimple extends Component {
                 </div>
                 <div>
                   <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>{ asset.description }</Typography>
                 </div>
               </div>
               <div className={classes.heading}>
@@ -572,7 +579,7 @@ class InvestSimple extends Component {
                 </div>
                 <div>
                   <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' }>{ asset.description }</Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>{ asset.description }</Typography>
                 </div>
               </div>
               <div className={classes.heading}>

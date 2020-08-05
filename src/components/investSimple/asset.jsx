@@ -40,6 +40,9 @@ const styles = theme => ({
     paddingBottom: '12px',
     display: 'flex',
     flex: '1',
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column'
+    }
   },
   title: {
     paddingRight: '24px'
@@ -55,9 +58,11 @@ const styles = theme => ({
   },
   sepperator: {
     borderBottom: '1px solid #E1E1E1',
+    margin: '24px',
     [theme.breakpoints.up('sm')]: {
       width: '40px',
-      borderBottom: 'none'
+      borderBottom: 'none',
+      margin: '0px'
     }
   },
   scaleContainer: {
