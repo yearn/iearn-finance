@@ -242,7 +242,6 @@ class InvestSimple extends Component {
     super()
 
     const account = store.getStore('account')
-
     this.state = {
       assets: store.getStore('assets'),
       account: account,
@@ -358,44 +357,44 @@ class InvestSimple extends Component {
 
           { account.address &&
 
-            <div className={ classes.intro }>
-              <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
-                <ToggleButton value={0} aria-label="v1">
-                  <Typography variant={ 'h4' }>v1</Typography>
-                </ToggleButton>
-                <ToggleButton value={1} aria-label="v2">
-                  <Typography variant={ 'h4' }>y.curve.fi</Typography>
-                </ToggleButton>
-                <ToggleButton value={2} aria-label="v3">
-                  <Typography variant={ 'h4' }>busd.curve.fi</Typography>
-                </ToggleButton>
-              </ToggleButtonGroup>
-              <div className={ classes.between }>
-              </div>
-              <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-                <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
-                <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
-                <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
-              </Card>
+          <div className={ classes.intro }>
+            <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
+              <ToggleButton value={0} aria-label="v1">
+                <Typography variant={ 'h4' }>v1</Typography>
+              </ToggleButton>
+              <ToggleButton value={1} aria-label="v2">
+                <Typography variant={ 'h4' }>y.curve.fi</Typography>
+              </ToggleButton>
+              <ToggleButton value={2} aria-label="v3">
+                <Typography variant={ 'h4' }>busd.curve.fi</Typography>
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <div className={ classes.between }>
             </div>
+            <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
+              <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
+              <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
+              <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
+            </Card>
+          </div>
           }
           { !account.address &&
-            <div className={ classes.introCenter }>
-              <Typography variant='h3'>{ t('InvestSimple.Intro') }</Typography>
-            </div>
+          <div className={ classes.introCenter }>
+            <Typography variant='h3'>{ t('InvestSimple.Intro') }</Typography>
+          </div>
           }
           {!account.address &&
-            <div className={ classes.connectContainer }>
-              <Button
-                className={ classes.actionButton }
-                variant="outlined"
-                color="primary"
-                disabled={ loading }
-                onClick={ this.overlayClicked }
-                >
-                <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('InvestSimple.Connect') }</Typography>
-              </Button>
-            </div>
+          <div className={ classes.connectContainer }>
+            <Button
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ loading }
+              onClick={ this.overlayClicked }
+            >
+              <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('InvestSimple.Connect') }</Typography>
+            </Button>
+          </div>
           }
           { account.address && value === 0 && this.renderAssetBlocksv1() }
           { account.address && value === 1 && this.renderAssetBlocksv2() }
@@ -427,7 +426,7 @@ class InvestSimple extends Component {
     return assets.filter((asset) => {
       return (hideV1 === true || asset.version !== 1)
     }).filter((asset) => {
-      return (asset.version === 1 && (asset.investedBalance).toFixed(4) > 0)
+      return (asset.version === 1 && asset.investedBalance && (asset.investedBalance).toFixed(4) > 0)
     }).filter((asset) => {
       return !(asset.symbol === "iDAI")
     }).map((asset) => {
@@ -454,11 +453,23 @@ class InvestSimple extends Component {
                 </div>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
+                <Typography variant={ 'h3' }>
+                  {
+                    asset.maxApr
+                      ? (asset.maxApr * 100).toFixed(4) + ' %'
+                      : 'N/A'
+                  }
+                </Typography>
                 <Typography variant={ 'h5' }>{ t('InvestSimple.InterestRate') }</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
+                <Typography variant={'h3'}>
+                  {
+                    asset.balance
+                      ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol)
+                      : 'N/A'
+                  }
+                </Typography>
                 <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
               </div>
             </div>
@@ -475,7 +486,6 @@ class InvestSimple extends Component {
     const { assets, expanded } = this.state
     const { classes, t } = this.props
     const width = window.innerWidth
-
     return assets.filter((asset) => {
       return (asset.version === 2)
     }).filter((asset) => {
@@ -504,11 +514,23 @@ class InvestSimple extends Component {
                 </div>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
+                <Typography variant={ 'h3' }>
+                  {
+                    asset.maxApr
+                      ? (asset.maxApr * 100).toFixed(4) + ' %'
+                      : 'N/A'
+                  }
+                </Typography>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ t('InvestSimple.InterestRate') }</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
+                <Typography variant={ 'h3' }>
+                  {
+                    asset.balance
+                      ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol)
+                      : 'N/A'
+                  }
+                </Typography>
                 <Typography variant={ 'h5' } className={ classes.grey }>{ t('InvestSimple.AvailableBalance') }</Typography>
               </div>
             </div>
@@ -554,11 +576,23 @@ class InvestSimple extends Component {
                 </div>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ (asset.maxApr*100).toFixed(4) + ' %' }</Typography>
+                <Typography variant={ 'h3' }>
+                  {
+                    asset.maxApr
+                      ? (asset.maxApr * 100).toFixed(4) + ' %'
+                      : 'N/A'
+                  }
+                </Typography>
                 <Typography variant={ 'h5' }>{ t('InvestSimple.InterestRate') }</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{(asset.balance).toFixed(4)+' '+( asset.tokenSymbol ? asset.tokenSymbol : asset.symbol )}</Typography>
+                <Typography variant={ 'h3' }>
+                  {
+                    asset.balance
+                      ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol)
+                      : 'N/A'
+                  }
+                </Typography>
                 <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
               </div>
             </div>
