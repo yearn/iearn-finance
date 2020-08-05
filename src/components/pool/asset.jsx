@@ -14,6 +14,10 @@ import {
   DEPOSIT_POOL_RETURNED,
   WITHDRAW_POOL,
   WITHDRAW_POOL_RETURNED,
+  DEPOSIT_ALL_POOL,
+  DEPOSIT_ALL_POOL_RETURNED,
+  WITHDRAW_ALL_POOL,
+  WITHDRAW_ALL_POOL_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -90,6 +94,10 @@ const styles = theme => ({
   },
   right: {
     textAlign: 'right'
+  },
+  buttons: {
+    display: 'flex',
+    width: '100%'
   }
 });
 
@@ -111,12 +119,16 @@ class Asset extends Component {
   componentWillMount() {
     emitter.on(DEPOSIT_POOL_RETURNED, this.depositReturned);
     emitter.on(WITHDRAW_POOL_RETURNED, this.withdrawReturned);
+    emitter.on(DEPOSIT_ALL_POOL_RETURNED, this.depositReturned);
+    emitter.on(WITHDRAW_ALL_POOL_RETURNED, this.withdrawReturned);
     emitter.on(ERROR, this.errorReturned);
   }
 
   componentWillUnmount() {
     emitter.removeListener(DEPOSIT_POOL_RETURNED, this.depositReturned);
     emitter.removeListener(WITHDRAW_POOL_RETURNED, this.withdrawReturned);
+    emitter.removeListener(DEPOSIT_ALL_POOL_RETURNED, this.depositReturned);
+    emitter.removeListener(WITHDRAW_ALL_POOL_RETURNED, this.withdrawReturned);
     emitter.removeListener(ERROR, this.errorReturned);
   };
 
@@ -194,16 +206,30 @@ class Asset extends Component {
             <Typography variant={'h5'}>100%</Typography>
           </Button>
         </div>
-        <Button
-          className={ classes.actionButton }
-          variant="outlined"
-          color="primary"
-          disabled={ loading || !account.address || asset.balance <= 0 }
-          onClick={ this.onDeposit }
-          fullWidth
-          >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit</Typography>
-        </Button>
+        <div className={ classes.buttons }>
+          <Button
+            className={ classes.actionButton }
+            variant="outlined"
+            color="primary"
+            disabled={ loading || !account.address || asset.balance <= 0 }
+            onClick={ this.onDeposit }
+            fullWidth
+            >
+            <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit</Typography>
+          </Button>
+          { asset.version === 2 &&
+            <Button
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ loading || !account.address || asset.balance <= 0 }
+              onClick={ this.onDepositAll }
+              fullWidth
+              >
+              <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit All</Typography>
+            </Button>
+          }
+        </div>
       </div>
       <div className={ classes.sepperator }></div>
       <div className={classes.tradeContainer}>
@@ -256,16 +282,30 @@ class Asset extends Component {
             <Typography variant={'h5'}>100%</Typography>
           </Button>
         </div>
-        <Button
-          className={ classes.actionButton }
-          variant="outlined"
-          color="primary"
-          disabled={ loading || !account.address || asset.pooledBalance <= 0 }
-          onClick={ this.onWithdraw }
-          fullWidth
-          >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Withdraw</Typography>
-        </Button>
+        <div className={ classes.buttons }>
+          <Button
+            className={ classes.actionButton }
+            variant="outlined"
+            color="primary"
+            disabled={ loading || !account.address || asset.pooledBalance <= 0 }
+            onClick={ this.onWithdraw }
+            fullWidth
+            >
+            <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Withdraw</Typography>
+          </Button>
+          { asset.version === 2 &&
+            <Button
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ loading || !account.address || asset.pooledBalance <= 0 }
+              onClick={ this.onWithdrawAll }
+              fullWidth
+              >
+              <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Withdraw All</Typography>
+            </Button>
+          }
+        </div>
       </div>
     </div>)
   };
@@ -298,6 +338,14 @@ class Asset extends Component {
     dispatcher.dispatch({ type: DEPOSIT_POOL, content: { amount: amount, asset: asset } })
   }
 
+  onDepositAll = () => {
+    const { asset, startLoading } = this.props
+
+    this.setState({ loading: true })
+    startLoading()
+    dispatcher.dispatch({ type: DEPOSIT_ALL_POOL, content: { asset: asset } })
+  }
+
   onWithdraw = () => {
     this.setState({ redeemAmountError: false })
 
@@ -313,6 +361,14 @@ class Asset extends Component {
     startLoading()
 
     dispatcher.dispatch({ type: WITHDRAW_POOL, content: { amount: redeemAmount, asset: asset } })
+  }
+
+  onWithdrawAll = () => {
+    const { asset, startLoading } = this.props
+
+    this.setState({ loading: true })
+    startLoading()
+    dispatcher.dispatch({ type: WITHDRAW_ALL_POOL, content: { asset: asset } })
   }
 
   setAmount = (percent) => {
