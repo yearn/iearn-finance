@@ -828,6 +828,48 @@ class Store {
       ethBalance: 0,
       poolAssets: [
         {
+          id: 'aLINK',
+          name: 'aLINK',
+          symbol: 'aLINK',
+          description: 'Aave Interest bearking LINK',
+          poolSymbol: 'yaLINK',
+          erc20address: '0xA64BD6C70Cb9051F6A9ba1F163Fdc07E0DfB5F84',
+          vaultContractAddress: '0x8ee2a5aca4f88cb8c757b8593d0734855dcc0eba',
+          vaultContractABI: config.vaultContractV2ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 18,
+          version: 2
+        },
+        {
+          id: 'LINK',
+          name: 'ChainLink',
+          symbol: 'LINK',
+          description: 'ChainLink',
+          poolSymbol: 'yLINK',
+          erc20address: '0x514910771af9ca656af840dff83e8264ecf986ca',
+          vaultContractAddress: '0x8ee2a5aca4f88cb8c757b8593d0734855dcc0eba',
+          vaultContractABI: config.vaultContractV2ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 18,
+          version: 2
+        },
+        {
+          id: 'TUSD',
+          name: 'TUSD',
+          symbol: 'TUSD',
+          description: 'TrueUSD',
+          poolSymbol: 'yTUSD',
+          erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
+          vaultContractAddress: '0x8ee2a5aca4f88cb8c757b8593d0734855dcc0eba',
+          vaultContractABI: config.vaultContractV2ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 18,
+          version: 2
+        },
+        {
           id: 'USDC',
           name: 'USD Coin',
           symbol: 'USDC',
@@ -854,34 +896,6 @@ class Store {
           pooledBalance: 0,
           decimals: 18,
           version: 1
-        },
-        {
-          id: 'TUSD',
-          name: 'TUSD',
-          symbol: 'TUSD',
-          description: 'TrueUSD',
-          poolSymbol: 'yTUSD',
-          erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
-          vaultContractAddress: '0x8ee2a5aca4f88cb8c757b8593d0734855dcc0eba',
-          vaultContractABI: config.vaultContractV2ABI,
-          balance: 0,
-          pooledBalance: 0,
-          decimals: 18,
-          version: 2
-        },
-        {
-          id: 'LINK',
-          name: 'ChainLink',
-          symbol: 'LINK',
-          description: 'ChainLink',
-          poolSymbol: 'yLINK',
-          erc20address: '0x514910771af9ca656af840dff83e8264ecf986ca',
-          vaultContractAddress: '0x8ee2a5aca4f88cb8c757b8593d0734855dcc0eba',
-          vaultContractABI: config.vaultContractV2ABI,
-          balance: 0,
-          pooledBalance: 0,
-          decimals: 18,
-          version: 2
         },
         // {
         //   id: 'DAI',
