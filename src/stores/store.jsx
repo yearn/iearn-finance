@@ -56,8 +56,12 @@ import {
   POOL_BALANCES_RETURNED,
   DEPOSIT_POOL,
   DEPOSIT_POOL_RETURNED,
+  DEPOSIT_ALL_POOL,
+  DEPOSIT_ALL_POOL_RETURNED,
   WITHDRAW_POOL,
   WITHDRAW_POOL_RETURNED,
+  WITHDRAW_ALL_POOL,
+  WITHDRAW_ALL_POOL_RETURNED,
   EXCHANGE_POOL,
   EXCHANGE_POOL_RETURNED,
   GET_EXCHANGE_PRICE,
@@ -102,46 +106,6 @@ class Store {
 
     this.store = {
       universalGasPrice: '70',
-      balancerPools: [
-        {
-          id: 'ycUSDC/ycUSDT',
-          name: 'ycUSDC/ycUSDT',
-          description: 'ycUSDC/ycUSDT Pool',
-          address: '0xEEeEe1033F5486ccd95c77257b2a2F2EE5f1eed8',
-          assets: [
-            'ycUSDC',
-            'ycUSDT'
-          ]
-        }
-      ],
-      balancerAssets: [
-        {
-          id: 'ycUSDC',
-          name: 'ycUSDC',
-          description: 'Compound USD Coin',
-          symbol: 'cUSDC',
-          investSymbol: 'ycUSDC',
-          erc20address: '0x39AA39c021dfbaE8faC545936693aC917d5E7563',
-          investAddress: '0x0597eaf957d896A5751AA35324Bf24E1d9Bc0F2C',
-          balancerAddress: '0xEEeEe1033F5486ccd95c77257b2a2F2EE5f1eed8',
-          decimals: 8,
-          balance: 0,
-          investedBalance: 0
-        },
-        {
-          id: 'ycUSDT',
-          name: 'ycUSDT',
-          description: 'Compound USDT',
-          symbol: 'cUSDT',
-          investSymbol: 'ycUSDT',
-          erc20address: '0xf650C3d88D12dB855b8bf7D11Be6C55A4e07dCC9',
-          investAddress: '0x631d66F79191C86D7b7a7c0E2AfAE3ae943931a4',
-          balancerAddress: '0xEEeEe1033F5486ccd95c77257b2a2F2EE5f1eed8',
-          decimals: 8,
-          balance: 0,
-          investedBalance: 0
-        }
-      ],
       ethPrice: 0,
       aprs: [{
           token: 'DAI',
@@ -863,19 +827,48 @@ class Store {
       ],
       ethBalance: 0,
       poolAssets: [
-        // {
-        //   id: 'DAI',
-        //   name: 'DAI',
-        //   symbol: 'DAI',
-        //   description: 'DAI Stablecoin',
-        //   poolSymbol: 'yDAI',
-        //   erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-        //   vaultContractAddress: null,
-        //   vaultContractABI: config.vaultContractABI,
-        //   balance: 0,
-        //   pooledBalance: 0,
-        //   decimals: 18,
-        // },
+        {
+          id: 'aLINK',
+          name: 'aLINK',
+          symbol: 'aLINK',
+          description: 'Aave Interest bearking LINK',
+          poolSymbol: 'yaLINK',
+          erc20address: '0xA64BD6C70Cb9051F6A9ba1F163Fdc07E0DfB5F84',
+          vaultContractAddress: '0x8ee2a5aca4f88cb8c757b8593d0734855dcc0eba',
+          vaultContractABI: config.vaultContractV2ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 18,
+          version: 2
+        },
+        {
+          id: 'LINK',
+          name: 'ChainLink',
+          symbol: 'LINK',
+          description: 'ChainLink',
+          poolSymbol: 'yLINK',
+          erc20address: '0x514910771af9ca656af840dff83e8264ecf986ca',
+          vaultContractAddress: '0x8ee2a5aca4f88cb8c757b8593d0734855dcc0eba',
+          vaultContractABI: config.vaultContractV2ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 18,
+          version: 2
+        },
+        {
+          id: 'TUSD',
+          name: 'TUSD',
+          symbol: 'TUSD',
+          description: 'TrueUSD',
+          poolSymbol: 'yTUSD',
+          erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
+          vaultContractAddress: '0x8ee2a5aca4f88cb8c757b8593d0734855dcc0eba',
+          vaultContractABI: config.vaultContractV2ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 18,
+          version: 2
+        },
         {
           id: 'USDC',
           name: 'USD Coin',
@@ -888,6 +881,7 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 6,
+          version: 1
         },
         {
           id: 'CRV',
@@ -901,7 +895,21 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
+          version: 1
         },
+        // {
+        //   id: 'DAI',
+        //   name: 'DAI',
+        //   symbol: 'DAI',
+        //   description: 'DAI Stablecoin',
+        //   poolSymbol: 'yDAI',
+        //   erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+        //   vaultContractAddress: null,
+        //   vaultContractABI: config.vaultContractABI,
+        //   balance: 0,
+        //   pooledBalance: 0,
+        //   decimals: 18,
+        // },
         // {
         //   id: 'USDT',
         //   name: 'USDT',
@@ -914,32 +922,6 @@ class Store {
         //   balance: 0,
         //   pooledBalance: 0,
         //   decimals: 6,
-        // },
-        // {
-        //   id: 'TUSD',
-        //   name: 'TUSD',
-        //   symbol: 'TUSD',
-        //   description: 'TrueUSD',
-        //   poolSymbol: 'yTUSD',
-        //   erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
-        //   vaultContractAddress: null,
-        //   vaultContractABI: config.vaultContractABI,
-        //   balance: 0,
-        //   pooledBalance: 0,
-        //   decimals: 18,
-        // },
-        // {
-        //   id: 'LINK',
-        //   name: 'ChainLink',
-        //   symbol: 'LINK',
-        //   description: 'ChainLink',
-        //   poolSymbol: 'yLINK',
-        //   erc20address: '0x514910771af9ca656af840dff83e8264ecf986ca',
-        //   vaultContractAddress: null,
-        //   vaultContractABI: config.vaultContractABI,
-        //   balance: 0,
-        //   pooledBalance: 0,
-        //   decimals: 18,
         // },
         // {
         //   id: 'SNX',
@@ -1061,8 +1043,14 @@ class Store {
           case DEPOSIT_POOL:
             this.depositPool(payload)
             break;
+          case DEPOSIT_ALL_POOL:
+            this.depositAllPool(payload)
+            break;
           case WITHDRAW_POOL:
             this.withdrawPool(payload)
+            break;
+          case WITHDRAW_ALL_POOL:
+            this.withdrawAllPool(payload)
             break;
           case EXCHANGE_POOL:
             this.exchangePool(payload)
@@ -2849,6 +2837,59 @@ class Store {
       })
   }
 
+  depositAllPool = (payload) => {
+    const account = store.getStore('account')
+    const { asset } = payload.content
+
+    this._checkApproval(asset, account, asset.balance, asset.vaultContractAddress, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callDepositAllPool(asset, account, (err, depositResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(DEPOSIT_ALL_POOL_RETURNED, depositResult)
+      })
+    })
+  }
+
+  _callDepositAllPool = async (asset, account, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+
+    vaultContract.methods.depositAll().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
   withdrawPool = (payload) => {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
@@ -2872,6 +2913,45 @@ class Store {
     }
 
     vaultContract.methods.withdraw(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    .on('transactionHash', function(hash){
+      console.log(hash)
+      callback(null, hash)
+    })
+    .on('confirmation', function(confirmationNumber, receipt){
+      console.log(confirmationNumber, receipt);
+    })
+    .on('receipt', function(receipt){
+      console.log(receipt);
+    })
+    .on('error', function(error) {
+      console.log(error);
+      if (!error.toString().includes("-32601")) {
+        if(error.message) {
+          return callback(error.message)
+        }
+        callback(error)
+      }
+    })
+  }
+
+  withdrawAllPool = (payload) => {
+    const account = store.getStore('account')
+    const { asset } = payload.content
+
+    this._callWithdrawPool(asset, account, (err, withdrawResult) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+      return emitter.emit(WITHDRAW_POOL_RETURNED, withdrawResult)
+    })
+  }
+
+  _callWithdrawPool = async (asset, account, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+
+    vaultContract.methods.withdrawAll().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
       console.log(hash)
       callback(null, hash)

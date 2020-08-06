@@ -80,7 +80,11 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingBottom: '32px'
+    paddingBottom: '32px',
+    [theme.breakpoints.down('sm')]: {
+      justifyContent: 'center',
+      maxWidth: 'calc(100vw - 24px)'
+    }
   },
   introCenter: {
     maxWidth: '500px',
@@ -352,7 +356,7 @@ class Pool extends Component {
           }
           { !account.address &&
             <div className={ classes.introCenter }>
-              <Typography variant='h3'>Pool assets. Simple.</Typography>
+              <Typography variant='h3'>Vaults. Simple.</Typography>
             </div>
           }
           {!account.address &&

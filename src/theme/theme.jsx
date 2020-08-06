@@ -215,7 +215,10 @@ const iswapTheme =  {
     },
     MuiExpansionPanelSummary: {
       root: {
-        padding: '30px 42px'
+        padding: '12px 24px',
+        '@media (min-width: 960px)': {
+          padding: '30px 42px',
+        }
       },
       content: {
         margin: '0px !important'
