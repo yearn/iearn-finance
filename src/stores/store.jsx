@@ -831,10 +831,10 @@ class Store {
           id: 'aLINK',
           name: 'aLINK',
           symbol: 'aLINK',
-          description: 'Aave Interest bearking LINK',
+          description: 'Aave Interest bearing LINK',
           poolSymbol: 'yaLINK',
           erc20address: '0xA64BD6C70Cb9051F6A9ba1F163Fdc07E0DfB5F84',
-          vaultContractAddress: '0x8ee2a5aca4f88cb8c757b8593d0734855dcc0eba',
+          vaultContractAddress: '0x29E240CFD7946BA20895a7a02eDb25C210f9f324',
           vaultContractABI: config.vaultContractV2ABI,
           balance: 0,
           pooledBalance: 0,
@@ -848,7 +848,7 @@ class Store {
           description: 'ChainLink',
           poolSymbol: 'yLINK',
           erc20address: '0x514910771af9ca656af840dff83e8264ecf986ca',
-          vaultContractAddress: '0x8ee2a5aca4f88cb8c757b8593d0734855dcc0eba',
+          vaultContractAddress: '0x881b06da56BB5675c54E4Ed311c21E54C5025298',
           vaultContractABI: config.vaultContractV2ABI,
           balance: 0,
           pooledBalance: 0,
@@ -862,7 +862,7 @@ class Store {
           description: 'TrueUSD',
           poolSymbol: 'yTUSD',
           erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
-          vaultContractAddress: '0x8ee2a5aca4f88cb8c757b8593d0734855dcc0eba',
+          vaultContractAddress: '0x37d19d1c4E1fa9DC47bD1eA12f742a0887eDa74a',
           vaultContractABI: config.vaultContractV2ABI,
           balance: 0,
           pooledBalance: 0,
@@ -2938,7 +2938,7 @@ class Store {
     const account = store.getStore('account')
     const { asset } = payload.content
 
-    this._callWithdrawPool(asset, account, (err, withdrawResult) => {
+    this._callWithdrawAllPool(asset, account, (err, withdrawResult) => {
       if(err) {
         return emitter.emit(ERROR, err);
       }
@@ -2946,7 +2946,7 @@ class Store {
     })
   }
 
-  _callWithdrawPool = async (asset, account, callback) => {
+  _callWithdrawAllPool = async (asset, account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
