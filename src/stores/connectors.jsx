@@ -61,7 +61,7 @@ export const fortmatic = new FortmaticConnector({
 });
 
 export const portis = new PortisConnector({
-  dAppId: "211b48db-e8cc-4b68-82ad-bf781727ea9e",
+  dAppId: "5dea304b-33ed-48bd-8f00-0076a2546b60",
   networks: [1, 100]
 });
 
