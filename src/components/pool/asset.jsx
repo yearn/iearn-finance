@@ -103,6 +103,11 @@ const styles = theme => ({
   buttons: {
     display: 'flex',
     width: '100%'
+  },
+  disabledContainer: {
+    width: '100%',
+    paddingTop: '12px',
+    textAlign: 'center'
   }
 });
 
@@ -216,7 +221,7 @@ class Asset extends Component {
             className={ classes.actionButton }
             variant="outlined"
             color="primary"
-            disabled={ loading || !account.address || asset.balance <= 0 }
+            disabled={ loading || !account.address || asset.balance <= 0 || asset.depositDisabled === true }
             onClick={ this.onDeposit }
             fullWidth
             >
@@ -227,7 +232,7 @@ class Asset extends Component {
               className={ classes.actionButton }
               variant="outlined"
               color="primary"
-              disabled={ loading || !account.address || asset.balance <= 0 }
+              disabled={ loading || !account.address || asset.balance <= 0 || asset.depositDisabled === true }
               onClick={ this.onDepositAll }
               fullWidth
               >
@@ -235,6 +240,11 @@ class Asset extends Component {
             </Button>
           }
         </div>
+        { asset.depositDisabled === true &&
+          <div className={classes.disabledContainer}>
+            <Typography variant='h4'>Deposits are currently disabled for this vault</Typography>
+          </div>
+        }
       </div>
       <div className={ classes.sepperator }></div>
       <div className={classes.tradeContainer}>
