@@ -853,7 +853,8 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 2
+          version: 2,
+          depositDisabled: true
         },
         {
           id: 'TUSD',
