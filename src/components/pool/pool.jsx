@@ -283,7 +283,7 @@ class Pool extends Component {
 
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('poolAssets') })
-    setTimeout(this.refresh, 5000);
+    setTimeout(this.refresh, 30000);
   };
 
   connectionConnected = () => {
@@ -416,11 +416,11 @@ class Pool extends Component {
                 </div>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ (asset.balance).toFixed(2)+' '+asset.symbol }</Typography>
+                <Typography variant={ 'h3' }>{ (asset.balance ? (asset.balance).toFixed(2) : '0.00')+' '+asset.symbol }</Typography>
                 <Typography variant={ 'h5' } className={ classes.grey }>Balance</Typography>
               </div>
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ (asset.pooledBalance).toFixed(2)+' '+ asset.poolSymbol }</Typography>
+                <Typography variant={ 'h3' }>{ (asset.pooledBalance ? (asset.pooledBalance).toFixed(2) : '0.00')+' '+ asset.poolSymbol }</Typography>
                 <Typography variant={ 'h5' } className={ classes.grey }>Deposited</Typography>
               </div>
             </div>
