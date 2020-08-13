@@ -905,7 +905,7 @@ class Store {
           description: 'Tether USD',
           poolSymbol: 'yUSDT',
           erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-          vaultContractAddress: null,
+          vaultContractAddress: '0x2f08119C6f07c006695E079AAFc638b8789FAf18',
           vaultContractABI: config.vaultContractV2ABI,
           balance: 0,
           pooledBalance: 0,
