@@ -839,7 +839,9 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 2
+          version: 2,
+          lastMeasurement: 0,
+          measurement: 0,
         },
         {
           id: 'LINK',
@@ -854,7 +856,9 @@ class Store {
           pooledBalance: 0,
           decimals: 18,
           version: 2,
-          depositDisabled: true
+          depositDisabled: true,
+          lastMeasurement: 0,
+          measurement: 0,
         },
         {
           id: 'DAI',
@@ -869,6 +873,8 @@ class Store {
           pooledBalance: 0,
           decimals: 18,
           version: 2,
+          lastMeasurement: 0,
+          measurement: 0,
         },
         {
           id: 'TUSD',
@@ -882,7 +888,9 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 2
+          version: 2,
+          lastMeasurement: 0,
+          measurement: 0,
         },
         {
           id: 'USDC',
@@ -896,7 +904,9 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 6,
-          version: 1
+          version: 1,
+          lastMeasurement: 0,
+          measurement: 0,
         },
         {
           id: 'USDT',
@@ -911,6 +921,8 @@ class Store {
           pooledBalance: 0,
           decimals: 6,
           version: 2,
+          lastMeasurement: 0,
+          measurement: 0,
         },
         {
           id: 'CRV',
@@ -924,7 +936,9 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 1
+          version: 1,
+          lastMeasurement: 0,
+          measurement: 0,
         },
         // {
         //   id: 'SNX',
@@ -2679,6 +2693,7 @@ class Store {
         (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getPooledBalance(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getPoolPricePerShare(web3, asset, account, callbackInner) }
+        (callbackInner) => { this._getVaultAPY(web3, asset, account, callbackInner) }
       ], (err, data) => {
         asset.balance = data[0]
         asset.pooledBalance = data[1]
@@ -3197,6 +3212,30 @@ class Store {
 
       return emitter.emit(GET_SPOOL_RATIO_RETURNED, { ratioCurve, ratioIearn })
     })
+  }
+
+  _getVaultAPY = async (web3, asset, account, callback) => {
+    try {
+      const block = await web3.eth.getBlockNumber();
+      const contract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
+      let balance = await contract.methods.getPricePerFullShare().call();
+
+      const measurementContract = new web3.eth.Contract(measurementContractABI, measurementContractAddress)
+      const lastMeasurement = await measurementContract.methods.getLastMeasurement().call();
+      const measurement = await measurementContract.methods.getMeasurement().call();
+
+      balance = balance - measurement;
+      balance = balance / 1e18;
+      let diff = block - lastMeasurement;
+
+      balance = balance / diff;
+      balance = balance * 2425846;
+
+      callback(null, parseFloat(balance))
+    } catch (e) {
+      console.log(e)
+      callback(null, 0)
+    }
   }
 
   _getGasPrice = async () => {
