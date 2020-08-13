@@ -392,8 +392,8 @@ class Manage extends Component {
         </div>
         { loading && <Loader /> }
         <div className={classes.footer}>
-          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>about</Typography>
-          <Typography onClick={()=> window.open("https://docs.iearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>docs</Typography>
+          <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>about</Typography>
+          <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>docs</Typography>
           <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>code</Typography>
           <Typography onClick={()=> window.open("https://t.me/iearnfinance", "_blank")} className={ classes.footerText } variant={ 'h6'}>telegram</Typography>
           <Typography onClick={()=> window.open("/apr", "_blank")} className={ classes.footerText } variant={ 'h6'}>yield</Typography>
