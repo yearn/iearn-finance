@@ -289,7 +289,7 @@ class InvestSimple extends Component {
 
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('assets') })
-    setTimeout(this.refresh,5000);
+    setTimeout(this.refresh, 30000);
   };
 
   connectionConnected = () => {

@@ -273,7 +273,7 @@ class Insure extends Component {
 
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('insuranceAssets') })
-    setTimeout(this.refresh,15000);
+    setTimeout(this.refresh, 30000);
   };
 
   ethBalanceReturned = (balances) => {

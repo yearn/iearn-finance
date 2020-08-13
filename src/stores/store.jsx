@@ -857,6 +857,20 @@ class Store {
           depositDisabled: true
         },
         {
+          id: 'DAI',
+          name: 'DAI',
+          symbol: 'DAI',
+          description: 'DAI Stablecoin',
+          poolSymbol: 'yDAI',
+          erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          vaultContractAddress: '0xACd43E627e64355f1861cEC6d3a6688B31a6F952',
+          vaultContractABI: config.vaultContractV2ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 18,
+          version: 2,
+        },
+        {
           id: 'TUSD',
           name: 'TUSD',
           symbol: 'TUSD',
@@ -885,6 +899,20 @@ class Store {
           version: 1
         },
         {
+          id: 'USDT',
+          name: 'USDT',
+          symbol: 'USDT',
+          description: 'Tether USD',
+          poolSymbol: 'yUSDT',
+          erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+          vaultContractAddress: null,
+          vaultContractABI: config.vaultContractV2ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 6,
+          version: 2,
+        },
+        {
           id: 'CRV',
           name: 'y.Curve.fi',
           symbol: 'CRV',
@@ -898,32 +926,6 @@ class Store {
           decimals: 18,
           version: 1
         },
-        // {
-        //   id: 'DAI',
-        //   name: 'DAI',
-        //   symbol: 'DAI',
-        //   description: 'DAI Stablecoin',
-        //   poolSymbol: 'yDAI',
-        //   erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-        //   vaultContractAddress: null,
-        //   vaultContractABI: config.vaultContractABI,
-        //   balance: 0,
-        //   pooledBalance: 0,
-        //   decimals: 18,
-        // },
-        // {
-        //   id: 'USDT',
-        //   name: 'USDT',
-        //   symbol: 'USDT',
-        //   description: 'Tether USD',
-        //   poolSymbol: 'yUSDT',
-        //   erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-        //   vaultContractAddress: null,
-        //   vaultContractABI: config.vaultContractABI,
-        //   balance: 0,
-        //   pooledBalance: 0,
-        //   decimals: 6,
-        // },
         // {
         //   id: 'SNX',
         //   name: 'SNX',
@@ -2943,7 +2945,7 @@ class Store {
       if(err) {
         return emitter.emit(ERROR, err);
       }
-      return emitter.emit(WITHDRAW_POOL_RETURNED, withdrawResult)
+      return emitter.emit(WITHDRAW_ALL_POOL_RETURNED, withdrawResult)
     })
   }
 
