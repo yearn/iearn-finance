@@ -840,8 +840,10 @@ class Store {
           pooledBalance: 0,
           decimals: 18,
           version: 2,
-          lastMeasurement: 0,
-          measurement: 0,
+          // lastMeasurement: 10652223,
+          // measurement: 1017405151788611094,
+          lastMeasurement: 10599617,
+          measurement: 1e18,
         },
         {
           id: 'LINK',
@@ -857,8 +859,10 @@ class Store {
           decimals: 18,
           version: 2,
           depositDisabled: true,
-          lastMeasurement: 0,
-          measurement: 0,
+          // lastMeasurement: 10652224,
+          // measurement: 990278321889622388,
+          lastMeasurement: 10604016,
+          measurement: 1e18,
         },
         {
           id: 'DAI',
@@ -873,8 +877,10 @@ class Store {
           pooledBalance: 0,
           decimals: 18,
           version: 2,
-          lastMeasurement: 0,
-          measurement: 0,
+          // lastMeasurement: 10652225,
+          // measurement: 1000034581106085539,
+          lastMeasurement: 10650116,
+          measurement: 1e18,
         },
         {
           id: 'TUSD',
@@ -889,8 +895,10 @@ class Store {
           pooledBalance: 0,
           decimals: 18,
           version: 2,
-          lastMeasurement: 0,
-          measurement: 0,
+          // lastMeasurement: 10652226,
+          // measurement: 1007516456361269411,
+          lastMeasurement: 10603368,
+          measurement: 1e18,
         },
         {
           id: 'USDC',
@@ -905,8 +913,10 @@ class Store {
           pooledBalance: 0,
           decimals: 6,
           version: 1,
-          lastMeasurement: 0,
-          measurement: 0,
+          // lastMeasurement: 10652227,
+          // measurement: 1009951049114847487,
+          lastMeasurement: 10532708,
+          measurement: 1e18,
         },
         {
           id: 'USDT',
@@ -921,8 +931,10 @@ class Store {
           pooledBalance: 0,
           decimals: 6,
           version: 2,
-          lastMeasurement: 0,
-          measurement: 0,
+          // lastMeasurement: 10652228,
+          // measurement: 1000001283393612709,
+          lastMeasurement: 10651402,
+          measurement: 1e18,
         },
         {
           id: 'CRV',
@@ -937,8 +949,10 @@ class Store {
           pooledBalance: 0,
           decimals: 18,
           version: 1,
-          lastMeasurement: 0,
-          measurement: 0,
+          // lastMeasurement: 10652229,
+          // measurement: 1024241520993827779,
+          lastMeasurement: 10559448,
+          measurement: 1e18,
         },
         // {
         //   id: 'SNX',
@@ -2692,12 +2706,13 @@ class Store {
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getPooledBalance(web3, asset, account, callbackInner) },
-        (callbackInner) => { this._getPoolPricePerShare(web3, asset, account, callbackInner) }
+        (callbackInner) => { this._getPoolPricePerShare(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getVaultAPY(web3, asset, account, callbackInner) }
       ], (err, data) => {
         asset.balance = data[0]
         asset.pooledBalance = data[1]
         asset.pricePerFullShare = data[2]
+        asset.apy = data[3]
 
         callback(null, asset)
       })
@@ -3220,16 +3235,12 @@ class Store {
       const contract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
       let balance = await contract.methods.getPricePerFullShare().call();
 
-      const measurementContract = new web3.eth.Contract(measurementContractABI, measurementContractAddress)
-      const lastMeasurement = await measurementContract.methods.getLastMeasurement().call();
-      const measurement = await measurementContract.methods.getMeasurement().call();
-
-      balance = balance - measurement;
+      balance = balance - asset.measurement;
       balance = balance / 1e18;
-      let diff = block - lastMeasurement;
+      let diff = block - asset.lastMeasurement;
 
       balance = balance / diff;
-      balance = balance * 2425846;
+      balance = balance * 242584600;
 
       callback(null, parseFloat(balance))
     } catch (e) {
