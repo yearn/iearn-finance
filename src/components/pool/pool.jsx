@@ -225,6 +225,7 @@ const styles = theme => ({
     border: '1px solid rgb(174, 174, 174)',
     borderRadius: '0.75rem',
     marginBottom: '24px',
+    lineHeight: '1.2'
   },
   walletAddress: {
     padding: '0px 12px'
@@ -343,7 +344,7 @@ class Pool extends Component {
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
 
-          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.<br />There is a 0.5% withdrawal fee on all vaults.</Typography>
 
           { account.address &&
             <div className={ classes.intro }>
