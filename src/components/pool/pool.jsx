@@ -227,6 +227,11 @@ const styles = theme => ({
     marginBottom: '24px',
     lineHeight: '1.2'
   },
+  fees: {
+    paddingRight: '75px',
+    padding: '12px',
+    lineHeight: '1.2'
+  },
   walletAddress: {
     padding: '0px 12px'
   },
@@ -344,10 +349,12 @@ class Pool extends Component {
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
 
-          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.<br />There is a 0.5% withdrawal fee on all vaults.</Typography>
+        <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
 
           { account.address &&
             <div className={ classes.intro }>
+            <Typography variant={'h5'} className={ classes.fees }>There is a 0.5% withdrawal fee on all vaults.
+              <br /><br />There is a 5% performance fee on subsidized gas.</Typography>
               <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
                 <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
                 <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
@@ -417,17 +424,17 @@ class Pool extends Component {
                 </div>
               </div>
               {
-                !['aLINK', 'LINK'].includes(asset.id) &&
+                !['LINK'].includes(asset.id) &&
                 <div className={classes.heading}>
                   <Typography variant={ 'h3' }>{ (asset.apy ? (asset.apy).toFixed(4) : '0.0000') }%</Typography>
-                  <Typography variant={ 'h5' } className={ classes.grey }>Interest Rate</Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>ROI</Typography>
                 </div>
               }
               {
-                ['aLINK', 'LINK'].includes(asset.id) &&
+                ['LINK'].includes(asset.id) &&
                 <div className={classes.heading}>
                   <Typography variant={ 'h3' }>Not Available</Typography>
-                  <Typography variant={ 'h5' } className={ classes.grey }>Interest Rate</Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>ROI</Typography>
                 </div>
               }
               <div className={classes.heading}>
