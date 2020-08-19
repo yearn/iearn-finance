@@ -954,32 +954,22 @@ class Store {
           lastMeasurement: 10604016,
           measurement: 1e18,
         },
-        // {
-        //   id: 'SNX',
-        //   name: 'SNX',
-        //   symbol: 'SNX',
-        //   description: 'Synthetix Network Token',
-        //   poolSymbol: 'ySNX',
-        //   erc20address: '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f',
-        //   vaultContractAddress: null,
-        //   vaultContractABI: config.vaultContractABI,
-        //   balance: 0,
-        //   pooledBalance: 0,
-        //   decimals: 18,
-        // },
-        // {
-        //   id: 'LEND',
-        //   name: 'LEND',
-        //   symbol: 'LEND',
-        //   description: 'AAVE (LEND)',
-        //   poolSymbol: 'yLEND',
-        //   erc20address: '0x80fB784B7eD66730e8b1DBd9820aFD29931aab03',
-        //   vaultContractAddress: null,
-        //   vaultContractABI: config.vaultContractABI,
-        //   balance: 0,
-        //   pooledBalance: 0,
-        //   decimals: 18,
-        // },
+        {
+          id: 'YFI',
+          name: 'yearn.finance',
+          symbol: 'YFI',
+          description: 'yearn.finance',
+          poolSymbol: 'yYFI',
+          erc20address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+          vaultContractAddress: '0xBA2E7Fed597fd0E3e70f5130BcDbbFE06bB94fe1',
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 18,
+          version: 2,
+          lastMeasurement: 10690968,
+          measurement: 1e18,
+        },
       ],
       sCrvBalance:  0
     }
@@ -2742,10 +2732,16 @@ class Store {
       return callback(null, 0)
     }
 
-    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-    var price = await vaultContract.methods.getPricePerFullShare().call({ from: account.address });
-    price = parseFloat(price)/10**18
-    callback(null, parseFloat(price))
+    try {
+      console.log(asset.vaultContractABI)
+      let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+      var price = await vaultContract.methods.getPricePerFullShare().call({ from: account.address });
+      price = parseFloat(price)/10**18
+      callback(null, parseFloat(price))
+    } catch(ex) {
+      console.log(ex)
+      callback(null, 0)
+    }
   }
 
   depositPool = (payload) => {
