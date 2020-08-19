@@ -960,14 +960,14 @@ class Store {
           symbol: 'YFI',
           description: 'yearn.finance',
           poolSymbol: 'yYFI',
-          erc20address: '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e',
-          vaultContractAddress: null,
-          vaultContractABI: config.vaultContractABI,
+          erc20address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+          vaultContractAddress: '0xBA2E7Fed597fd0E3e70f5130BcDbbFE06bB94fe1',
+          vaultContractABI: config.vaultContractV3ABI,
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 1,
-          lastMeasurement: 10690901,
+          version: 2,
+          lastMeasurement: 10690968,
           measurement: 1e18,
         },
       ],
@@ -2732,10 +2732,16 @@ class Store {
       return callback(null, 0)
     }
 
-    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-    var price = await vaultContract.methods.getPricePerFullShare().call({ from: account.address });
-    price = parseFloat(price)/10**18
-    callback(null, parseFloat(price))
+    try {
+      console.log(asset.vaultContractABI)
+      let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+      var price = await vaultContract.methods.getPricePerFullShare().call({ from: account.address });
+      price = parseFloat(price)/10**18
+      callback(null, parseFloat(price))
+    } catch(ex) {
+      console.log(ex)
+      callback(null, 0)
+    }
   }
 
   depositPool = (payload) => {
