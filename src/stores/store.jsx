@@ -752,6 +752,11 @@ class Store {
           logo: 'etherscan.png',
           name: 'Etherscan'
         },
+        {
+          website: 'https://alchemyapi.io/',
+          logo: 'alchemy.png',
+          name: 'Alchemy'
+        },
       ],
       web3context: null,
       languages: [
