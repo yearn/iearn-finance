@@ -22,7 +22,6 @@ import Header from './components/header';
 // import Vaults from './components/pool';
 import Vaults from './components/poolNew';
 
-
 import { injected } from "./stores/connectors";
 
 import {
