@@ -283,7 +283,7 @@ const iswapTheme =  {
       main: colors.blue
     },
     secondary: {
-      main: colors.topaz
+      main: colors.white
     },
     text: {
       primary: colors.text,

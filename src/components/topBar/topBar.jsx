@@ -20,6 +20,7 @@ const styles = theme => ({
     padding: '8px 13px',
     margin: '15px 8px 0',
     borderRadius: '4px',
+    boxShadow: 'none',
     '&:first-of-type': {
       marginLeft: '0',
     },
@@ -34,6 +35,7 @@ const styles = theme => ({
   menuContainer: {
     display: 'flex',
     justifyContent: 'center',
+    alignItems: 'inherit',
     flexWrap: 'wrap',
     marginTop: '21px',
   },
@@ -55,6 +57,12 @@ const styles = theme => ({
   },
   container: {
     padding: '36px 0 53px'
+  },
+  vLine: {
+    width: '1px',
+    height: '44px',
+    background: '#D5D7D9',
+    margin: '15px 8px 0',
   }
 })
 
@@ -69,7 +77,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle })
           <Button
             className={ classes.actionButton }
             variant="contained"
-            color={currentPage === '/' ? 'primary' : ''}
+            color={currentPage === '/' ? 'primary' : 'secondary'}
             onClick={() => nav('/')}
           >
             <img src={require(`../../assets/ico-dashboard.svg`)} alt="" />
@@ -81,7 +89,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle })
             variant="contained"
             
             onClick={() => nav('/zap')}
-            color={currentPage === '/zap' ? 'primary' : ''}
+            color={currentPage === '/zap' ? 'primary' : 'secondary'}
           >
             <img src={require(`../../assets/ico-zapper.svg`)} alt="" />
             {' '}
@@ -92,7 +100,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle })
             variant="contained"
             
             onClick={() => nav('/vaults')}
-            color={currentPage === '/vaults' ? 'primary' : ''}
+            color={currentPage === '/vaults' ? 'primary' : 'secondary'}
           >
             <img src={require(`../../assets/ico-grow.svg`)} alt="" />
             {' '}
@@ -103,7 +111,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle })
             variant="contained"
             
             onClick={() => nav('/earn')}
-            color={currentPage === '/earn' ? 'primary' : ''}
+            color={currentPage === '/earn' ? 'primary' : 'secondary'}
           >
             <img src={require(`../../assets/ico-save.svg`)} alt="" />
             {' '}
@@ -113,15 +121,17 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle })
             className={ classes.actionButton }
             variant="contained"
             onClick={() => nav('/apr')}
-            color={currentPage === '/apr' ? 'primary' : ''}
+            color={currentPage === '/apr' ? 'primary' : 'secondary'}
           >
             <img src={require(`../../assets/ico-cover.svg`)} alt="" />
             {' '}
             Cover
           </Button>
+          <div className={ classes.vLine }/>
           <Button
             className={ classes.actionButton }
             variant="contained"
+            color="secondary"
             onClick={() => setModalOpen(true)}
             // fullWidth
           >
