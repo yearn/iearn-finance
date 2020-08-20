@@ -289,7 +289,7 @@ class Pool extends Component {
 
   balancesReturned = (balances) => {
     this.setState({ assets: store.getStore('poolAssets') })
-    setTimeout(this.refresh, 30000);
+    setTimeout(this.refresh, 300000);
   };
 
   connectionConnected = () => {

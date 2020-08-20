@@ -1150,9 +1150,6 @@ class Store {
 
       const ethAllowance = web3.utils.fromWei(allowance, "ether")
 
-      console.log(ethAllowance)
-      console.log(amount)
-
       if(parseFloat(ethAllowance) < parseFloat(amount)) {
         /*
           code to accomodate for "assert _value == 0 or self.allowances[msg.sender][_spender] == 0" in contract
@@ -2738,7 +2735,6 @@ class Store {
     }
 
     try {
-      console.log(asset.vaultContractABI)
       let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
       var price = await vaultContract.methods.getPricePerFullShare().call({ from: account.address });
       price = parseFloat(price)/10**18
@@ -2774,8 +2770,6 @@ class Store {
     const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
 
     const ethAllowance = web3.utils.fromWei(allowance, "ether")
-    console.log(ethAllowance)
-    console.log(amount)
     if(parseFloat(ethAllowance) < parseFloat(amount)) {
       asset.amount = amount
       callback(null, asset)
@@ -3064,9 +3058,6 @@ class Store {
     const web3 = new Web3(store.getStore('web3context').library.provider);
     const poolAssets = store.getStore('poolAssets')
 
-    console.log(config.exchangeContractABI)
-    console.log(config.exchangeContractAddress)
-
     const exchangeContract = new web3.eth.Contract(config.exchangeContractABI, config.exchangeContractAddress)
 
     const assetToSend = poolAssets.filter((asset) => { return asset.id === sendAsset})[0]
@@ -3082,14 +3073,7 @@ class Store {
       amount = sendAmount*10**assetToSend.decimals
     }
 
-    console.log(exchangeContract.methods.get_dy_underlying)
-    console.log(sendIndex)
-    console.log(receiveIndex)
-    console.log(amount)
-
-
     const price = await exchangeContract.methods.get_dy_underlying(sendIndex, receiveIndex, amount).call({ from: account.address })
-    console.log(price)
 
     exchangeContract.methods.exchange_underlying(sendIndex, receiveIndex, amount, price).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
@@ -3132,19 +3116,14 @@ class Store {
     let amount = web3.utils.toWei(sendAmount, "ether")
     let prices = await exchangeContract.methods.calc_withdraw_amount(amount).call({ from: account.address })
 
-    console.log(prices)
     let returnPrices = []
     for (var i = 0; i < prices.length; i++) {
       if(poolAssets[i].decimals === 18) {
         returnPrices.push(parseFloat(web3.utils.fromWei(prices[i], "ether")))
       } else {
-        console.log(prices[i])
-        console.log(poolAssets[i].decimals)
         returnPrices.push((parseFloat(prices[i])/(10**poolAssets[i].decimals)))
       }
     }
-
-    console.log(returnPrices)
 
     return emitter.emit(WITHDRAW_PRICE_RETURNED, returnPrices)
   }
@@ -3174,11 +3153,8 @@ class Store {
       }
     })
 
-    console.log(amounts)
     let minMintAmount = await exchangeContract.methods.calc_deposit_amount(amounts).call({ from: account.address })
-    console.log(minMintAmount)
     minMintAmount = web3.utils.fromWei(minMintAmount, "ether")
-    console.log(minMintAmount)
     return emitter.emit(DEPOSIT_PRICE_RETURNED, minMintAmount)
   }
 
@@ -3194,7 +3170,6 @@ class Store {
 
     this._getERC20Balance(web3, asset, account, (err, balance) => {
       store.setStore({ sCrvBalance: balance })
-      console.log(balance)
       return emitter.emit(SPOOL_BALANCE_RETURNED, balance)
     })
   }
@@ -3222,9 +3197,6 @@ class Store {
 
       const ratioCurve = (balances[0]*100/(balances[0]+balances[1])).toFixed(0)
       const ratioIearn = (balances[1]*100/(balances[0]+balances[1])).toFixed(0)
-
-      console.log(ratioCurve)
-      console.log(ratioIearn)
 
       return emitter.emit(GET_SPOOL_RATIO_RETURNED, { ratioCurve, ratioIearn })
     })
