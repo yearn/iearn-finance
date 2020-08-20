@@ -22,7 +22,7 @@ const styles = theme => ({
     width: '100%',
     margin: '0 auto',
   },
-  icon_container: {
+  iconContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -39,7 +39,7 @@ const styles = theme => ({
       marginRight: '0',
     },
   },
-  menu_container: {
+  menuContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -51,7 +51,7 @@ const styles = theme => ({
   link: {
     textDecoration: 'none',
   },
-  menu_item: {
+  menuItem: {
     fontWeight: '600',
     fontSize: '14px',
     lineHeight: '22px',
@@ -89,7 +89,7 @@ const FooterNew = (props) => {
   return(
     <div className={classes.footer}>
       <div className={classes.container}>
-        <div className={classes.icon_container}>
+        <div className={classes.iconContainer}>
           <img className={classes.icon} onClick={()=> window.open("#", "_blank")} src={ require('../../assets/footer/footer-icon-1.svg') } alt="github" />
           <img className={classes.icon} onClick={()=> window.open("#", "_blank")} src={ require('../../assets/footer/footer-icon-2.svg') } alt="telegram" />
           <img className={classes.icon} onClick={()=> window.open("#", "_blank")} src={ require('../../assets/footer/footer-icon-3.svg') } alt="discord" />
@@ -97,14 +97,14 @@ const FooterNew = (props) => {
           <img className={classes.icon} onClick={()=> window.open("#", "_blank")} src={ require('../../assets/footer/footer-icon-5.svg') } alt="github" />
           <img className={classes.icon} onClick={()=> window.open("#", "_blank")} src={ require('../../assets/footer/footer-icon-6.svg') } alt="mail" />
         </div>
-        <div className={classes.menu_container}>
+        <div className={classes.menuContainer}>
           <Link to={"/"} className={ classes.link }>
-            <Typography className={ classes.menu_item } style={{marginLeft: '0'}} variant={ 'h6'}>Home</Typography>
+            <Typography className={ classes.menuItem } style={{marginLeft: '0'}} variant={ 'h6'}>Home</Typography>
           </Link>
-          <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} className={ classes.menu_item } variant={ 'h6'}>About</Typography>
-          <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} className={ classes.menu_item } variant={ 'h6'}>Docs</Typography>
-          <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.menu_item } variant={ 'h6'}>Code</Typography>
-          <Typography onClick={ builtWithOverlayClicked } className={ classes.menu_item } variant={ 'h6'}>Builtwith</Typography>
+          <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} className={ classes.menuItem } variant={ 'h6'}>About</Typography>
+          <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} className={ classes.menuItem } variant={ 'h6'}>Docs</Typography>
+          <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.menuItem } variant={ 'h6'}>Code</Typography>
+          <Typography onClick={ builtWithOverlayClicked } className={ classes.menuItem } variant={ 'h6'}>Builtwith</Typography>
         </div>
       </div>
       { modal && renderBuiltWithModal() }

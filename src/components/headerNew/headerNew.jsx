@@ -11,20 +11,20 @@ const styles = theme => ({
     verticalAlign: 'top',
     width: '100%',
   },
-  root_beta: {
+  rootBeta: {
     background: '#EFDBFF',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     padding: '10px',
   },
-  beta_ico:{
+  betaIco:{
     maxWidth: '15px',
     width: '100%',
     height: 'auto',
     marginRight: '9px'
   },
-  beta_text: {
+  betaText: {
     fontWeight: '600',
     fontSize: '14px',
     lineHeight: '22px',
@@ -37,7 +37,7 @@ const styles = theme => ({
     lineHeight: '24px',
     transition: 'color 0.3s',
   },
-  menu_item: {
+  menuItem: {
     padding: '8px 13px',
     cursor: 'pointer',
     display: 'flex',
@@ -57,7 +57,7 @@ const styles = theme => ({
       marginRight: '0',
     },
   },
-  menu_container: {
+  menuContainer: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -79,51 +79,38 @@ const HeaderNew = (props) => {
 
   return (
     <div className={ classes.root }>
-      <div className={classes.root_beta}>
-        <img className={classes.beta_ico} src={ require('../../assets/header-beta-icon.svg') } alt="beta icon" />
-        <Typography variant={'h6'} className={classes.beta_text}>This project is in beta. Use at your own risk.</Typography>
+      <div className={classes.rootBeta}>
+        <img className={classes.betaIco} src={ require('../../assets/header-beta-icon.svg') } alt="beta icon" />
+        <Typography variant={'h6'} className={classes.betaText}>This project is in beta. Use at your own risk.</Typography>
       </div>
 
-      <div className={classes.menu_container}>
-        <div className={classes.menu_item} onClick={ () => { nav('') } }>
+      <div className={classes.menuContainer}>
+        <div className={classes.menuItem} onClick={ () => { nav('') } }>
           <Typography variant={'h3'} className={classes.item}>FAQ</Typography>
         </div>
-        <div className={classes.menu_item} onClick={ () => { nav('') } }>
+        <div className={classes.menuItem} onClick={ () => { nav('') } }>
           <Typography variant={'h3'} className={classes.item}>yCosystem</Typography>
         </div>
-        <div className={classes.menu_item} onClick={ () => { nav('') } }>
+        <div className={classes.menuItem} onClick={ () => { nav('') } }>
           <img style={{marginRight: '8px'}} src={ require('../../assets/learn-yearn.png') } alt="learn-yearn" />
           <Typography variant={'h3'} className={classes.item}>Learn Yearn</Typography>
         </div>
-        <div className={classes.menu_item} onClick={ () => { nav('') } }>
+        <div className={classes.menuItem} onClick={ () => { nav('') } }>
           <Typography variant={'h3'} className={classes.item}>View Strategies</Typography>
         </div>
-        <div className={classes.menu_item} onClick={ () => { nav('') } }>
+        <div className={classes.menuItem} onClick={ () => { nav('') } }>
           <Typography variant={'h3'} className={classes.item}>Yearn Stats</Typography>
         </div>
-        <div className={classes.menu_item} onClick={ () => { nav('') } }>
+        <div className={classes.menuItem} onClick={ () => { nav('') } }>
           <Typography variant={'h3'} className={classes.item}>Wallet Stats</Typography>
         </div>
-        <div className={classes.menu_item} onClick={ () => { nav('') } }>
+        <div className={classes.menuItem} onClick={ () => { nav('') } }>
           <Typography variant={'h3'} className={classes.item}>Governance Stats</Typography>
         </div>
-        <div className={classes.menu_item} onClick={ () => { nav('') } }>
+        <div className={classes.menuItem} onClick={ () => { nav('') } }>
           <Typography variant={'h3'} className={classes.item}>Governance</Typography>
         </div>
       </div>
-
-      {/* <div className={ `${classes.earn}` } onClick={ () => { nav('earn') } }>
-        <Typography variant={'h3'} className={ headerValue===0?`titleActive`:`title` }>Earn</Typography>
-      </div>
-      <div className={ `${classes.zap}` } onClick={ () => { nav('zap') } }>
-        <Typography variant={'h3'} className={ headerValue===1?`titleActive`:`title` }>Zap</Typography>
-      </div>
-      <div className={ `${classes.apr}` } onClick={ () => { nav('apr') } }>
-        <Typography variant={'h3'} className={ headerValue===2?`titleActive`:`title` }>APR</Typography>
-      </div>
-      <div className={ `${classes.pool}` } onClick={ () => { nav('vaults') } }>
-        <Typography variant={'h3'} className={ headerValue===4?`titleActive`:`title` }>Vaults</Typography>
-      </div> */}
     </div>
   )
 }
