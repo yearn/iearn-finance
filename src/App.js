@@ -19,7 +19,8 @@ import IDai from './components/idai';
 import Footer from './components/footer';
 import Home from './components/home';
 import Header from './components/header';
-import Vaults from './components/pool';
+// import Vaults from './components/pool';
+import Vaults from './components/poolNew';
 
 
 import { injected } from "./stores/connectors";
@@ -71,7 +72,8 @@ class App extends Component {
             flexDirection: 'column',
             minHeight: '100vh',
             alignItems: 'center',
-            background: "#f9fafb"
+            backgroundImage: `url(${require(`./assets/bg.png`)})`,
+            backgroundPosition: 'left bottom',
           }}>
             <Switch>
               <Route path="/apr">
@@ -96,7 +98,7 @@ class App extends Component {
                 <Manage />
               </Route>
               <Route path="/vaults">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
+                {/* <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } /> */}
                 <Vaults />
               </Route>
               <Route path="/">
