@@ -840,7 +840,7 @@ class Store {
           pooledBalance: 0,
           decimals: 18,
           version: 2,
-          lastMeasurement: 10690968,
+          lastMeasurement: 10695309,
           measurement: 1e18,
         },
         {
