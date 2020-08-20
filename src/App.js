@@ -16,11 +16,10 @@ import Manage from './components/manage';
 import Performance from './components/performance';
 import Zap from './components/zapNew';
 import IDai from './components/idai';
-import Footer from './components/footer';
 import Home from './components/home';
-import Header from './components/header';
-// import Vaults from './components/pool';
 import Vaults from './components/poolNew';
+import Header from './components/headerNew';
+import Footer from './components/footerNew';
 
 import { injected } from "./stores/connectors";
 
@@ -75,6 +74,7 @@ class App extends Component {
             backgroundImage: `url(${require(`./assets/bg.png`)})`,
             backgroundPosition: 'left bottom',
           }}>
+            <Header />
             <Switch>
               <Route path="/apr">
                 <APR accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
