@@ -21,9 +21,6 @@ import Home from './components/home';
 import Header from './components/header';
 import Vaults from './components/pool';
 
-import HeaderNew from './components/header-new'
-import FooterNew from './components/footer-new'
-
 import { injected } from "./stores/connectors";
 
 import {
@@ -98,10 +95,8 @@ class App extends Component {
                 <Manage />
               </Route>
               <Route path="/vaults">
-                <HeaderNew />
                 <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
                 <Vaults />
-                <FooterNew />
               </Route>
               <Route path="/">
                 <Home />
