@@ -2175,7 +2175,7 @@ class Store {
   }
 
   _getDexAgTrade = async (sendAsset, receiveAsset, account, amount) => {
-    const url = 'https://api-v2.dex.ag/trade?from='+sendAsset.symbol.toLowerCase()+'&to='+receiveAsset.symbol.toLowerCase()+'&fromAmount='+amount+'&dex=best'
+    const url = 'https://api-v2.dex.ag/trade?from='+sendAsset.symbol.toLowerCase()+'&to='+receiveAsset.symbol.toLowerCase()+'&fromAmount='+amount+'&dex=ag'
     let trade = await rp(url);
     return JSON.parse(trade);
   }
