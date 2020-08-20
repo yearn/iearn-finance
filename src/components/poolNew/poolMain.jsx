@@ -16,7 +16,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  ListItemText,
 } from '@material-ui/core'
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'

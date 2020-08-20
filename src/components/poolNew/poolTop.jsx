@@ -28,7 +28,7 @@ const PoolTop = ({ account, classes, nav, currentPage }) => {
             className={ classes.actionButton }
             variant="outlined"
             color={currentPage === '/' ? 'primary' : 'secondary'}
-            onClick={() => nav('')}
+            onClick={() => nav('/')}
           >
             <img src={require(`../../assets/ico-dashboard.svg`)} alt="" />
             {' '}
@@ -38,7 +38,7 @@ const PoolTop = ({ account, classes, nav, currentPage }) => {
             className={ classes.actionButton }
             variant="outlined"
             color="secondary"
-            onClick={() => nav('zap')}
+            onClick={() => nav('/zap')}
             color={currentPage === '/zap' ? 'primary' : 'secondary'}
           >
             <img src={require(`../../assets/ico-zapper.svg`)} alt="" />
@@ -49,7 +49,7 @@ const PoolTop = ({ account, classes, nav, currentPage }) => {
             className={ classes.actionButton }
             variant="outlined"
             color="secondary"
-            onClick={() => nav('vaults')}
+            onClick={() => nav('/vaults')}
             color={currentPage === '/vaults' ? 'primary' : 'secondary'}
           >
             <img src={require(`../../assets/ico-grow.svg`)} alt="" />
@@ -60,7 +60,7 @@ const PoolTop = ({ account, classes, nav, currentPage }) => {
             className={ classes.actionButton }
             variant="outlined"
             color="secondary"
-            onClick={() => nav('earn')}
+            onClick={() => nav('/earn')}
             color={currentPage === '/earn' ? 'primary' : 'secondary'}
           >
             <img src={require(`../../assets/ico-save.svg`)} alt="" />
@@ -71,7 +71,7 @@ const PoolTop = ({ account, classes, nav, currentPage }) => {
             className={ classes.actionButton }
             variant="outlined"
             color="secondary"
-            onClick={() => nav('apr')}
+            onClick={() => nav('/apr')}
             color={currentPage === '/apr' ? 'primary' : 'secondary'}
           >
             <img src={require(`../../assets/ico-cover.svg`)} alt="" />

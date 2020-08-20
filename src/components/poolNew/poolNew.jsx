@@ -11,12 +11,9 @@ const Pool = ({ history }) => {
   console.log({history})
   const [accGlobal, setAccGlobal] = useState(null)
 
-  const nav = (screen) => {
-    history.push(`/${screen}`)
-  }
   return (
     <div>
-      <PoolTop currentPage={history.location.pathname} nav={nav} account={accGlobal} />
+      <PoolTop currentPage={history.location.pathname} nav={(slag) => history.push(slag)} account={accGlobal} />
       <PoolMain setAccountGlobal={(acc) => setAccGlobal(acc)} />
     </div>
   )

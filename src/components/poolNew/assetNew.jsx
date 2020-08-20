@@ -4,7 +4,8 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
   TextField,
-  Button
+  Button,
+  Slider
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
 
@@ -69,6 +70,9 @@ const styles = theme => ({
       margin: '0px'
     }
   },
+  percentSlider: {
+    width: 300
+  },
   scaleContainer: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -123,6 +127,8 @@ class Asset extends Component {
       redeemAmount: '',
       redeemAmountError: false,
       account: store.getStore('account'),
+      leftSlider: 0,
+      rightSlider: 0,
     }
   }
 
@@ -162,7 +168,9 @@ class Asset extends Component {
       amountError,
       redeemAmount,
       redeemAmountError,
-      loading
+      loading,
+      leftSlider,
+      rightSlider
     } = this.state
 
     return (
@@ -179,9 +187,6 @@ class Asset extends Component {
         </div>
         <div className={ classes.actionsContainer }>
           <div className={ classes.tradeContainer }>
-            {!asset.disabled && <div className={ classes.balances }>
-                <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
-            </div>}
             <TextField
               fullWidth
               className={ classes.actionInput }
@@ -194,39 +199,24 @@ class Asset extends Component {
               variant="outlined"
               onKeyDown={ this.inputKeyDown }
             />
-            <div className={ classes.scaleContainer }>
-              <Button
-                className={ classes.scale }
-                variant='text'
+            {!asset.disabled && <div className={ classes.balances }>
+                <Typography variant='h4' className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
+            </div>}
+            <div className={ classes.percentSlider }>
+              <Slider
+                defaultValue={0}
+                aria-labelledby="discrete-slider"
+                step={25}
+                marks
+                min={0}
+                max={100}
                 disabled={ loading || asset.disabled }
-                color="primary"
-                onClick={ () => { this.setAmount(25) } }>
-                <Typography variant={'h5'}>25%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading || asset.disabled }
-                color="primary"
-                onClick={ () => { this.setAmount(50) } }>
-                <Typography variant={'h5'}>50%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading || asset.disabled }
-                color="primary"
-                onClick={ () => { this.setAmount(75) } }>
-                <Typography variant={'h5'}>75%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading || asset.disabled }
-                color="primary"
-                onClick={ () => { this.setAmount(100) } }>
-                <Typography variant={'h5'}>100%</Typography>
-              </Button>
+                onChange={(_, value) => {
+                  this.setState({ leftSlider: value })
+                  this.setAmount(value)
+                }}
+              />
+              <span>{leftSlider}%</span>
             </div>
             <div className={ classes.buttons }>
               <Button
@@ -236,7 +226,8 @@ class Asset extends Component {
                 disabled={ loading || !account.address || asset.balance <= 0 || asset.depositDisabled === true }
                 onClick={ this.onDeposit }
                 fullWidth
-                >
+              >
+                <img src={require(`../../assets/ico-deposit.svg`)} alt="" />
                 <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit</Typography>
               </Button>
               { asset.version === 2 &&
@@ -248,6 +239,7 @@ class Asset extends Component {
                   onClick={ this.onDepositAll }
                   fullWidth
                   >
+                  <img src={require(`../../assets/ico-deposit.svg`)} alt="" />
                   <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit All</Typography>
                 </Button>
               }
@@ -257,12 +249,10 @@ class Asset extends Component {
                 <Typography variant='h4'>Deposits are currently disabled for this vault</Typography>
               </div>
             }
+            <p>Upon deposit, assets are wrapped as yTokens in your wallet representing liquidity provided</p>
           </div>
           <div className={ classes.sepperator }></div>
           <div className={classes.tradeContainer}>
-            <div className={ classes.balances }>
-              <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ asset.pooledBalance ? (Math.floor(asset.pooledBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.poolSymbol } ({ (asset.pooledBalance ? (Math.floor(asset.pooledBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol }) </Typography>
-            </div>
             <TextField
               fullWidth
               className={ classes.actionInput }
@@ -275,39 +265,24 @@ class Asset extends Component {
               variant="outlined"
               onKeyDown={ this.inputRedeemKeyDown }
             />
-            <div className={ classes.scaleContainer }>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setRedeemAmount(25) } }>
-                <Typography variant={'h5'}>25%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setRedeemAmount(50) } }>
-                <Typography variant={'h5'}>50%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setRedeemAmount(75) } }>
-                <Typography variant={'h5'}>75%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setRedeemAmount(100) } }>
-                <Typography variant={'h5'}>100%</Typography>
-              </Button>
+            <div className={ classes.balances }>
+              <Typography variant='h4' className={ classes.value } noWrap>{ asset.pooledBalance ? (Math.floor(asset.pooledBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.poolSymbol } </Typography>
+            </div>
+            <div className={ classes.percentSlider }>
+              <Slider
+                defaultValue={0}
+                aria-labelledby="discrete-slider"
+                step={25}
+                marks
+                min={0}
+                max={100}
+                disabled={ loading || asset.disabled }
+                onChange={(_, value) => {
+                  this.setState({ rightSlider: value })
+                  this.setRedeemAmount(value)
+                }}
+              />
+              <span>{rightSlider}%</span>
             </div>
             <div className={ classes.buttons }>
               <Button
@@ -318,6 +293,7 @@ class Asset extends Component {
                 onClick={ this.onWithdraw }
                 fullWidth
                 >
+                <img src={require(`../../assets/ico-withdraw.svg`)} alt="" />
                 <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Withdraw</Typography>
               </Button>
               { asset.version === 2 &&
@@ -329,10 +305,12 @@ class Asset extends Component {
                   onClick={ this.onWithdrawAll }
                   fullWidth
                   >
+                  <img src={require(`../../assets/ico-withdraw.svg`)} alt="" />
                   <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Withdraw All</Typography>
                 </Button>
               }
             </div>
+            <p>There is a 0.5% withdrawal fee on all vaults, and a 5% performance fee on subsidized gas.</p>
           </div>
         </div>
       </>
