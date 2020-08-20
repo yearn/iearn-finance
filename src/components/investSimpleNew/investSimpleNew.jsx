@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom'
 import { withStyles } from '@material-ui/core/styles'
 import { withNamespaces } from 'react-i18next'
 import TopBar from '../topBar'
-import PoolMain from './poolMain'
+import InvestSimpleMain from './investSimpleMain'
 
 const styles = (theme) => ({})
 
@@ -14,10 +14,10 @@ const Pool = ({ history, accGlobal, setAccGlobal }) => {
         currentPage={history.location.pathname}
         nav={(slag) => history.push(slag)}
         account={accGlobal}
-        pageTitle="Harvest DeFi Yield Opportunities on Autopilot"
-        pageSubtitle="Maximize profits with the best growth strategy for your asset at any time"
+        pageTitle="Grow Savings With DeFi Lending on Autopilot"
+        pageSubtitle="Deploys funds to the best lending strategy for your asset at any time"
       />
-      <PoolMain setAccountGlobal={(acc) => setAccGlobal(acc)} />
+      <InvestSimpleMain setAccountGlobal={(acc) => setAccGlobal(acc)} />
     </div>
   )
 }

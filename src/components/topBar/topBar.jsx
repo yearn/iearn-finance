@@ -14,10 +14,8 @@ const styles = theme => ({
   },
 })
 
-const PoolTop = ({ account, classes, nav, currentPage }) => {
+const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle }) => {
   const [modalOpen, setModalOpen] = useState(false)
-  
-  if (!account || !account.address) return null
   return (
       <>
         <div>
@@ -70,7 +68,6 @@ const PoolTop = ({ account, classes, nav, currentPage }) => {
           <Button
             className={ classes.actionButton }
             variant="outlined"
-            color="secondary"
             onClick={() => nav('/apr')}
             color={currentPage === '/apr' ? 'primary' : 'secondary'}
           >
@@ -85,21 +82,23 @@ const PoolTop = ({ account, classes, nav, currentPage }) => {
             onClick={() => setModalOpen(true)}
             // fullWidth
           >
-            <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>
-              <img src={require(`../../assets/ico-wallet.svg`)} alt="" />
-              {' '}
-              {`${account.address.substring(0, 6)}...${account.address.substring(account.address.length - 4, account.address.length)}`}
-            </Typography>
+            {!account || !account.address ? 'Login' : (
+              <Typography className={ classes.buttonText } variant={'h5'} color='secondary'>
+                <img src={require(`../../assets/ico-wallet.svg`)} alt="" />
+                {' '}
+                {`${account.address.substring(0, 6)}...${account.address.substring(account.address.length - 4, account.address.length)}`}
+              </Typography>
+            )}
           </Button>
         </div>
         <div>
-          <h2>Harvest DeFi Yield Opportunities on Autopilot</h2>
-          <h3>Maximize profits with the best growth strategy for your asset at any time</h3>
+          <h2>{pageTitle}</h2>
+          <h3>{pageSubtitle}</h3>
         </div>
-        {modalOpen && <UnlockModal closeModal={() =>   setModalOpen(false)} modalOpen={modalOpen} />}
+        {modalOpen && <UnlockModal closeModal={() => setModalOpen(false)} modalOpen={modalOpen} />}
       </>
 
   )
 }
 
-export default withNamespaces()(withRouter(withStyles(styles)(PoolTop)))
+export default withNamespaces()(withRouter(withStyles(styles)(TopBar)))

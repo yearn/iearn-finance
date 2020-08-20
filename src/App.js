@@ -10,11 +10,11 @@ import IpfsRouter from 'ipfs-react-router'
 import './i18n';
 import interestTheme from './theme';
 
-import APR from './components/apr';
-import InvestSimple from './components/investSimple';
+import APR from './components/aprNew';
+import InvestSimple from './components/investSimpleNew';
 import Manage from './components/manage';
 import Performance from './components/performance';
-import Zap from './components/zap';
+import Zap from './components/zapNew';
 import IDai from './components/idai';
 import Footer from './components/footer';
 import Home from './components/home';
@@ -35,7 +35,8 @@ const store = Store.store
 
 class App extends Component {
   state = {
-    headerValue: null
+    headerValue: null,
+    accGlobal: null
   };
 
   setHeaderValue = (newValue) => {
@@ -77,16 +78,13 @@ class App extends Component {
           }}>
             <Switch>
               <Route path="/apr">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
-                <APR />
+                <APR accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
               </Route>
               <Route path="/earn">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
-                <InvestSimple />
+                <InvestSimple accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
               </Route>
               <Route path="/zap">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
-                <Zap />
+                <Zap accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
               </Route>
               <Route path="/idai">
                 <IDai />
@@ -98,8 +96,7 @@ class App extends Component {
                 <Manage />
               </Route>
               <Route path="/vaults">
-                {/* <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } /> */}
-                <Vaults />
+                <Vaults accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
               </Route>
               <Route path="/">
                 <Home />
