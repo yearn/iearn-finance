@@ -75,7 +75,8 @@ const styles = theme => ({
     flex: '1',
     marginTop: '23px',
     [theme.breakpoints.down('sm')]: {
-      flexDirection: 'column'
+      flexDirection: 'column',
+      alignItems: 'center',
     }
   },
   title: {
@@ -105,6 +106,9 @@ const styles = theme => ({
     alignItems: 'center',
     maxWidth: '275px',
     width: '100%',
+    [theme.breakpoints.down('sm')]: {
+      maxWidth: '100%',
+    }
   },
   sepperator: {
     borderBottom: '1px solid #E1E1E1',
@@ -175,7 +179,12 @@ const styles = theme => ({
     padding: '25px 40px',
     maxWidth: '695px',
     width: '100%',
-    margin: '0 auto'
+    margin: '0 auto',
+    position: 'relative',
+    zIndex: '3',
+    [theme.breakpoints.down('sm')]: {
+      padding: '20px 10px',
+    }
   },
   assetHeader: {
     display: 'flex',

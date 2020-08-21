@@ -70,7 +70,6 @@ class App extends Component {
             display: 'flex',
             flexDirection: 'column',
             minHeight: '100vh',
-            alignItems: 'center',
             backgroundImage: `url(${require(`./assets/bg.png`)})`,
             backgroundPosition: 'left bottom',
           }}>
