@@ -259,6 +259,7 @@ class InvestSimple extends Component {
       snackbarMessage: null,
       hideV1: true,
       value: 1,
+      refreshTimer: null
     }
 
     if(account && account.address) {
@@ -276,6 +277,8 @@ class InvestSimple extends Component {
   }
 
   componentWillUnmount() {
+    const { refreshTimer } = this.state
+    clearTimeout(refreshTimer)
     emitter.removeListener(INVEST_RETURNED, this.investReturned);
     emitter.removeListener(REDEEM_RETURNED, this.redeemReturned);
     emitter.removeListener(ERROR, this.errorReturned);
@@ -289,8 +292,8 @@ class InvestSimple extends Component {
   }
 
   balancesReturned = (balances) => {
-    this.setState({ assets: store.getStore('assets') })
-    setTimeout(this.refresh, 30000);
+    const _refreshTimer = setTimeout(this.refresh, 30000)
+    this.setState({ assets: store.getStore('assets'), refreshTimer: _refreshTimer })
   };
 
   connectionConnected = () => {
@@ -309,8 +312,10 @@ class InvestSimple extends Component {
 
   connectionDisconnected = () => {
     const { setAccountGlobal} = this.props
+    const { refreshTimer } = this.state
     const account = store.getStore('account')
-    this.setState({ account })
+    clearTimeout(refreshTimer)
+    this.setState({ account, refreshTimer: null })
     setAccountGlobal(account)
   }
 
