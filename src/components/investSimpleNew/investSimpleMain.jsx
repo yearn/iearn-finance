@@ -8,6 +8,14 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
+  Avatar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper
 } from '@material-ui/core';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
@@ -241,6 +249,31 @@ const styles = theme => ({
   grey: {
     color: colors.darkGray
   },
+  assetContainer: {
+    position: 'relative',
+    width: '100%',
+    background: '#fff',
+    height: '100%',
+  },
+  whiteBg: {
+    background: '#fff',
+    height: '50%',
+    position: 'absolute',
+    bottom: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  },
+  mainBg: {
+    backgroundImage: `url(${require(`../../assets/bg.png`)})`,
+    backgroundPosition: 'left bottom',
+    height: '50%',
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  }
 });
 
 class InvestSimple extends Component {
@@ -250,8 +283,11 @@ class InvestSimple extends Component {
 
     const account = store.getStore('account')
     props.setAccountGlobal(account)
+    const assets = store.getStore('assets')
+    console.log({assets})
     this.state = {
-      assets: store.getStore('assets'),
+      assets,
+      currentAsset: assets.find(a => a.id === 'DAI') || assets[0],
       account: account,
       modalOpen: false,
       modalInvestAllOpen: false,
@@ -361,61 +397,74 @@ class InvestSimple extends Component {
       modalInvestAllOpen,
       snackbarMessage,
       value,
+      currentAsset,
     } = this.state
-    var address = null;
-    if (account.address) {
-      address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
-    }
+    
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
-
-          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
-
-          { account.address &&
-
-          <div className={ classes.intro }>
-            <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
-              <ToggleButton value={0} aria-label="v1">
-                <Typography variant={ 'h4' }>v1</Typography>
-              </ToggleButton>
-              <ToggleButton value={1} aria-label="v2">
-                <Typography variant={ 'h4' }>y.curve.fi</Typography>
-              </ToggleButton>
-              <ToggleButton value={2} aria-label="v3">
-                <Typography variant={ 'h4' }>busd.curve.fi</Typography>
-              </ToggleButton>
-            </ToggleButtonGroup>
-            <div className={ classes.between }>
-            </div>
-            <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-              <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
-              <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
-              <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
-            </Card>
-          </div>
-          }
           { !account.address &&
           <div className={ classes.introCenter }>
             <Typography variant='h3'>{ t('InvestSimple.Intro') }</Typography>
           </div>
           }
           {!account.address &&
-          <div className={ classes.connectContainer }>
-            <Button
-              className={ classes.actionButton }
-              variant="outlined"
-              color="primary"
-              disabled={ loading }
-              onClick={ this.overlayClicked }
-            >
-              <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('InvestSimple.Connect') }</Typography>
-            </Button>
-          </div>
+            <div className={ classes.connectContainer }>
+              <Button
+                className={ classes.actionButton }
+                variant="outlined"
+                color="primary"
+                disabled={ loading }
+                onClick={ this.overlayClicked }
+              >
+                <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('InvestSimple.Connect') }</Typography>
+              </Button>
+            </div>
           }
-          { account.address && value === 0 && this.renderAssetBlocksv1() }
-          { account.address && value === 1 && this.renderAssetBlocksv2() }
-          { account.address && value === 2 && this.renderAssetBlocksv3() }
+          { account.address &&
+            <div className={ classes.intro }>
+              <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
+                <ToggleButton value={0} aria-label="v1">
+                  <Typography variant={ 'h4' }>v1</Typography>
+                </ToggleButton>
+                <ToggleButton value={1} aria-label="v2">
+                  <Typography variant={ 'h4' }>y.curve.fi</Typography>
+                </ToggleButton>
+                <ToggleButton value={2} aria-label="v3">
+                  <Typography variant={ 'h4' }>busd.curve.fi</Typography>
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </div>
+          }
+          {account.address && (
+            <>
+              <div className={classes.assetContainer}>
+                <div className={classes.wavesBg} />
+                <Asset asset={currentAsset} startLoading={this.startLoading} />
+                <div className={classes.whiteBg}  />
+                <div className={classes.mainBg}  />
+              </div>
+            </>
+          )}
+          {account.address && (
+              <TableContainer component={Paper}>
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Asset</TableCell>
+                      <TableCell align="right">Details</TableCell>
+                      <TableCell align="right">Interest Rate</TableCell>
+                      <TableCell align="right">Available Balance</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    { account.address && value === 0 && this.renderAssetBlocksv1() }
+                    { account.address && value === 1 && this.renderAssetBlocksv2() }
+                    { account.address && value === 2 && this.renderAssetBlocksv3() }
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
         </div>
         { loading && <Loader /> }
         { modalOpen && this.renderModal() }
@@ -426,7 +475,7 @@ class InvestSimple extends Component {
   };
 
   handleTabChange = (event, newValue) => {
-    this.setState({value:newValue})
+    this.setState({ value: newValue })
   };
 
   onChange = (event) => {
@@ -436,134 +485,76 @@ class InvestSimple extends Component {
   };
 
   renderAssetBlocksv1 = () => {
-    const { assets, expanded, hideV1 } = this.state
-    const { classes, t } = this.props
-    const width = window.innerWidth
+    const { assets, hideV1, currentAsset } = this.state
 
     return assets.filter((asset) => {
-      return (hideV1 === true || asset.version !== 1)
+      return (hideV1 === false || asset.version !== 1)
     }).filter((asset) => {
       return (asset.version === 1 && asset.investedBalance && (asset.investedBalance).toFixed(4) > 0)
     }).filter((asset) => {
       return !(asset.symbol === "iDAI")
     }).map((asset) => {
       return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
-          <ExpansionPanelSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1bh-content"
-            id="panel1bh-header"
-          >
-            <div className={ classes.assetSummary }>
-              <div className={classes.headingName}>
-                <div className={ classes.assetIcon }>
-                  <img
-                    alt=""
-                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
-                    height={ width > 600 ? '40px' : '30px'}
-                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
-                  />
-                </div>
-                <div>
-                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' } className={ classes.grey }>{ asset.description }</Typography>
-                </div>
-              </div>
-              <div className={classes.heading}>
-                <Typography variant={ 'h3' }>
-                  {
-                    asset.maxApr
-                      ? (asset.maxApr * 100).toFixed(4) + ' %'
-                      : 'N/A'
-                  }
-                </Typography>
-                <Typography variant={ 'h5' }>{ t('InvestSimple.InterestRate') }</Typography>
-              </div>
-              <div className={classes.heading}>
-                <Typography variant={'h3'}>
-                  {
-                    asset.balance
-                      ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol)
-                      : 'N/A'
-                  }
-                </Typography>
-                <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
-              </div>
-            </div>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
-            <Asset asset={ asset } startLoading={ this.startLoading } />
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+        <TableRow key={asset.id} onClick={() => this.setState({ currentAsset: asset })}>
+          <TableCell component="th" scope="row">
+            <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
+            <Avatar>
+              <img
+                alt=""
+                src={require('../../assets/' + asset.symbol + '-logo.png')}
+                height={'40px'}
+                style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
+              />
+            </Avatar>
+            <span>{asset.id}</span>
+          </TableCell>
+          <TableCell align="right">{asset.description}</TableCell>
+          <TableCell align="right">
+            { asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }
+          </TableCell>
+          <TableCell align="right">
+            { asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }
+          </TableCell>
+        </TableRow>
       )
     })
   }
 
   renderAssetBlocksv2 = () => {
-    const { assets, expanded } = this.state
-    const { classes, t } = this.props
-    const width = window.innerWidth
+    const { assets, currentAsset } = this.state
     return assets.filter((asset) => {
       return (asset.version === 2)
     }).filter((asset) => {
       return !(asset.symbol === "iDAI")
     }).map((asset) => {
       return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
-          <ExpansionPanelSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1bh-content"
-            id="panel1bh-header"
-          >
-            <div className={ classes.assetSummary }>
-              <div className={classes.headingName}>
-                <div className={ classes.assetIcon }>
-                  <img
-                    alt=""
-                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
-                    height={ width > 600 ? '40px' : '30px'}
-                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
-                  />
-                </div>
-                <div>
-                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' } className={ classes.grey }>{ asset.description }</Typography>
-                </div>
-              </div>
-              <div className={classes.heading}>
-                <Typography variant={ 'h3' }>
-                  {
-                    asset.maxApr
-                      ? (asset.maxApr * 100).toFixed(4) + ' %'
-                      : 'N/A'
-                  }
-                </Typography>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ t('InvestSimple.InterestRate') }</Typography>
-              </div>
-              <div className={classes.heading}>
-                <Typography variant={ 'h3' }>
-                  {
-                    asset.balance
-                      ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol)
-                      : 'N/A'
-                  }
-                </Typography>
-                <Typography variant={ 'h5' } className={ classes.grey }>{ t('InvestSimple.AvailableBalance') }</Typography>
-              </div>
-            </div>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
-            <Asset asset={ asset } startLoading={ this.startLoading } />
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+        <TableRow key={asset.id} onClick={() => this.setState({ currentAsset: asset })}>
+          <TableCell component="th" scope="row">
+            <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
+            <Avatar>
+              <img
+                alt=""
+                src={require('../../assets/' + asset.symbol + '-logo.png')}
+                height={'40px'}
+                style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
+              />
+            </Avatar>
+            <span>{asset.id}</span>
+          </TableCell>
+          <TableCell align="right">{asset.description}</TableCell>
+          <TableCell align="right">
+            { asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }
+          </TableCell>
+          <TableCell align="right">
+            { asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }
+          </TableCell>
+        </TableRow>
       )
     })
   }
 
   renderAssetBlocksv3 = () => {
-    const { assets, expanded } = this.state
-    const { classes, t } = this.props
-    const width = window.innerWidth
+    const { assets, currentAsset } = this.state
 
     return assets.filter((asset) => {
       return (asset.version === 3)
@@ -571,53 +562,27 @@ class InvestSimple extends Component {
       return !(asset.symbol === "iDAI")
     }).map((asset) => {
       return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
-          <ExpansionPanelSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1bh-content"
-            id="panel1bh-header"
-          >
-            <div className={ classes.assetSummary }>
-              <div className={classes.headingName}>
-                <div className={ classes.assetIcon }>
-                  <img
-                    alt=""
-                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
-                    height={ width > 600 ? '40px' : '30px'}
-                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
-                  />
-                </div>
-                <div>
-                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' } className={ classes.grey }>{ asset.description }</Typography>
-                </div>
-              </div>
-              <div className={classes.heading}>
-                <Typography variant={ 'h3' }>
-                  {
-                    asset.maxApr
-                      ? (asset.maxApr * 100).toFixed(4) + ' %'
-                      : 'N/A'
-                  }
-                </Typography>
-                <Typography variant={ 'h5' }>{ t('InvestSimple.InterestRate') }</Typography>
-              </div>
-              <div className={classes.heading}>
-                <Typography variant={ 'h3' }>
-                  {
-                    asset.balance
-                      ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol)
-                      : 'N/A'
-                  }
-                </Typography>
-                <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
-              </div>
-            </div>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
-            <Asset asset={ asset } startLoading={ this.startLoading } />
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+        <TableRow key={asset.id} onClick={() => this.setState({ currentAsset: asset })}>
+          <TableCell component="th" scope="row">
+            <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
+            <Avatar>
+              <img
+                alt=""
+                src={require('../../assets/' + asset.symbol + '-logo.png')}
+                height={'40px'}
+                style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
+              />
+            </Avatar>
+            <span>{asset.id}</span>
+          </TableCell>
+          <TableCell align="right">{asset.description}</TableCell>
+          <TableCell align="right">
+            { asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }
+          </TableCell>
+          <TableCell align="right">
+            { asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }
+          </TableCell>
+        </TableRow>
       )
     })
   }

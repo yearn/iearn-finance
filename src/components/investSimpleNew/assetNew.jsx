@@ -4,7 +4,8 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
   TextField,
-  Button
+  Button,
+  Slider
 } from '@material-ui/core';
 import { withNamespaces } from 'react-i18next';
 
@@ -76,7 +77,10 @@ const styles = theme => ({
     minWidth: '10px'
   },
   buttonText: {
-    fontWeight: '700',
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    marginLeft: '5px',
   },
   headingContainer: {
     width: '100%',
@@ -95,7 +99,79 @@ const styles = theme => ({
   },
   right: {
     textAlign: 'right'
-  }
+  },
+  box: {
+    background: '#fff',
+    boxShadow: '0px 4px 26px rgba(83, 29, 171, 0.29)',
+    borderRadius: '4px',
+    padding: '25px 40px',
+    maxWidth: '695px',
+    width: '100%',
+    margin: '0 auto',
+    position: 'relative',
+    zIndex: '3',
+    [theme.breakpoints.down('sm')]: {
+      padding: '20px 10px',
+    }
+  },
+  assetHeader: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    borderBottom: '1px solid #D5D7D9',
+    paddingBottom: '20px',
+  },
+  assetTitle: {
+    maxWidth: '340px',
+    width: '100%',
+    fontWeight: 'normal',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#252626',
+    marginLeft: '15px',
+  },
+  description: {
+    fontWeight: 'normal',
+    fontSize: '12px',
+    lineHeight: '20px',
+    textAlign: 'center',
+    color: '#252626',
+    marginTop: '19px',
+  },
+  percentValue: {
+    fontWeight: 'normal',
+    fontSize: '14px',
+    lineHeight: '22px',
+    alignItems: 'center',
+    color: '#595959',
+    marginLeft: '8px'
+  },
+  slider:{
+    width: '83%',
+    '& .MuiSlider-rail':{
+      height: '8px',
+      background: '#dcdcdc',
+    },
+    '& .MuiSlider-track':{
+      height: '8px',
+      background: '#1890FF',
+    },
+    '& .MuiSlider-mark':{
+      height: '14px',
+      width: '1px',
+      background: '#D5D7D9',
+      marginTop: '-3px'
+    },
+    '& .MuiSlider-thumb':{
+      display: 'none',
+    }
+  },
+  percentSlider: {
+    display: 'flex',
+    width: '100%',
+    alignItems: 'center', 
+    justifyContent: 'space-between',
+    marginTop: '30px', 
+  },
 });
 
 
@@ -110,6 +186,8 @@ class Asset extends Component {
       redeemAmount: '',
       redeemAmountError: false,
       account: store.getStore('account'),
+      leftSlider: 0,
+      rightSlider: 0,
     }
   }
 
@@ -145,140 +223,136 @@ class Asset extends Component {
       amountError,
       redeemAmount,
       redeemAmountError,
-      loading
+      loading,
+      leftSlider,
+      rightSlider
     } = this.state
 
-    return (<div className={ classes.actionsContainer }>
-      <div className={ classes.tradeContainer }>
-        {!asset.disabled && <div className={ classes.balances }>
-            <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
-        </div>}
-        <TextField
-          fullWidth
-          className={ classes.actionInput }
-          id='amount'
-          value={ amount }
-          error={ amountError }
-          onChange={ this.onChange }
-          disabled={ loading || asset.disabled }
-          placeholder="0.00"
-          variant="outlined"
-          onKeyDown={ this.inputKeyDown }
-        />
-        <div className={ classes.scaleContainer }>
-          <Button
-            className={ classes.scale }
-            variant='text'
-            disabled={ loading || asset.disabled }
-            color="primary"
-            onClick={ () => { this.setAmount(25) } }>
-            <Typography variant={'h5'}>25%</Typography>
-          </Button>
-          <Button
-            className={ classes.scale }
-            variant='text'
-            disabled={ loading || asset.disabled }
-            color="primary"
-            onClick={ () => { this.setAmount(50) } }>
-            <Typography variant={'h5'}>50%</Typography>
-          </Button>
-          <Button
-            className={ classes.scale }
-            variant='text'
-            disabled={ loading || asset.disabled }
-            color="primary"
-            onClick={ () => { this.setAmount(75) } }>
-            <Typography variant={'h5'}>75%</Typography>
-          </Button>
-          <Button
-            className={ classes.scale }
-            variant='text'
-            disabled={ loading || asset.disabled }
-            color="primary"
-            onClick={ () => { this.setAmount(100) } }>
-            <Typography variant={'h5'}>100%</Typography>
-          </Button>
+    return (
+      <>
+        <div className={ classes.box }> 
+          <div className={ classes.assetHeader }>
+            <img
+              alt=""
+              src={require('../../assets/' + asset.symbol + '-logo.png')}
+              height={'40px'}
+              style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
+            />
+            <Typography variant={'h6'}>{asset.symbol}</Typography>
+            <Typography className={ classes.assetTitle } variant={ 'h6'}>Choose an asset in the table below and deposit it so YFI can put it to work for you</Typography>
+          </div>
+          <div className={ classes.actionsContainer }>
+            <div className={ classes.tradeContainer }>
+              <TextField
+                fullWidth
+                className={ classes.actionInput }
+                id='amount'
+                variant="filled"
+                value={ amount }
+                error={ amountError }
+                onChange={ this.onChange }
+                disabled={ loading || asset.disabled }
+                placeholder="0.00"
+                onKeyDown={ this.inputKeyDown }
+              />
+              {!asset.disabled && <div className={ classes.balances }>
+                  <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
+              </div>}
+              <div className={ classes.percentSlider }>
+                <Slider
+                  value={leftSlider}
+                  className={ classes.slider }
+                  aria-labelledby="discrete-slider"
+                  step={25}
+                  marks
+                  min={0}
+                  max={100}
+                  disabled={ loading || asset.disabled }
+                  onChange={(_, value) => {
+                    this.setState({ leftSlider: value })
+                    this.setAmount(value)
+                  }}
+                />
+                <Typography className={ classes.percentValue } variant={ 'h6'}>{leftSlider}%</Typography>
+              </div>
+              <div className={ classes.buttons }>
+                <Button
+                  className={ classes.actionButton }
+                  variant="contained"
+                  color="primary"
+                  disabled={ loading || !account.address || asset.disabled }
+                  onClick={ this.onInvest }
+                  fullWidth
+                >
+                  <img src={require(`../../assets/ico-deposit.svg`)} alt="" />
+                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Asset.Disabled'):t('Asset.Earn')}</Typography>
+                </Button>
+              </div>
+              <Typography className={ classes.description } variant='h6'>Upon deposit, assets are wrapped as yTokens in your wallet representing liquidity provided</Typography>
+            </div>
+            <div className={ classes.sepperator }></div>
+            <div className={classes.tradeContainer}>
+              <TextField
+                fullWidth
+                className={ classes.actionInput }
+                id='redeemAmount'
+                value={ redeemAmount }
+                error={ redeemAmountError }
+                onChange={ this.onChange }
+                disabled={ loading }
+                placeholder="0.00"
+                variant="filled"
+                onKeyDown={ this.inputRedeemKeyDown }
+              />
+              <div className={ classes.balances }>
+                <Typography variant='h4' className={ classes.value } noWrap>{ 'Balance: ' + (asset.investedBalance ? asset.investedBalance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
+              </div>
+              <div className={ classes.percentSlider }>
+                <Slider
+                  className={ classes.slider }
+                  value={rightSlider}
+                  aria-labelledby="discrete-slider"
+                  step={25}
+                  marks
+                  min={0}
+                  max={100}
+                  disabled={ loading || asset.disabled }
+                  onChange={(_, value) => {
+                    console.log({value})
+                    this.setState({ rightSlider: value })
+                    this.setRedeemAmount(value)
+                  }}
+                />
+                <Typography className={ classes.percentValue } variant={ 'h6'}>{rightSlider}%</Typography>
+              </div>
+              <div className={ classes.buttons }>
+                <Button
+                  className={ classes.actionButton }
+                  variant="contained"
+                  color="primary"
+                  disabled={ loading || !account.address }
+                  onClick={ this.onRedeem }
+                  fullWidth
+                  >
+                  <img src={require(`../../assets/ico-withdraw.svg`)} alt="" />
+                  <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.Claim') }</Typography>
+                </Button>
+              </div>
+              <Typography className={ classes.description } variant='h6'>There is a 0.5% withdrawal fee on all vaults, and a 5% performance fee on subsidized gas.</Typography>
+            </div>
+          </div>
         </div>
-        <Button
-          className={ classes.actionButton }
-          variant="outlined"
-          color="primary"
-          disabled={ loading || !account.address || asset.disabled }
-          onClick={ this.onInvest }
-          fullWidth
-          >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Asset.Disabled'):t('Asset.Earn')}</Typography>
-        </Button>
-      </div>
-      <div className={ classes.sepperator }></div>
-      <div className={classes.tradeContainer}>
-        <div className={ classes.balances }>
-          <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ asset.investedBalance ? asset.investedBalance.toFixed(4) : '0.0000' } { asset.investSymbol } ({ asset.investedBalance ? (parseFloat(asset.investedBalance)*parseFloat(asset.price)).toFixed(4) : '0' }  { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol } )</Typography>
-        </div>
-        <TextField
-          fullWidth
-          className={ classes.actionInput }
-          id='redeemAmount'
-          value={ redeemAmount }
-          error={ redeemAmountError }
-          onChange={ this.onChange }
-          disabled={ loading }
-          placeholder="0.00"
-          variant="outlined"
-          onKeyDown={ this.inputRedeemKeyDown }
-        />
-        <div className={ classes.scaleContainer }>
-          <Button
-            className={ classes.scale }
-            variant='text'
-            disabled={ loading }
-            color="primary"
-            onClick={ () => { this.setRedeemAmount(25) } }>
-            <Typography variant={'h5'}>25%</Typography>
-          </Button>
-          <Button
-            className={ classes.scale }
-            variant='text'
-            disabled={ loading }
-            color="primary"
-            onClick={ () => { this.setRedeemAmount(50) } }>
-            <Typography variant={'h5'}>50%</Typography>
-          </Button>
-          <Button
-            className={ classes.scale }
-            variant='text'
-            disabled={ loading }
-            color="primary"
-            onClick={ () => { this.setRedeemAmount(75) } }>
-            <Typography variant={'h5'}>75%</Typography>
-          </Button>
-          <Button
-            className={ classes.scale }
-            variant='text'
-            disabled={ loading }
-            color="primary"
-            onClick={ () => { this.setRedeemAmount(100) } }>
-            <Typography variant={'h5'}>100%</Typography>
-          </Button>
-        </div>
-        <Button
-          className={ classes.actionButton }
-          variant="outlined"
-          color="primary"
-          disabled={ loading || !account.address }
-          onClick={ this.onRedeem }
-          fullWidth
-          >
-          <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.Claim') }</Typography>
-        </Button>
-      </div>
-    </div>)
+
+      </>
+    )
   };
 
   onChange = (event) => {
     let val = []
     val[event.target.id] = event.target.value
     this.setState(val)
+    if (event.currentTarget.id === 'amount') this.setState({ leftSlider: 0 })
+    if (event.currentTarget.id === 'redeemAmount') this.setState({ rightSlider: 0 })
   }
 
   inputKeyDown = (event) => {
@@ -344,7 +418,11 @@ class Asset extends Component {
       return
     }
 
-    const balance = this.props.asset.investedBalance
+    const { asset } = this.props
+    console.log({asset})
+
+    const balance = asset.investedBalance
+    console.log({balance})
     let amount = balance*percent/100
     amount = Math.floor(amount*10000)/10000;
 

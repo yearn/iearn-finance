@@ -287,7 +287,6 @@ class PoolMain extends Component {
     const account = store.getStore('account')
     props.setAccountGlobal(account)
     const assets = store.getStore('poolAssets')
-    console.log({ assets })
 
     this.state = {
       assets,

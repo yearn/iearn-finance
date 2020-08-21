@@ -306,6 +306,7 @@ class Asset extends Component {
             height={'40px'}
             style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
           />
+          <Typography variant={'h6'}>{asset.symbol}</Typography>
           <Typography className={ classes.assetTitle } variant={ 'h6'}>Choose an asset in the table below and deposit it so YFI can put it to work for you</Typography>
         </div>
         <div className={ classes.actionsContainer }>
@@ -323,7 +324,7 @@ class Asset extends Component {
               onKeyDown={ this.inputKeyDown }
             />
             {!asset.disabled && <div className={ classes.balances }>
-                <Typography variant='h4' className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
+              <Typography variant='h4' className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
             </div>}
             <div className={ classes.percentSlider }>
               <Slider
@@ -446,7 +447,6 @@ class Asset extends Component {
     let val = []
     val[event.target.id] = event.target.value
     this.setState(val)
-    console.log(event.currentTarget.id)
     if (event.currentTarget.id === 'amount') this.setState({ leftSlider: 0 })
     if (event.currentTarget.id === 'redeemAmount') this.setState({ rightSlider: 0 })
   }
