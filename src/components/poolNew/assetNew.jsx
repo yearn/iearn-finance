@@ -104,7 +104,7 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    maxWidth: '275px',
+    maxWidth: '290px',
     width: '100%',
     [theme.breakpoints.down('sm')]: {
       maxWidth: '100%',
@@ -177,7 +177,7 @@ const styles = theme => ({
     boxShadow: '0px 4px 26px rgba(83, 29, 171, 0.29)',
     borderRadius: '4px',
     padding: '25px 40px',
-    maxWidth: '695px',
+    maxWidth: '730px',
     width: '100%',
     margin: '0 auto',
     position: 'relative',
