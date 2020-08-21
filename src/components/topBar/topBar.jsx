@@ -3,7 +3,8 @@ import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import { withNamespaces } from 'react-i18next';
 import {Button,Typography} from '@material-ui/core'
-import UnlockModal from '../unlock/unlockModal.jsx'
+import UnlockModal from '../unlock/unlockModal'
+import SoonModal from '../soonModal/soonModal'
 
 const styles = theme => ({
   buttonText: {
@@ -68,6 +69,7 @@ const styles = theme => ({
 
 const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle }) => {
   const [modalOpen, setModalOpen] = useState(false)
+  const [soonModalOpen, setSoonModalOpen] = useState(false)
   return (
       <div className={ classes.container }>
         <div className={ classes.logoContainer }>
@@ -78,7 +80,9 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle })
             className={ classes.actionButton }
             variant="contained"
             color={currentPage === '/' ? 'primary' : 'secondary'}
-            onClick={() => nav('/')}
+            onClick={() => !!account && !!account.address
+              ? window.open(`https://zapper.fi/dashboard?address=${account.address}`)
+              : setModalOpen(true)}
           >
             <img src={require(`../../assets/ico-dashboard.svg`)} alt="" />
             {' '}
@@ -120,8 +124,8 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle })
           <Button
             className={ classes.actionButton }
             variant="contained"
-            onClick={() => nav('/apr')}
-            color={currentPage === '/apr' ? 'primary' : 'secondary'}
+            onClick={() => setSoonModalOpen(true)}
+            color={'secondary'}
           >
             <img src={require(`../../assets/ico-cover.svg`)} alt="" />
             {' '}
@@ -149,6 +153,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle })
           <Typography className={ classes.subTitle } variant={'h3'} >{pageSubtitle}</Typography>
         </div>
         {modalOpen && <UnlockModal closeModal={() => setModalOpen(false)} modalOpen={modalOpen} />}
+        {soonModalOpen && <SoonModal closeModal={() => setSoonModalOpen(false)} isOpen={soonModalOpen} />}
       </div>
 
   )

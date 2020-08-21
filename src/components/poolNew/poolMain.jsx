@@ -270,6 +270,7 @@ class PoolMain extends Component {
       snackbarType: null,
       snackbarMessage: null,
       value: 1,
+      refreshTimer: null
     }
 
     if (account && account.address) {
@@ -286,6 +287,8 @@ class PoolMain extends Component {
   }
 
   componentWillUnmount() {
+    const { refreshTimer } = this.state
+    clearTimeout(refreshTimer)
     emitter.removeListener(DEPOSIT_POOL_RETURNED, this.showHash)
     emitter.removeListener(WITHDRAW_POOL_RETURNED, this.showHash)
     emitter.removeListener(ERROR, this.errorReturned)
@@ -299,8 +302,8 @@ class PoolMain extends Component {
   }
 
   balancesReturned = (balances) => {
-    this.setState({ assets: store.getStore('poolAssets') })
-    setTimeout(this.refresh, 30000)
+    const _refreshTimer = setTimeout(this.refresh, 30000)
+    this.setState({ assets: store.getStore('poolAssets'), refreshTimer: _refreshTimer })
   }
 
   connectionConnected = () => {
@@ -320,9 +323,12 @@ class PoolMain extends Component {
 
   connectionDisconnected = () => {
     const { setAccountGlobal } = this.props
+    const { refreshTimer } = this.state
+    clearTimeout(refreshTimer)
     const acc = store.getStore('account')
-    this.setState({ account: acc })
+    this.setState({ account: acc, refreshTimer: null })
     setAccountGlobal(acc)
+    console.log('DISCONNECTED')
   }
 
   errorReturned = (error) => {

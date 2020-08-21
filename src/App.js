@@ -10,7 +10,7 @@ import IpfsRouter from 'ipfs-react-router'
 import './i18n';
 import interestTheme from './theme';
 
-import APR from './components/aprNew';
+import Cover from './components/cover';
 import InvestSimple from './components/investSimpleNew';
 import Manage from './components/manage';
 import Performance from './components/performance';
@@ -77,7 +77,7 @@ class App extends Component {
             <Header />
             <Switch>
               <Route path="/apr">
-                <APR accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
+                <Cover accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
               </Route>
               <Route path="/earn">
                 <InvestSimple accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
