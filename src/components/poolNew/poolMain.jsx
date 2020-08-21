@@ -44,13 +44,6 @@ const store = Store.store
 
 const styles = (theme) => ({
   root: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    maxWidth: '1200px',
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   investedContainer: {
     display: 'flex',
@@ -59,7 +52,6 @@ const styles = (theme) => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     minWidth: '100%',
-    marginTop: '40px',
     [theme.breakpoints.up('md')]: {
       minWidth: '900px',
     },
@@ -251,6 +243,41 @@ const styles = (theme) => ({
   grey: {
     color: colors.darkGray,
   },
+  wavesBg: {
+    backgroundImage: `url(${require('../../assets/bg-waves.svg')})`,
+    height: '38px',
+    width: '100%',
+    position: 'absolute',
+    top: '50%',
+    left: '0',
+    zIndex: '2',
+    marginTop: '-38px'
+  },
+  assetContainer: {
+    position: 'relative',
+    width: '100%',
+    background: '#fff',
+    height: '100%',
+  },
+  whiteBg: {
+    background: '#fff',
+    height: '50%',
+    position: 'absolute',
+    bottom: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  },
+  mainBg: {
+    backgroundImage: `url(${require(`../../assets/bg.png`)})`,
+    backgroundPosition: 'left bottom',
+    height: '50%',
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  }
 })
 
 class PoolMain extends Component {
@@ -366,53 +393,64 @@ class PoolMain extends Component {
     }
 
     return (
-      <div className={classes.root}>
-        <img src={require(`../../assets/bg-waves.svg`)} alt="" />
-        <img src={require(`../../assets/bg-waves.svg`)} style={{ transform: 'rotateY(180deg)' }} alt="" />
-        <div className={classes.investedContainer}>
-          {!account.address && (
-            <div className={classes.introCenter}>
-              <Typography variant="h3">Vaults. Simple.</Typography>
-            </div>
-          )}
-          {!account.address && (
-            <div className={classes.connectContainer}>
-              <Button
-                className={classes.actionButton}
-                variant="outlined"
-                color="primary"
-                disabled={loading}
-                onClick={this.overlayClicked}
-              >
-                <Typography className={classes.buttonText} variant={'h5'}>
-                  {t('InvestSimple.Connect')}
-                </Typography>
-              </Button>
-            </div>
-          )}
-          {account.address && <Asset asset={currentAsset} startLoading={this.startLoading} />}
-          {account.address && (
-            <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Asset</TableCell>
-                    <TableCell align="right">Details</TableCell>
-                    <TableCell align="right">Annialized ROI</TableCell>
-                    <TableCell align="right">Wallet Balance</TableCell>
-                    <TableCell align="right">Deployed Balance</TableCell>
-                    <TableCell align="right">LP Token Balance</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>{this.renderAssetBlocks()}</TableBody>
-              </Table>
-            </TableContainer>
-          )}
+      <>
+        
+        <div className={classes.root}>
+          <div className={classes.investedContainer}>
+            {!account.address && (
+              <div className={classes.introCenter}>
+                <Typography variant="h3">Vaults. Simple.</Typography>
+              </div>
+            )}
+            {!account.address && (
+              <div className={classes.connectContainer}>
+                <Button
+                  className={classes.actionButton}
+                  variant="outlined"
+                  color="primary"
+                  disabled={loading}
+                  onClick={this.overlayClicked}
+                >
+                  <Typography className={classes.buttonText} variant={'h5'}>
+                    {t('InvestSimple.Connect')}
+                  </Typography>
+                </Button>
+              </div>
+            )}
+            
+            {account.address && (
+              <>
+                <div className={classes.assetContainer}>
+                  <div className={classes.wavesBg} />
+                  <Asset asset={currentAsset} startLoading={this.startLoading} />
+                  <div className={classes.whiteBg}  />
+                  <div className={classes.mainBg}  />
+                </div>
+              </>
+            )}
+            {account.address && (
+              <TableContainer component={Paper}>
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Asset</TableCell>
+                      <TableCell align="right">Details</TableCell>
+                      <TableCell align="right">Annialized ROI</TableCell>
+                      <TableCell align="right">Wallet Balance</TableCell>
+                      <TableCell align="right">Deployed Balance</TableCell>
+                      <TableCell align="right">LP Token Balance</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>{this.renderAssetBlocks()}</TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </div>
+          {loading && <Loader />}
+          {modalOpen && this.renderModal()}
+          {snackbarMessage && this.renderSnackbar()}
         </div>
-        {loading && <Loader />}
-        {modalOpen && this.renderModal()}
-        {snackbarMessage && this.renderSnackbar()}
-      </div>
+      </>
     )
   }
 
