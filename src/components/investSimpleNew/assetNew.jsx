@@ -25,11 +25,39 @@ const store = Store.store
 
 const styles = theme => ({
   value: {
-    cursor: 'pointer'
+    cursor: 'pointer',
+    textAlign: 'left',
+    fontWeight: 'normal',
+    fontSize: '14px',
+    lineHeight: '22px',
+    color: '#252626',
+    marginTop: '5px',
   },
   actionInput: {
-    padding: '0px 0px 12px 0px',
-    fontSize: '0.5rem'
+    fontSize: '14px',
+    lineHeight: '22px',
+    color: '#888A8C',
+    '& input': {
+      padding: '11px',
+      fontWeight: 'normal',
+      borderRadius: '6px',
+    },
+    '& div:hover:before': {
+      borderBottom: 'none',
+      boxShadow: 'none',
+    },
+    '& div:before': {
+      border: 'none',
+      boxShadow: 'none',
+    },
+    '& div:after': {
+      border: 'none',
+      boxShadow: 'none',
+    },
+    '& div': {
+      borderRadius: '6px',
+      background: '#F3F4F5',
+    }
   },
   balances: {
     width: '100%',
@@ -38,24 +66,45 @@ const styles = theme => ({
     cursor: 'pointer'
   },
   actionsContainer: {
-    paddingBottom: '12px',
     display: 'flex',
+    justifyContent: 'space-between',
     flex: '1',
+    marginTop: '23px',
     [theme.breakpoints.down('sm')]: {
-      flexDirection: 'column'
+      flexDirection: 'column',
+      alignItems: 'center',
     }
   },
   title: {
     paddingRight: '24px'
   },
   actionButton: {
-    height: '47px'
+    borderRadius: '4px',
+    margin: '10px 5px 0',
+    padding: '8px 13px',
+    maxWidth: 'max-content',
+    alignItems: 'center',
+    whiteSpace: 'nowrap',
+    '&:first-of-type': {
+      marginLeft: '0',
+    },
+    '&:last-of-type': {
+      marginRight: '0',
+    },
+    '&.MuiButton-contained.Mui-disabled':{
+      color: '#b1b1b1',
+    },
   },
   tradeContainer: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
+    maxWidth: '290px',
+    width: '100%',
+    [theme.breakpoints.down('sm')]: {
+      maxWidth: '100%',
+    }
   },
   sepperator: {
     borderBottom: '1px solid #E1E1E1',
@@ -172,6 +221,28 @@ const styles = theme => ({
     justifyContent: 'space-between',
     marginTop: '30px', 
   },
+  assetButton: {
+    background: '#F3F4F5',
+    borderRadius: '4px',
+    padding: '6px 15px',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  assetId: {
+    fontWeight: '600',
+    fontSize: '24px',
+    lineHeight: '32px',
+    color: '#080809',
+    marginLeft: '6px'
+  },
+  buttons: {
+    display: 'flex',
+    width: '100%',
+    marginTop: '20px',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  
 });
 
 
@@ -232,13 +303,15 @@ class Asset extends Component {
       <>
         <div className={ classes.box }> 
           <div className={ classes.assetHeader }>
-            <img
-              alt=""
-              src={require('../../assets/' + asset.symbol + '-logo.png')}
-              height={'40px'}
-              style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
-            />
-            <Typography variant={'h6'}>{asset.symbol}</Typography>
+            <div className={ classes.assetButton }>
+              <img
+                alt=""
+                src={require('../../assets/' + asset.symbol + '-logo.png')}
+                height={'26px'}
+                style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
+              />
+              <Typography className={classes.assetId} variant={'h6'}>{asset.symbol}</Typography>
+            </div>
             <Typography className={ classes.assetTitle } variant={ 'h6'}>Choose an asset in the table below and deposit it so YFI can put it to work for you</Typography>
           </div>
           <div className={ classes.actionsContainer }>
@@ -256,7 +329,8 @@ class Asset extends Component {
                 onKeyDown={ this.inputKeyDown }
               />
               {!asset.disabled && <div className={ classes.balances }>
-                  <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
+                  <Typography variant='h3' className={ classes.title }></Typography>
+                  <Typography variant='h4' className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
               </div>}
               <div className={ classes.percentSlider }>
                 <Slider

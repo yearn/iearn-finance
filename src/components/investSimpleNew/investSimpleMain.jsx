@@ -46,13 +46,6 @@ const store = Store.store
 
 const styles = theme => ({
   root: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    maxWidth: '1200px',
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center'
   },
   investedContainer: {
     display: 'flex',
@@ -61,7 +54,6 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     minWidth: '100%',
-    marginTop: '40px',
     [theme.breakpoints.up('md')]: {
       minWidth: '900px',
     }
@@ -89,7 +81,7 @@ const styles = theme => ({
     width: '100%',
     position: 'relative',
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: '32px',
     [theme.breakpoints.down('sm')]: {
@@ -249,11 +241,15 @@ const styles = theme => ({
   grey: {
     color: colors.darkGray
   },
-  assetContainer: {
-    position: 'relative',
+  wavesBg: {
+    backgroundImage: `url(${require('../../assets/bg-waves.svg')})`,
+    height: '38px',
     width: '100%',
-    background: '#fff',
-    height: '100%',
+    position: 'absolute',
+    top: '50%',
+    left: '0',
+    zIndex: '2',
+    marginTop: '-38px'
   },
   whiteBg: {
     background: '#fff',
@@ -273,7 +269,62 @@ const styles = theme => ({
     left: '0',
     width: '100%',
     zIndex: '1',
-  }
+  },
+  assetContainer: {
+    position: 'relative',
+    width: '100%',
+    background: '#fff',
+    height: '100%',
+  },
+  tableContainer: {
+    padding: '70px 0 87px',
+  },
+  table: {
+    maxWidth: '967px',
+    width: '100%',
+    margin: '0 auto',
+  },
+  assetTitle: {
+    fontWeight: '600',
+    fontSize: '20px',
+    lineHeight: '24px',
+    color: '#080809',
+    marginLeft: '6px',
+  },
+  tableRowCell: {
+    padding: '8px 16px',
+  },
+  tableRow: {
+    borderBottom: '1px solid rgba(224, 224, 224, 1)',
+    '&:hover': {
+      background: '#E6F7FF',
+    }
+  },
+  assetDescription: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#575859',
+  },
+  tableCell: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '22px',
+    color: '#252626',
+    padding: '8px 16px',
+
+  },
+  tableAvatarCell: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '8px 16px',
+    height: '65px',
+    borderBottom: 'none',
+  },
+  tableAvatar: {
+    marginLeft: '20px',
+    background: 'transparent'
+  },
 });
 
 class InvestSimple extends Component {
@@ -447,14 +498,14 @@ class InvestSimple extends Component {
             </>
           )}
           {account.address && (
-              <TableContainer component={Paper}>
+              <TableContainer className={classes.tableContainer} component={Paper}>
                 <Table className={classes.table} aria-label="simple table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Asset</TableCell>
-                      <TableCell align="right">Details</TableCell>
-                      <TableCell align="right">Interest Rate</TableCell>
-                      <TableCell align="right">Available Balance</TableCell>
+                      <TableCell className={classes.tableCell}>Asset</TableCell>
+                      <TableCell className={classes.tableCell}>Details</TableCell>
+                      <TableCell className={classes.tableCell}>Interest Rate</TableCell>
+                      <TableCell className={classes.tableCell}>Available Balance</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -485,7 +536,7 @@ class InvestSimple extends Component {
   };
 
   renderAssetBlocksv1 = () => {
-    const { assets, hideV1, currentAsset } = this.state
+    const { classes, assets, hideV1, currentAsset } = this.state
 
     return assets.filter((asset) => {
       return (hideV1 === false || asset.version !== 1)
@@ -495,25 +546,27 @@ class InvestSimple extends Component {
       return !(asset.symbol === "iDAI")
     }).map((asset) => {
       return (
-        <TableRow key={asset.id} onClick={() => this.setState({ currentAsset: asset })}>
-          <TableCell component="th" scope="row">
+        <TableRow className={classes.tableRow} key={asset.id} onClick={() => this.setState({ currentAsset: asset })}>
+          <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
-            <Avatar>
+            <Avatar className={classes.tableAvatar}>
               <img
                 alt=""
                 src={require('../../assets/' + asset.symbol + '-logo.png')}
-                height={'40px'}
+                height={'24px'}
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
             </Avatar>
-            <span>{asset.id}</span>
+            <Typography className={classes.assetTitle} variant="h6">{asset.id}</Typography>
           </TableCell>
-          <TableCell align="right">{asset.description}</TableCell>
-          <TableCell align="right">
-            { asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }
+          <TableCell className={classes.tableRowCell}>
+            <Typography className={classes.assetDescription} variant="h6">{asset.description}</Typography>
           </TableCell>
-          <TableCell align="right">
-            { asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }
+          <TableCell className={classes.tableRowCell}>
+            <Typography className={classes.assetDescription} variant="h6">{ asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }</Typography>
+          </TableCell>
+          <TableCell className={classes.tableRowCell}>
+            <Typography className={classes.assetDescription} variant="h6">{ asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }</Typography>
           </TableCell>
         </TableRow>
       )
@@ -535,17 +588,17 @@ class InvestSimple extends Component {
               <img
                 alt=""
                 src={require('../../assets/' + asset.symbol + '-logo.png')}
-                height={'40px'}
+                height={'24px'}
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
             </Avatar>
             <span>{asset.id}</span>
           </TableCell>
-          <TableCell align="right">{asset.description}</TableCell>
-          <TableCell align="right">
+          <TableCell>{asset.description}</TableCell>
+          <TableCell>
             { asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }
           </TableCell>
-          <TableCell align="right">
+          <TableCell>
             { asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }
           </TableCell>
         </TableRow>
@@ -555,7 +608,7 @@ class InvestSimple extends Component {
 
   renderAssetBlocksv3 = () => {
     const { assets, currentAsset } = this.state
-
+    
     return assets.filter((asset) => {
       return (asset.version === 3)
     }).filter((asset) => {
@@ -569,7 +622,7 @@ class InvestSimple extends Component {
               <img
                 alt=""
                 src={require('../../assets/' + asset.symbol + '-logo.png')}
-                height={'40px'}
+                height={'24px'}
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
             </Avatar>
