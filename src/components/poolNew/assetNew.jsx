@@ -318,7 +318,7 @@ class Asset extends Component {
             </div>}
             <div className={ classes.percentSlider }>
               <Slider
-                defaultValue={0}
+                value={leftSlider}
                 className={ classes.slider }
                 aria-labelledby="discrete-slider"
                 step={25}
@@ -386,7 +386,7 @@ class Asset extends Component {
             <div className={ classes.percentSlider }>
               <Slider
                 className={ classes.slider }
-                defaultValue={0}
+                value={rightSlider}
                 aria-labelledby="discrete-slider"
                 step={25}
                 marks
@@ -437,6 +437,9 @@ class Asset extends Component {
     let val = []
     val[event.target.id] = event.target.value
     this.setState(val)
+    console.log(event.currentTarget.id)
+    if (event.currentTarget.id === 'amount') this.setState({ leftSlider: 0 })
+    if (event.currentTarget.id === 'redeemAmount') this.setState({ rightSlider: 0 })
   }
 
   inputKeyDown = (event) => {
