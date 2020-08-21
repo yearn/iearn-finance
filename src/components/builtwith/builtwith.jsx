@@ -157,7 +157,6 @@ function MyComponent(props) {
 
               <img style={
                 {
-                  position: 'absolute',
                   right: '20px',
 
                   width: '30px',
