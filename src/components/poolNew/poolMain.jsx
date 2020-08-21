@@ -277,7 +277,56 @@ const styles = (theme) => ({
     left: '0',
     width: '100%',
     zIndex: '1',
-  }
+  },
+  table: {
+    maxWidth: '967px',
+    width: '100%',
+    margin: '0 auto',
+  },
+  tableCell: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '22px',
+    color: '#252626',
+    padding: '8px 16px',
+
+  },
+  tableAvatarCell: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '8px 16px',
+    height: '65px',
+    borderBottom: 'none',
+  },
+  tableAvatar: {
+    marginLeft: '20px',
+    background: 'transparent'
+  },
+  assetTitle: {
+    fontWeight: '600',
+    fontSize: '20px',
+    lineHeight: '24px',
+    color: '#080809',
+    marginLeft: '6px',
+  },
+  tableRowCell: {
+    padding: '8px 16px',
+  },
+  tableRow: {
+    borderBottom: '1px solid rgba(224, 224, 224, 1)',
+    '&:hover': {
+      background: '#E6F7FF',
+    }
+  },
+  assetDescription: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#575859',
+  },
+  tableContainer: {
+    padding: '70px 0 87px',
+  },
 })
 
 class PoolMain extends Component {
@@ -428,16 +477,16 @@ class PoolMain extends Component {
               </>
             )}
             {account.address && (
-              <TableContainer component={Paper}>
+              <TableContainer className={classes.tableContainer} component={Paper}>
                 <Table className={classes.table} aria-label="simple table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Asset</TableCell>
-                      <TableCell align="right">Details</TableCell>
-                      <TableCell align="right">Annialized ROI</TableCell>
-                      <TableCell align="right">Wallet Balance</TableCell>
-                      <TableCell align="right">Deployed Balance</TableCell>
-                      <TableCell align="right">LP Token Balance</TableCell>
+                      <TableCell className={classes.tableCell}>Asset</TableCell>
+                      <TableCell className={classes.tableCell}>Details</TableCell>
+                      <TableCell className={classes.tableCell}>Annialized ROI</TableCell>
+                      <TableCell className={classes.tableCell}>Wallet Balance</TableCell>
+                      <TableCell className={classes.tableCell}>Deployed Balance</TableCell>
+                      <TableCell className={classes.tableCell}>LP Token Balance</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>{this.renderAssetBlocks()}</TableBody>
@@ -466,35 +515,39 @@ class PoolMain extends Component {
 
     return assets.map((asset) => {
       return (
-        <TableRow key={asset.id} onClick={() => this.setState({ currentAsset: asset })}>
-          <TableCell component="th" scope="row">
+        <TableRow className={classes.tableRow} key={asset.id} onClick={() => this.setState({ currentAsset: asset })}>
+          <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
-            <Avatar>
+            <Avatar className={classes.tableAvatar}>
               <img
                 alt=""
                 src={require('../../assets/' + asset.symbol + '-logo.png')}
-                height={'40px'}
+                height={'24px'}
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
             </Avatar>
-            <span>{asset.id}</span>
+            <Typography className={classes.assetTitle} variant="h6">{asset.id}</Typography>
           </TableCell>
-          <TableCell align="right">{asset.description}</TableCell>
-          <TableCell align="right">
-            {['LINK'].includes(asset.id) ? 'Not Available' : `${asset.apy ? asset.apy.toFixed(4) : '0.0000'}%`}
+          <TableCell className={classes.tableRowCell} align="left">
+            <Typography className={classes.assetDescription} variant="h6">{asset.description}</Typography>
           </TableCell>
-          <TableCell align="right">
-            {(asset.balance ? asset.balance.toFixed(4) : '0.0000') + ' ' + asset.symbol}
+          <TableCell className={classes.tableRowCell} align="left">
+            <Typography className={classes.assetDescription} variant="h6">{['LINK'].includes(asset.id) ? 'Not Available' : `${asset.apy ? asset.apy.toFixed(4) : '0.0000'}%`}</Typography>
           </TableCell>
-          <TableCell align="right">
-            {asset.pooledBalance
+          <TableCell className={classes.tableRowCell} align="left">
+            <Typography className={classes.assetDescription} variant="h6">{(asset.balance ? asset.balance.toFixed(4) : '0.0000') + ' ' + asset.symbol}</Typography>
+          </TableCell>
+          <TableCell className={classes.tableRowCell} align="left">
+            <Typography className={classes.assetDescription} variant="h6">{asset.pooledBalance
               ? (Math.floor(asset.pooledBalance * asset.pricePerFullShare * 10000) / 10000).toFixed(4)
               : '0.0000'}{' '}
-            {asset.symbol}
+              {asset.symbol}
+            </Typography>
           </TableCell>
-          <TableCell align="right">
-            {asset.pooledBalance ? (Math.floor(asset.pooledBalance * 10000) / 10000).toFixed(4) : '0.0000'}{' '}
-            {asset.poolSymbol}
+          <TableCell className={classes.tableRowCell} align="left">
+            <Typography className={classes.assetDescription} variant="h6">{asset.pooledBalance ? (Math.floor(asset.pooledBalance * 10000) / 10000).toFixed(4) : '0.0000'}{' '}
+              {asset.poolSymbol}
+            </Typography>
           </TableCell>
         </TableRow>
       )

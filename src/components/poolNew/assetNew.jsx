@@ -104,7 +104,7 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    maxWidth: '275px',
+    maxWidth: '290px',
     width: '100%',
     [theme.breakpoints.down('sm')]: {
       maxWidth: '100%',
@@ -177,7 +177,7 @@ const styles = theme => ({
     boxShadow: '0px 4px 26px rgba(83, 29, 171, 0.29)',
     borderRadius: '4px',
     padding: '25px 40px',
-    maxWidth: '695px',
+    maxWidth: '730px',
     width: '100%',
     margin: '0 auto',
     position: 'relative',
@@ -236,6 +236,20 @@ const styles = theme => ({
     '& .MuiSlider-thumb':{
       display: 'none',
     }
+  },
+  assetButton: {
+    background: '#F3F4F5',
+    borderRadius: '4px',
+    padding: '6px 15px',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  assetId: {
+    fontWeight: '600',
+    fontSize: '24px',
+    lineHeight: '32px',
+    color: '#080809',
+    marginLeft: '6px'
   }
 });
 
@@ -300,13 +314,15 @@ class Asset extends Component {
     return (
       <div className={ classes.box }> 
         <div className={ classes.assetHeader }>
-          <img
-            alt=""
-            src={require('../../assets/' + asset.symbol + '-logo.png')}
-            height={'40px'}
-            style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
-          />
-          <Typography variant={'h6'}>{asset.symbol}</Typography>
+          <div className={ classes.assetButton }>
+            <img
+              alt=""
+              src={require('../../assets/' + asset.symbol + '-logo.png')}
+              height={'26px'}
+              style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
+            />
+            <Typography className={classes.assetId} variant="h6">{asset.id}</Typography>
+          </div>
           <Typography className={ classes.assetTitle } variant={ 'h6'}>Choose an asset in the table below and deposit it so YFI can put it to work for you</Typography>
         </div>
         <div className={ classes.actionsContainer }>
