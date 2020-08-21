@@ -314,6 +314,9 @@ const styles = (theme) => ({
   },
   tableRow: {
     borderBottom: '1px solid rgba(224, 224, 224, 1)',
+    '&:hover': {
+      background: '#E6F7FF',
+    }
   },
   assetDescription: {
     fontWeight: '600',
