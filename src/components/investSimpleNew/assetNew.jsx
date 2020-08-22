@@ -317,7 +317,7 @@ class Asset extends Component {
               />
               <Typography className={classes.assetId} variant={'h6'}>{asset.symbol}&nbsp;</Typography>↓
             </div>
-            <Typography className={ classes.assetTitle } variant={ 'h6'}>Choose an asset in the table below and deposit it so YFI can put it to work for you</Typography>
+            <Typography className={ classes.assetTitle } variant={ 'h6'}>Choose an asset in the table below and deposit it so Yearn can put it to work for you</Typography>
           </div>
           <div className={ classes.actionsContainer }>
             <div className={ classes.tradeContainer }>
