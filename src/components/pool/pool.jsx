@@ -163,6 +163,7 @@ const styles = theme => ({
     }
   },
   assetIcon: {
+    position: 'relative',
     display: 'flex',
     alignItems: 'center',
     verticalAlign: 'middle',
@@ -177,6 +178,16 @@ const styles = theme => ({
       width: '40px',
       marginRight: '24px',
     }
+  },
+  assetIconActive: {
+    background: '#31a24c',
+    position: 'absolute',
+    borderRadius: '14px',
+    width: '14px',
+    height: '14px',
+    bottom: '-4px',
+    right: '-4px',
+    border: '2px solid #fff',
   },
   addressContainer: {
     display: 'flex',
@@ -417,6 +428,10 @@ class Pool extends Component {
                     height={ width > 600 ? '40px' : '30px'}
                     style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
+                  {
+                    asset.pooledBalance > 0 &&
+                    <div className={ classes.assetIconActive }></div>
+                  }
                 </div>
                 <div>
                   <Typography variant={ 'h3' } noWrap>{ asset.name }</Typography>
