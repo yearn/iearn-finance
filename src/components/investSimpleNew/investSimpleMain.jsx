@@ -319,7 +319,7 @@ const styles = theme => ({
     lineHeight: '22px',
     color: '#252626',
     padding: '8px 16px',
-
+    borderRight: '1px solid rgba(224, 224, 224, 1)',
   },
   tableAvatarCell: {
     display: 'flex',
@@ -572,7 +572,7 @@ class InvestSimple extends Component {
                 </Table>
               </TableContainer>
             )}
-            <Fab
+            {/* <Fab
               className={classes.fab}
               variant="extended"
               color="secondary"
@@ -580,7 +580,7 @@ class InvestSimple extends Component {
             >
               <NavigationIcon className={classes.extendedIcon} />
               To Info
-            </Fab>
+            </Fab> */}
         </div>
         { loading && <Loader /> }
         { modalOpen && this.renderModal() }

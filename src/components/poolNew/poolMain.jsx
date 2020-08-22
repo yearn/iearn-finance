@@ -296,7 +296,7 @@ const styles = (theme) => ({
     lineHeight: '22px',
     color: '#252626',
     padding: '8px 16px',
-
+    borderRight: '1px solid rgba(224, 224, 224, 1)',
   },
   tableAvatarCell: {
     display: 'flex',
@@ -318,7 +318,7 @@ const styles = (theme) => ({
   },
   tableRowCell: {
     padding: '8px 16px',
-    borderColor: '#F3F4F5'
+    borderColor: '#F3F4F5',
   },
   tableRow: {
     borderBottom: '1px solid #F3F4F5',
@@ -563,7 +563,7 @@ class PoolMain extends Component {
                 </Table>
               </TableContainer>
             )}
-            <Fab
+            {/* <Fab
               className={classes.fab}
               variant="extended"
               color="secondary"
@@ -571,7 +571,7 @@ class PoolMain extends Component {
             >
               <NavigationIcon className={classes.extendedIcon} />
               To Info
-            </Fab>
+            </Fab> */}
           </div>
           {loading && <Loader />}
           {modalOpen && this.renderModal()}
