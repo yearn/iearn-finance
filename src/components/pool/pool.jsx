@@ -400,7 +400,13 @@ class Pool extends Component {
     const { classes } = this.props
     const width = window.innerWidth
 
-    return assets.map((asset) => {
+    return assets.slice().sort((a, b) => {
+      if ((a.pooledBalance === 0 && b.pooledBalance === 0) || (a.pooledBalance > 0 && b.pooledBalance > 0)) {
+        return 0
+      }
+      return a.pooledBalance > 0 ? -1 : 1
+
+    }).map((asset) => {
       return (
         <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
           <ExpansionPanelSummary
