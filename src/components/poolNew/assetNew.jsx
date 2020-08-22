@@ -193,7 +193,7 @@ const styles = theme => ({
     paddingBottom: '20px',
   },
   assetTitle: {
-    maxWidth: '340px',
+    maxWidth: '360px',
     width: '100%',
     fontWeight: 'normal',
     fontSize: '16px',
