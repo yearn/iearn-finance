@@ -355,7 +355,7 @@ class InvestSimple extends Component {
     console.log({assets})
     this.state = {
       assets,
-      currentAsset: assets.find(a => a.id === 'DAI') || assets[0],
+      currentAsset: assets.find(a => a.id === 'DAIv2') || assets[0],
       account: account,
       modalOpen: false,
       modalInvestAllOpen: false,
@@ -371,6 +371,7 @@ class InvestSimple extends Component {
     }
 
     this.tableRef = React.createRef()
+    this.formRef = React.createRef()
   }
   componentWillMount() {
     emitter.on(INVEST_RETURNED, this.investReturned);
@@ -458,8 +459,13 @@ class InvestSimple extends Component {
     })
   };
 
-  scrollToMyRef = () => window.scrollTo({
+  scrollToTable = () => window.scrollTo({
     top: this.tableRef.current.offsetTop,
+    behavior: "smooth"
+  })
+
+  scrollToForm = () => window.scrollTo({
+    top: this.formRef.current.offsetTop,
     behavior: "smooth"
   })
 
@@ -513,9 +519,9 @@ class InvestSimple extends Component {
           }
           {account.address && (
             <>
-              <div className={classes.assetContainer}>
+              <div ref={this.formRef} className={classes.assetContainer}>
                 <div className={classes.wavesBg} />
-                <Asset asset={currentAsset} startLoading={this.startLoading} scrollToMyRef={this.scrollToMyRef} />
+                <Asset asset={currentAsset} startLoading={this.startLoading} scrollToTable={this.scrollToTable} />
                 <div className={classes.whiteBg}  />
                 <div className={classes.mainBg}  />
               </div>
@@ -573,7 +579,10 @@ class InvestSimple extends Component {
         <TableRow 
           style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
           className={classes.tableRow} key={asset.id} 
-          onClick={() => this.setState({ currentAsset: asset })}>
+          onClick={() => {
+            this.setState({ currentAsset: asset })
+            this.scrollToForm()
+          }}>
           <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
             <Avatar className={classes.tableAvatar}>
@@ -612,7 +621,10 @@ class InvestSimple extends Component {
         <TableRow 
           style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
           className={classes.tableRow} key={asset.id} 
-          onClick={() => this.setState({ currentAsset: asset })}>
+          onClick={() => {
+            this.setState({ currentAsset: asset })
+            this.scrollToForm()
+          }}>
           <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
             <Avatar className={classes.tableAvatar}>
@@ -651,7 +663,10 @@ class InvestSimple extends Component {
         <TableRow 
           style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
           className={classes.tableRow} key={asset.id} 
-          onClick={() => this.setState({ currentAsset: asset })}>
+          onClick={() => {
+            this.setState({ currentAsset: asset })
+            this.scrollToForm()
+          }}>
           <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
             <Avatar className={classes.tableAvatar}>

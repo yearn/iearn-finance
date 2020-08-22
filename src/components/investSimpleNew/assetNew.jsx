@@ -292,7 +292,7 @@ class Asset extends Component {
   };
 
   render() {
-    const { classes, asset, t, scrollToMyRef } = this.props;
+    const { classes, asset, t, scrollToTable } = this.props;
     const {
       account,
       amount,
@@ -308,14 +308,14 @@ class Asset extends Component {
       <>
         <div className={ classes.box }> 
           <div className={ classes.assetHeader }>
-            <div onClick={scrollToMyRef} className={ classes.assetButton }>
+            <div onClick={scrollToTable} className={ classes.assetButton }>
               <img
                 alt=""
                 src={require('../../assets/' + asset.symbol + '-logo.png')}
                 height={'26px'}
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
-              <Typography className={classes.assetId} variant={'h6'}>{asset.id}&nbsp;</Typography>↓
+              <Typography className={classes.assetId} variant={'h6'}>{asset.symbol}&nbsp;</Typography>↓
             </div>
             <Typography className={ classes.assetTitle } variant={ 'h6'}>Choose an asset in the table below and deposit it so YFI can put it to work for you</Typography>
           </div>

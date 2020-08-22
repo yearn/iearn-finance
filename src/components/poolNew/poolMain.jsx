@@ -360,7 +360,7 @@ class PoolMain extends Component {
     const account = store.getStore('account')
     props.setAccountGlobal(account)
     const assets = store.getStore('poolAssets')
-
+    console.log({assets})
     this.state = {
       assets,
       currentAsset: assets[0],
@@ -378,6 +378,7 @@ class PoolMain extends Component {
     }
 
     this.tableRef = React.createRef()
+    this.formRef = React.createRef()
   }
   componentWillMount() {
     emitter.on(DEPOSIT_POOL_RETURNED, this.showHash)
@@ -474,8 +475,13 @@ class PoolMain extends Component {
     })
   }
 
-  scrollToMyRef = () => window.scrollTo({
+  scrollToTable = () => window.scrollTo({
     top: this.tableRef.current.offsetTop,
+    behavior: "smooth"
+  })
+
+  scrollToForm = () => window.scrollTo({
+    top: this.formRef.current.offsetTop,
     behavior: "smooth"
   })
 
@@ -519,9 +525,9 @@ class PoolMain extends Component {
             
             {account.address && (
               <>
-                <div className={classes.assetContainer}>
+                <div ref={this.formRef} className={classes.assetContainer}>
                   <div className={classes.wavesBg} />
-                  <Asset asset={currentAsset} startLoading={this.startLoading} scrollToMyRef={this.scrollToMyRef} />
+                  <Asset asset={currentAsset} startLoading={this.startLoading} scrollToTable={this.scrollToTable} />
                   <div className={classes.whiteBg}  />
                   <div className={classes.mainBg}  />
                 </div>
@@ -534,6 +540,7 @@ class PoolMain extends Component {
                     <TableRow>
                       <TableCell className={classes.tableCell}>Asset</TableCell>
                       <TableCell className={classes.tableCell}>Details</TableCell>
+                      <TableCell className={classes.tableCell}>Current Strategy: Annualized ROI</TableCell>
                       <TableCell className={classes.tableCell}>Current Strategy: Weekly ROI</TableCell>
                       <TableCell className={classes.tableCell}>Wallet Balance</TableCell>
                       <TableCell className={classes.tableCell}>Deployed Balance</TableCell>
@@ -570,7 +577,10 @@ class PoolMain extends Component {
           style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
           className={classes.tableRow}
           key={asset.id}
-          onClick={() => this.setState({ currentAsset: asset })}
+          onClick={() => {
+            this.setState({ currentAsset: asset })
+            this.scrollToForm()
+          }}
         >
           <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
@@ -588,7 +598,10 @@ class PoolMain extends Component {
             <Typography className={classes.assetDescription} variant="h6">{asset.description}</Typography>
           </TableCell>
           <TableCell className={classes.tableRowCell} align="left">
-            <Typography className={classes.assetDescription} variant="h6">{asset.pyEarn ? asset.pyEarn : <Skeleton />}</Typography>
+            <Typography className={classes.assetDescription} variant="h6">{!asset.pyEarn ? <Skeleton /> : asset.pyEarn === 'Not Available' ? 'Not Available' : `${(+asset.pyEarn.split('%')[0] * 52).toFixed(5)}%`}</Typography>
+          </TableCell>
+          <TableCell className={classes.tableRowCell} align="left">
+            <Typography className={classes.assetDescription} variant="h6">{!asset.pyEarn ? <Skeleton /> : asset.pyEarn}</Typography>
           </TableCell>
           <TableCell className={classes.tableRowCell} align="left">
             <Typography className={classes.assetDescription} variant="h6">{(asset.balance ? asset.balance.toFixed(4) : '0.0000') + ' ' + asset.symbol}</Typography>
