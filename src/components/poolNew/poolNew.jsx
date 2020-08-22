@@ -7,7 +7,7 @@ import PoolMain from './poolMain'
 
 const styles = (theme) => ({})
 
-const Pool = ({ history, accGlobal, setAccGlobal }) => {
+const Pool = ({ history, accGlobal, setAccGlobal, isDarkTheme, setIsDarkTheme }) => {
   return (
     <div>
       <TopBar
@@ -16,8 +16,13 @@ const Pool = ({ history, accGlobal, setAccGlobal }) => {
         account={accGlobal}
         pageTitle="Harvest DeFi Yield Opportunities on Autopilot"
         pageSubtitle="Maximize profits with the best growth strategy for your asset at any time"
+        isDarkTheme={isDarkTheme}
+        setIsDarkTheme={setIsDarkTheme}
       />
-      <PoolMain setAccountGlobal={(acc) => setAccGlobal(acc)} />
+      <PoolMain
+        setAccountGlobal={(acc) => setAccGlobal(acc)}
+        isDarkTheme={isDarkTheme}
+      />
     </div>
   )
 }

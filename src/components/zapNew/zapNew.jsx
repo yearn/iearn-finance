@@ -7,7 +7,7 @@ import Zap from './zapMain'
 
 const styles = (theme) => ({})
 
-const ZapNew = ({ history, accGlobal, setAccGlobal }) => {
+const ZapNew = ({ history, accGlobal, setAccGlobal, isDarkTheme, setIsDarkTheme }) => {
   return (
     <div>
       <TopBar
@@ -16,8 +16,10 @@ const ZapNew = ({ history, accGlobal, setAccGlobal }) => {
         account={accGlobal}
         pageTitle="Lorem"
         pageSubtitle="Ipsum"
+        isDarkTheme={isDarkTheme}
+        setIsDarkTheme={setIsDarkTheme}
       />
-      <Zap setAccountGlobal={(acc) => setAccGlobal(acc)} />
+      <Zap setAccountGlobal={(acc) => setAccGlobal(acc)} isDarkTheme={isDarkTheme} />
     </div>
   )
 }

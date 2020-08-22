@@ -7,7 +7,7 @@ import InvestSimpleMain from './investSimpleMain'
 
 const styles = (theme) => ({})
 
-const Pool = ({ history, accGlobal, setAccGlobal }) => {
+const Pool = ({ history, accGlobal, setAccGlobal, isDarkTheme, setIsDarkTheme }) => {
   return (
     <div>
       <TopBar
@@ -16,8 +16,10 @@ const Pool = ({ history, accGlobal, setAccGlobal }) => {
         account={accGlobal}
         pageTitle="Grow Savings With DeFi Lending on Autopilot"
         pageSubtitle="Deploys funds to the best lending strategy for your asset at any time"
+        isDarkTheme={isDarkTheme}
+        setIsDarkTheme={setIsDarkTheme}
       />
-      <InvestSimpleMain setAccountGlobal={(acc) => setAccGlobal(acc)} />
+      <InvestSimpleMain setAccountGlobal={(acc) => setAccGlobal(acc)} isDarkTheme={isDarkTheme} />
     </div>
   )
 }

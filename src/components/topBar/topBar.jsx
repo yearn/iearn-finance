@@ -2,7 +2,7 @@ import React,{ useState} from 'react'
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import { withNamespaces } from 'react-i18next';
-import {Button,Typography} from '@material-ui/core'
+import {Button,Typography, Switch} from '@material-ui/core'
 import UnlockModal from '../unlock/unlockModal'
 import SoonModal from '../soonModal/soonModal'
 
@@ -67,7 +67,7 @@ const styles = theme => ({
   }
 })
 
-const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle }) => {
+const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, isDarkTheme, setIsDarkTheme }) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [soonModalOpen, setSoonModalOpen] = useState(false)
   return (
@@ -156,6 +156,12 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle })
               </Typography>
             )}
           </Button>
+          <Switch
+            checked={isDarkTheme}
+            onChange={setIsDarkTheme}
+            name="theme-chooser"
+            inputProps={{ 'aria-label': 'secondary checkbox' }}
+          />
         </div>
         <div >
           <Typography className={ classes.title } variant={'h2'} >{pageTitle}</Typography>

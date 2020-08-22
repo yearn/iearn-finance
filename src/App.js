@@ -34,7 +34,8 @@ const store = Store.store
 class App extends Component {
   state = {
     headerValue: null,
-    accGlobal: null
+    accGlobal: null,
+    isDarkTheme: false,
   };
 
   setHeaderValue = (newValue) => {
@@ -73,16 +74,31 @@ class App extends Component {
             backgroundImage: `url(${require(`./assets/bg.png`)})`,
             backgroundPosition: 'left bottom',
           }}>
-            <Header />
+            <Header isDarkTheme={this.state.isDarkTheme} />
             <Switch>
               <Route path="/apr">
-                <Cover accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
+                <Cover
+                  accGlobal={this.state.accGlobal}
+                  setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
+                  isDarkTheme={this.state.isDarkTheme}
+                  setIsDarkTheme={() => this.setState({ isDarkTheme: !this.state.isDarkTheme })}
+                />
               </Route>
               <Route path="/earn">
-                <InvestSimple accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
+                <InvestSimple
+                  accGlobal={this.state.accGlobal}
+                  setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
+                  isDarkTheme={this.state.isDarkTheme}
+                  setIsDarkTheme={() => this.setState({ isDarkTheme: !this.state.isDarkTheme })}
+                />
               </Route>
               <Route path="/zap">
-                <Zap accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
+                <Zap
+                  accGlobal={this.state.accGlobal}
+                  setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
+                  isDarkTheme={this.state.isDarkTheme}
+                  setIsDarkTheme={() => this.setState({ isDarkTheme: !this.state.isDarkTheme })}
+                />
               </Route>
               <Route path="/idai">
                 <IDai />
@@ -94,13 +110,18 @@ class App extends Component {
                 <Manage />
               </Route>
               <Route path="/vaults">
-                <Vaults accGlobal={this.state.accGlobal} setAccGlobal={(accGlobal) => this.setState({ accGlobal })} />
+                <Vaults
+                  accGlobal={this.state.accGlobal}
+                  setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
+                  isDarkTheme={this.state.isDarkTheme}
+                  setIsDarkTheme={() => this.setState({ isDarkTheme: !this.state.isDarkTheme })}
+                />
               </Route>
               <Route path="/">
                 <Home />
               </Route>
             </Switch>
-            <Footer />
+            <Footer isDarkTheme={this.state.isDarkTheme} />
           </div>
         </IpfsRouter>
       </MuiThemeProvider>

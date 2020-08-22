@@ -6,7 +6,7 @@ import TopBar from '../topBar'
 
 const styles = (theme) => ({})
 
-const Cover = ({ history, accGlobal, setAccGlobal }) => {
+const Cover = ({ history, accGlobal, setAccGlobal, isDarkTheme, setIsDarkTheme }) => {
   return (
     <div>
       <TopBar
@@ -15,6 +15,8 @@ const Cover = ({ history, accGlobal, setAccGlobal }) => {
         account={accGlobal}
         pageTitle="Lorem"
         pageSubtitle="Ipsum"
+        isDarkTheme={isDarkTheme}
+        setIsDarkTheme={setIsDarkTheme}
       />
       <h2>SOON</h2>
     </div>

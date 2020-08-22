@@ -311,9 +311,11 @@ const styles = (theme) => ({
   },
   tableRowCell: {
     padding: '8px 16px',
+    borderColor: '#F3F4F5'
   },
   tableRow: {
-    borderBottom: '1px solid rgba(224, 224, 224, 1)',
+    borderBottom: '1px solid #F3F4F5',
+    cursor: 'pointer',
     '&:hover': {
       background: '#E6F7FF',
     }
@@ -515,7 +517,12 @@ class PoolMain extends Component {
 
     return assets.map((asset) => {
       return (
-        <TableRow className={classes.tableRow} key={asset.id} onClick={() => this.setState({ currentAsset: asset })}>
+        <TableRow
+          style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
+          className={classes.tableRow}
+          key={asset.id}
+          onClick={() => this.setState({ currentAsset: asset })}
+        >
           <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
             <Avatar className={classes.tableAvatar}>
@@ -537,7 +544,11 @@ class PoolMain extends Component {
           <TableCell className={classes.tableRowCell} align="left">
             <Typography className={classes.assetDescription} variant="h6">{(asset.balance ? asset.balance.toFixed(4) : '0.0000') + ' ' + asset.symbol}</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell} align="left">
+          <TableCell
+            style={{ background: currentAsset.id === asset.id ? '#BAE7FF' : 'inherit', borderBottom: '1px solid #BAE7FF' }}
+            className={classes.tableRowCell}
+            align="left"
+          >
             <Typography className={classes.assetDescription} variant="h6">{asset.pooledBalance
               ? (Math.floor(asset.pooledBalance * asset.pricePerFullShare * 10000) / 10000).toFixed(4)
               : '0.0000'}{' '}
