@@ -94,19 +94,40 @@ const styles = theme => ({
     display: 'flex',
     padding: '48px 0px'
   },
+  introCenterDark: {
+    maxWidth: '500px',
+    textAlign: 'center',
+    display: 'flex',
+    padding: '48px 0px',
+    color: '#fff'
+  },
   introText: {
     paddingLeft: '20px'
   },
   actionButton: {
-    '&:hover': {
-      backgroundColor: "#2F80ED",
+    fontWeight: '600',
+    fontSize: '16px',
+    lineLeight: '24px',
+    padding: '8px 13px',
+    margin: '15px 8px 0',
+    borderRadius: '4px',
+    boxShadow: 'none',
+    '&:first-of-type': {
+      marginLeft: '0',
     },
-    padding: '12px',
-    backgroundColor: "#2F80ED",
-    border: '1px solid #E1E1E1',
-    fontWeight: 500,
-    [theme.breakpoints.up('md')]: {
-      padding: '15px',
+    '&:last-of-type': {
+      marginRight: '0',
+    },
+  },
+  pulsingButton: {
+    animation: '$pulse-animation 2s infinite'
+  },
+  '@keyframes pulse-animation': {
+    '0%': {
+      boxShadow: '0 0 0 0px rgba(47, 128, 237, 0.5)'
+    },
+    '100%': {
+      boxShadow: '0 0 0 10px rgba(47, 128, 237, 0)'
     }
   },
   overlay: {
@@ -280,7 +301,7 @@ const styles = theme => ({
     padding: '70px 0 87px',
   },
   table: {
-    maxWidth: '967px',
+    maxWidth: '695px',
     width: '100%',
     margin: '0 auto',
   },
@@ -341,6 +362,76 @@ const styles = theme => ({
       borderTopRightRadius: '0',
       borderBottomRightRadius: '0',
     }
+  },
+  groupButtonDark: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineLeight: '24px',
+    borderRadius: '4px',
+    background: '#373B42',
+    '& .MuiToggleButtonGroup-groupedHorizontal:not(:last-child)': {
+      borderTopLeftRadius: '0',
+      borderBottomLeftRadius: '0',
+    },
+    '& .MuiToggleButtonGroup-groupedHorizontal:not(:first-child)': {
+      borderTopRightRadius: '0',
+      borderBottomRightRadius: '0',
+    }
+  },
+  darkBg: {
+    backgroundImage: `url(${require('../../assets/bg-dark.png')})`,
+    height: '50%',
+    position: 'absolute',
+    bottom: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  },
+  mainDarkBg: {
+    backgroundImage: `url(${require('../../assets/bg-dark.png')})`,
+    backgroundPosition: 'left bottom',
+    height: '50%',
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  },
+  tableContainerDark: {
+    padding: '70px 0 87px',
+    backgroundImage: `url(${require('../../assets/bg-dark.png')})`,
+  },
+  tableCellDark: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '22px',
+    color: '#FFF',
+    padding: '8px 16px',
+    borderColor: '#535963',
+  },
+  tableRowDark: {
+    borderBottom: '1px solid #535963',
+    cursor: 'pointer',
+    '&:hover': {
+      background: '#535963',
+    }
+  },
+  tableRowCellDark: {
+    padding: '8px 16px',
+    borderColor: '#535963'
+  },
+  assetDescriptionDark: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#FFF',
+  },
+  assetTitleDark: {
+    fontWeight: '600',
+    fontSize: '20px',
+    lineHeight: '24px',
+    color: '#fff',
+    marginLeft: '6px',
   },
 });
 
@@ -464,7 +555,7 @@ class InvestSimple extends Component {
   })
 
   render() {
-    const { classes, t } = this.props;
+    const { classes, t, isDarkTheme } = this.props;
     const {
       loading,
       account,
@@ -479,15 +570,15 @@ class InvestSimple extends Component {
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
           { !account.address &&
-          <div className={ classes.introCenter }>
+          <div className={ isDarkTheme ? classes.introCenterDark : classes.introCenter }>
             <Typography variant='h3'>{ t('InvestSimple.Intro') }</Typography>
           </div>
           }
           {!account.address &&
             <div className={ classes.connectContainer }>
               <Button
-                className={ classes.actionButton }
-                variant="outlined"
+                className={`${classes.actionButton} ${classes.pulsingButton}`}
+                variant="contained"
                 color="primary"
                 disabled={ loading }
                 onClick={ this.overlayClicked }
@@ -498,15 +589,15 @@ class InvestSimple extends Component {
           }
           { account.address &&
             <div className={ classes.intro }>
-              <ToggleButtonGroup className={ classes.groupButton } value={value} onChange={this.handleTabChange} aria-label="contained primary button group" variant="contained" exclusive size={ 'small' }>
+              <ToggleButtonGroup className={ isDarkTheme ? classes.groupButtonDark : classes.groupButton } value={value} onChange={this.handleTabChange} aria-label="contained primary button group" variant="contained" exclusive size={ 'small' }>
                 <ToggleButton value={0}>
-                  <Typography variant={ 'h4' }>v1</Typography>
+                  <Typography style={{color: isDarkTheme && '#fff'}} variant={ 'h4' }>v1</Typography>
                 </ToggleButton>
                 <ToggleButton value={1}>
-                  <Typography variant={ 'h4' }>y.curve.fi</Typography>
+                  <Typography style={{color: isDarkTheme && '#fff'}} variant={ 'h4' }>y.curve.fi</Typography>
                 </ToggleButton>
                 <ToggleButton value={2}>
-                  <Typography variant={ 'h4' }>busd.curve.fi</Typography>
+                  <Typography style={{color: isDarkTheme && '#fff'}} variant={ 'h4' }>busd.curve.fi</Typography>
                 </ToggleButton>
               </ToggleButtonGroup>
             </div>
@@ -515,21 +606,21 @@ class InvestSimple extends Component {
             <>
               <div className={classes.assetContainer}>
                 <div className={classes.wavesBg} />
-                <Asset asset={currentAsset} startLoading={this.startLoading} scrollToMyRef={this.scrollToMyRef} />
-                <div className={classes.whiteBg}  />
-                <div className={classes.mainBg}  />
+                <Asset asset={currentAsset} startLoading={this.startLoading} isDarkTheme={isDarkTheme} scrollToMyRef={this.scrollToMyRef} />
+                <div className={isDarkTheme ? classes.darkBg : classes.whiteBg}  />
+                  <div className={isDarkTheme ? classes.mainDarkBg : classes.mainBg}  />
               </div>
             </>
           )}
           {account.address && (
-              <TableContainer ref={this.tableRef} className={classes.tableContainer} component={Paper}>
+              <TableContainer ref={this.tableRef} className={ isDarkTheme ? classes.tableContainerDark : classes.tableContainer} component={Paper}>
                 <Table className={classes.table} aria-label="simple table">
                   <TableHead>
                     <TableRow>
-                      <TableCell className={classes.tableCell}>Asset</TableCell>
-                      <TableCell className={classes.tableCell}>Details</TableCell>
-                      <TableCell className={classes.tableCell}>Interest Rate</TableCell>
-                      <TableCell className={classes.tableCell}>Available Balance</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Asset</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Details</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Interest Rate</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Available Balance</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -561,7 +652,7 @@ class InvestSimple extends Component {
 
   renderAssetBlocksv1 = () => {
     const { assets, hideV1, currentAsset } = this.state
-    const { classes } = this.props
+    const { classes, isDarkTheme } = this.props
     return assets.filter((asset) => {
       return (hideV1 === false || asset.version !== 1)
     }).filter((asset) => {
@@ -571,8 +662,9 @@ class InvestSimple extends Component {
     }).map((asset) => {
       return (
         <TableRow 
-          style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
-          className={classes.tableRow} key={asset.id} 
+          style={isDarkTheme ? { background: currentAsset.id === asset.id ? '#373B42' : 'inherit'} : { background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
+          className={isDarkTheme ? classes.tableRowDark : classes.tableRow}
+          key={asset.id} 
           onClick={() => this.setState({ currentAsset: asset })}>
           <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
@@ -584,16 +676,16 @@ class InvestSimple extends Component {
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
             </Avatar>
-            <Typography className={classes.assetTitle} variant="h6">{asset.id}</Typography>
+            <Typography className={isDarkTheme ? classes.assetTitleDark : classes.assetTitle} variant="h6">{asset.id}</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell}>
-            <Typography className={classes.assetDescription} variant="h6">{asset.description}</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell}>
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{asset.description}</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell}>
-            <Typography className={classes.assetDescription} variant="h6">{ asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell}>
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{ asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell}>
-            <Typography className={classes.assetDescription} variant="h6">{ asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell}>
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{ asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }</Typography>
           </TableCell>
         </TableRow>
       )
@@ -602,7 +694,7 @@ class InvestSimple extends Component {
 
   renderAssetBlocksv2 = () => {
     const { assets, currentAsset } = this.state
-    const { classes } = this.props
+    const { classes, isDarkTheme } = this.props
     return assets.filter((asset) => {
       return (asset.version === 2)
     }).filter((asset) => {
@@ -610,8 +702,9 @@ class InvestSimple extends Component {
     }).map((asset) => {
       return (
         <TableRow 
-          style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
-          className={classes.tableRow} key={asset.id} 
+          style={isDarkTheme ? { background: currentAsset.id === asset.id ? '#373B42' : 'inherit'} : { background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
+          className={isDarkTheme ? classes.tableRowDark : classes.tableRow}
+          key={asset.id} 
           onClick={() => this.setState({ currentAsset: asset })}>
           <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
@@ -623,16 +716,16 @@ class InvestSimple extends Component {
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
             </Avatar>
-            <Typography className={classes.assetTitle} variant="h6">{asset.id}</Typography>
+            <Typography className={isDarkTheme ? classes.assetTitleDark : classes.assetTitle} variant="h6">{asset.id}</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell}>
-            <Typography className={classes.assetDescription} variant="h6">{asset.description}</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell}>
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{asset.description}</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell}>
-            <Typography className={classes.assetDescription} variant="h6">{ asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell}>
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{ asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell}>
-            <Typography className={classes.assetDescription} variant="h6">{ asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell}>
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{ asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }</Typography>
           </TableCell>
         </TableRow>
       )
@@ -641,7 +734,7 @@ class InvestSimple extends Component {
 
   renderAssetBlocksv3 = () => {
     const { assets, currentAsset } = this.state
-    const { classes } = this.props
+    const { classes, isDarkTheme } = this.props
     return assets.filter((asset) => {
       return (asset.version === 3)
     }).filter((asset) => {
@@ -649,8 +742,9 @@ class InvestSimple extends Component {
     }).map((asset) => {
       return (
         <TableRow 
-          style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
-          className={classes.tableRow} key={asset.id} 
+          style={isDarkTheme ? { background: currentAsset.id === asset.id ? '#373B42' : 'inherit'} : { background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
+          className={isDarkTheme ? classes.tableRowDark : classes.tableRow}
+          key={asset.id} 
           onClick={() => this.setState({ currentAsset: asset })}>
           <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
@@ -662,16 +756,16 @@ class InvestSimple extends Component {
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
             </Avatar>
-            <Typography className={classes.assetTitle} variant="h6">{asset.id}</Typography>
+            <Typography className={isDarkTheme ? classes.assetTitleDark : classes.assetTitle} variant="h6">{asset.id}</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell}>
-            <Typography className={classes.assetDescription} variant="h6">{asset.description}</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell}>
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{asset.description}</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell}>
-            <Typography className={classes.assetDescription} variant="h6">{ asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell}>
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{ asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell}>
-            <Typography className={classes.assetDescription} variant="h6">{ asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell}>
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{ asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }</Typography>
           </TableCell>
         </TableRow>
       )

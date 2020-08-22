@@ -18,6 +18,13 @@ const styles = theme => ({
     alignItems: 'center',
     padding: '10px',
   },
+  rootBetaDark: {
+    background: '#531DAB',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '10px',
+  },
   betaIco:{
     maxWidth: '15px',
     width: '100%',
@@ -29,6 +36,12 @@ const styles = theme => ({
     fontSize: '14px',
     lineHeight: '22px',
     color: '#080809',
+  },
+  betaTextDark: {
+    fontWeight: '600',
+    fontSize: '14px',
+    lineHeight: '22px',
+    color: '#fff',
   },
   item: {
     color: '#888A8C',
@@ -70,6 +83,8 @@ const styles = theme => ({
 const HeaderNew = (props) => {
   const {
     classes,
+    isDarkTheme,
+    setIsDarkTheme,
     headerValue
   } = props;
 
@@ -79,9 +94,9 @@ const HeaderNew = (props) => {
 
   return (
     <div className={ classes.root }>
-      <div className={classes.rootBeta}>
-        <img className={classes.betaIco} src={ require('../../assets/header-beta-icon.svg') } alt="beta icon" />
-        <Typography variant={'h6'} className={classes.betaText}>This project is in beta. Use at your own risk.</Typography>
+      <div className={isDarkTheme ? classes.rootBetaDark : classes.rootBeta}>
+        <img className={classes.betaIco} src={ require(`../../assets/${isDarkTheme ? 'header-beta-icon-dark' : 'header-beta-icon'}.svg`) } alt="beta icon" />
+        <Typography variant={'h6'} className={isDarkTheme ? classes.betaTextDark : classes.betaText}>This project is in beta. Use at your own risk.</Typography>
       </div>
 
       {/* <div className={classes.menuContainer}>

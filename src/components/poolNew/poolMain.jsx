@@ -93,6 +93,13 @@ const styles = (theme) => ({
     display: 'flex',
     padding: '48px 0px',
   },
+  introCenterDark: {
+    maxWidth: '500px',
+    textAlign: 'center',
+    display: 'flex',
+    padding: '48px 0px',
+    color: '#fff'
+  },
   introText: {
     paddingLeft: '20px',
   },
@@ -256,6 +263,15 @@ const styles = (theme) => ({
     zIndex: '2',
     marginTop: '-38px'
   },
+  darkBg: {
+    backgroundImage: `url(${require('../../assets/bg-dark.png')})`,
+    height: '50%',
+    position: 'absolute',
+    bottom: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  },
   assetContainer: {
     position: 'relative',
     width: '100%',
@@ -267,6 +283,16 @@ const styles = (theme) => ({
     height: '50%',
     position: 'absolute',
     bottom: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  },
+  mainDarkBg: {
+    backgroundImage: `url(${require('../../assets/bg-dark.png')})`,
+    backgroundPosition: 'left bottom',
+    height: '50%',
+    position: 'absolute',
+    top: '0',
     left: '0',
     width: '100%',
     zIndex: '1',
@@ -292,7 +318,14 @@ const styles = (theme) => ({
     lineHeight: '22px',
     color: '#252626',
     padding: '8px 16px',
-
+  },
+  tableCellDark: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '22px',
+    color: '#FFF',
+    padding: '8px 16px',
+    borderColor: '#535963',
   },
   tableAvatarCell: {
     display: 'flex',
@@ -301,6 +334,7 @@ const styles = (theme) => ({
     height: '65px',
     borderBottom: 'none',
   },
+  
   tableAvatar: {
     marginLeft: '20px',
     background: 'transparent'
@@ -310,6 +344,13 @@ const styles = (theme) => ({
     fontSize: '20px',
     lineHeight: '24px',
     color: '#080809',
+    marginLeft: '6px',
+  },
+  assetTitleDark: {
+    fontWeight: '600',
+    fontSize: '20px',
+    lineHeight: '24px',
+    color: '#fff',
     marginLeft: '6px',
   },
   tableRowCell: {
@@ -323,11 +364,28 @@ const styles = (theme) => ({
       background: '#E6F7FF',
     }
   },
+  tableRowDark: {
+    borderBottom: '1px solid #535963',
+    cursor: 'pointer',
+    '&:hover': {
+      background: '#535963',
+    }
+  },
+  tableRowCellDark: {
+    padding: '8px 16px',
+    borderColor: '#535963'
+  },
   assetDescription: {
     fontWeight: '600',
     fontSize: '16px',
     lineHeight: '24px',
     color: '#575859',
+  },
+  assetDescriptionDark: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#FFF',
   },
   assetDescriptionBalance: {
     fontWeight: '600',
@@ -335,8 +393,18 @@ const styles = (theme) => ({
     lineHeight: '24px',
     color: '#096DD9',
   },
+  assetDescriptionBalanceDark: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#1890FF',
+  },
   tableContainer: {
     padding: '70px 0 87px',
+  },
+  tableContainerDark: {
+    padding: '70px 0 87px',
+    backgroundImage: `url(${require('../../assets/bg-dark.png')})`,
   },
   pulsingButton: {
     animation: '$pulse-animation 2s infinite'
@@ -458,7 +526,7 @@ class PoolMain extends Component {
   })
 
   render() {
-    const { classes, t } = this.props
+    const { classes, t, isDarkTheme } = this.props
     const { loading, account, modalOpen, snackbarMessage, currentAsset } = this.state
 
     var address = null
@@ -471,11 +539,10 @@ class PoolMain extends Component {
 
     return (
       <>
-        
         <div className={classes.root}>
           <div className={classes.investedContainer}>
             {!account.address && (
-              <div className={classes.introCenter}>
+              <div className={ isDarkTheme ? classes.introCenterDark : classes.introCenter}>
                 <Typography variant="h3">Vaults. Simple.</Typography>
               </div>
             )}
@@ -499,23 +566,23 @@ class PoolMain extends Component {
               <>
                 <div className={classes.assetContainer}>
                   <div className={classes.wavesBg} />
-                  <Asset asset={currentAsset} startLoading={this.startLoading} scrollToMyRef={this.scrollToMyRef} />
-                  <div className={classes.whiteBg}  />
-                  <div className={classes.mainBg}  />
+                  <Asset asset={currentAsset} startLoading={this.startLoading} isDarkTheme={isDarkTheme} scrollToMyRef={this.scrollToMyRef} />
+                  <div className={isDarkTheme ? classes.darkBg : classes.whiteBg}  />
+                  <div className={isDarkTheme ? classes.mainDarkBg : classes.mainBg}  />
                 </div>
               </>
             )}
             {account.address && (
-              <TableContainer ref={this.tableRef} className={classes.tableContainer} component={Paper}>
+              <TableContainer ref={this.tableRef} className={ isDarkTheme ? classes.tableContainerDark : classes.tableContainer} component={Paper}>
                 <Table className={classes.table} aria-label="simple table">
                   <TableHead>
                     <TableRow>
-                      <TableCell className={classes.tableCell}>Asset</TableCell>
-                      <TableCell className={classes.tableCell}>Details</TableCell>
-                      <TableCell className={classes.tableCell}>Annialized ROI</TableCell>
-                      <TableCell className={classes.tableCell}>Wallet Balance</TableCell>
-                      <TableCell className={classes.tableCell}>Deployed Balance</TableCell>
-                      <TableCell className={classes.tableCell}>LP Token Balance</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Asset</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Details</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Annialized ROI</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Wallet Balance</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Deployed Balance</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>LP Token Balance</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>{this.renderAssetBlocks()}</TableBody>
@@ -539,14 +606,14 @@ class PoolMain extends Component {
 
   renderAssetBlocks = () => {
     const { assets, expanded, currentAsset } = this.state
-    const { classes } = this.props
+    const { classes, isDarkTheme } = this.props
     const width = window.innerWidth
 
     return assets.map((asset) => {
       return (
         <TableRow
-          style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
-          className={classes.tableRow}
+          style={isDarkTheme ? { background: currentAsset.id === asset.id ? '#373B42' : 'inherit'} : { background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
+          className={isDarkTheme ? classes.tableRowDark : classes.tableRow}
           key={asset.id}
           onClick={() => this.setState({ currentAsset: asset })}
         >
@@ -560,30 +627,30 @@ class PoolMain extends Component {
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
             </Avatar>
-            <Typography className={classes.assetTitle} variant="h6">{asset.id}</Typography>
+            <Typography className={isDarkTheme ? classes.assetTitleDark : classes.assetTitle} variant="h6">{asset.id}</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell} align="left">
-            <Typography className={classes.assetDescription} variant="h6">{asset.description}</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell} align="left">
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{asset.description}</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell} align="left">
-            <Typography className={classes.assetDescription} variant="h6">{['LINK'].includes(asset.id) ? 'Not Available' : `${asset.apy ? asset.apy.toFixed(4) : '0.0000'}%`}</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell} align="left">
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{['LINK'].includes(asset.id) ? 'Not Available' : `${asset.apy ? asset.apy.toFixed(4) : '0.0000'}%`}</Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell} align="left">
-            <Typography className={classes.assetDescription} variant="h6">{(asset.balance ? asset.balance.toFixed(4) : '0.0000') + ' ' + asset.symbol}</Typography>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell} align="left">
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{(asset.balance ? asset.balance.toFixed(4) : '0.0000') + ' ' + asset.symbol}</Typography>
           </TableCell>
           <TableCell
-            style={{ background: currentAsset.id === asset.id ? '#BAE7FF' : 'inherit', borderBottom: '1px solid #BAE7FF' }}
-            className={classes.tableRowCell}
+            style={ isDarkTheme ? { borderBottom: '1px solid #1890FF' } : { background: currentAsset.id === asset.id ? '#BAE7FF' : 'inherit', borderBottom: '1px solid #BAE7FF' }}
+            className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell}
             align="left"
           >
-            <Typography className={classes.assetDescriptionBalance} variant="h6">{asset.pooledBalance
+            <Typography className={isDarkTheme ? classes.assetDescriptionBalanceDark : classes.assetDescriptionBalance} variant="h6">{asset.pooledBalance
               ? (Math.floor(asset.pooledBalance * asset.pricePerFullShare * 10000) / 10000).toFixed(4)
               : '0.0000'}{' '}
               {asset.symbol}
             </Typography>
           </TableCell>
-          <TableCell className={classes.tableRowCell} align="left">
-            <Typography className={classes.assetDescription} variant="h6">{asset.pooledBalance ? (Math.floor(asset.pooledBalance * 10000) / 10000).toFixed(4) : '0.0000'}{' '}
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell} align="left">
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{asset.pooledBalance ? (Math.floor(asset.pooledBalance * 10000) / 10000).toFixed(4) : '0.0000'}{' '}
               {asset.poolSymbol}
             </Typography>
           </TableCell>
