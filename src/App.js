@@ -3,7 +3,8 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import {
   Switch,
-  Route
+  Route,
+  Redirect
 } from "react-router-dom";
 import IpfsRouter from 'ipfs-react-router'
 
@@ -118,7 +119,8 @@ class App extends Component {
                 />
               </Route>
               <Route path="/">
-                <Home />
+                <Redirect to="/vaults" />
+                {/* <Home /> */}
               </Route>
             </Switch>
             <Footer isDarkTheme={this.state.isDarkTheme} />

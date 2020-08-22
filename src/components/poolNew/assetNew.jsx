@@ -228,6 +228,10 @@ const styles = theme => ({
       background: '#1890FF',
     },
     '& .MuiSlider-mark':{
+      visibility: 'hidden'
+    },
+    '& .MuiSlider-mark:nth-child(25n+1)':{
+      visibility: 'visible',
       height: '14px',
       width: '1px',
       background: '#D5D7D9',
@@ -347,7 +351,7 @@ class Asset extends Component {
                 value={leftSlider}
                 className={ classes.slider }
                 aria-labelledby="discrete-slider"
-                step={25}
+                step={1}
                 marks
                 min={0}
                 max={100}
@@ -414,7 +418,7 @@ class Asset extends Component {
                 className={ classes.slider }
                 value={rightSlider}
                 aria-labelledby="discrete-slider"
-                step={25}
+                step={1}
                 marks
                 min={0}
                 max={100}

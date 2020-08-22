@@ -14,7 +14,7 @@ const Pool = ({ history, accGlobal, setAccGlobal, isDarkTheme, setIsDarkTheme })
         currentPage={history.location.pathname}
         nav={(slag) => history.push(slag)}
         account={accGlobal}
-        pageTitle="Grow Savings With DeFi Lending on Autopilot"
+        pageTitle="Maximize Savings With Automated DeFi Lending"
         pageSubtitle="Deploys funds to the best lending strategy for your asset at any time"
         isDarkTheme={isDarkTheme}
         setIsDarkTheme={setIsDarkTheme}

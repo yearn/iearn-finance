@@ -64,6 +64,17 @@ const styles = theme => ({
     height: '44px',
     background: '#D5D7D9',
     margin: '15px 8px 0',
+  },
+  pulsingButton: {
+    animation: '$pulse-animation 2s infinite'
+  },
+  '@keyframes pulse-animation': {
+    '0%': {
+      boxShadow: '0 0 0 0px rgba(47, 128, 237, 0.5)'
+    },
+    '100%': {
+      boxShadow: '0 0 0 10px rgba(47, 128, 237, 0)'
+    }
   }
 })
 
@@ -142,13 +153,15 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
           </Button>
           <div className={ classes.vLine }/>
           <Button
-            className={ classes.actionButton }
+            className={`${classes.actionButton} ${!account || !account.address ? classes.pulsingButton : ''}` }
             variant="contained"
             color="secondary"
             onClick={() => setModalOpen(true)}
             // fullWidth
           >
-            {!account || !account.address ? 'Login' : (
+            {!account || !account.address ? (
+              <Typography variant={'h5'}>Connect Wallet</Typography>
+            ) : (
               <Typography className={ classes.buttonText } variant={'h5'} >
                 <img src={require(`../../assets/ico-wallet.svg`)} alt="" />
                 {' '}
