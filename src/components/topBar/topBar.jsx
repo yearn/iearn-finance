@@ -111,8 +111,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
           <Button
             className={ classes.actionButton }
             variant="contained"
-            
-            onClick={() => nav('/zap')}
+            onClick={() => setSoonModalOpen(true)}
             color={currentPage === '/zap' ? 'primary' : 'secondary'}
           >
             <img src={require(`../../assets/ico-zapper.svg`)} alt="" />
@@ -122,7 +121,6 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
           <Button
             className={ classes.actionButton }
             variant="contained"
-            
             onClick={() => nav('/vaults')}
             color={currentPage === '/vaults' ? 'primary' : 'secondary'}
           >
@@ -133,7 +131,6 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
           <Button
             className={ classes.actionButton }
             variant="contained"
-            
             onClick={() => nav('/earn')}
             color={currentPage === '/earn' ? 'primary' : 'secondary'}
           >
@@ -153,7 +150,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
           </Button>
           <div className={ classes.vLine }/>
           <Button
-            className={`${classes.actionButton} ${!account || !account.address ? classes.pulsingButton : ''}` }
+            className={`${classes.actionButton} ${!account || !account.address ? classes.pulsingButton : ''}`}
             variant="contained"
             color="secondary"
             onClick={() => setModalOpen(true)}

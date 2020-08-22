@@ -72,7 +72,7 @@ class App extends Component {
             display: 'flex',
             flexDirection: 'column',
             minHeight: '100vh',
-            backgroundImage: `url(${require(`./assets/bg.png`)})`,
+            backgroundImage: `url(${require(`./assets/${this.state.isDarkTheme ? 'bg-dark' : 'bg'}.png`)})`,
             backgroundPosition: 'left bottom',
           }}>
             <Header isDarkTheme={this.state.isDarkTheme} />

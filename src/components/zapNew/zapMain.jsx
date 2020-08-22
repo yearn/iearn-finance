@@ -135,17 +135,19 @@ const styles = theme => ({
     }
   },
   actionButton: {
-    '&:hover': {
-      backgroundColor: "#2F80ED",
+    fontWeight: '600',
+    fontSize: '16px',
+    lineLeight: '24px',
+    padding: '8px 13px',
+    margin: '15px 8px 0',
+    borderRadius: '4px',
+    boxShadow: 'none',
+    '&:first-of-type': {
+      marginLeft: '0',
     },
-    padding: '12px',
-    backgroundColor: "#2F80ED",
-    borderRadius: '1rem',
-    border: '1px solid #E1E1E1',
-    fontWeight: 500,
-    [theme.breakpoints.up('md')]: {
-      padding: '15px',
-    }
+    '&:last-of-type': {
+      marginRight: '0',
+    },
   },
   buttonText: {
     fontWeight: '700',
@@ -190,6 +192,17 @@ const styles = theme => ({
   grey: {
     color: colors.darkGray
   },
+  pulsingButton: {
+    animation: '$pulse-animation 2s infinite'
+  },
+  '@keyframes pulse-animation': {
+    '0%': {
+      boxShadow: '0 0 0 0px rgba(47, 128, 237, 0.5)'
+    },
+    '100%': {
+      boxShadow: '0 0 0 10px rgba(47, 128, 237, 0)'
+    }
+  }
 });
 
 class Zap extends Component {
@@ -358,8 +371,8 @@ class Zap extends Component {
             </div>
             <div className={ classes.connectContainer }>
               <Button
-                className={ classes.actionButton }
-                variant="outlined"
+                className={`${classes.actionButton}  ${classes.pulsingButton}`}
+                variant="contained"
                 color="primary"
                 disabled={ loading }
                 onClick={ this.overlayClicked }
