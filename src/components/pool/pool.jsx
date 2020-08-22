@@ -419,26 +419,26 @@ class Pool extends Component {
                   />
                 </div>
                 <div>
-                  <Typography variant={ 'h3' }>{ asset.name }</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ asset.name }</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ asset.description }</Typography>
                 </div>
               </div>
               {
                 !['LINK'].includes(asset.id) &&
                 <div className={classes.heading}>
-                  <Typography variant={ 'h3' }>{ (asset.apy ? (asset.apy).toFixed(4) : '0.0000') }%</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(4) : '0.0000') }%</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>ROI</Typography>
                 </div>
               }
               {
                 ['LINK'].includes(asset.id) &&
                 <div className={classes.heading}>
-                  <Typography variant={ 'h3' }>Not Available</Typography>
+                  <Typography variant={ 'h3' } noWrap>Not Available</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>ROI</Typography>
                 </div>
               }
               <div className={classes.heading}>
-                <Typography variant={ 'h3' }>{ (asset.balance ? (asset.balance).toFixed(4) : '0.0000')+' '+asset.symbol }</Typography>
+                <Typography variant={ 'h3' } noWrap>{ (asset.balance ? (asset.balance).toFixed(4) : '0.0000')+' '+asset.symbol }</Typography>
                 <Typography variant={ 'h5' } className={ classes.grey }>Balance</Typography>
               </div>
             </div>
