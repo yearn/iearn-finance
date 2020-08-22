@@ -247,7 +247,156 @@ const styles = theme => ({
     justifyContent: 'center',
     alignItems: 'flex-start',
   },
-  
+  valueDark: {
+    cursor: 'pointer',
+    textAlign: 'left',
+    fontWeight: 'normal',
+    fontSize: '14px',
+    lineHeight: '22px',
+    color: '#fff',
+    marginTop: '5px',
+  },
+  actionInputDark: {
+    fontSize: '14px',
+    lineHeight: '22px',
+    color: '#888A8C',
+    '& input': {
+      padding: '11px',
+      fontWeight: 'normal',
+      borderRadius: '6px',
+    },
+    '& div:hover:before': {
+      borderBottom: 'none',
+      boxShadow: 'none',
+    },
+    '& div:before': {
+      border: 'none',
+      boxShadow: 'none',
+    },
+    '& div:after': {
+      border: 'none',
+      boxShadow: 'none',
+    },
+    '& div': {
+      borderRadius: '6px',
+      background: '#535963',
+      color: '#888A8C',
+    }
+  },
+  actionButtonDark: {
+    borderRadius: '4px',
+    margin: '10px 5px 0',
+    padding: '8px 13px',
+    maxWidth: 'max-content',
+    alignItems: 'center',
+    whiteSpace: 'nowrap',
+    '&:first-of-type': {
+      marginLeft: '0',
+    },
+    '&:last-of-type': {
+      marginRight: '0',
+    },
+    '&.MuiButton-contained.Mui-disabled':{
+      color: '#b1b1b1',
+    },
+    '&.MuiButton-containedSecondary': {
+      backgroundColor: '#373B42',
+    },
+  },
+  buttonTextDark: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    marginLeft: '5px',
+    color: '#FFF',
+  },
+  boxDark: {
+    background: '#373B42',
+    boxShadow: '0px 4px 26px rgba(57, 16, 133, 0.75)',
+    borderRadius: '4px',
+    padding: '25px 40px',
+    maxWidth: '695px',
+    width: '100%',
+    margin: '0 auto',
+    position: 'relative',
+    zIndex: '3',
+    [theme.breakpoints.down('sm')]: {
+      padding: '20px 10px',
+    }
+  },
+  assetHeaderDark: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    borderBottom: '1px solid #535963',
+    paddingBottom: '20px',
+  },
+  assetTitleDark: {
+    maxWidth: '340px',
+    width: '100%',
+    fontWeight: 'normal',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#FFF',
+    marginLeft: '15px',
+  },
+  descriptionDark: {
+    fontWeight: 'normal',
+    fontSize: '12px',
+    lineHeight: '20px',
+    textAlign: 'center',
+    color: '#fff',
+    marginTop: '19px',
+  },
+  percentValueDark: {
+    fontWeight: 'normal',
+    fontSize: '14px',
+    lineHeight: '22px',
+    alignItems: 'center',
+    color: '#fff',
+    marginLeft: '8px'
+  },
+  sliderDark:{
+    width: '83%',
+    '& .MuiSlider-rail':{
+      height: '8px',
+      background: '#535963',
+    },
+    '& .MuiSlider-track':{
+      height: '8px',
+      background: '#1890FF',
+    },
+    '& .MuiSlider-mark':{
+      visibility: 'hidden'
+    },
+    '& .MuiSlider-mark:nth-child(25n+1)':{
+      visibility: 'visible',
+      height: '14px',
+      width: '1px',
+      background: '#535963',
+      marginTop: '-3px'
+    },
+    '& .MuiSlider-thumb':{
+      display: 'none',
+    }
+  },
+  assetButtonDark: {
+    background: '#535963',
+    borderRadius: '4px',
+    padding: '6px 15px',
+    display: 'flex',
+    alignItems: 'center',
+    cursor: 'pointer'
+  },
+  assetIdDark: {
+    fontWeight: '600',
+    fontSize: '24px',
+    lineHeight: '32px',
+    color: '#F3F4F5',
+    marginLeft: '6px'
+  },
+  karetDown: {
+    marginLeft: '15px'
+  }
 });
 
 
@@ -292,7 +441,7 @@ class Asset extends Component {
   };
 
   render() {
-    const { classes, asset, t, scrollToTable } = this.props;
+    const { classes, asset, t, scrollToTable, isDarkTheme } = this.props;
     const {
       account,
       amount,
@@ -306,24 +455,25 @@ class Asset extends Component {
 
     return (
       <>
-        <div className={ classes.box }> 
-          <div className={ classes.assetHeader }>
-            <div onClick={scrollToTable} className={ classes.assetButton }>
+        <div className={isDarkTheme ? classes.boxDark : classes.box }> 
+          <div className={isDarkTheme ? classes.assetHeaderDark : classes.assetHeader }>
+            <div onClick={scrollToTable} className={ isDarkTheme ? classes.assetButtonDark : classes.assetButton }>
               <img
                 alt=""
                 src={require('../../assets/' + asset.symbol + '-logo.png')}
                 height={'26px'}
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
-              <Typography className={classes.assetId} variant={'h6'}>{asset.symbol}&nbsp;</Typography>↓
+              <Typography className={isDarkTheme ? classes.assetIdDark : classes.assetId} variant={'h6'}>{asset.symbol}</Typography>
+              <img className={classes.karetDown} alt="" src={require(`../../assets/karet-down-${isDarkTheme ? 'dark': 'light'}.svg`)} />
             </div>
-            <Typography className={ classes.assetTitle } variant={ 'h6'}>Choose an asset in the table below and deposit it so Yearn can put it to work for you</Typography>
+            <Typography className={isDarkTheme ? classes.assetTitleDark : classes.assetTitle } variant={ 'h6'}>Choose an asset in the table below and deposit it so Yearn can put it to work for you</Typography>
           </div>
           <div className={ classes.actionsContainer }>
             <div className={ classes.tradeContainer }>
               <TextField
                 fullWidth
-                className={ classes.actionInput }
+                className={ isDarkTheme ? classes.actionInputDark : classes.actionInput }
                 id='amount'
                 variant="filled"
                 value={ amount }
@@ -335,12 +485,12 @@ class Asset extends Component {
               />
               {!asset.disabled && <div className={ classes.balances }>
                   <Typography variant='h3' className={ classes.title }></Typography>
-                  <Typography variant='h4' className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
+                  <Typography variant='h4' className={isDarkTheme ? classes.valueDark : classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
               </div>}
               <div className={ classes.percentSlider }>
                 <Slider
                   value={leftSlider}
-                  className={ classes.slider }
+                  className={ isDarkTheme ? classes.sliderDark : classes.slider }
                   aria-labelledby="discrete-slider"
                   step={1}
                   marks
@@ -352,11 +502,11 @@ class Asset extends Component {
                     this.setAmount(value)
                   }}
                 />
-                <Typography className={ classes.percentValue } variant={ 'h6'}>{leftSlider}%</Typography>
+                <Typography className={isDarkTheme ? classes.percentValueDark : classes.percentValue } variant={ 'h6'}>{leftSlider}%</Typography>
               </div>
               <div className={ classes.buttons }>
                 <Button
-                  className={ classes.actionButton }
+                  className={ isDarkTheme ? classes.actionButtonDark : classes.actionButton }
                   variant="contained"
                   color="primary"
                   disabled={ loading || !account.address || asset.disabled }
@@ -364,16 +514,16 @@ class Asset extends Component {
                   fullWidth
                 >
                   <img src={require(`../../assets/ico-deposit.svg`)} alt="" />
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Asset.Disabled'):t('Asset.Earn')}</Typography>
+                  <Typography className={isDarkTheme ? classes.buttonTextDark : classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>{asset.disabled? t('Asset.Disabled'):t('Asset.Earn')}</Typography>
                 </Button>
               </div>
-              <Typography className={ classes.description } variant='h6'>Upon deposit, assets are wrapped as yTokens in your wallet representing liquidity provided</Typography>
+              <Typography className={ isDarkTheme ? classes.descriptionDark : classes.description } variant='h6'>Upon deposit, assets are wrapped as yTokens in your wallet representing liquidity provided</Typography>
             </div>
             <div className={ classes.sepperator }></div>
             <div className={classes.tradeContainer}>
               <TextField
                 fullWidth
-                className={ classes.actionInput }
+                className={ isDarkTheme ? classes.actionInputDark : classes.actionInput }
                 id='redeemAmount'
                 value={ redeemAmount }
                 error={ redeemAmountError }
@@ -384,11 +534,11 @@ class Asset extends Component {
                 onKeyDown={ this.inputRedeemKeyDown }
               />
               <div className={ classes.balances }>
-                <Typography variant='h4' className={ classes.value } noWrap>{ 'Balance: ' + (asset.investedBalance ? asset.investedBalance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
+                <Typography variant='h4' className={isDarkTheme ? classes.valueDark : classes.value } noWrap>{ 'Balance: ' + (asset.investedBalance ? asset.investedBalance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
               </div>
               <div className={ classes.percentSlider }>
                 <Slider
-                  className={ classes.slider }
+                  className={ isDarkTheme ? classes.sliderDark : classes.slider }
                   value={rightSlider}
                   aria-labelledby="discrete-slider"
                   step={1}
@@ -402,11 +552,11 @@ class Asset extends Component {
                     this.setRedeemAmount(value)
                   }}
                 />
-                <Typography className={ classes.percentValue } variant={ 'h6'}>{rightSlider}%</Typography>
+                <Typography className={ isDarkTheme ? classes.percentValueDark : classes.percentValue } variant={ 'h6'}>{rightSlider}%</Typography>
               </div>
               <div className={ classes.buttons }>
                 <Button
-                  className={ classes.actionButton }
+                   className={ isDarkTheme ? classes.actionButtonDark : classes.actionButton }
                   variant="contained"
                   color="primary"
                   disabled={ loading || !account.address }
@@ -414,10 +564,10 @@ class Asset extends Component {
                   fullWidth
                   >
                   <img src={require(`../../assets/ico-withdraw.svg`)} alt="" />
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.Claim') }</Typography>
+                  <Typography className={isDarkTheme ? classes.buttonTextDark : classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Asset.Claim') }</Typography>
                 </Button>
               </div>
-              <Typography className={ classes.description } variant='h6'>There is a 0.5% withdrawal fee on all vaults, and a 5% performance fee on subsidized gas.</Typography>
+              <Typography className={ isDarkTheme ? classes.descriptionDark : classes.description } variant='h6'>There is a 0.5% withdrawal fee on all vaults, and a 5% performance fee on subsidized gas.</Typography>
             </div>
           </div>
         </div>

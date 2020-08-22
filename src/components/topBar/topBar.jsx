@@ -29,6 +29,25 @@ const styles = theme => ({
       marginRight: '0',
     },
   },
+  actionButtonDark: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineLeight: '24px',
+    padding: '8px 13px',
+    margin: '15px 8px 0',
+    borderRadius: '4px',
+    boxShadow: 'none',
+    color: '#FFF',
+    '&:first-of-type': {
+      marginLeft: '0',
+    },
+    '&:last-of-type': {
+      marginRight: '0',
+    },
+    '&.MuiButton-containedSecondary': {
+      backgroundColor: '#373B42',
+    },
+  },
   logoContainer: {
     display: 'flex',
     justifyContent: 'center',
@@ -47,6 +66,22 @@ const styles = theme => ({
     lineHeight: '38px',
     color: '#080809',
     marginTop: '54px'
+  },
+  titleDark: {
+    textAlign: 'center',
+    fontWeight: '600',
+    fontSize: '30px',
+    lineHeight: '38px',
+    marginTop: '54px',
+    color: '#fff',
+  },
+  subTitleDark: {
+    textAlign: 'center',
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    marginTop: '22px',
+    color: '#fff',
   },
   subTitle: {
     textAlign: 'center',
@@ -84,11 +119,11 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
   return (
       <div className={ classes.container }>
         <div className={ classes.logoContainer }>
-          <img src={require(`../../assets/logo-top.svg`)} alt="" />
+          <img src={require(`../../assets/${isDarkTheme ? 'logo-top-dark' : 'logo-top'}.svg`)} alt="" />
         </div>
         <div className={ classes.menuContainer }>
           <Button
-            className={ classes.actionButton }
+            className={ isDarkTheme ? classes.actionButtonDark : classes.actionButton }
             variant="contained"
             color={currentPage === '/' ? 'primary' : 'secondary'}
             onClick={() => window.open('https://ycosystem.info/')}
@@ -97,7 +132,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
             yCosystem
           </Button>
           <Button
-            className={ classes.actionButton }
+            className={ isDarkTheme ? classes.actionButtonDark : classes.actionButton }
             variant="contained"
             color={currentPage === '/' ? 'primary' : 'secondary'}
             onClick={() => !!account && !!account.address
@@ -109,7 +144,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
             Dashboard
           </Button>
           <Button
-            className={ classes.actionButton }
+            className={ isDarkTheme ? classes.actionButtonDark : classes.actionButton }
             variant="contained"
             onClick={() => setSoonModalOpen(true)}
             color={currentPage === '/zap' ? 'primary' : 'secondary'}
@@ -119,7 +154,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
             Zapper
           </Button>
           <Button
-            className={ classes.actionButton }
+            className={ isDarkTheme ? classes.actionButtonDark : classes.actionButton }
             variant="contained"
             onClick={() => nav('/vaults')}
             color={currentPage === '/vaults' ? 'primary' : 'secondary'}
@@ -129,7 +164,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
             Grow
           </Button>
           <Button
-            className={ classes.actionButton }
+            className={ isDarkTheme ? classes.actionButtonDark : classes.actionButton }
             variant="contained"
             onClick={() => nav('/earn')}
             color={currentPage === '/earn' ? 'primary' : 'secondary'}
@@ -139,7 +174,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
             Save
           </Button>
           <Button
-            className={ classes.actionButton }
+            className={ isDarkTheme ? classes.actionButtonDark : classes.actionButton }
             variant="contained"
             onClick={() => setSoonModalOpen(true)}
             color={'secondary'}
@@ -150,7 +185,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
           </Button>
           <div className={ classes.vLine }/>
           <Button
-            className={`${classes.actionButton} ${!account || !account.address ? classes.pulsingButton : ''}`}
+            className={`${ isDarkTheme ? classes.actionButtonDark : classes.actionButton} ${!account || !account.address ? classes.pulsingButton : ''}`}
             variant="contained"
             color={!account || !account.address ? 'primary' : 'secondary'}
             onClick={() => setModalOpen(true)}
@@ -160,8 +195,8 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
               <Typography variant={'h5'}>Connect Wallet</Typography>
             ) : (
               <Typography className={ classes.buttonText } variant={'h5'} >
-                <img src={require(`../../assets/ico-wallet.svg`)} alt="" />
-                {' '}
+                <img src={require(`../../assets/${isDarkTheme ? 'ico-wallet-dark' : 'ico-wallet'}.svg`)} alt="" />
+                &nbsp;
                 {`${account.address.substring(0, 6)}...${account.address.substring(account.address.length - 4, account.address.length)}`}
               </Typography>
             )}
@@ -174,8 +209,8 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
           />
         </div>
         <div >
-          <Typography className={ classes.title } variant={'h2'} >{pageTitle}</Typography>
-          <Typography className={ classes.subTitle } variant={'h3'} >{pageSubtitle}</Typography>
+          <Typography className={ isDarkTheme ? classes.titleDark : classes.title } variant={'h2'} >{pageTitle}</Typography>
+          <Typography className={ isDarkTheme ? classes.subTitleDark : classes.subTitle } variant={'h3'} >{pageSubtitle}</Typography>
         </div>
         {modalOpen && <UnlockModal closeModal={() => setModalOpen(false)} modalOpen={modalOpen} />}
         {soonModalOpen && <SoonModal closeModal={() => setSoonModalOpen(false)} isOpen={soonModalOpen} />}
