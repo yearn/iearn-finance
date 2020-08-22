@@ -16,8 +16,10 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Fab
 } from '@material-ui/core'
 import { Skeleton } from '@material-ui/lab'
+import NavigationIcon from '@material-ui/icons/Navigation';
 import axios from 'axios'
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
@@ -350,7 +352,17 @@ const styles = (theme) => ({
     '100%': {
       boxShadow: '0 0 0 10px rgba(47, 128, 237, 0)'
     }
-  }
+  },
+  fab: {
+    visibility: 'hidden',
+    '@media (max-width: 767.98px)': {
+      visibility: 'visible',
+      position: 'fixed',
+      bottom: '25px',
+      right: '25px',
+      zIndex: '999'
+    }
+  },
 })
 
 class PoolMain extends Component {
@@ -551,6 +563,15 @@ class PoolMain extends Component {
                 </Table>
               </TableContainer>
             )}
+            <Fab
+              className={classes.fab}
+              variant="extended"
+              color="secondary"
+              onClick={() => this.scrollToForm()}
+            >
+              <NavigationIcon className={classes.extendedIcon} />
+              To Info
+            </Fab>
           </div>
           {loading && <Loader />}
           {modalOpen && this.renderModal()}

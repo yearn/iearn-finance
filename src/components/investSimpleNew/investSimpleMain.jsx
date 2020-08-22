@@ -15,10 +15,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  Fab
 } from '@material-ui/core';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import NavigationIcon from '@material-ui/icons/Navigation';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
@@ -355,7 +357,17 @@ const styles = theme => ({
     '100%': {
       boxShadow: '0 0 0 10px rgba(47, 128, 237, 0)'
     }
-  }
+  },
+  fab: {
+    visibility: 'hidden',
+    '@media (max-width: 767.98px)': {
+      visibility: 'visible',
+      position: 'fixed',
+      bottom: '25px',
+      right: '25px',
+      zIndex: '999'
+    }
+  },
 });
 
 class InvestSimple extends Component {
@@ -560,6 +572,15 @@ class InvestSimple extends Component {
                 </Table>
               </TableContainer>
             )}
+            <Fab
+              className={classes.fab}
+              variant="extended"
+              color="secondary"
+              onClick={() => this.scrollToForm()}
+            >
+              <NavigationIcon className={classes.extendedIcon} />
+              To Info
+            </Fab>
         </div>
         { loading && <Loader /> }
         { modalOpen && this.renderModal() }
