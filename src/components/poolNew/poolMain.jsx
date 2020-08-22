@@ -17,6 +17,7 @@ import {
   TableRow,
   Paper,
 } from '@material-ui/core'
+import axios from 'axios'
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import { withNamespaces } from 'react-i18next'
@@ -367,7 +368,8 @@ class PoolMain extends Component {
       snackbarType: null,
       snackbarMessage: null,
       value: 1,
-      refreshTimer: null
+      refreshTimer: null,
+      pyEarnData: []
     }
 
     if (account && account.address) {
@@ -400,9 +402,17 @@ class PoolMain extends Component {
     dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
   }
 
-  balancesReturned = (balances) => {
+  balancesReturned = async (balances) => {
     const _refreshTimer = setTimeout(this.refresh, 30000)
     this.setState({ assets: store.getStore('poolAssets'), refreshTimer: _refreshTimer })
+    const pyEarnData = (await axios({
+      url: 'https://py-earn.herokuapp.com/',
+      method: 'GET',
+      headers: {
+        Host: 'https://py-earn.herokuapp.com/'
+      }
+    })).data
+    console.log({pyEarnData})
   }
 
   connectionConnected = () => {
