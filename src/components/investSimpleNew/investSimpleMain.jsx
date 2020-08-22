@@ -293,9 +293,11 @@ const styles = theme => ({
   },
   tableRowCell: {
     padding: '8px 16px',
+    borderColor: '#F3F4F5',
   },
   tableRow: {
-    borderBottom: '1px solid rgba(224, 224, 224, 1)',
+    borderBottom: '1px solid #F3F4F5',
+    cursor: 'pointer',
     '&:hover': {
       background: '#E6F7FF',
     }
@@ -324,6 +326,21 @@ const styles = theme => ({
   tableAvatar: {
     marginLeft: '20px',
     background: 'transparent'
+  },
+  groupButton: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineLeight: '24px',
+    borderRadius: '4px',
+    background: '#fff',
+    '& .MuiToggleButtonGroup-groupedHorizontal:not(:last-child)': {
+      borderTopLeftRadius: '0',
+      borderBottomLeftRadius: '0',
+    },
+    '& .MuiToggleButtonGroup-groupedHorizontal:not(:first-child)': {
+      borderTopRightRadius: '0',
+      borderBottomRightRadius: '0',
+    }
   },
 });
 
@@ -481,14 +498,14 @@ class InvestSimple extends Component {
           }
           { account.address &&
             <div className={ classes.intro }>
-              <ToggleButtonGroup value={value} onChange={this.handleTabChange} aria-label="version" exclusive size={ 'small' }>
-                <ToggleButton value={0} aria-label="v1">
+              <ToggleButtonGroup className={ classes.groupButton } value={value} onChange={this.handleTabChange} aria-label="contained primary button group" variant="contained" exclusive size={ 'small' }>
+                <ToggleButton value={0}>
                   <Typography variant={ 'h4' }>v1</Typography>
                 </ToggleButton>
-                <ToggleButton value={1} aria-label="v2">
+                <ToggleButton value={1}>
                   <Typography variant={ 'h4' }>y.curve.fi</Typography>
                 </ToggleButton>
-                <ToggleButton value={2} aria-label="v3">
+                <ToggleButton value={2}>
                   <Typography variant={ 'h4' }>busd.curve.fi</Typography>
                 </ToggleButton>
               </ToggleButtonGroup>
@@ -543,8 +560,8 @@ class InvestSimple extends Component {
   };
 
   renderAssetBlocksv1 = () => {
-    const { classes, assets, hideV1, currentAsset } = this.state
-
+    const { assets, hideV1, currentAsset } = this.state
+    const { classes } = this.props
     return assets.filter((asset) => {
       return (hideV1 === false || asset.version !== 1)
     }).filter((asset) => {
@@ -553,7 +570,10 @@ class InvestSimple extends Component {
       return !(asset.symbol === "iDAI")
     }).map((asset) => {
       return (
-        <TableRow className={classes.tableRow} key={asset.id} onClick={() => this.setState({ currentAsset: asset })}>
+        <TableRow 
+          style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
+          className={classes.tableRow} key={asset.id} 
+          onClick={() => this.setState({ currentAsset: asset })}>
           <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
             <Avatar className={classes.tableAvatar}>
@@ -582,16 +602,20 @@ class InvestSimple extends Component {
 
   renderAssetBlocksv2 = () => {
     const { assets, currentAsset } = this.state
+    const { classes } = this.props
     return assets.filter((asset) => {
       return (asset.version === 2)
     }).filter((asset) => {
       return !(asset.symbol === "iDAI")
     }).map((asset) => {
       return (
-        <TableRow key={asset.id} onClick={() => this.setState({ currentAsset: asset })}>
-          <TableCell component="th" scope="row">
+        <TableRow 
+          style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
+          className={classes.tableRow} key={asset.id} 
+          onClick={() => this.setState({ currentAsset: asset })}>
+          <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
-            <Avatar>
+            <Avatar className={classes.tableAvatar}>
               <img
                 alt=""
                 src={require('../../assets/' + asset.symbol + '-logo.png')}
@@ -599,14 +623,16 @@ class InvestSimple extends Component {
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
             </Avatar>
-            <span>{asset.id}</span>
+            <Typography className={classes.assetTitle} variant="h6">{asset.id}</Typography>
           </TableCell>
-          <TableCell>{asset.description}</TableCell>
-          <TableCell>
-            { asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }
+          <TableCell className={classes.tableRowCell}>
+            <Typography className={classes.assetDescription} variant="h6">{asset.description}</Typography>
           </TableCell>
-          <TableCell>
-            { asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }
+          <TableCell className={classes.tableRowCell}>
+            <Typography className={classes.assetDescription} variant="h6">{ asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }</Typography>
+          </TableCell>
+          <TableCell className={classes.tableRowCell}>
+            <Typography className={classes.assetDescription} variant="h6">{ asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }</Typography>
           </TableCell>
         </TableRow>
       )
@@ -615,17 +641,20 @@ class InvestSimple extends Component {
 
   renderAssetBlocksv3 = () => {
     const { assets, currentAsset } = this.state
-    
+    const { classes } = this.props
     return assets.filter((asset) => {
       return (asset.version === 3)
     }).filter((asset) => {
       return !(asset.symbol === "iDAI")
     }).map((asset) => {
       return (
-        <TableRow key={asset.id} onClick={() => this.setState({ currentAsset: asset })}>
-          <TableCell component="th" scope="row">
+        <TableRow 
+          style={{ background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
+          className={classes.tableRow} key={asset.id} 
+          onClick={() => this.setState({ currentAsset: asset })}>
+          <TableCell className={classes.tableAvatarCell} component="th" scope="row">
             <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
-            <Avatar>
+            <Avatar className={classes.tableAvatar}>
               <img
                 alt=""
                 src={require('../../assets/' + asset.symbol + '-logo.png')}
@@ -633,14 +662,16 @@ class InvestSimple extends Component {
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
             </Avatar>
-            <span>{asset.id}</span>
+            <Typography className={classes.assetTitle} variant="h6">{asset.id}</Typography>
           </TableCell>
-          <TableCell align="right">{asset.description}</TableCell>
-          <TableCell align="right">
-            { asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }
+          <TableCell className={classes.tableRowCell}>
+            <Typography className={classes.assetDescription} variant="h6">{asset.description}</Typography>
           </TableCell>
-          <TableCell align="right">
-            { asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }
+          <TableCell className={classes.tableRowCell}>
+            <Typography className={classes.assetDescription} variant="h6">{ asset.maxApr ? (asset.maxApr * 100).toFixed(4) + ' %' : 'N/A' }</Typography>
+          </TableCell>
+          <TableCell className={classes.tableRowCell}>
+            <Typography className={classes.assetDescription} variant="h6">{ asset.balance ? (asset.balance).toFixed(4) + ' ' + (asset.tokenSymbol ? asset.tokenSymbol : asset.symbol) : 'N/A' }</Typography>
           </TableCell>
         </TableRow>
       )

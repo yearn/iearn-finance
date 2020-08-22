@@ -326,6 +326,12 @@ const styles = (theme) => ({
     lineHeight: '24px',
     color: '#575859',
   },
+  assetDescriptionBalance: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#096DD9',
+  },
   tableContainer: {
     padding: '70px 0 87px',
   },
@@ -353,6 +359,8 @@ class PoolMain extends Component {
     if (account && account.address) {
       dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
     }
+
+    this.tableRef = React.createRef()
   }
   componentWillMount() {
     emitter.on(DEPOSIT_POOL_RETURNED, this.showHash)
@@ -430,6 +438,11 @@ class PoolMain extends Component {
     })
   }
 
+  scrollToMyRef = () => window.scrollTo({
+    top: this.tableRef.current.offsetTop,
+    behavior: "smooth"
+  })
+
   render() {
     const { classes, t } = this.props
     const { loading, account, modalOpen, snackbarMessage, currentAsset } = this.state
@@ -472,14 +485,14 @@ class PoolMain extends Component {
               <>
                 <div className={classes.assetContainer}>
                   <div className={classes.wavesBg} />
-                  <Asset asset={currentAsset} startLoading={this.startLoading} />
+                  <Asset asset={currentAsset} startLoading={this.startLoading} scrollToMyRef={this.scrollToMyRef} />
                   <div className={classes.whiteBg}  />
                   <div className={classes.mainBg}  />
                 </div>
               </>
             )}
             {account.address && (
-              <TableContainer className={classes.tableContainer} component={Paper}>
+              <TableContainer ref={this.tableRef} className={classes.tableContainer} component={Paper}>
                 <Table className={classes.table} aria-label="simple table">
                   <TableHead>
                     <TableRow>
@@ -549,7 +562,7 @@ class PoolMain extends Component {
             className={classes.tableRowCell}
             align="left"
           >
-            <Typography className={classes.assetDescription} variant="h6">{asset.pooledBalance
+            <Typography className={classes.assetDescriptionBalance} variant="h6">{asset.pooledBalance
               ? (Math.floor(asset.pooledBalance * asset.pricePerFullShare * 10000) / 10000).toFixed(4)
               : '0.0000'}{' '}
               {asset.symbol}
