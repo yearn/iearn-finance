@@ -17,6 +17,7 @@ import {
   TableRow,
   Paper,
 } from '@material-ui/core'
+import { Skeleton } from '@material-ui/lab'
 import axios from 'axios'
 
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
@@ -403,16 +404,27 @@ class PoolMain extends Component {
   }
 
   balancesReturned = async (balances) => {
-    const _refreshTimer = setTimeout(this.refresh, 30000)
-    this.setState({ assets: store.getStore('poolAssets'), refreshTimer: _refreshTimer })
-    const pyEarnData = (await axios({
-      url: 'https://py-earn.herokuapp.com/',
-      method: 'GET',
-      headers: {
-        Host: 'https://py-earn.herokuapp.com/'
-      }
-    })).data
-    console.log({pyEarnData})
+    const _refreshTimer = setTimeout(this.refresh, 300000)
+    let assets = store.getStore('poolAssets')
+    try {
+      const { body: { data: pyEarnData } } = (await axios({
+        url: 'http://localhost:3000/api/pyearn',
+        method: 'GET',
+      })).data
+      assets = assets.map(a => {
+        const obj = pyEarnData.find(d => d.symbol === a.poolSymbol)
+        if (!obj) {
+          if (a.poolSymbol === 'yUSD') {
+            const yCurve = pyEarnData.find(d => d.symbol === 'yCurve')
+            a.pyEarn = yCurve ? yCurve.value : 'Not Available'
+          } else a.pyEarn = 'Not Available'
+        } else a.pyEarn = obj.value
+        return a
+      })
+    } catch (e) {
+      console.error('[pyearn]', e.toString())
+    }
+    this.setState({ assets, refreshTimer: _refreshTimer })
   }
 
   connectionConnected = () => {
@@ -522,7 +534,7 @@ class PoolMain extends Component {
                     <TableRow>
                       <TableCell className={classes.tableCell}>Asset</TableCell>
                       <TableCell className={classes.tableCell}>Details</TableCell>
-                      <TableCell className={classes.tableCell}>Annialized ROI</TableCell>
+                      <TableCell className={classes.tableCell}>Current Strategy: Weekly ROI</TableCell>
                       <TableCell className={classes.tableCell}>Wallet Balance</TableCell>
                       <TableCell className={classes.tableCell}>Deployed Balance</TableCell>
                       <TableCell className={classes.tableCell}>LP Token Balance</TableCell>
@@ -576,7 +588,7 @@ class PoolMain extends Component {
             <Typography className={classes.assetDescription} variant="h6">{asset.description}</Typography>
           </TableCell>
           <TableCell className={classes.tableRowCell} align="left">
-            <Typography className={classes.assetDescription} variant="h6">{['LINK'].includes(asset.id) ? 'Not Available' : `${asset.apy ? asset.apy.toFixed(4) : '0.0000'}%`}</Typography>
+            <Typography className={classes.assetDescription} variant="h6">{asset.pyEarn ? asset.pyEarn : <Skeleton />}</Typography>
           </TableCell>
           <TableCell className={classes.tableRowCell} align="left">
             <Typography className={classes.assetDescription} variant="h6">{(asset.balance ? asset.balance.toFixed(4) : '0.0000') + ' ' + asset.symbol}</Typography>
