@@ -80,6 +80,15 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle })
             className={ classes.actionButton }
             variant="contained"
             color={currentPage === '/' ? 'primary' : 'secondary'}
+            onClick={() => window.open('https://ycosystem.info/')}
+          >
+            <img src={require(`../../assets/ico-ycosystem.svg`)} style={{paddingRight: '5px'}} alt="" />
+            yCosystem
+          </Button>
+          <Button
+            className={ classes.actionButton }
+            variant="contained"
+            color={currentPage === '/' ? 'primary' : 'secondary'}
             onClick={() => !!account && !!account.address
               ? window.open(`https://zapper.fi/dashboard?address=${account.address}`)
               : setModalOpen(true)}
@@ -106,7 +115,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle })
             onClick={() => nav('/vaults')}
             color={currentPage === '/vaults' ? 'primary' : 'secondary'}
           >
-            <img src={require(`../../assets/ico-grow.svg`)} alt="" />
+            <img src={require(`../../assets/${currentPage === '/vaults' ? 'ico-grow' : 'ico-grow-light'}.svg`)} alt="" />
             {' '}
             Grow
           </Button>

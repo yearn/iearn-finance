@@ -227,6 +227,7 @@ const styles = theme => ({
     padding: '6px 15px',
     display: 'flex',
     alignItems: 'center',
+    cursor: 'pointer'
   },
   assetId: {
     fontWeight: '600',
@@ -287,7 +288,7 @@ class Asset extends Component {
   };
 
   render() {
-    const { classes, asset, t } = this.props;
+    const { classes, asset, t, scrollToMyRef } = this.props;
     const {
       account,
       amount,
@@ -303,14 +304,14 @@ class Asset extends Component {
       <>
         <div className={ classes.box }> 
           <div className={ classes.assetHeader }>
-            <div className={ classes.assetButton }>
+            <div onClick={scrollToMyRef} className={ classes.assetButton }>
               <img
                 alt=""
                 src={require('../../assets/' + asset.symbol + '-logo.png')}
                 height={'26px'}
                 style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
               />
-              <Typography className={classes.assetId} variant={'h6'}>{asset.symbol}</Typography>
+              <Typography className={classes.assetId} variant={'h6'}>{asset.id}&nbsp;</Typography>↓
             </div>
             <Typography className={ classes.assetTitle } variant={ 'h6'}>Choose an asset in the table below and deposit it so YFI can put it to work for you</Typography>
           </div>

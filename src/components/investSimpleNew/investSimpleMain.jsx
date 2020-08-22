@@ -352,6 +352,8 @@ class InvestSimple extends Component {
     if(account && account.address) {
       dispatcher.dispatch({ type: GET_BALANCES, content: {} })
     }
+
+    this.tableRef = React.createRef()
   }
   componentWillMount() {
     emitter.on(INVEST_RETURNED, this.investReturned);
@@ -439,6 +441,11 @@ class InvestSimple extends Component {
     })
   };
 
+  scrollToMyRef = () => window.scrollTo({
+    top: this.tableRef.current.offsetTop,
+    behavior: "smooth"
+  })
+
   render() {
     const { classes, t } = this.props;
     const {
@@ -491,14 +498,14 @@ class InvestSimple extends Component {
             <>
               <div className={classes.assetContainer}>
                 <div className={classes.wavesBg} />
-                <Asset asset={currentAsset} startLoading={this.startLoading} />
+                <Asset asset={currentAsset} startLoading={this.startLoading} scrollToMyRef={this.scrollToMyRef} />
                 <div className={classes.whiteBg}  />
                 <div className={classes.mainBg}  />
               </div>
             </>
           )}
           {account.address && (
-              <TableContainer className={classes.tableContainer} component={Paper}>
+              <TableContainer ref={this.tableRef} className={classes.tableContainer} component={Paper}>
                 <Table className={classes.table} aria-label="simple table">
                   <TableHead>
                     <TableRow>

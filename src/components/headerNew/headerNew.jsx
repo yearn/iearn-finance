@@ -84,7 +84,7 @@ const HeaderNew = (props) => {
         <Typography variant={'h6'} className={classes.betaText}>This project is in beta. Use at your own risk.</Typography>
       </div>
 
-      <div className={classes.menuContainer}>
+      {/* <div className={classes.menuContainer}>
         <div className={classes.menuItem} onClick={ () => { nav('') } }>
           <Typography variant={'h3'} className={classes.item}>FAQ</Typography>
         </div>
@@ -110,7 +110,7 @@ const HeaderNew = (props) => {
         <div className={classes.menuItem} onClick={ () => { nav('') } }>
           <Typography variant={'h3'} className={classes.item}>Governance</Typography>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }
