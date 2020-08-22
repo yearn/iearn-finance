@@ -408,7 +408,7 @@ class PoolMain extends Component {
     let assets = store.getStore('poolAssets')
     try {
       const { body: { data: pyEarnData } } = (await axios({
-        url: 'http://localhost:3000/api/pyearn',
+        url: '/api/pyearn',
         method: 'GET',
       })).data
       assets = assets.map(a => {
