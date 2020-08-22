@@ -152,7 +152,7 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
           <Button
             className={`${classes.actionButton} ${!account || !account.address ? classes.pulsingButton : ''}`}
             variant="contained"
-            color="secondary"
+            color={!account || !account.address ? 'primary' : 'secondary'}
             onClick={() => setModalOpen(true)}
             // fullWidth
           >
