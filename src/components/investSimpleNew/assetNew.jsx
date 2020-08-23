@@ -170,7 +170,7 @@ const styles = theme => ({
     paddingBottom: '20px',
   },
   assetTitle: {
-    maxWidth: '360px',
+    maxWidth: '360px!important',
     width: '100%',
     fontWeight: 'normal',
     fontSize: '16px',
@@ -331,7 +331,7 @@ const styles = theme => ({
     paddingBottom: '20px',
   },
   assetTitleDark: {
-    maxWidth: '340px',
+    maxWidth: '360px!important',
     width: '100%',
     fontWeight: 'normal',
     fontSize: '16px',
@@ -467,7 +467,7 @@ class Asset extends Component {
               <Typography className={isDarkTheme ? classes.assetIdDark : classes.assetId} variant={'h6'}>{asset.symbol}</Typography>
               <img className={classes.karetDown} alt="" src={require(`../../assets/karet-down-${isDarkTheme ? 'dark': 'light'}.svg`)} />
             </div>
-            <Typography className={isDarkTheme ? classes.assetTitleDark : classes.assetTitle } variant={ 'h6'}>Choose an asset in the table below and deposit it so Yearn can put it to work for you</Typography>
+            <Typography className={isDarkTheme ? classes.assetTitleDark : classes.assetTitle } variant={'h6'}>Choose an asset in the table below and deposit it so Yearn can put it to work for you</Typography>
           </div>
           <div className={ classes.actionsContainer }>
             <div className={ classes.tradeContainer }>

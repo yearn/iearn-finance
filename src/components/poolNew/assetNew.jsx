@@ -276,7 +276,7 @@ const styles = theme => ({
     paddingBottom: '20px',
   },
   assetTitle: {
-    maxWidth: '360px',
+    maxWidth: '360px!important',
     width: '100%',
     fontWeight: 'normal',
     fontSize: '16px',
@@ -285,7 +285,7 @@ const styles = theme => ({
     marginLeft: '15px',
   },
   assetTitleDark: {
-    maxWidth: '360px',
+    maxWidth: '360px!important',
     width: '100%',
     fontWeight: 'normal',
     fontSize: '16px',
