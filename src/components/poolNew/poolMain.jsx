@@ -110,7 +110,7 @@ const styles = (theme) => ({
   actionButton: {
     fontWeight: '600',
     fontSize: '16px',
-    lineLeight: '24px',
+    lineHeight: '24px',
     padding: '8px 13px',
     margin: '15px 8px 0',
     borderRadius: '4px',
@@ -331,6 +331,7 @@ const styles = (theme) => ({
     color: '#FFF',
     padding: '8px 16px',
     borderColor: '#535963',
+    borderRight: '1px solid rgba(84, 89, 98, 1)',
   },
   tableAvatarCell: {
     display: 'flex',
@@ -661,6 +662,7 @@ class PoolMain extends Component {
     const width = window.innerWidth
 
     return assets.map((asset) => {
+      if (asset.id === 'CRV') asset.id = 'yCRV'
       return (
         <TableRow
           style={isDarkTheme ? { background: currentAsset.id === asset.id ? '#373B42' : 'inherit'} : { background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}

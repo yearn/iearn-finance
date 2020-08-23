@@ -109,7 +109,7 @@ const styles = theme => ({
   actionButton: {
     fontWeight: '600',
     fontSize: '16px',
-    lineLeight: '24px',
+    lineHeight: '24px',
     padding: '8px 13px',
     margin: '15px 8px 0',
     borderRadius: '4px',
@@ -342,7 +342,7 @@ const styles = theme => ({
   groupButton: {
     fontWeight: '600',
     fontSize: '16px',
-    lineLeight: '24px',
+    lineHeight: '24px',
     borderRadius: '4px',
     background: '#fff',
     '& .MuiToggleButtonGroup-groupedHorizontal:not(:last-child)': {
@@ -378,7 +378,7 @@ const styles = theme => ({
   groupButtonDark: {
     fontWeight: '600',
     fontSize: '16px',
-    lineLeight: '24px',
+    lineHeight: '24px',
     borderRadius: '4px',
     background: '#373B42',
     '& .MuiToggleButtonGroup-groupedHorizontal:not(:last-child)': {
@@ -420,6 +420,7 @@ const styles = theme => ({
     color: '#FFF',
     padding: '8px 16px',
     borderColor: '#535963',
+    borderRight: '1px solid rgba(84, 89, 98, 1)',
   },
   tableRowDark: {
     borderBottom: '1px solid #535963',

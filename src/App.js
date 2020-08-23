@@ -33,11 +33,16 @@ const emitter = Store.emitter
 const store = Store.store
 
 class App extends Component {
-  state = {
-    headerValue: null,
-    accGlobal: null,
-    isDarkTheme: false,
-  };
+  constructor(props) {
+    super()
+    const isStoredDarkTheme = localStorage.getItem('yearnDarkMode') === 'true'
+    this.state = {
+      headerValue: null,
+      accGlobal: null,
+      isDarkTheme: isStoredDarkTheme || false,
+    };
+    
+  }
 
   setHeaderValue = (newValue) => {
     this.setState({ headerValue: newValue })
@@ -61,6 +66,11 @@ class App extends Component {
     });
   }
 
+  handleDarkTheme = () => {
+    localStorage.setItem('yearnDarkMode', !this.state.isDarkTheme)
+    this.setState({ isDarkTheme: !this.state.isDarkTheme })
+  }
+
   render() {
     const { headerValue } = this.state
 
@@ -82,7 +92,7 @@ class App extends Component {
                   accGlobal={this.state.accGlobal}
                   setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
                   isDarkTheme={this.state.isDarkTheme}
-                  setIsDarkTheme={() => this.setState({ isDarkTheme: !this.state.isDarkTheme })}
+                  setIsDarkTheme={this.handleDarkTheme}
                 />
               </Route>
               <Route path="/earn">
@@ -90,7 +100,7 @@ class App extends Component {
                   accGlobal={this.state.accGlobal}
                   setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
                   isDarkTheme={this.state.isDarkTheme}
-                  setIsDarkTheme={() => this.setState({ isDarkTheme: !this.state.isDarkTheme })}
+                  setIsDarkTheme={this.handleDarkTheme}
                 />
               </Route>
               <Route path="/zap">
@@ -98,7 +108,7 @@ class App extends Component {
                   accGlobal={this.state.accGlobal}
                   setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
                   isDarkTheme={this.state.isDarkTheme}
-                  setIsDarkTheme={() => this.setState({ isDarkTheme: !this.state.isDarkTheme })}
+                  setIsDarkTheme={this.handleDarkTheme}
                 />
               </Route>
               <Route path="/idai">
@@ -115,7 +125,7 @@ class App extends Component {
                   accGlobal={this.state.accGlobal}
                   setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
                   isDarkTheme={this.state.isDarkTheme}
-                  setIsDarkTheme={() => this.setState({ isDarkTheme: !this.state.isDarkTheme })}
+                  setIsDarkTheme={this.handleDarkTheme}
                 />
               </Route>
               <Route path="/">

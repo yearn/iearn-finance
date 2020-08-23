@@ -17,7 +17,7 @@ const styles = theme => ({
   actionButton: {
     fontWeight: '600',
     fontSize: '16px',
-    lineLeight: '24px',
+    lineHeight: '24px',
     padding: '8px 13px',
     margin: '15px 8px 0',
     borderRadius: '4px',
@@ -32,7 +32,7 @@ const styles = theme => ({
   actionButtonDark: {
     fontWeight: '600',
     fontSize: '16px',
-    lineLeight: '24px',
+    lineHeight: '24px',
     padding: '8px 13px',
     margin: '15px 8px 0',
     borderRadius: '4px',
@@ -55,7 +55,7 @@ const styles = theme => ({
   menuContainer: {
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'inherit',
+    alignItems: 'center',
     flexWrap: 'wrap',
     marginTop: '21px',
   },
@@ -110,7 +110,23 @@ const styles = theme => ({
     '100%': {
       boxShadow: '0 0 0 10px rgba(47, 128, 237, 0)'
     }
-  }
+  },
+  toggleDarkMode: {
+    cursor: 'pointer',
+    margin: '15px 8px 0',
+    padding: '8px 13px'
+    // animation: '$toggle-dark-mode 0.1s ease'
+  },
+  // '@keyframes toggle-dark-mode': {
+  //   '0%': {
+  //     transition: 'transform 0.1s',
+  //     transform: 'rotateY(90deg)',
+  //     opacity: 0,
+  //   },
+  //   '100%': {
+  //     opacity: 1,
+  //   }
+  // }
 })
 
 const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, isDarkTheme, setIsDarkTheme }) => {
@@ -201,11 +217,11 @@ const TopBar = ({ account, classes, nav, currentPage, pageTitle, pageSubtitle, i
               </Typography>
             )}
           </Button>
-          <Switch
-            checked={isDarkTheme}
-            onChange={setIsDarkTheme}
-            name="theme-chooser"
-            inputProps={{ 'aria-label': 'secondary checkbox' }}
+          <img
+            className={classes.toggleDarkMode}
+            onClick={setIsDarkTheme}
+            src={require(`../../assets/${isDarkTheme ? 'ico-darkmode-dark' : 'ico-darkmode'}.svg`)}
+            alt=""
           />
         </div>
         <div >

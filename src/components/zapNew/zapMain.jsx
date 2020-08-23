@@ -137,7 +137,7 @@ const styles = theme => ({
   actionButton: {
     fontWeight: '600',
     fontSize: '16px',
-    lineLeight: '24px',
+    lineHeight: '24px',
     padding: '8px 13px',
     margin: '15px 8px 0',
     borderRadius: '4px',

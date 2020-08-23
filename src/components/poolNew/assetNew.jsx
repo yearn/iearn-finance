@@ -338,7 +338,7 @@ const styles = theme => ({
     '& .MuiSlider-mark':{
       visibility: 'hidden'
     },
-    '& .MuiSlider-mark:nth-child(25n+1)':{
+    '& .MuiSlider-mark:nth-child(25n+4)':{
       visibility: 'visible',
       height: '14px',
       width: '1px',
@@ -362,7 +362,7 @@ const styles = theme => ({
     '& .MuiSlider-mark':{
       visibility: 'hidden'
     },
-    '& .MuiSlider-mark:nth-child(25n+1)':{
+    '& .MuiSlider-mark:nth-child(25n+4)':{
       visibility: 'visible',
       height: '14px',
       width: '1px',
