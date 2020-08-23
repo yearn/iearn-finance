@@ -135,7 +135,8 @@ const styles = theme => ({
     flexShrink: 0,
     [theme.breakpoints.up('sm')]: {
       paddingTop: '5px',
-      display: 'block'
+      display: 'block',
+      maxWidth: '194.5px'
     }
   },
   headingName: {
