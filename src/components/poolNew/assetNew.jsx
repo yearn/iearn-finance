@@ -285,7 +285,7 @@ const styles = theme => ({
     marginLeft: '15px',
   },
   assetTitleDark: {
-    maxWidth: '340px',
+    maxWidth: '360px',
     width: '100%',
     fontWeight: 'normal',
     fontSize: '16px',

@@ -608,7 +608,7 @@ class PoolMain extends Component {
               <>
                 <div ref={this.formRef} className={classes.assetContainer}>
                   <div className={classes.wavesBg} />
-                  <Asset asset={currentAsset} startLoading={this.startLoading} isDarkTheme={isDarkTheme} scrollToMyRef={this.scrollToMyRef} />
+                  <Asset asset={currentAsset} startLoading={this.startLoading} isDarkTheme={isDarkTheme} scrollToTable={this.scrollToTable} />
                   <div className={isDarkTheme ? classes.darkBg : classes.whiteBg}  />
                   <div className={isDarkTheme ? classes.mainDarkBg : classes.mainBg}  />
                 </div>
