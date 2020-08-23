@@ -3,24 +3,24 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import {
   Switch,
-  Route
+  Route,
+  Redirect
 } from "react-router-dom";
 import IpfsRouter from 'ipfs-react-router'
 
 import './i18n';
 import interestTheme from './theme';
 
-import APR from './components/apr';
-import InvestSimple from './components/investSimple';
+import Cover from './components/cover';
+import InvestSimple from './components/investSimpleNew';
 import Manage from './components/manage';
 import Performance from './components/performance';
-import Zap from './components/zap';
+import Zap from './components/zapNew';
 import IDai from './components/idai';
-import Footer from './components/footer';
 import Home from './components/home';
-import Header from './components/header';
-import Vaults from './components/pool';
-
+import Vaults from './components/poolNew';
+import Header from './components/headerNew';
+import Footer from './components/footerNew';
 
 import { injected } from "./stores/connectors";
 
@@ -33,9 +33,16 @@ const emitter = Store.emitter
 const store = Store.store
 
 class App extends Component {
-  state = {
-    headerValue: null
-  };
+  constructor(props) {
+    super()
+    const isStoredDarkTheme = localStorage.getItem('yearnDarkMode') === 'true'
+    this.state = {
+      headerValue: null,
+      accGlobal: null,
+      isDarkTheme: isStoredDarkTheme || false,
+    };
+    
+  }
 
   setHeaderValue = (newValue) => {
     this.setState({ headerValue: newValue })
@@ -59,6 +66,11 @@ class App extends Component {
     });
   }
 
+  handleDarkTheme = () => {
+    localStorage.setItem('yearnDarkMode', !this.state.isDarkTheme)
+    this.setState({ isDarkTheme: !this.state.isDarkTheme })
+  }
+
   render() {
     const { headerValue } = this.state
 
@@ -70,21 +82,34 @@ class App extends Component {
             display: 'flex',
             flexDirection: 'column',
             minHeight: '100vh',
-            alignItems: 'center',
-            background: "#f9fafb"
+            backgroundImage: `url(${require(`./assets/${this.state.isDarkTheme ? 'bg-dark' : 'bg'}.png`)})`,
+            backgroundPosition: 'left bottom',
           }}>
+            <Header isDarkTheme={this.state.isDarkTheme} />
             <Switch>
               <Route path="/apr">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
-                <APR />
+                <Cover
+                  accGlobal={this.state.accGlobal}
+                  setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
+                  isDarkTheme={this.state.isDarkTheme}
+                  setIsDarkTheme={this.handleDarkTheme}
+                />
               </Route>
               <Route path="/earn">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
-                <InvestSimple />
+                <InvestSimple
+                  accGlobal={this.state.accGlobal}
+                  setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
+                  isDarkTheme={this.state.isDarkTheme}
+                  setIsDarkTheme={this.handleDarkTheme}
+                />
               </Route>
               <Route path="/zap">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
-                <Zap />
+                <Zap
+                  accGlobal={this.state.accGlobal}
+                  setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
+                  isDarkTheme={this.state.isDarkTheme}
+                  setIsDarkTheme={this.handleDarkTheme}
+                />
               </Route>
               <Route path="/idai">
                 <IDai />
@@ -96,14 +121,19 @@ class App extends Component {
                 <Manage />
               </Route>
               <Route path="/vaults">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
-                <Vaults />
+                <Vaults
+                  accGlobal={this.state.accGlobal}
+                  setAccGlobal={(accGlobal) => this.setState({ accGlobal })}
+                  isDarkTheme={this.state.isDarkTheme}
+                  setIsDarkTheme={this.handleDarkTheme}
+                />
               </Route>
               <Route path="/">
-                <Home />
+                <Redirect to="/vaults" />
+                {/* <Home /> */}
               </Route>
             </Switch>
-            <Footer />
+            <Footer isDarkTheme={this.state.isDarkTheme} />
           </div>
         </IpfsRouter>
       </MuiThemeProvider>

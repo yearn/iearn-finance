@@ -2694,8 +2694,12 @@ class Store {
   getPoolBalances = async () => {
     const account = store.getStore('account')
     const assets = store.getStore('poolAssets')
-
-    const web3 = new Web3(store.getStore('web3context').library.provider);
+    const context = store.getStore('web3context')
+    if(!context) {
+      console.log('no context')
+      return emitter.emit(ERROR, 'no context')
+    }
+    const web3 = new Web3(context.library.provider);
 
     async.map(assets, (asset, callback) => {
       async.parallel([

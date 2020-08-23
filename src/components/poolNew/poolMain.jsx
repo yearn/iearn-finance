@@ -1,0 +1,747 @@
+import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom'
+import { withStyles } from '@material-ui/core/styles'
+import {
+  Card,
+  Typography,
+  Button,
+  ExpansionPanel,
+  ExpansionPanelDetails,
+  ExpansionPanelSummary,
+  Avatar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Fab
+} from '@material-ui/core'
+import { Skeleton } from '@material-ui/lab'
+import NavigationIcon from '@material-ui/icons/Navigation';
+import axios from 'axios'
+
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import { withNamespaces } from 'react-i18next'
+import { colors } from '../../theme'
+
+import UnlockModal from '../unlock/unlockModal.jsx'
+import Snackbar from '../snackbar'
+import Asset from './assetNew'
+import Loader from '../loader'
+
+import {
+  ERROR,
+  GET_POOL_BALANCES,
+  POOL_BALANCES_RETURNED,
+  DEPOSIT_POOL_RETURNED,
+  WITHDRAW_POOL_RETURNED,
+  CONNECTION_CONNECTED,
+  CONNECTION_DISCONNECTED,
+} from '../../constants'
+
+import Store from '../../stores'
+const emitter = Store.emitter
+const dispatcher = Store.dispatcher
+const store = Store.store
+
+const styles = (theme) => ({
+  root: {
+  },
+  investedContainer: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    minWidth: '100%',
+    [theme.breakpoints.up('md')]: {
+      minWidth: '900px',
+    },
+  },
+  balancesContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+    padding: '12px 12px',
+    position: 'relative',
+  },
+  connectContainer: {
+    padding: '12px',
+    display: 'flex',
+    justifyContent: 'center',
+    width: '100%',
+    maxWidth: '450px',
+    [theme.breakpoints.up('md')]: {
+      width: '450',
+    },
+  },
+  intro: {
+    width: '100%',
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: '32px',
+    [theme.breakpoints.down('sm')]: {
+      justifyContent: 'center',
+      maxWidth: 'calc(100vw - 24px)',
+    },
+  },
+  introCenter: {
+    maxWidth: '500px',
+    textAlign: 'center',
+    display: 'flex',
+    padding: '48px 0px',
+  },
+  introCenterDark: {
+    maxWidth: '500px',
+    textAlign: 'center',
+    display: 'flex',
+    padding: '48px 0px',
+    color: '#fff'
+  },
+  introText: {
+    paddingLeft: '20px',
+  },
+  actionButton: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    padding: '8px 13px',
+    margin: '15px 8px 0',
+    borderRadius: '4px',
+    boxShadow: 'none',
+    '&:first-of-type': {
+      marginLeft: '0',
+    },
+    '&:last-of-type': {
+      marginRight: '0',
+    },
+  },
+  overlay: {
+    position: 'absolute',
+    borderRadius: '10px',
+    background: 'RGBA(200, 200, 200, 1)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: '1px solid #aaa',
+    cursor: 'pointer',
+
+    right: '0px',
+    top: '10px',
+    height: '70px',
+    width: '160px',
+    [theme.breakpoints.up('md')]: {
+      right: '0px',
+      top: '10px',
+      height: '90px',
+      width: '210px',
+    },
+  },
+  heading: {
+    display: 'none',
+    paddingTop: '12px',
+    flex: 1,
+    flexShrink: 0,
+    [theme.breakpoints.up('sm')]: {
+      paddingTop: '5px',
+      display: 'block',
+    },
+  },
+  headingName: {
+    paddingTop: '5px',
+    flex: 2,
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+    minWidth: '100%',
+    [theme.breakpoints.up('sm')]: {
+      minWidth: 'auto',
+    },
+  },
+  buttonText: {
+    fontWeight: '700',
+    color: 'white',
+  },
+  assetSummary: {
+    display: 'flex',
+    alignItems: 'center',
+    flex: 1,
+    flexWrap: 'wrap',
+    [theme.breakpoints.up('sm')]: {
+      flexWrap: 'nowrap',
+    },
+  },
+  assetIcon: {
+    display: 'flex',
+    alignItems: 'center',
+    verticalAlign: 'middle',
+    borderRadius: '20px',
+    height: '30px',
+    width: '30px',
+    textAlign: 'center',
+    cursor: 'pointer',
+    marginRight: '20px',
+    [theme.breakpoints.up('sm')]: {
+      height: '40px',
+      width: '40px',
+      marginRight: '24px',
+    },
+  },
+  addressContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    overflow: 'hidden',
+    flex: 1,
+    whiteSpace: 'nowrap',
+    fontSize: '0.83rem',
+    textOverflow: 'ellipsis',
+    cursor: 'pointer',
+    padding: '28px 30px',
+    borderRadius: '50px',
+    border: '1px solid ' + colors.borderBlue,
+    alignItems: 'center',
+    maxWidth: '450px',
+    [theme.breakpoints.up('md')]: {
+      width: '100%',
+    },
+  },
+  between: {
+    width: '40px',
+  },
+  expansionPanel: {
+    maxWidth: 'calc(100vw - 24px)',
+    width: '100%',
+  },
+  versionToggle: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  tableHeadContainer: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  investAllContainer: {
+    paddingTop: '24px',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    width: '100%',
+  },
+  disaclaimer: {
+    padding: '12px',
+    border: '1px solid rgb(174, 174, 174)',
+    borderRadius: '0.75rem',
+    marginBottom: '24px',
+    lineHeight: '1.2',
+  },
+  fees: {
+    paddingRight: '75px',
+    padding: '12px',
+    lineHeight: '1.2',
+  },
+  walletAddress: {
+    padding: '0px 12px',
+  },
+  walletTitle: {
+    flex: 1,
+    color: colors.darkGray,
+  },
+  grey: {
+    color: colors.darkGray,
+  },
+  wavesBg: {
+    backgroundImage: `url(${require('../../assets/bg-waves.svg')})`,
+    height: '38px',
+    width: '100%',
+    position: 'absolute',
+    top: '50%',
+    left: '0',
+    zIndex: '2',
+    marginTop: '-38px'
+  },
+  darkBg: {
+    backgroundImage: `url(${require('../../assets/bg-dark.png')})`,
+    height: '50%',
+    position: 'absolute',
+    bottom: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  },
+  assetContainer: {
+    position: 'relative',
+    width: '100%',
+    background: '#fff',
+    height: '100%',
+  },
+  whiteBg: {
+    background: '#fff',
+    height: '50%',
+    position: 'absolute',
+    bottom: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  },
+  mainDarkBg: {
+    backgroundImage: `url(${require('../../assets/bg-dark.png')})`,
+    backgroundPosition: 'left bottom',
+    height: '50%',
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  },
+  mainBg: {
+    backgroundImage: `url(${require(`../../assets/bg.png`)})`,
+    backgroundPosition: 'left bottom',
+    height: '50%',
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '1',
+  },
+  table: {
+    maxWidth: '967px',
+    width: '100%',
+    margin: '0 auto',
+  },
+  tableCell: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '22px',
+    color: '#252626',
+    padding: '8px 16px',
+    borderRight: '1px solid rgba(224, 224, 224, 1)',
+  },
+  tableCellDark: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '22px',
+    color: '#FFF',
+    padding: '8px 16px',
+    borderColor: '#535963',
+    borderRight: '1px solid rgba(84, 89, 98, 1)',
+  },
+  tableAvatarCell: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '8px 16px',
+    height: '65px',
+    borderBottom: 'none',
+  },
+  
+  tableAvatar: {
+    marginLeft: '20px',
+    background: 'transparent'
+  },
+  assetTitle: {
+    fontWeight: '600',
+    fontSize: '20px',
+    lineHeight: '24px',
+    color: '#080809',
+    marginLeft: '6px',
+  },
+  assetTitleDark: {
+    fontWeight: '600',
+    fontSize: '20px',
+    lineHeight: '24px',
+    color: '#fff',
+    marginLeft: '6px',
+  },
+  tableRowCell: {
+    padding: '8px 16px',
+    borderColor: '#F3F4F5',
+  },
+  tableRow: {
+    borderBottom: '1px solid #F3F4F5',
+    cursor: 'pointer',
+    '&:hover': {
+      background: '#E6F7FF',
+    }
+  },
+  tableRowDark: {
+    borderBottom: '1px solid #535963',
+    cursor: 'pointer',
+    '&:hover': {
+      background: '#535963',
+    }
+  },
+  tableRowCellDark: {
+    padding: '8px 16px',
+    borderColor: '#535963'
+  },
+  assetDescription: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#575859',
+  },
+  assetDescriptionDark: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#FFF',
+  },
+  assetDescriptionBalance: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#096DD9',
+  },
+  assetDescriptionBalanceDark: {
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '24px',
+    color: '#1890FF',
+  },
+  tableContainer: {
+    padding: '70px 0 87px',
+  },
+  tableContainerDark: {
+    padding: '70px 0 87px',
+    backgroundImage: `url(${require('../../assets/bg-dark.png')})`,
+  },
+  pulsingButton: {
+    animation: '$pulse-animation 2s infinite'
+  },
+  '@keyframes pulse-animation': {
+    '0%': {
+      boxShadow: '0 0 0 0px rgba(47, 128, 237, 0.5)'
+    },
+    '100%': {
+      boxShadow: '0 0 0 10px rgba(47, 128, 237, 0)'
+    }
+  },
+  fab: {
+    visibility: 'hidden',
+    '@media (max-width: 767.98px)': {
+      visibility: 'visible',
+      position: 'fixed',
+      bottom: '25px',
+      right: '25px',
+      zIndex: '999'
+    }
+  },
+})
+
+class PoolMain extends Component {
+  constructor(props) {
+    super()
+
+    const account = store.getStore('account')
+    props.setAccountGlobal(account)
+    const assets = store.getStore('poolAssets')
+    console.log({assets})
+    this.state = {
+      assets,
+      currentAsset: assets[0],
+      account: account,
+      modalOpen: false,
+      snackbarType: null,
+      snackbarMessage: null,
+      value: 1,
+      refreshTimer: null,
+      pyEarnData: []
+    }
+
+    if (account && account.address) {
+      dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
+    }
+
+    this.tableRef = React.createRef()
+    this.formRef = React.createRef()
+  }
+  componentWillMount() {
+    emitter.on(DEPOSIT_POOL_RETURNED, this.showHash)
+    emitter.on(WITHDRAW_POOL_RETURNED, this.showHash)
+    emitter.on(ERROR, this.errorReturned)
+    emitter.on(POOL_BALANCES_RETURNED, this.balancesReturned)
+    emitter.on(CONNECTION_CONNECTED, this.connectionConnected)
+    emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected)
+  }
+
+  componentWillUnmount() {
+    const { refreshTimer } = this.state
+    clearTimeout(refreshTimer)
+    emitter.removeListener(DEPOSIT_POOL_RETURNED, this.showHash)
+    emitter.removeListener(WITHDRAW_POOL_RETURNED, this.showHash)
+    emitter.removeListener(ERROR, this.errorReturned)
+    emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected)
+    emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected)
+    emitter.removeListener(POOL_BALANCES_RETURNED, this.balancesReturned)
+  }
+
+  refresh() {
+    dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
+  }
+
+  balancesReturned = async (balances) => {
+    const _refreshTimer = setTimeout(this.refresh, 300000)
+    let assets = store.getStore('poolAssets')
+    try {
+      const { body: { data: pyEarnData } } = (await axios({
+        url: '/api/pyearn',
+        method: 'GET',
+      })).data
+      assets = assets.map(a => {
+        const obj = pyEarnData.find(d => d.symbol === a.poolSymbol)
+        if (!obj) {
+          if (a.poolSymbol === 'yUSD') {
+            const yCurve = pyEarnData.find(d => d.symbol === 'yCurve')
+            a.pyEarn = yCurve ? yCurve.value : 'Not Available'
+          } else a.pyEarn = 'Not Available'
+        } else a.pyEarn = obj.value
+        return a
+      })
+    } catch (e) {
+      console.error('[pyearn]', e.toString())
+    }
+    this.setState({ assets, refreshTimer: _refreshTimer })
+  }
+
+  connectionConnected = () => {
+    const { t, setAccountGlobal } = this.props
+    const acc = store.getStore('account')
+    this.setState({ account: acc })
+    setAccountGlobal(acc)
+
+    dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
+
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: t('Unlock.WalletConnected'), snackbarType: 'Info' }
+      that.setState(snackbarObj)
+    })
+  }
+
+  connectionDisconnected = () => {
+    const { setAccountGlobal } = this.props
+    const { refreshTimer } = this.state
+    clearTimeout(refreshTimer)
+    const acc = store.getStore('account')
+    this.setState({ account: acc, refreshTimer: null })
+    setAccountGlobal(acc)
+    console.log('DISCONNECTED')
+  }
+
+  errorReturned = (error) => {
+    const snackbarObj = { snackbarMessage: null, snackbarType: null }
+    this.setState(snackbarObj)
+    this.setState({ loading: false })
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: error.toString(), snackbarType: 'Error' }
+      that.setState(snackbarObj)
+    })
+  }
+
+  showHash = (txHash) => {
+    const snackbarObj = { snackbarMessage: null, snackbarType: null }
+    this.setState(snackbarObj)
+    this.setState({ loading: false })
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: txHash, snackbarType: 'Hash' }
+      that.setState(snackbarObj)
+    })
+  }
+
+  scrollToTable = () => window.scrollTo({
+    top: this.tableRef.current.offsetTop,
+    behavior: "smooth"
+  })
+
+  scrollToForm = () => window.scrollTo({
+    top: this.formRef.current.offsetTop,
+    behavior: "smooth"
+  })
+
+  render() {
+    const { classes, t, isDarkTheme } = this.props
+    const { loading, account, modalOpen, snackbarMessage, currentAsset } = this.state
+
+    var address = null
+    if (account.address) {
+      address =
+        account.address.substring(0, 6) +
+        '...' +
+        account.address.substring(account.address.length - 4, account.address.length)
+    }
+
+    return (
+      <>
+        <div className={classes.root}>
+          <div className={classes.investedContainer}>
+            {!account.address && (
+              <div className={ isDarkTheme ? classes.introCenterDark : classes.introCenter}>
+                <Typography variant="h3">Vaults. Simple.</Typography>
+              </div>
+            )}
+            {!account.address && (
+              <div className={classes.connectContainer}>
+                <Button
+                  className={`${classes.actionButton} ${classes.pulsingButton}`}
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  onClick={this.overlayClicked}
+                >
+                  <Typography className={classes.buttonText} variant={'h5'}>
+                    {t('InvestSimple.Connect')}
+                  </Typography>
+                </Button>
+              </div>
+            )}
+            
+            {account.address && (
+              <>
+                <div ref={this.formRef} className={classes.assetContainer}>
+                  <div className={classes.wavesBg} />
+                  <Asset asset={currentAsset} startLoading={this.startLoading} isDarkTheme={isDarkTheme} scrollToTable={this.scrollToTable} />
+                  <div className={isDarkTheme ? classes.darkBg : classes.whiteBg}  />
+                  <div className={isDarkTheme ? classes.mainDarkBg : classes.mainBg}  />
+                </div>
+              </>
+            )}
+            {account.address && (
+              <TableContainer ref={this.tableRef} className={ isDarkTheme ? classes.tableContainerDark : classes.tableContainer} component={Paper}>
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Asset</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Details</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Current Strategy: Annualized ROI</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Current Strategy: Weekly ROI</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Wallet Balance</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>Deployed Balance</TableCell>
+                      <TableCell className={ isDarkTheme ? classes.tableCellDark : classes.tableCell }>LP Token Balance</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>{this.renderAssetBlocks()}</TableBody>
+                </Table>
+              </TableContainer>
+            )}
+            {/* <Fab
+              className={classes.fab}
+              variant="extended"
+              color="secondary"
+              onClick={() => this.scrollToForm()}
+            >
+              <NavigationIcon className={classes.extendedIcon} />
+              To Info
+            </Fab> */}
+          </div>
+          {loading && <Loader />}
+          {modalOpen && this.renderModal()}
+          {snackbarMessage && this.renderSnackbar()}
+        </div>
+      </>
+    )
+  }
+
+  onChange = (event) => {
+    let val = []
+    val[event.target.id] = event.target.checked
+    this.setState(val)
+  }
+
+  renderAssetBlocks = () => {
+    const { assets, expanded, currentAsset } = this.state
+    const { classes, isDarkTheme } = this.props
+    const width = window.innerWidth
+
+    return assets.map((asset) => {
+      if (asset.id === 'CRV') asset.id = 'yCRV'
+      return (
+        <TableRow
+          style={isDarkTheme ? { background: currentAsset.id === asset.id ? '#373B42' : 'inherit'} : { background: currentAsset.id === asset.id ? '#E6F7FF' : 'inherit'}}
+          className={isDarkTheme ? classes.tableRowDark : classes.tableRow}
+          key={asset.id}
+          onClick={() => {
+            this.setState({ currentAsset: asset })
+            this.scrollToForm()
+          }}
+        >
+          <TableCell className={classes.tableAvatarCell} component="th" scope="row">
+            <img src={require(`../../assets/${currentAsset.id === asset.id ? 'check' : 'no-check'}.svg`)} alt="" />
+            <Avatar className={classes.tableAvatar}>
+              <img
+                alt=""
+                src={require('../../assets/' + asset.symbol + '-logo.png')}
+                height={'24px'}
+                style={asset.disabled ? { filter: 'grayscale(100%)' } : {}}
+              />
+            </Avatar>
+            <Typography className={isDarkTheme ? classes.assetTitleDark : classes.assetTitle} variant="h6">{asset.id}</Typography>
+          </TableCell>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell} align="left">
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{asset.description}</Typography>
+          </TableCell>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell} align="left">
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{!asset.pyEarn ? <Skeleton /> : asset.pyEarn === 'Not Available' ? 'Not Available' : `${(+asset.pyEarn.split('%')[0] * 52).toFixed(5)}%`}</Typography>
+          </TableCell>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell} align="left">
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{!asset.pyEarn ? <Skeleton /> : asset.pyEarn}</Typography>
+          </TableCell>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell} align="left">
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{(asset.balance ? asset.balance.toFixed(4) : '0.0000') + ' ' + asset.symbol}</Typography>
+          </TableCell>
+          <TableCell
+            style={ isDarkTheme ? { borderBottom: '1px solid #1890FF' } : { background: currentAsset.id === asset.id ? '#BAE7FF' : 'inherit', borderBottom: '1px solid #BAE7FF' }}
+            className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell}
+            align="left"
+          >
+            <Typography className={isDarkTheme ? classes.assetDescriptionBalanceDark : classes.assetDescriptionBalance} variant="h6">{asset.pooledBalance
+              ? (Math.floor(asset.pooledBalance * asset.pricePerFullShare * 10000) / 10000).toFixed(4)
+              : '0.0000'}{' '}
+              {asset.symbol}
+            </Typography>
+          </TableCell>
+          <TableCell className={isDarkTheme ? classes.tableRowCellDark : classes.tableRowCell} align="left">
+            <Typography className={ isDarkTheme ? classes.assetDescriptionDark : classes.assetDescription } variant="h6">{asset.pooledBalance ? (Math.floor(asset.pooledBalance * 10000) / 10000).toFixed(4) : '0.0000'}{' '}
+              {asset.poolSymbol}
+            </Typography>
+          </TableCell>
+        </TableRow>
+      )
+    })
+  }
+
+  handleChange = (id) => {
+    this.setState({ expanded: this.state.expanded === id ? null : id })
+  }
+
+  startLoading = () => {
+    this.setState({ loading: true })
+  }
+
+  renderSnackbar = () => {
+    var { snackbarType, snackbarMessage } = this.state
+    return <Snackbar type={snackbarType} message={snackbarMessage} open={true} />
+  }
+
+  renderModal = () => {
+    return <UnlockModal closeModal={this.closeModal} modalOpen={this.state.modalOpen} />
+  }
+
+  overlayClicked = () => {
+    this.setState({ modalOpen: true })
+  }
+
+  closeModal = () => {
+    this.setState({ modalOpen: false })
+  }
+}
+
+export default withNamespaces()(withRouter(withStyles(styles)(PoolMain)))
