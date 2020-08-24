@@ -3053,7 +3053,12 @@ class Store {
       amountSend = amount*10**asset.decimals;
     }
 
-    vaultContract.methods.withdraw(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    let functionCall = vaultContract.methods.withdraw(amountSend)
+    if(asset.erc20address === 'Ethereum') {
+      functionCall = vaultContract.methods.withdrawETH(amountSend)
+    }
+
+    functionCall.send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
       console.log(hash)
       callback(null, hash)
@@ -3075,7 +3080,7 @@ class Store {
     })
   }
 
-  withdrawAllPool = (payload) => {
+    withdrawAllPool = (payload) => {
     const account = store.getStore('account')
     const { asset } = payload.content
 
@@ -3092,7 +3097,12 @@ class Store {
 
     let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
 
-    vaultContract.methods.withdrawAll().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    let functionCall = vaultContract.methods.withdrawAll()
+    if(asset.erc20address === 'Ethereum') {
+      functionCall = vaultContract.methods.withdrawAllETH()
+    }
+
+    functionCall.send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
       console.log(hash)
       callback(null, hash)

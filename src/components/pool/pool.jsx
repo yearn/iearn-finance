@@ -256,7 +256,9 @@ const styles = theme => ({
     alignItems: 'center',
   },
   searchField: {
-    flex: 1
+    flex: 1,
+    background: colors.white,
+    borderRadius: '50px'
   },
   checkbox: {
     flex: 1,
