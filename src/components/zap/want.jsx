@@ -81,9 +81,7 @@ class Want extends Component {
   }
 
   componentWillReceiveProps(props) {
-    console.log(props);
     if(props.assets && props.curveContracts) {
-
 
       const a = props.assets
       const b = props.curveContracts

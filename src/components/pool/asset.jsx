@@ -6,7 +6,6 @@ import {
   TextField,
   Button
 } from '@material-ui/core';
-import { withNamespaces } from 'react-i18next';
 
 import {
   ERROR,
@@ -24,7 +23,6 @@ import Store from "../../stores";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
-
 
 const styles = theme => ({
   value: {
@@ -167,9 +165,9 @@ class Asset extends Component {
 
     return (<div className={ classes.actionsContainer }>
       <div className={ classes.tradeContainer }>
-        {!asset.disabled && <div className={ classes.balances }>
+        <div className={ classes.balances }>
             <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
-        </div>}
+        </div>
         <TextField
           fullWidth
           className={ classes.actionInput }
@@ -177,7 +175,7 @@ class Asset extends Component {
           value={ amount }
           error={ amountError }
           onChange={ this.onChange }
-          disabled={ loading || asset.disabled }
+          disabled={ loading }
           placeholder="0.00"
           variant="outlined"
           onKeyDown={ this.inputKeyDown }
@@ -186,7 +184,7 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading || asset.disabled }
+            disabled={ loading }
             color="primary"
             onClick={ () => { this.setAmount(25) } }>
             <Typography variant={'h5'}>25%</Typography>
@@ -194,7 +192,7 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading || asset.disabled }
+            disabled={ loading }
             color="primary"
             onClick={ () => { this.setAmount(50) } }>
             <Typography variant={'h5'}>50%</Typography>
@@ -202,7 +200,7 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading || asset.disabled }
+            disabled={ loading }
             color="primary"
             onClick={ () => { this.setAmount(75) } }>
             <Typography variant={'h5'}>75%</Typography>
@@ -210,29 +208,31 @@ class Asset extends Component {
           <Button
             className={ classes.scale }
             variant='text'
-            disabled={ loading || asset.disabled }
+            disabled={ loading }
             color="primary"
             onClick={ () => { this.setAmount(100) } }>
             <Typography variant={'h5'}>100%</Typography>
           </Button>
         </div>
         <div className={ classes.buttons }>
-          <Button
-            className={ classes.actionButton }
-            variant="outlined"
-            color="primary"
-            disabled={ loading || !account.address || asset.balance <= 0 || asset.depositDisabled === true }
-            onClick={ this.onDeposit }
-            fullWidth
-            >
-            <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit</Typography>
-          </Button>
-          { asset.version === 2 &&
+          { asset.deposit === true &&
             <Button
               className={ classes.actionButton }
               variant="outlined"
               color="primary"
-              disabled={ loading || !account.address || asset.balance <= 0 || asset.depositDisabled === true }
+              disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
+              onClick={ this.onDeposit }
+              fullWidth
+              >
+              <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit</Typography>
+            </Button>
+          }
+          { asset.depositAll === true &&
+            <Button
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
               onClick={ this.onDepositAll }
               fullWidth
               >
@@ -298,22 +298,24 @@ class Asset extends Component {
           </Button>
         </div>
         <div className={ classes.buttons }>
-          <Button
-            className={ classes.actionButton }
-            variant="outlined"
-            color="primary"
-            disabled={ loading || !account.address || asset.pooledBalance <= 0 }
-            onClick={ this.onWithdraw }
-            fullWidth
-            >
-            <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Withdraw</Typography>
-          </Button>
-          { asset.version === 2 &&
+          { asset.withdraw === true &&
             <Button
               className={ classes.actionButton }
               variant="outlined"
               color="primary"
-              disabled={ loading || !account.address || asset.pooledBalance <= 0 }
+              disabled={ loading || asset.pooledBalance <= 0 }
+              onClick={ this.onWithdraw }
+              fullWidth
+              >
+              <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Withdraw</Typography>
+            </Button>
+          }
+          { asset.withdrawAll === true &&
+            <Button
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ loading || asset.pooledBalance <= 0 }
               onClick={ this.onWithdrawAll }
               fullWidth
               >
@@ -413,4 +415,4 @@ class Asset extends Component {
   }
 }
 
-export default withNamespaces()(withRouter(withStyles(styles, { withTheme: true })(Asset)));
+export default withRouter(withStyles(styles, { withTheme: true })(Asset));

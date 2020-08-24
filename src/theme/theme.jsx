@@ -202,7 +202,7 @@ const iswapTheme =  {
         marginRight: '0px'
       }
     },
-    MuiExpansionPanel: {
+    MuiAccordion: {
       root: {
         border: '1px solid '+colors.borderBlue,
         borderRadius: '50px',
@@ -213,7 +213,7 @@ const iswapTheme =  {
         },
       }
     },
-    MuiExpansionPanelSummary: {
+    MuiAccordionSummary: {
       root: {
         padding: '12px 24px',
         '@media (min-width: 960px)': {
@@ -224,7 +224,7 @@ const iswapTheme =  {
         margin: '0px !important'
       }
     },
-    MuiExpansionPanelDetails: {
+    MuiAccordionDetails: {
       root: {
         padding: '0 12px 15px 12px',
         '@media (min-width: 960px)': {
@@ -274,7 +274,12 @@ const iswapTheme =  {
     },
     MuiFormControlLabel: {
       label: {
-        color: colors.darkBlack
+        color: colors.darkBlack,
+        fontSize: '14px',
+        fontWeight: '600',
+        WebkitFontSmoothing: "antialiased",
+        MozOsxFontSmoothing: "grayscale",
+        lineHeight: 1.2
       }
     }
   },

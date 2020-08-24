@@ -235,8 +235,12 @@ class APR extends Component {
                 variant="outlined"
               />
               <table className={ classes.tableContainer }>
-                { this.renderAggregatedHeader() }
-                { this.renderAggregatedYields() }
+                <thead>
+                  { this.renderAggregatedHeader() }
+                </thead>
+                <tbody>
+                  { this.renderAggregatedYields() }
+                </tbody>
               </table>
             </Card>
           </div>

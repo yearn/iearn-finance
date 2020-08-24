@@ -5,9 +5,9 @@ import {
   Card,
   Typography,
   Button,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
 } from '@material-ui/core';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
@@ -438,8 +438,8 @@ class InvestSimple extends Component {
       return !(asset.symbol === "iDAI")
     }).map((asset) => {
       return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
-          <ExpansionPanelSummary
+        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+          <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
             id="panel1bh-header"
@@ -480,11 +480,11 @@ class InvestSimple extends Component {
                 <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
               </div>
             </div>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
+          </AccordionSummary>
+          <AccordionDetails>
             <Asset asset={ asset } startLoading={ this.startLoading } />
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+          </AccordionDetails>
+        </Accordion>
       )
     })
   }
@@ -499,8 +499,8 @@ class InvestSimple extends Component {
       return !(asset.symbol === "iDAI")
     }).map((asset) => {
       return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
-          <ExpansionPanelSummary
+        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+          <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
             id="panel1bh-header"
@@ -541,11 +541,11 @@ class InvestSimple extends Component {
                 <Typography variant={ 'h5' } className={ classes.grey }>{ t('InvestSimple.AvailableBalance') }</Typography>
               </div>
             </div>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
+          </AccordionSummary>
+          <AccordionDetails>
             <Asset asset={ asset } startLoading={ this.startLoading } />
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+          </AccordionDetails>
+        </Accordion>
       )
     })
   }
@@ -561,8 +561,8 @@ class InvestSimple extends Component {
       return !(asset.symbol === "iDAI")
     }).map((asset) => {
       return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
-          <ExpansionPanelSummary
+        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+          <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
             id="panel1bh-header"
@@ -603,11 +603,11 @@ class InvestSimple extends Component {
                 <Typography variant={ 'h5' }>{ t('InvestSimple.AvailableBalance') }</Typography>
               </div>
             </div>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
+          </AccordionSummary>
+          <AccordionDetails>
             <Asset asset={ asset } startLoading={ this.startLoading } />
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+          </AccordionDetails>
+        </Accordion>
       )
     })
   }

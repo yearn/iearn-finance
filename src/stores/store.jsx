@@ -833,6 +833,44 @@ class Store {
       ethBalance: 0,
       poolAssets: [
         {
+          id: 'ETH',
+          name: 'ETH',
+          symbol: 'ETH',
+          description: 'Ether',
+          poolSymbol: 'yETH',
+          erc20address: 'Ethereum',
+          vaultContractAddress: null,
+          vaultContractABI: config.vaultContractV4ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10695309,
+          measurement: 1e18,
+        },
+        {
+          id: 'WETH',
+          name: 'WETH',
+          symbol: 'WETH',
+          description: 'Wrappeth Ether',
+          poolSymbol: 'yWETH',
+          erc20address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          vaultContractAddress: null,
+          vaultContractABI: config.vaultContractV4ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10695309,
+          measurement: 1e18,
+        },
+        {
           id: 'YFI',
           name: 'yearn.finance',
           symbol: 'YFI',
@@ -844,7 +882,10 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 2,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
           lastMeasurement: 10695309,
           measurement: 1e18,
         },
@@ -860,7 +901,10 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 1,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: false,
           lastMeasurement: 10559448,
           measurement: 1e18,
         },
@@ -876,7 +920,10 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 2,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
           depositDisabled: false,
           lastMeasurement: 10709740,
           measurement: 1e18,
@@ -893,7 +940,10 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 2,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
           lastMeasurement: 10650116,
           measurement: 1e18,
         },
@@ -909,7 +959,10 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 2,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
           lastMeasurement: 10603368,
           measurement: 1e18,
         },
@@ -925,7 +978,10 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 6,
-          version: 1,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: false,
           lastMeasurement: 10532708,
           measurement: 1e18,
         },
@@ -941,7 +997,10 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 6,
-          version: 2,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
           lastMeasurement: 10651402,
           measurement: 1e18,
         },
@@ -957,7 +1016,10 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 2,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
           lastMeasurement: 10599617,
           measurement: 1e18,
         },
@@ -973,7 +1035,10 @@ class Store {
           balance: 0,
           pooledBalance: 0,
           decimals: 18,
-          version: 2,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
           depositDisabled: true,
           lastMeasurement: 10604016,
           measurement: 1e18,
@@ -1146,6 +1211,11 @@ class Store {
   }
 
   _checkApproval = async (asset, account, amount, contract, callback) => {
+
+    if(asset.erc20address === 'Ethereum') {
+      callback()
+    }
+
     const web3 = new Web3(store.getStore('web3context').library.provider);
     let erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
     try {
@@ -1425,6 +1495,10 @@ class Store {
   getBalances = async () => {
     const account = store.getStore('account')
     const assets = store.getStore('assets')
+
+    if(!account || !account.address) {
+      return false
+    }
 
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
@@ -1878,7 +1952,6 @@ class Store {
         return emitter.emit(ERROR, err)
       }
       //get all headers
-      console.log(yields[0])
       const headers = Object.keys(yields[0].apr)
       store.setStore({ aggregatedYields: yields, aggregatedHeaders: headers })
       return emitter.emit(GET_AGGREGATED_YIELD_RETURNED, yields)
@@ -2695,19 +2768,26 @@ class Store {
     const account = store.getStore('account')
     const assets = store.getStore('poolAssets')
 
+    if(!account || !account.address) {
+      return false
+    }
+
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     async.map(assets, (asset, callback) => {
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getPooledBalance(web3, asset, account, callbackInner) },
-        (callbackInner) => { this._getPoolPricePerShare(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getVaultAPY(web3, asset, account, callbackInner) }
       ], (err, data) => {
+        if(err) {
+          return callback(err)
+        }
+
         asset.balance = data[0]
         asset.pooledBalance = data[1]
-        asset.pricePerFullShare = data[2]
-        asset.apy = data[3]
+        asset.pricePerFullShare = data[2].pricePerFullShare
+        asset.apy = data[2].apy
 
         callback(null, asset)
       })
@@ -2839,33 +2919,63 @@ class Store {
       amountToSend = amount*10**asset.decimals;
     }
 
-    vaultContract.methods.deposit(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-      .on('transactionHash', function(hash){
-        console.log(hash)
-        callback(null, hash)
-      })
-      .on('confirmation', function(confirmationNumber, receipt){
-        console.log(confirmationNumber, receipt);
-      })
-      .on('receipt', function(receipt){
-        console.log(receipt);
-      })
-      .on('error', function(error) {
-        if (!error.toString().includes("-32601")) {
-          if(error.message) {
-            return callback(error.message)
+    if(asset.erc20address === 'Ethereum') {
+      vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+        .on('transactionHash', function(hash){
+          console.log(hash)
+          callback(null, hash)
+        })
+        .on('confirmation', function(confirmationNumber, receipt){
+          console.log(confirmationNumber, receipt);
+        })
+        .on('receipt', function(receipt){
+          console.log(receipt);
+        })
+        .on('error', function(error) {
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
-        }
-      })
-      .catch((error) => {
-        if (!error.toString().includes("-32601")) {
-          if(error.message) {
-            return callback(error.message)
+        })
+        .catch((error) => {
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
           }
-          callback(error)
-        }
-      })
+        })
+    } else {
+      vaultContract.methods.deposit(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+        .on('transactionHash', function(hash){
+          console.log(hash)
+          callback(null, hash)
+        })
+        .on('confirmation', function(confirmationNumber, receipt){
+          console.log(confirmationNumber, receipt);
+        })
+        .on('receipt', function(receipt){
+          console.log(receipt);
+        })
+        .on('error', function(error) {
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
+          }
+        })
+        .catch((error) => {
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
+          }
+        })
+    }
   }
 
   depositAllPool = (payload) => {
@@ -3207,21 +3317,36 @@ class Store {
 
   _getVaultAPY = async (web3, asset, account, callback) => {
     try {
+      if(asset.vaultContractAddress === null) {
+        return callback(null, {
+          pricePerFullShare: 0,
+          apy: 0
+        })
+      }
+
       const block = await web3.eth.getBlockNumber();
       const contract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
-      let balance = await contract.methods.getPricePerFullShare().call();
+      let pricePerFullShare = await contract.methods.getPricePerFullShare().call();
 
-      balance = balance - asset.measurement;
+      let balance = pricePerFullShare - asset.measurement;
       balance = balance / 1e18;
       let diff = block - asset.lastMeasurement;
 
       balance = balance / diff;
       balance = balance * 242584600;
 
-      callback(null, parseFloat(balance))
+      const returnObj = {
+        pricePerFullShare: parseFloat(pricePerFullShare)/10**18,
+        apy: parseFloat(balance)
+      }
+
+      callback(null, returnObj)
     } catch (e) {
       console.log(e)
-      callback(null, 0)
+      callback(null, {
+        pricePerFullShare: 0,
+        apy: 0
+      })
     }
   }
 

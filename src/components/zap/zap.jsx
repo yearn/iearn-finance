@@ -343,8 +343,6 @@ class Zap extends Component {
       address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
     }
 
-    console.log(receiveAsset)
-
     return (
       <div className={ classes.root }>
         { !account.address &&

@@ -5,11 +5,16 @@ import {
   Card,
   Typography,
   Button,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  TextField,
+  InputAdornment,
+  FormControlLabel,
+  Checkbox
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import SearchIcon from '@material-ui/icons/Search';
 import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
 
@@ -83,7 +88,8 @@ const styles = theme => ({
     paddingBottom: '32px',
     [theme.breakpoints.down('sm')]: {
       justifyContent: 'center',
-      maxWidth: 'calc(100vw - 24px)'
+      maxWidth: 'calc(100vw - 24px)',
+      flexWrap: 'wrap'
     }
   },
   introCenter: {
@@ -231,7 +237,7 @@ const styles = theme => ({
   fees: {
     paddingRight: '75px',
     padding: '12px',
-    lineHeight: '1.2'
+    lineHeight: '1.2',
   },
   walletAddress: {
     padding: '0px 12px'
@@ -243,6 +249,19 @@ const styles = theme => ({
   grey: {
     color: colors.darkGray
   },
+  filters: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  searchField: {
+    flex: 1
+  },
+  checkbox: {
+    flex: 1,
+    margin: '0px !important'
+  }
 });
 
 class Pool extends Component {
@@ -255,10 +274,13 @@ class Pool extends Component {
     this.state = {
       assets: store.getStore('poolAssets'),
       account: account,
+      address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null,
       modalOpen: false,
       snackbarType: null,
       snackbarMessage: null,
-      value: 1,
+      search: '',
+      searchError: false,
+      hideZero: localStorage.getItem('yearn.finance-hideZero') === '1' ? true : false
     }
 
     if(account && account.address) {
@@ -295,7 +317,11 @@ class Pool extends Component {
 
   connectionConnected = () => {
     const { t } = this.props
-    this.setState({ account: store.getStore('account') })
+    const account = store.getStore('account')
+    this.setState({
+      account: account,
+      address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null
+    })
 
     dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
 
@@ -307,7 +333,10 @@ class Pool extends Component {
   };
 
   connectionDisconnected = () => {
-    this.setState({ account: store.getStore('account') })
+    this.setState({
+      account: null,
+      address: null
+    })
   }
 
   errorReturned = (error) => {
@@ -337,38 +366,19 @@ class Pool extends Component {
     const {
       loading,
       account,
+      address,
       modalOpen,
       snackbarMessage,
     } = this.state
 
-    var address = null;
-    if (account.address) {
-      address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
-    }
-
-    return (
-      <div className={ classes.root }>
-        <div className={ classes.investedContainer }>
-
-        <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
-
-          { account.address &&
-            <div className={ classes.intro }>
-            <Typography variant={'h5'} className={ classes.fees }>There is a 0.5% withdrawal fee on all vaults.
-              <br /><br />There is a 5% performance fee on subsidized gas.</Typography>
-              <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-                <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
-                <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
-                <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
-              </Card>
-            </div>
-          }
-          { !account.address &&
+    if(!account.address) {
+      return (
+        <div className={ classes.root }>
+          <div className={ classes.investedContainer }>
+          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.introCenter }>
               <Typography variant='h3'>Vaults. Simple.</Typography>
             </div>
-          }
-          {!account.address &&
             <div className={ classes.connectContainer }>
               <Button
                 className={ classes.actionButton }
@@ -380,8 +390,29 @@ class Pool extends Component {
                 <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('InvestSimple.Connect') }</Typography>
               </Button>
             </div>
-          }
-          { account.address && this.renderAssetBlocks() }
+          </div>
+          { modalOpen && this.renderModal() }
+          { snackbarMessage && this.renderSnackbar() }
+        </div>
+      )
+    }
+
+    return (
+      <div className={ classes.root }>
+        <div className={ classes.investedContainer }>
+        <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+          <div className={ classes.intro }>
+            <Typography variant={'h5'} className={ classes.fees }>There is a 0.5% withdrawal fee on all vaults.
+              <br /><br />There is a 5% performance fee on subsidized gas.</Typography>
+            <div className={ classes.between }></div>
+            <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
+              <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
+              <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
+              <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
+            </Card>
+          </div>
+          { this.renderFilters() }
+          { this.renderAssetBlocks() }
         </div>
         { loading && <Loader /> }
         { modalOpen && this.renderModal() }
@@ -390,6 +421,12 @@ class Pool extends Component {
     )
   };
 
+  onSearchChanged = (event) => {
+    let val = []
+    val[event.target.id] = event.target.value
+    this.setState(val)
+  }
+
   onChange = (event) => {
     let val = []
     val[event.target.id] = event.target.checked
@@ -397,14 +434,30 @@ class Pool extends Component {
   };
 
   renderAssetBlocks = () => {
-    const { assets, expanded } = this.state
+    const { assets, expanded, search, hideZero } = this.state
     const { classes } = this.props
     const width = window.innerWidth
 
-    return assets.map((asset) => {
+    return assets.filter((asset) => {
+      if(hideZero && (asset.balance === 0 && asset.pooledBalance === 0)) {
+        return false
+      }
+
+      if(search && search !== '') {
+        return asset.id.toLowerCase().includes(search.toLowerCase()) ||
+              asset.name.toLowerCase().includes(search.toLowerCase()) ||
+              asset.symbol.toLowerCase().includes(search.toLowerCase()) ||
+              asset.description.toLowerCase().includes(search.toLowerCase()) ||
+              asset.poolSymbol.toLowerCase().includes(search.toLowerCase())
+              // asset.erc20address.toLowerCase().includes(search.toLowerCase()) ||
+              // asset.vaultContractAddress.toLowerCase().includes(search.toLowerCase())
+      } else {
+        return true
+      }
+    }).map((asset) => {
       return (
-        <ExpansionPanel className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
-          <ExpansionPanelSummary
+        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+          <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1bh-content"
             id="panel1bh-header"
@@ -427,7 +480,7 @@ class Pool extends Component {
               {
                 !['LINK'].includes(asset.id) &&
                 <div className={classes.heading}>
-                  <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(4) : '0.0000') }%</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(2) : '0.00') }%</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>ROI</Typography>
                 </div>
               }
@@ -443,13 +496,56 @@ class Pool extends Component {
                 <Typography variant={ 'h5' } className={ classes.grey }>Balance</Typography>
               </div>
             </div>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
+          </AccordionSummary>
+          <AccordionDetails>
             <Asset asset={ asset } startLoading={ this.startLoading } />
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
+          </AccordionDetails>
+        </Accordion>
       )
     })
+  }
+
+  renderFilters = () => {
+    const { loading, search, searchError, hideZero } = this.state
+    const { classes } = this.props
+
+    return (
+      <div className={ classes.filters }>
+        <FormControlLabel
+          className={ classes.checkbox }
+          control={
+            <Checkbox
+              checked={ hideZero }
+              onChange={ this.handleChecked }
+              color='primary'
+            />
+          }
+          label="Hide zero balances"
+        />
+        <div className={ classes.between }>
+        </div>
+        <TextField
+          fullWidth
+          disabled={ loading }
+          className={ classes.searchField }
+          id={ 'search' }
+          value={ search }
+          error={ searchError }
+          onChange={ this.onSearchChanged }
+          placeholder="ETH, CRV, ..."
+          variant="outlined"
+          onKeyDown= { this.onSearchKeyDown }
+          InputProps={{
+            startAdornment: <InputAdornment position="end" className={ classes.inputAdornment }><SearchIcon /></InputAdornment>,
+          }}
+        />
+      </div>
+    )
+  }
+
+  handleChecked = (event) => {
+    this.setState({ hideZero: event.target.checked })
+    localStorage.setItem('yearn.finance-hideZero', (event.target.checked ? '1' : '0' ))
   }
 
   handleChange = (id) => {
