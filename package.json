@@ -20,7 +20,7 @@
     "@web3-react/squarelink-connector": "^6.1.1",
     "@web3-react/torus-connector": "^6.1.1",
     "@web3-react/trezor-connector": "^6.1.1",
-    "@web3-react/walletconnect-connector": "^6.1.5",
+    "@web3-react/walletconnect-connector": "^6.1.6",
     "@web3-react/walletlink-connector": "^6.1.1",
     "async": "^3.2.0",
     "flux": "^3.1.3",

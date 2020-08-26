@@ -91,6 +91,8 @@ import {
   authereum
 } from "./connectors";
 
+// import { createAlchemyWeb3 } from "@alch/alchemy-web3";
+
 const rp = require('request-promise');
 const ethers = require('ethers');
 
@@ -832,44 +834,44 @@ class Store {
       ],
       ethBalance: 0,
       poolAssets: [
-        {
-          id: 'ETH',
-          name: 'ETH',
-          symbol: 'ETH',
-          description: 'Ether',
-          poolSymbol: 'yETH',
-          erc20address: 'Ethereum',
-          vaultContractAddress: null,
-          vaultContractABI: config.vaultContractV4ABI,
-          balance: 0,
-          pooledBalance: 0,
-          decimals: 18,
-          deposit: true,
-          depositAll: false,
-          withdraw: true,
-          withdrawAll: true,
-          lastMeasurement: 10695309,
-          measurement: 1e18,
-        },
-        {
-          id: 'WETH',
-          name: 'WETH',
-          symbol: 'WETH',
-          description: 'Wrappeth Ether',
-          poolSymbol: 'yWETH',
-          erc20address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-          vaultContractAddress: null,
-          vaultContractABI: config.vaultContractV4ABI,
-          balance: 0,
-          pooledBalance: 0,
-          decimals: 18,
-          deposit: true,
-          depositAll: true,
-          withdraw: true,
-          withdrawAll: true,
-          lastMeasurement: 10695309,
-          measurement: 1e18,
-        },
+        // {
+        //   id: 'ETH',
+        //   name: 'ETH',
+        //   symbol: 'ETH',
+        //   description: 'Ether',
+        //   poolSymbol: 'yETH',
+        //   erc20address: 'Ethereum',
+        //   vaultContractAddress: '0x20d98BD5E85Fc652B679526e2a2d6ef65a82ee0E',
+        //   vaultContractABI: config.vaultContractV4ABI,
+        //   balance: 0,
+        //   pooledBalance: 0,
+        //   decimals: 18,
+        //   deposit: true,
+        //   depositAll: false,
+        //   withdraw: true,
+        //   withdrawAll: true,
+        //   lastMeasurement: 10727750,
+        //   measurement: 1e18,
+        // },
+        // {
+        //   id: 'WETH',
+        //   name: 'WETH',
+        //   symbol: 'WETH',
+        //   description: 'Wrappeth Ether',
+        //   poolSymbol: 'yWETH',
+        //   erc20address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+        //   vaultContractAddress: '0x20d98BD5E85Fc652B679526e2a2d6ef65a82ee0E',
+        //   vaultContractABI: config.vaultContractV4ABI,
+        //   balance: 0,
+        //   pooledBalance: 0,
+        //   decimals: 18,
+        //   deposit: true,
+        //   depositAll: true,
+        //   withdraw: true,
+        //   withdrawAll: true,
+        //   lastMeasurement: 10727750,
+        //   measurement: 1e18,
+        // },
         {
           id: 'YFI',
           name: 'yearn.finance',
@@ -926,6 +928,25 @@ class Store {
           withdrawAll: true,
           depositDisabled: false,
           lastMeasurement: 10709740,
+          measurement: 1e18,
+        },
+        {
+          id: 'crvBTC',
+          name: 'curve.fi/sbtc',
+          symbol: 'crvBTC',
+          description: 'renBTC/wBTC/sBTC',
+          poolSymbol: 'ycrvBTC',
+          erc20address: '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3',
+          vaultContractAddress: '0x7Ff566E1d69DEfF32a7b244aE7276b9f90e9D0f6',
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          pooledBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10734341,
           measurement: 1e18,
         },
         {
@@ -3373,6 +3394,23 @@ class Store {
       console.log(e)
       return store.getStore('universalGasPrice')
     }
+  }
+
+  _getWeb3Provider = async () => {
+    const web3context = store.getStore('web3context')
+    if(!web3context) {
+      return null
+    }
+    const provider = web3context.library.provider
+    if(!provider) {
+      return null
+    }
+
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    // const web3 = createAlchemyWeb3(config.infuraProvider, { writeProvider: provider });
+
+    return web3
   }
 }
 
