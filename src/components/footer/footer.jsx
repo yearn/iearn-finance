@@ -7,9 +7,6 @@ import {
   MenuItem,
   FormControl
 } from '@material-ui/core';
-import {
-  Link
-} from "react-router-dom";
 import { withNamespaces } from 'react-i18next';
 import i18n from '../../i18n';
 import { colors } from '../../theme'
@@ -43,7 +40,10 @@ const styles = theme => ({
     maxWidth: '420px'
   },
   footerText: {
-    cursor: 'pointer'
+    cursor: 'pointer',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '14px',
+    }
   },
   languageContainer: {
     paddingLeft: '12px',
@@ -79,25 +79,13 @@ class Footer extends Component {
       language
     } = this.state
 
-    if(!location.pathname.includes('/earn') && !location.pathname.includes('/zap') && !location.pathname.includes('/cover') && !location.pathname.includes('/apr') && !location.pathname.includes('/pool') && !location.pathname.includes('/balancer') ) {
+    if(location.pathname === '' || location.pathname === '/') {
       return null
     }
 
     return (
       <div className={classes.footer}>
         <div className={classes.footerLinks}>
-          <Link to={"/"} className={ classes.link }>
-            <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Home') }</Typography>
-          </Link>
-          {/*<Link to={"/zap"} className={ classes.link }>
-            <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Zap') }</Typography>
-          </Link>
-          <Link to={"/insure"} className={ classes.link }>
-            <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Insure') }</Typography>
-          </Link>
-          <Link to={"/apr"} className={ classes.link }>
-            <Typography className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Yield') }</Typography>
-          </Link>*/}
           <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.About') }</Typography>
           <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Docs') }</Typography>
           <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} className={ classes.footerText } variant={ 'h6'}>{ t('Footer.Code') }</Typography>

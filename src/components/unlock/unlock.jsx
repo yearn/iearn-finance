@@ -73,9 +73,9 @@ const styles = theme => ({
     width: '100%'
   },
   closeIcon: {
-    position: 'fixed',
-    right: '12px',
-    top: '12px',
+    position: 'absolute',
+    right: '0px',
+    top: '0px',
     cursor: 'pointer'
   }
 });

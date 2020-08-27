@@ -50,6 +50,12 @@ const styles = theme => ({
       },
       '& .icon': {
         color: colors.white
+      },
+      '& .description': {
+        display: 'block',
+        color: colors.white,
+        padding: '48px',
+        textAlign: 'center'
       }
     },
     '& .title': {
@@ -57,6 +63,9 @@ const styles = theme => ({
     },
     '& .icon': {
       color: colors.pink
+    },
+    '& .description': {
+      display: 'none'
     }
   },
   zap: {
@@ -68,6 +77,12 @@ const styles = theme => ({
       },
       '& .icon': {
         color: colors.white
+      },
+      '& .description': {
+        display: 'block',
+        color: colors.white,
+        padding: '48px',
+        textAlign: 'center'
       }
     },
     '& .title': {
@@ -81,6 +96,9 @@ const styles = theme => ({
     '& .icon': {
       color: colors.blue
     },
+    '& .description': {
+      display: 'none'
+    }
   },
   apr: {
     backgroundColor: colors.white,
@@ -91,6 +109,12 @@ const styles = theme => ({
       },
       '& .icon': {
         color: colors.white
+      },
+      '& .description': {
+        display: 'block',
+        color: colors.white,
+        padding: '48px',
+        textAlign: 'center'
       }
     },
     '& .title': {
@@ -99,33 +123,9 @@ const styles = theme => ({
     '& .icon': {
       color: colors.lightBlack
     },
-  },
-  cover: {
-    backgroundColor: colors.white,
-    '&:hover': {
-      backgroundColor: colors.compoundGreen,
-      '& .title': {
-        color: colors.white,
-        display: 'none'
-      },
-      '& .soon': {
-        color: colors.white,
-        display: 'block'
-      },
-      '& .icon': {
-        color: colors.white
-      }
-    },
-    '& .title': {
-      color: colors.compoundGreen,
-    },
-    '& .soon': {
-      color: colors.compoundGreen,
+    '& .description': {
       display: 'none'
-    },
-    '& .icon': {
-      color: colors.compoundGreen
-    },
+    }
   },
   pool: {
     backgroundColor: colors.white,
@@ -133,44 +133,26 @@ const styles = theme => ({
       backgroundColor: colors.tomato,
       '& .title': {
         color: colors.white,
-        // display: 'none'
       },
-      // '& .soon': {
-      //   color: colors.white,
-      //   display: 'block'
-      // },
       '& .icon': {
         color: colors.white
+      },
+      '& .description': {
+        display: 'block',
+        color: colors.white,
+        padding: '48px',
+        textAlign: 'center'
       }
     },
     '& .title': {
       color: colors.tomato,
     },
-    // '& .soon': {
-    //   color: colors.tomato,
-    //   display: 'none'
-    // },
     '& .icon': {
       color: colors.tomato
     },
-  },
-  balancer: {
-    backgroundColor: colors.white,
-    '&:hover': {
-      backgroundColor: colors.purple,
-      '& .title': {
-        color: colors.white,
-      },
-      '& .icon': {
-        color: colors.white
-      }
-    },
-    '& .title': {
-      color: colors.purple,
-    },
-    '& .icon': {
-      color: colors.purple
-    },
+    '& .description': {
+      display: 'none'
+    }
   },
   title: {
     padding: '24px',
@@ -204,9 +186,15 @@ class Home extends Component {
 
     return (
       <div className={ classes.root }>
+        <Card className={ `${classes.card} ${classes.pool}` } onClick={ () => { this.nav(location.pathname+'vaults') }}>
+          <PieChartIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Vaults") }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Vaults follow a unique strategy that are designed to maximize the yield of the deposited asset and minimize risk." }</Typography>
+        </Card>
         <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav(location.pathname+'earn') } }>
           <AttachMoneyIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Earn") }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Earn performs profit switching for lending providers, moving your funds between dydx, Aave, Compound autonomously." }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.zap}` } onClick={ () => { this.nav(location.pathname+'zap') } }>
           <FlashOnIcon className={ `${classes.icon} icon` } />
@@ -215,10 +203,6 @@ class Home extends Component {
         <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav(location.pathname+'apr') } }>
           <BarChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Apr") }</Typography>
-        </Card>
-        <Card className={ `${classes.card} ${classes.pool}` } onClick={ () => { this.nav(location.pathname+'vaults') }}>
-          <PieChartIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Vaults") }</Typography>
         </Card>
       </div>
     )

@@ -170,8 +170,6 @@ class APR extends Component {
 
     this.state = {
       yields: store.getStore('yields'),
-      uniswapYields: store.getStore('uniswapYields'),
-      uniswapYieldsV2: store.getStore('uniswapYieldsV2'),
       aggregatedYields: store.getStore('aggregatedYields'),
       aggregatedHeaders: store.getStore('aggregatedHeaders'),
       amount: '',

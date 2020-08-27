@@ -329,7 +329,7 @@ class Insure extends Component {
       <div className={ classes.root }>
         <div className={ classes.insuranceContainer }>
         <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
-        { account.address &&
+        { (account && account.address) &&
             <div className={ classes.intro }>
               <div className={ classes.placeholder }>
               </div>
@@ -341,18 +341,18 @@ class Insure extends Component {
               </Card>
             </div>
           }
-          { account.address &&
+          { (account && account.address) &&
             <div className={ classes.actualIntro }>
               <Typography variant='h3'>{ t('Zap.Intro') }</Typography>
             </div>
           }
-          { !account.address &&
+          { (!account || !account.address) &&
             <div className={ classes.introCenter }>
               <Typography variant='h3'>{ t('Insure.Intro') }</Typography>
             </div>
           }
 
-          {!account.address &&
+          { (!account || !account.address) &&
             <div className={ classes.connectContainer }>
               <Button
                 className={ classes.actionButton }
@@ -365,7 +365,7 @@ class Insure extends Component {
               </Button>
             </div>
           }
-          { account.address && this.renderAssetBlocks() }
+          { (account && account.address) && this.renderAssetBlocks() }
         </div>
         { loading && <Loader /> }
         { modalOpen && this.renderModal() }

@@ -2,23 +2,22 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
-  Card,
   Typography,
-  Button,
   Accordion,
   AccordionDetails,
   AccordionSummary,
   TextField,
   InputAdornment,
   FormControlLabel,
-  Checkbox
+  Checkbox,
+  Tooltip
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
+import InfoIcon from '@material-ui/icons/Info';
 import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
 
-import UnlockModal from '../unlock/unlockModal.jsx'
 import Snackbar from '../snackbar'
 import Asset from './asset'
 import Loader from '../loader'
@@ -47,6 +46,18 @@ const styles = theme => ({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  investedContainerLoggedOut: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '100%',
+    marginTop: '40px',
+    [theme.breakpoints.up('md')]: {
+      minWidth: '900px',
+    }
   },
   investedContainer: {
     display: 'flex',
@@ -96,7 +107,7 @@ const styles = theme => ({
     maxWidth: '500px',
     textAlign: 'center',
     display: 'flex',
-    padding: '48px 0px'
+    padding: '24px 0px'
   },
   introText: {
     paddingLeft: '20px'
@@ -113,47 +124,27 @@ const styles = theme => ({
       padding: '15px',
     }
   },
-  overlay: {
-    position: 'absolute',
-    borderRadius: '10px',
-    background: 'RGBA(200, 200, 200, 1)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    border: '1px solid #aaa',
-    cursor: 'pointer',
-
-    right: '0px',
-    top: '10px',
-    height: '70px',
-    width: '160px',
-    [theme.breakpoints.up('md')]: {
-      right: '0px',
-      top: '10px',
-      height: '90px',
-      width: '210px',
-    }
-  },
   heading: {
     display: 'none',
-    paddingTop: '12px',
     flex: 1,
-    flexShrink: 0,
-    [theme.breakpoints.up('sm')]: {
-      paddingTop: '5px',
-      display: 'block',
-      maxWidth: '194.5px'
+    [theme.breakpoints.up('md')]: {
+      display: 'block'
     }
   },
   headingName: {
-    paddingTop: '5px',
-    flex: 2,
-    flexShrink: 0,
     display: 'flex',
     alignItems: 'center',
-    minWidth: '100%',
+    width: '325px',
+    [theme.breakpoints.down('sm')]: {
+      width: 'auto',
+      flex: 1
+    }
+  },
+  headingEarning: {
+    display: 'none',
+    width: '300px',
     [theme.breakpoints.up('sm')]: {
-      minWidth: 'auto',
+      display: 'block'
     }
   },
   buttonText: {
@@ -232,7 +223,8 @@ const styles = theme => ({
     border: '1px solid rgb(174, 174, 174)',
     borderRadius: '0.75rem',
     marginBottom: '24px',
-    lineHeight: '1.2'
+    lineHeight: '1.2',
+    background: colors.white
   },
   fees: {
     paddingRight: '75px',
@@ -254,6 +246,9 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    [theme.breakpoints.down('sm')]: {
+      padding: '0px 12px'
+    },
   },
   searchField: {
     flex: 1,
@@ -263,6 +258,17 @@ const styles = theme => ({
   checkbox: {
     flex: 1,
     margin: '0px !important'
+  },
+  flexy: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  on: {
+    color: colors.darkGray,
+    padding: '0px 6px'
+  },
+  positive: {
+    color: colors.compoundGreen
   }
 });
 
@@ -277,7 +283,6 @@ class Pool extends Component {
       assets: store.getStore('poolAssets'),
       account: account,
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null,
-      modalOpen: false,
       snackbarType: null,
       snackbarMessage: null,
       search: '',
@@ -296,7 +301,6 @@ class Pool extends Component {
     emitter.on(POOL_BALANCES_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-
   }
 
   componentWillUnmount() {
@@ -364,36 +368,22 @@ class Pool extends Component {
   };
 
   render() {
-    const { classes, t } = this.props;
+    const { classes } = this.props;
     const {
       loading,
       account,
-      address,
-      modalOpen,
       snackbarMessage,
     } = this.state
 
-    if(!account.address) {
+    if(!account || !account.address) {
       return (
         <div className={ classes.root }>
-          <div className={ classes.investedContainer }>
+          <div className={ classes.investedContainerLoggedOut }>
           <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
             <div className={ classes.introCenter }>
-              <Typography variant='h3'>Vaults. Simple.</Typography>
-            </div>
-            <div className={ classes.connectContainer }>
-              <Button
-                className={ classes.actionButton }
-                variant="outlined"
-                color="primary"
-                disabled={ loading }
-                onClick={ this.overlayClicked }
-                >
-                <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('InvestSimple.Connect') }</Typography>
-              </Button>
+              <Typography variant='h3'>Connect your wallet to continue</Typography>
             </div>
           </div>
-          { modalOpen && this.renderModal() }
           { snackbarMessage && this.renderSnackbar() }
         </div>
       )
@@ -402,22 +392,11 @@ class Pool extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
-        <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
-          <div className={ classes.intro }>
-            <Typography variant={'h5'} className={ classes.fees }>There is a 0.5% withdrawal fee on all vaults.
-              <br /><br />There is a 5% performance fee on subsidized gas.</Typography>
-            <div className={ classes.between }></div>
-            <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-              <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
-              <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
-              <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
-            </Card>
-          </div>
+          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
           { this.renderFilters() }
           { this.renderAssetBlocks() }
         </div>
         { loading && <Loader /> }
-        { modalOpen && this.renderModal() }
         { snackbarMessage && this.renderSnackbar() }
       </div>
     )
@@ -480,22 +459,35 @@ class Pool extends Component {
                 </div>
               </div>
               {
-                !['LINK'].includes(asset.id) &&
-                <div className={classes.heading}>
-                  <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(2) : '0.00') }%</Typography>
-                  <Typography variant={ 'h5' } className={ classes.grey }>ROI</Typography>
+                (!['LINK'].includes(asset.id) && asset.pooledBalance > 0) &&
+                <div className={classes.headingEarning}>
+                  <Typography variant={ 'h5' } className={ classes.grey }>You are earning:</Typography>
+                  <div className={ classes.flexy }>
+                    <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(2) : '0.00') }% </Typography>
+                    <Typography variant={ 'h5' } className={ classes.on }> on </Typography>
+                    <Typography variant={ 'h3' } noWrap>{ (asset.pooledBalance ? (asset.pooledBalance).toFixed(2) : '0.00') } {asset.poolSymbol}</Typography>
+                  </div>
+                </div>
+              }
+              {
+                (!['LINK'].includes(asset.id) && asset.pooledBalance === 0) &&
+                <div className={classes.headingEarning}>
+                  <Typography variant={ 'h5' } className={ classes.grey }>This vault is earning:</Typography>
+                  <div className={ classes.flexy }>
+                    <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(2) : '0.00') }% </Typography>
+                  </div>
                 </div>
               }
               {
                 ['LINK'].includes(asset.id) &&
-                <div className={classes.heading}>
+                <div className={classes.headingEarning}>
+                  <Typography variant={ 'h5' } className={ classes.grey }>You are earning:</Typography>
                   <Typography variant={ 'h3' } noWrap>Not Available</Typography>
-                  <Typography variant={ 'h5' } className={ classes.grey }>ROI</Typography>
                 </div>
               }
               <div className={classes.heading}>
-                <Typography variant={ 'h3' } noWrap>{ (asset.balance ? (asset.balance).toFixed(4) : '0.0000')+' '+asset.symbol }</Typography>
-                <Typography variant={ 'h5' } className={ classes.grey }>Balance</Typography>
+                <Typography variant={ 'h5' } className={ classes.grey }>Available to deposit:</Typography>
+                <Typography variant={ 'h3' } noWrap>{ (asset.balance ? (asset.balance).toFixed(2) : '0.00')+' '+asset.symbol }</Typography>
               </div>
             </div>
           </AccordionSummary>
@@ -525,6 +517,16 @@ class Pool extends Component {
           label="Hide zero balances"
         />
         <div className={ classes.between }>
+          <Tooltip title={
+              <React.Fragment>
+                <Typography variant={'h5'} className={ classes.fees }>
+                  There is a 0.5% withdrawal fee on all vaults.<br /><br />
+                  There is a 5% performance fee on subsidized gas.
+                </Typography>
+              </React.Fragment>
+            } arrow>
+            <InfoIcon />
+          </Tooltip>
         </div>
         <TextField
           fullWidth
@@ -565,20 +567,6 @@ class Pool extends Component {
     } = this.state
     return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true}/>
   };
-
-  renderModal = () => {
-    return (
-      <UnlockModal closeModal={ this.closeModal } modalOpen={ this.state.modalOpen } />
-    )
-  }
-
-  overlayClicked = () => {
-    this.setState({ modalOpen: true })
-  }
-
-  closeModal = () => {
-    this.setState({ modalOpen: false })
-  }
 }
 
 export default withNamespaces()(withRouter(withStyles(styles)(Pool)));

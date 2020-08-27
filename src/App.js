@@ -33,13 +33,7 @@ const emitter = Store.emitter
 const store = Store.store
 
 class App extends Component {
-  state = {
-    headerValue: null
-  };
-
-  setHeaderValue = (newValue) => {
-    this.setState({ headerValue: newValue })
-  };
+  state = {};
 
   componentWillMount() {
     injected.isAuthorized().then(isAuthorized => {
@@ -60,8 +54,6 @@ class App extends Component {
   }
 
   render() {
-    const { headerValue } = this.state
-
     return (
       <MuiThemeProvider theme={ createMuiTheme(interestTheme) }>
         <CssBaseline />
@@ -75,28 +67,30 @@ class App extends Component {
           }}>
             <Switch>
               <Route path="/apr">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
+                <Header />
                 <APR />
               </Route>
               <Route path="/earn">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
+                <Header />
                 <InvestSimple />
               </Route>
               <Route path="/zap">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
+                <Header />
                 <Zap />
               </Route>
               <Route path="/idai">
                 <IDai />
               </Route>
               <Route path="/performance">
+                <Header />
                 <Performance />
               </Route>
               <Route path="/manage">
+                <Header />
                 <Manage />
               </Route>
               <Route path="/vaults">
-                <Header setHeaderValue={ this.setHeaderValue } headerValue={ headerValue } />
+                <Header />
                 <Vaults />
               </Route>
               <Route path="/">

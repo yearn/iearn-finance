@@ -80,7 +80,7 @@ const iswapTheme =  {
       lineHeight: 1.2
     },
     h3: {
-      fontSize: '24px',
+      fontSize: '22px',
       fontWeight: '600',
       WebkitFontSmoothing: "antialiased",
       MozOsxFontSmoothing: "grayscale",
@@ -238,6 +238,7 @@ const iswapTheme =  {
         textTransform: 'none',
         minWidth:  '100px',
         border: 'none',
+        background: colors.white,
         '& > span > h4': {
           color: '#555',
         },

@@ -155,7 +155,6 @@ class Asset extends Component {
   render() {
     const { classes, asset } = this.props;
     const {
-      account,
       amount,
       amountError,
       redeemAmount,

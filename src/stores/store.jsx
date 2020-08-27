@@ -8,6 +8,8 @@ import {
   CONNECT_METAMASK_PASSIVE,
   GET_BALANCES,
   BALANCES_RETURNED,
+  GET_BALANCES_LIGHT,
+  BALANCES_LIGHT_RETURNED,
   INVEST,
   INVEST_RETURNED,
   REDEEM,
@@ -932,7 +934,7 @@ class Store {
         },
         {
           id: 'crvBTC',
-          name: 'curve.fi/sbtc',
+          name: 'curve.fi/sbtc LP',
           symbol: 'crvBTC',
           description: 'renBTC/wBTC/sBTC',
           poolSymbol: 'ycrvBTC',
@@ -1079,6 +1081,9 @@ class Store {
             break;
           case CONNECT_METAMASK_PASSIVE:
             this.connectMetamaskPassive(payload);
+            break;
+          case GET_BALANCES_LIGHT:
+            this.getBalancesLight(payload);
             break;
           case GET_BALANCES:
             this.getBalances(payload);
@@ -1510,6 +1515,40 @@ class Store {
         }
         callback(error)
       }
+    })
+  }
+
+  getBalancesLight = async () => {
+    const account = store.getStore('account')
+    const assets = store.getStore('assets')
+
+    if(!account || !account.address) {
+      return false
+    }
+
+    const web3 = await this._getWeb3Provider();
+
+    async.map(assets, (asset, callback) => {
+      async.parallel([
+        (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getInvestedBalance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getPoolPrice(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getMaxAPR(web3, asset, account, callbackInner) },
+      ], (err, data) => {
+        asset.balance = data[0]
+        asset.investedBalance = data[1]
+        asset.price = data[2]
+        asset.maxApr = data[3]
+
+        callback(null, asset)
+      })
+    }, (err, assets) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+
+      store.setStore({ assets: assets })
+      return emitter.emit(BALANCES_LIGHT_RETURNED, assets)
     })
   }
 
@@ -1973,8 +2012,10 @@ class Store {
         return emitter.emit(ERROR, err)
       }
       //get all headers
-      const headers = Object.keys(yields[0].apr)
-      store.setStore({ aggregatedYields: yields, aggregatedHeaders: headers })
+      if(yields && yields.length > 0 && yields[0].apr) {
+        const headers = Object.keys(yields[0].apr)
+        store.setStore({ aggregatedYields: yields, aggregatedHeaders: headers })
+      }
       return emitter.emit(GET_AGGREGATED_YIELD_RETURNED, yields)
     })
   }
@@ -3406,7 +3447,7 @@ class Store {
       return null
     }
 
-    const web3 = new Web3(store.getStore('web3context').library.provider);
+    const web3 = new Web3(provider);
 
     // const web3 = createAlchemyWeb3(config.infuraProvider, { writeProvider: provider });
 

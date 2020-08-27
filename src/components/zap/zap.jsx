@@ -10,12 +10,8 @@ import {
 import Have from './have'
 import Want from './want'
 import Sending from './sending'
-//import Receiving from './receiving'
 import ConversionRatios from './conversionRatios'
-// import Fees from './fees'
 import Loader from '../loader'
-import BuiltWithModal from '../builtwith/builtwithModal.jsx'
-import UnlockModal from '../unlock/unlockModal.jsx'
 import Snackbar from '../snackbar'
 import { colors } from '../../theme'
 
@@ -50,9 +46,20 @@ const styles = theme => ({
     flexDirection: 'column',
     maxWidth: '1200px',
     width: '100%',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    marginTop: '40px'
+  },
+  investedContainerLoggedOut: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '100%',
+    marginTop: '40px',
+    [theme.breakpoints.up('md')]: {
+      minWidth: '900px',
+    }
   },
   iHaveContainer: {
     flex: 1,
@@ -93,7 +100,8 @@ const styles = theme => ({
     justifyContent: 'center',
     minWidth: '100%',
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: '40px'
   },
   intro: {
     width: '100%',
@@ -110,7 +118,7 @@ const styles = theme => ({
   introCenter: {
     minWidth: '100%',
     textAlign: 'center',
-    padding: '48px 0px'
+    padding: '24px 0px'
   },
   investedContainer: {
     display: 'flex',
@@ -179,6 +187,7 @@ const styles = theme => ({
     border: '1px solid rgb(174, 174, 174)',
     borderRadius: '0.75rem',
     marginBottom: '24px',
+    background: colors.white
   },
   walletAddress: {
     padding: '0px 12px'
@@ -332,94 +341,71 @@ class Zap extends Component {
       // receiveAmount,
       account,
       loading,
-      modalOpen,
-      modalBuiltWithOpen,
       snackbarMessage,
       bestPrice
     } = this.state
 
-    var address = null;
-    if (account.address) {
-      address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
+    if(!account || !account.address) {
+      return (
+        <div className={ classes.root }>
+          <div className={ classes.investedContainerLoggedOut }>
+          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+            <div className={ classes.introCenter }>
+              <Typography variant='h3'>Connect your wallet to continue</Typography>
+            </div>
+          </div>
+          { snackbarMessage && this.renderSnackbar() }
+        </div>
+      )
     }
 
     return (
       <div className={ classes.root }>
-        { !account.address &&
-          <div className={ classes.investedContainer }>
-            <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
-            <div className={ classes.introCenter }>
-              <Typography variant='h3'>{ t('Zap.Intro') }</Typography>
-            </div>
-            <div className={ classes.connectContainer }>
-              <Button
-                className={ classes.actionButton }
-                variant="outlined"
-                color="primary"
-                disabled={ loading }
-                onClick={ this.overlayClicked }
-                >
-                <Typography className={ classes.buttonText } variant={ 'h5'}>{ t('InvestSimple.Connect') }</Typography>
-              </Button>
-            </div>
+        <div className={ classes.card }>
+          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+          <Card className={ classes.iHaveContainer }>
+            <Have assets={ assets } curveContracts={ curveContracts } setSendAsset={ this.setSendAsset } sendAsset={ sendAsset } setSendAmountPercent={ this.setSendAmountPercent } loading={ loading } />
+            <Sending sendAsset={ sendAsset } sendAmount={ sendAmount } setSendAmount={ this.setSendAmount } setSendAmountPercent={ this.setSendAmountPercent } loading={ loading }  />
+            <div className={ classes.sepperator }></div>
+            { (sendAsset && sendAsset.symbol === 'ETH') &&
+              <ConversionRatios bestPrice={ bestPrice } sendAsset={ sendAsset } receiveAsset={ receiveAsset } />
+            }
+            <Want assets={ assets } curveContracts={ curveContracts } receiveAsset={ receiveAsset } setReceiveAsset={ this.setReceiveAsset } sendAsset={ sendAsset } loading={ loading } bestPrice={ bestPrice } sendAmount={ sendAmount } />
+            <div className={ classes.sepperator }></div>
+            { (sendAsset && receiveAsset && !(['crvV3', 'crvV4'].includes(receiveAsset.id) && ['crvV1', 'crvV2', 'crvV3'].includes(sendAsset.id)) && !(sendAsset && sendAsset.symbol === 'ETH')) && <Button
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ loading || !sendAsset || !receiveAsset || !sendAmount || sendAmount === '' }
+              onClick={ this.onZap }
+              fullWidth
+              >
+              <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Zap.Zap') }</Typography>
+            </Button> }
+            { (sendAsset && receiveAsset && ['crvV3', 'crvV4'].includes(receiveAsset.id) && ['crvV1', 'crvV2', 'crvV3'].includes(sendAsset.id)) && <Button
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ loading || !sendAsset || !receiveAsset || !sendAmount || sendAmount === '' }
+              onClick={ this.onSwap }
+              fullWidth
+              >
+              <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Zap.Swap') }</Typography>
+            </Button> }
+            { (sendAsset && sendAsset.symbol === 'ETH') && <Button
+              className={ classes.actionButton }
+              variant="outlined"
+              color="primary"
+              disabled={ loading || !sendAsset || !receiveAsset || !sendAmount || sendAmount === '' }
+              onClick={ this.onTrade }
+              fullWidth
+              >
+              <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Zap.Trade') }</Typography>
+            </Button> }
+          </Card>
+          <div className={ classes.introCenter }>
           </div>
-        }
-        { account.address &&
-          <div className={ classes.card }>
-            <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
-            <div className={ classes.intro }>
-              <Card className={ classes.addressContainer } onClick={this.overlayClicked}>
-                <Typography variant={ 'h3'} className={ classes.walletTitle } noWrap>Wallet</Typography>
-                <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>{ address }</Typography>
-                <div style={{ background: '#DC6BE5', opacity: '1', borderRadius: '10px', width: '10px', height: '10px', marginRight: '3px', marginTop:'3px', marginLeft:'6px' }}></div>
-              </Card>
-            </div>
-            <Card className={ classes.iHaveContainer }>
-              <Have assets={ assets } curveContracts={ curveContracts } setSendAsset={ this.setSendAsset } sendAsset={ sendAsset } setSendAmountPercent={ this.setSendAmountPercent } loading={ loading } />
-              <Sending sendAsset={ sendAsset } sendAmount={ sendAmount } setSendAmount={ this.setSendAmount } setSendAmountPercent={ this.setSendAmountPercent } loading={ loading }  />
-              <div className={ classes.sepperator }></div>
-              { (sendAsset && sendAsset.symbol === 'ETH') &&
-                <ConversionRatios bestPrice={ bestPrice } sendAsset={ sendAsset } receiveAsset={ receiveAsset } />
-              }
-              <Want assets={ assets } curveContracts={ curveContracts } receiveAsset={ receiveAsset } setReceiveAsset={ this.setReceiveAsset } sendAsset={ sendAsset } loading={ loading } bestPrice={ bestPrice } sendAmount={ sendAmount } />
-              <div className={ classes.sepperator }></div>
-              { (sendAsset && receiveAsset && !(['crvV3', 'crvV4'].includes(receiveAsset.id) && ['crvV1', 'crvV2', 'crvV3'].includes(sendAsset.id)) && !(sendAsset && sendAsset.symbol === 'ETH')) && <Button
-                className={ classes.actionButton }
-                variant="outlined"
-                color="primary"
-                disabled={ loading || !sendAsset || !receiveAsset || !sendAmount || sendAmount === '' }
-                onClick={ this.onZap }
-                fullWidth
-                >
-                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Zap.Zap') }</Typography>
-              </Button> }
-              { (sendAsset && receiveAsset && ['crvV3', 'crvV4'].includes(receiveAsset.id) && ['crvV1', 'crvV2', 'crvV3'].includes(sendAsset.id)) && <Button
-                className={ classes.actionButton }
-                variant="outlined"
-                color="primary"
-                disabled={ loading || !sendAsset || !receiveAsset || !sendAmount || sendAmount === '' }
-                onClick={ this.onSwap }
-                fullWidth
-                >
-                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Zap.Swap') }</Typography>
-              </Button> }
-              { (sendAsset && sendAsset.symbol === 'ETH') && <Button
-                className={ classes.actionButton }
-                variant="outlined"
-                color="primary"
-                disabled={ loading || !sendAsset || !receiveAsset || !sendAmount || sendAmount === '' }
-                onClick={ this.onTrade }
-                fullWidth
-                >
-                <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>{ t('Zap.Trade') }</Typography>
-              </Button> }
-            </Card>
-            <div className={ classes.introCenter }>
-            </div>
-          </div>
-        }
-        { modalOpen && this.renderModal() }
-        { modalBuiltWithOpen && this.renderBuiltWithModal() }
+        </div>
         { snackbarMessage && this.renderSnackbar() }
         { loading && <Loader /> }
       </div>
@@ -512,18 +498,6 @@ class Zap extends Component {
     }
   }
 
-  renderModal = () => {
-    return (
-      <UnlockModal closeModal={ this.closeModal } modalOpen={ this.state.modalOpen } />
-    )
-  }
-
-  renderBuiltWithModal = () => {
-    return (
-      <BuiltWithModal closeModal={ this.closeBuiltWithModal } modalOpen={ this.state.modalBuiltWithOpen } />
-    )
-  }
-
   renderSnackbar = () => {
     var {
       snackbarType,
@@ -531,22 +505,6 @@ class Zap extends Component {
     } = this.state
     return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true}/>
   };
-
-  overlayClicked = () => {
-    this.setState({ modalOpen: true })
-  }
-
-  closeModal = () => {
-    this.setState({ modalOpen: false })
-  }
-
-  builtWithOverlayClicked = () => {
-    this.setState({ modalBuiltWithOpen: true })
-  }
-
-  closeBuiltWithModal = () => {
-    this.setState({ modalBuiltWithOpen: false })
-  }
 }
 
 export default withNamespaces()(withRouter(withStyles(styles)(Zap)));

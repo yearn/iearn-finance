@@ -62,23 +62,16 @@ const styles = theme => ({
     position: 'relative',
   },
   balances: {
-    marginBottom: '-25px',
-    marginRight: '30px',
-    zIndex: '900',
-    display: 'flex',
-    alignItems: 'center',
     width: '100%',
-    justifyContent: 'space-between'
+    textAlign: 'right',
+    paddingRight: '20px',
+    cursor: 'pointer'
   },
   actionsContainer: {
     padding: '12px',
     display: 'flex',
     justifyContent: 'space-between',
     width: '100%',
-    maxWidth: '900px',
-    [theme.breakpoints.up('md')]: {
-      width: '750px',
-    }
   },
   connectContainer: {
     padding: '12px',
@@ -214,22 +207,20 @@ class Asset extends Component {
         <div className={ classes.balances }>
             <Typography variant='h3' className={ classes.title }></Typography><Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? asset.balance.toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
         </div>
-        <div className={ classes.amountContainer }>
-          <TextField
-            fullWidth
-            className={ classes.actionInput }
-            id='amount'
-            value={ amount }
-            error={ amountError }
-            onChange={ this.onChange }
-            disabled={ loading }
-            label=""
-            size="small"
-            placeholder="0.00"
-            variant="outlined"
-            onKeyDown={ this.inputKeyDown }
-          />
-        </div>
+        <TextField
+          fullWidth
+          className={ classes.actionInput }
+          id='amount'
+          value={ amount }
+          error={ amountError }
+          onChange={ this.onChange }
+          disabled={ loading }
+          label=""
+          size="small"
+          placeholder="0.00"
+          variant="outlined"
+          onKeyDown={ this.inputKeyDown }
+        />
         <div className={ classes.scaleContainer }>
           <Button
             className={ classes.scale }
