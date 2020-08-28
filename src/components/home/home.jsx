@@ -127,7 +127,7 @@ const styles = theme => ({
       display: 'none'
     }
   },
-  pool: {
+  vault: {
     backgroundColor: colors.white,
     '&:hover': {
       backgroundColor: colors.tomato,
@@ -186,7 +186,7 @@ class Home extends Component {
 
     return (
       <div className={ classes.root }>
-        <Card className={ `${classes.card} ${classes.pool}` } onClick={ () => { this.nav(location.pathname+'vaults') }}>
+        <Card className={ `${classes.card} ${classes.vault}` } onClick={ () => { this.nav(location.pathname+'vaults') }}>
           <PieChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Vaults") }</Typography>
           <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Vaults follow a unique strategy that are designed to maximize the yield of the deposited asset and minimize risk." }</Typography>

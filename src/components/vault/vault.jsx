@@ -24,10 +24,10 @@ import Loader from '../loader'
 
 import {
   ERROR,
-  GET_POOL_BALANCES,
-  POOL_BALANCES_RETURNED,
-  DEPOSIT_POOL_RETURNED,
-  WITHDRAW_POOL_RETURNED,
+  GET_VAULT_BALANCES,
+  VAULT_BALANCES_RETURNED,
+  DEPOSIT_VAULT_RETURNED,
+  WITHDRAW_VAULT_RETURNED,
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED
 } from '../../constants'
@@ -272,7 +272,7 @@ const styles = theme => ({
   }
 });
 
-class Pool extends Component {
+class Vault extends Component {
 
   constructor(props) {
     super()
@@ -280,7 +280,7 @@ class Pool extends Component {
     const account = store.getStore('account')
 
     this.state = {
-      assets: store.getStore('poolAssets'),
+      assets: store.getStore('vaultAssets'),
       account: account,
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null,
       snackbarType: null,
@@ -291,33 +291,33 @@ class Pool extends Component {
     }
 
     if(account && account.address) {
-      dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
+      dispatcher.dispatch({ type: GET_VAULT_BALANCES, content: {} })
     }
   }
   componentWillMount() {
-    emitter.on(DEPOSIT_POOL_RETURNED, this.showHash);
-    emitter.on(WITHDRAW_POOL_RETURNED, this.showHash);
+    emitter.on(DEPOSIT_VAULT_RETURNED, this.showHash);
+    emitter.on(WITHDRAW_VAULT_RETURNED, this.showHash);
     emitter.on(ERROR, this.errorReturned);
-    emitter.on(POOL_BALANCES_RETURNED, this.balancesReturned);
+    emitter.on(VAULT_BALANCES_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
   }
 
   componentWillUnmount() {
-    emitter.removeListener(DEPOSIT_POOL_RETURNED, this.showHash);
-    emitter.removeListener(WITHDRAW_POOL_RETURNED, this.showHash);
+    emitter.removeListener(DEPOSIT_VAULT_RETURNED, this.showHash);
+    emitter.removeListener(WITHDRAW_VAULT_RETURNED, this.showHash);
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-    emitter.removeListener(POOL_BALANCES_RETURNED, this.balancesReturned);
+    emitter.removeListener(VAULT_BALANCES_RETURNED, this.balancesReturned);
   };
 
   refresh() {
-    dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_VAULT_BALANCES, content: {} })
   }
 
   balancesReturned = (balances) => {
-    this.setState({ assets: store.getStore('poolAssets') })
+    this.setState({ assets: store.getStore('vaultAssets') })
     setTimeout(this.refresh, 300000);
   };
 
@@ -329,7 +329,7 @@ class Pool extends Component {
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null
     })
 
-    dispatcher.dispatch({ type: GET_POOL_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_VAULT_BALANCES, content: {} })
 
     const that = this
     setTimeout(() => {
@@ -420,7 +420,7 @@ class Pool extends Component {
     const width = window.innerWidth
 
     return assets.filter((asset) => {
-      if(hideZero && (asset.balance === 0 && asset.pooledBalance === 0)) {
+      if(hideZero && (asset.balance === 0 && asset.vaultBalance === 0)) {
         return false
       }
 
@@ -429,7 +429,7 @@ class Pool extends Component {
               asset.name.toLowerCase().includes(search.toLowerCase()) ||
               asset.symbol.toLowerCase().includes(search.toLowerCase()) ||
               asset.description.toLowerCase().includes(search.toLowerCase()) ||
-              asset.poolSymbol.toLowerCase().includes(search.toLowerCase())
+              asset.vaultSymbol.toLowerCase().includes(search.toLowerCase())
               // asset.erc20address.toLowerCase().includes(search.toLowerCase()) ||
               // asset.vaultContractAddress.toLowerCase().includes(search.toLowerCase())
       } else {
@@ -459,18 +459,18 @@ class Pool extends Component {
                 </div>
               </div>
               {
-                (!['LINK'].includes(asset.id) && asset.pooledBalance > 0) &&
+                (!['LINK'].includes(asset.id) && asset.vaultBalance > 0) &&
                 <div className={classes.headingEarning}>
                   <Typography variant={ 'h5' } className={ classes.grey }>You are earning:</Typography>
                   <div className={ classes.flexy }>
                     <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(2) : '0.00') }% </Typography>
                     <Typography variant={ 'h5' } className={ classes.on }> on </Typography>
-                    <Typography variant={ 'h3' } noWrap>{ (asset.pooledBalance ? (asset.pooledBalance).toFixed(2) : '0.00') } {asset.poolSymbol}</Typography>
+                    <Typography variant={ 'h3' } noWrap>{ (asset.vaultBalance ? (asset.vaultBalance).toFixed(2) : '0.00') } {asset.vaultSymbol}</Typography>
                   </div>
                 </div>
               }
               {
-                (!['LINK'].includes(asset.id) && asset.pooledBalance === 0) &&
+                (!['LINK'].includes(asset.id) && asset.vaultBalance === 0) &&
                 <div className={classes.headingEarning}>
                   <Typography variant={ 'h5' } className={ classes.grey }>This vault is earning:</Typography>
                   <div className={ classes.flexy }>
@@ -569,4 +569,4 @@ class Pool extends Component {
   };
 }
 
-export default withNamespaces()(withRouter(withStyles(styles)(Pool)));
+export default withNamespaces()(withRouter(withStyles(styles)(Vault)));

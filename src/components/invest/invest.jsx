@@ -7,7 +7,7 @@ import Invested from './invested'
 
 import {
   GET_PRICES,
-  GET_POOL_VALUES
+  GET_VAULT_VALUES
 } from '../../constants'
 
 import Store from "../../stores";
@@ -40,7 +40,7 @@ class Invest extends Component {
 
   componentWillMount() {
     dispatcher.dispatch({ type: GET_PRICES, content: {} })
-    dispatcher.dispatch({ type: GET_POOL_VALUES, content: {} })
+    dispatcher.dispatch({ type: GET_VAULT_VALUES, content: {} })
   }
 
   render() {

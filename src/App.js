@@ -19,7 +19,7 @@ import IDai from './components/idai';
 import Footer from './components/footer';
 import Home from './components/home';
 import Header from './components/header';
-import Vaults from './components/pool';
+import Vaults from './components/vault';
 
 
 import { injected } from "./stores/connectors";

@@ -21,7 +21,6 @@ import {
   BALANCES_RETURNED,
   DONATE_RETURNED,
   REBALANCE_RETURNED,
-  CONNECT_METAMASK,
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED
 } from '../../constants'
@@ -224,8 +223,6 @@ class Manage extends Component {
 
   constructor() {
     super()
-
-    // dispatcher.dispatch({ type: CONNECT_METAMASK_PASSIVE, content: {} })
 
     this.state = {
       assets: store.getStore('assets'),
@@ -453,11 +450,6 @@ class Manage extends Component {
     } = this.state
     return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true}/>
   };
-
-  unlockMetamask = () => {
-    this.setState({ metamaskLoading: true })
-    dispatcher.dispatch({ type: CONNECT_METAMASK, content: {} })
-  }
 
   renderModal = () => {
     return (

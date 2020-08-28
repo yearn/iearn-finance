@@ -9,14 +9,14 @@ import {
 
 import {
   ERROR,
-  DEPOSIT_POOL,
-  DEPOSIT_POOL_RETURNED,
-  WITHDRAW_POOL,
-  WITHDRAW_POOL_RETURNED,
-  DEPOSIT_ALL_POOL,
-  DEPOSIT_ALL_POOL_RETURNED,
-  WITHDRAW_ALL_POOL,
-  WITHDRAW_ALL_POOL_RETURNED
+  DEPOSIT_VAULT,
+  DEPOSIT_VAULT_RETURNED,
+  WITHDRAW_VAULT,
+  WITHDRAW_VAULT_RETURNED,
+  DEPOSIT_ALL_VAULT,
+  DEPOSIT_ALL_VAULT_RETURNED,
+  WITHDRAW_ALL_VAULT,
+  WITHDRAW_ALL_VAULT_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -125,18 +125,18 @@ class Asset extends Component {
   }
 
   componentWillMount() {
-    emitter.on(DEPOSIT_POOL_RETURNED, this.depositReturned);
-    emitter.on(WITHDRAW_POOL_RETURNED, this.withdrawReturned);
-    emitter.on(DEPOSIT_ALL_POOL_RETURNED, this.depositReturned);
-    emitter.on(WITHDRAW_ALL_POOL_RETURNED, this.withdrawReturned);
+    emitter.on(DEPOSIT_VAULT_RETURNED, this.depositReturned);
+    emitter.on(WITHDRAW_VAULT_RETURNED, this.withdrawReturned);
+    emitter.on(DEPOSIT_ALL_VAULT_RETURNED, this.depositReturned);
+    emitter.on(WITHDRAW_ALL_VAULT_RETURNED, this.withdrawReturned);
     emitter.on(ERROR, this.errorReturned);
   }
 
   componentWillUnmount() {
-    emitter.removeListener(DEPOSIT_POOL_RETURNED, this.depositReturned);
-    emitter.removeListener(WITHDRAW_POOL_RETURNED, this.withdrawReturned);
-    emitter.removeListener(DEPOSIT_ALL_POOL_RETURNED, this.depositReturned);
-    emitter.removeListener(WITHDRAW_ALL_POOL_RETURNED, this.withdrawReturned);
+    emitter.removeListener(DEPOSIT_VAULT_RETURNED, this.depositReturned);
+    emitter.removeListener(WITHDRAW_VAULT_RETURNED, this.withdrawReturned);
+    emitter.removeListener(DEPOSIT_ALL_VAULT_RETURNED, this.depositReturned);
+    emitter.removeListener(WITHDRAW_ALL_VAULT_RETURNED, this.withdrawReturned);
     emitter.removeListener(ERROR, this.errorReturned);
   };
 
@@ -248,7 +248,7 @@ class Asset extends Component {
       <div className={ classes.sepperator }></div>
       <div className={classes.tradeContainer}>
         <div className={ classes.balances }>
-          <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ asset.pooledBalance ? (Math.floor(asset.pooledBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.poolSymbol } ({ (asset.pooledBalance ? (Math.floor(asset.pooledBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol }) </Typography>
+          <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ asset.vaultBalance ? (Math.floor(asset.vaultBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol } ({ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol }) </Typography>
         </div>
         <TextField
           fullWidth
@@ -302,7 +302,7 @@ class Asset extends Component {
               className={ classes.actionButton }
               variant="outlined"
               color="primary"
-              disabled={ loading || asset.pooledBalance <= 0 }
+              disabled={ loading || asset.vaultBalance <= 0 }
               onClick={ this.onWithdraw }
               fullWidth
               >
@@ -314,7 +314,7 @@ class Asset extends Component {
               className={ classes.actionButton }
               variant="outlined"
               color="primary"
-              disabled={ loading || asset.pooledBalance <= 0 }
+              disabled={ loading || asset.vaultBalance <= 0 }
               onClick={ this.onWithdrawAll }
               fullWidth
               >
@@ -351,7 +351,7 @@ class Asset extends Component {
 
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: DEPOSIT_POOL, content: { amount: amount, asset: asset } })
+    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: asset } })
   }
 
   onDepositAll = () => {
@@ -359,7 +359,7 @@ class Asset extends Component {
 
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: DEPOSIT_ALL_POOL, content: { asset: asset } })
+    dispatcher.dispatch({ type: DEPOSIT_ALL_VAULT, content: { asset: asset } })
   }
 
   onWithdraw = () => {
@@ -368,7 +368,7 @@ class Asset extends Component {
     const { redeemAmount } = this.state
     const { asset, startLoading  } = this.props
 
-    if(!redeemAmount || isNaN(redeemAmount) || redeemAmount <= 0 || redeemAmount > asset.pooledBalance) {
+    if(!redeemAmount || isNaN(redeemAmount) || redeemAmount <= 0 || redeemAmount > asset.vaultBalance) {
       this.setState({ redeemAmountError: true })
       return false
     }
@@ -376,7 +376,7 @@ class Asset extends Component {
     this.setState({ loading: true })
     startLoading()
 
-    dispatcher.dispatch({ type: WITHDRAW_POOL, content: { amount: redeemAmount, asset: asset } })
+    dispatcher.dispatch({ type: WITHDRAW_VAULT, content: { amount: redeemAmount, asset: asset } })
   }
 
   onWithdrawAll = () => {
@@ -384,7 +384,7 @@ class Asset extends Component {
 
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: WITHDRAW_ALL_POOL, content: { asset: asset } })
+    dispatcher.dispatch({ type: WITHDRAW_ALL_VAULT, content: { asset: asset } })
   }
 
   setAmount = (percent) => {
@@ -406,7 +406,7 @@ class Asset extends Component {
       return
     }
 
-    const balance = this.props.asset.pooledBalance
+    const balance = this.props.asset.vaultBalance
     let amount = balance*percent/100
     amount = Math.floor(amount*10000)/10000;
 
