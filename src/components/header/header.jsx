@@ -74,7 +74,6 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'flex-end',
     flex: 1,
-    cursor: 'pointer',
     [theme.breakpoints.down('sm')]: {
       flex: '0'
     }
@@ -85,6 +84,7 @@ const styles = theme => ({
     borderRadius: '50px',
     display: 'flex',
     alignItems: 'center',
+    cursor: 'pointer',
     '&:hover': {
       border: "2px solid "+colors.borderBlue,
       background: 'rgba(47, 128, 237, 0.1)'
@@ -109,6 +109,12 @@ const styles = theme => ({
     height: '10px',
     marginRight: '3px',
     marginLeft:'6px'
+  },
+  name: {
+    paddingLeft: '24px',
+    [theme.breakpoints.down('sm')]: {
+      display: 'none',
+    }
   }
 });
 
@@ -159,12 +165,14 @@ class Header extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.headerV2 }>
-          <div className={ classes.icon } onClick={ () => { this.nav('') } }>
+          <div className={ classes.icon }>
             <img
               alt=""
               src={ require('../../assets/YFI-logo.png') }
               height={ '40px' }
+              onClick={ () => { this.nav('') } }
             />
+            <Typography variant={ 'h3'} className={ classes.name } onClick={ () => { this.nav('') } }>yearn.finance</Typography>
           </div>
           <div className={ classes.links }>
             { this.renderLink('vaults') }
@@ -172,15 +180,15 @@ class Header extends Component {
             { this.renderLink('zap') }
             { this.renderLink('apr') }
           </div>
-          <div className={ classes.account } onClick={this.addressClicked} >
+          <div className={ classes.account }>
             { address &&
-              <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>
+              <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap onClick={this.addressClicked} >
                 { address }
                 <div className={ classes.connectedDot }></div>
               </Typography>
             }
             { !address &&
-              <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap>
+              <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap onClick={this.addressClicked} >
                 Connect your wallet
               </Typography>
             }

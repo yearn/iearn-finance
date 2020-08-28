@@ -1,6 +1,5 @@
 import config from "../config";
 import async from 'async';
-import * as moment from 'moment';
 import {
   ERROR,
   GET_BALANCES,
@@ -17,7 +16,6 @@ import {
   DONATE_RETURNED,
   GET_AGGREGATED_YIELD,
   GET_AGGREGATED_YIELD_RETURNED,
-  GET_UNISWAP_COMPARRISONS,
   GET_CONTRACT_EVENTS,
   GET_CONTRACT_EVENTS_RETURNED,
   ZAP,
