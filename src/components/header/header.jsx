@@ -179,6 +179,7 @@ class Header extends Component {
             { this.renderLink('earn') }
             { this.renderLink('zap') }
             { this.renderLink('apr') }
+            { this.renderLink('cover') }
           </div>
           <div className={ classes.account }>
             { address &&
@@ -212,6 +213,10 @@ class Header extends Component {
   }
 
   nav = (screen) => {
+    if(screen === 'cover') {
+      window.open("https://yinsure.finance", "_blank")
+      return
+    }
     this.props.history.push('/'+screen)
   }
 

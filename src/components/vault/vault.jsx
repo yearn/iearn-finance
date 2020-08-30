@@ -538,7 +538,6 @@ class Vault extends Component {
           onChange={ this.onSearchChanged }
           placeholder="ETH, CRV, ..."
           variant="outlined"
-          onKeyDown= { this.onSearchKeyDown }
           InputProps={{
             startAdornment: <InputAdornment position="end" className={ classes.inputAdornment }><SearchIcon /></InputAdornment>,
           }}

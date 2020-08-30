@@ -11,6 +11,7 @@ import FlashOnIcon from '@material-ui/icons/FlashOn';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PieChartIcon from '@material-ui/icons/PieChart';
+import SecurityIcon from '@material-ui/icons/Security';
 
 const styles = theme => ({
   root: {
@@ -154,6 +155,33 @@ const styles = theme => ({
       display: 'none'
     }
   },
+  cover: {
+    backgroundColor: colors.white,
+    '&:hover': {
+      backgroundColor: colors.compoundGreen,
+      '& .title': {
+        color: colors.white,
+      },
+      '& .icon': {
+        color: colors.white
+      },
+      '& .description': {
+        display: 'block',
+        color: colors.white,
+        padding: '48px',
+        textAlign: 'center'
+      }
+    },
+    '& .title': {
+      color: colors.compoundGreen,
+    },
+    '& .icon': {
+      color: colors.compoundGreen
+    },
+    '& .description': {
+      display: 'none'
+    }
+  },
   title: {
     padding: '24px',
     paddingBottom: '0px',
@@ -203,6 +231,11 @@ class Home extends Component {
         <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav(location.pathname+'apr') } }>
           <BarChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Apr") }</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { window.open("https://yinsure.finance", "_blank") } }>
+          <SecurityIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Cover") }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Get cover with Nexus Mutual from yinsure.finance" }</Typography>
         </Card>
       </div>
     )
