@@ -19,6 +19,7 @@ import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 
 import ForumIcon from '@material-ui/icons/Forum';
 import BarChartIcon from '@material-ui/icons/BarChart';
+import BuildIcon from '@material-ui/icons/Build';
 
 import BuiltWithModal from '../builtwith/builtwithModal.jsx'
 
@@ -35,13 +36,18 @@ const styles = theme => ({
     borderRadius: '50px 50px 0px 0px',
     border: '1px solid '+colors.borderBlue,
     borderBottom: 'none',
-    marginTop: '48px'
+    marginTop: '48px',
+    flexWrap: 'wrap',
+    [theme.breakpoints.down('xs')]: {
+      justifyContent: 'flex-start',
+    }
   },
   heading: {
     marginBottom: '12px',
     paddingBottom: '9px',
     borderBottom: "3px solid "+colors.borderBlue,
-    width: 'fit-content'
+    width: 'fit-content',
+    marginLeft: '30px'
   },
   link: {
     paddingBottom: '12px',
@@ -55,8 +61,43 @@ const styles = theme => ({
   icon: {
     fill: colors.borderBlue,
     marginRight: '6px'
+  },
+  yearnIcon: {
+    minHeight: '100%',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  builtWith:{
+    display: 'flex',
+    flexDirection: 'column',
+    [theme.breakpoints.down('md')]: {
+      display: 'none',
+    }
+  },
+  builtWithLink: {
+    paddingTop: '12px'
+  },
+  builtHeading: {
+    marginBottom: '12px',
+    paddingBottom: '9px',
+    borderBottom: "3px solid "+colors.borderBlue,
+    width: 'fit-content',
+  },
+  products: {
+    padding: '0px 24px',
+    [theme.breakpoints.down('xs')]: {
+      paddingBottom: '24px'
+    }
+  },
+  community: {
+    padding: '0px 24px',
+    [theme.breakpoints.down('xs')]: {
+      paddingBottom: '24px'
+    }
+  },
+  socials: {
+    padding: '0px 24px'
   }
-
 });
 
 
@@ -82,77 +123,89 @@ class Footer extends Component {
 
     return (
       <div className={classes.footer}>
-        <div className={ classes.socials }>
-          <Typography className={ classes.heading } variant={ 'h6'}>Products</Typography>
-          <div  className={ classes.link }>
-            <AttachMoneyIcon height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://yearn.finance", "_blank")} variant={ 'h4'} >yearn.finance</Typography>
-          </div>
-          <div  className={ classes.link }>
-            <HowToVoteIcon height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://ygov.finance", "_blank")} variant={ 'h4'} >ygov.finance</Typography>
-          </div>
-          <div  className={ classes.link }>
-            <SecurityIcon height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://yinsure.finance", "_blank")} variant={ 'h4'} >yinsure.finance</Typography>
-          </div>
-          <div  className={ classes.link }>
-            <MonetizationOnIcon height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://yborrow.finance", "_blank")} variant={ 'h4'} >yborrow.finance</Typography>
-          </div>
-          <div  className={ classes.link }>
-            <DescriptionIcon height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} variant={ 'h4'} >docs.yearn.finance</Typography>
+        <div className={ classes.builtWith }>
+          <Typography className={ classes.builtHeading } variant={ 'h6'}>yearn.finance</Typography>
+          <img
+            alt=""
+            src={ require('../../assets/YFI-logo.png') }
+            height={ '120px' }
+          />
+          <div  className={ `${classes.link} ${classes.builtWithLink}` } onClick={ () => { this.builtWithOverlayClicked() } } >
+            <BuildIcon height='15px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >Built with</Typography>
           </div>
         </div>
-        <div className={ classes.socials }>
+        <div className={ classes.products }>
+          <Typography className={ classes.heading } variant={ 'h6'}>Products</Typography>
+          <div  className={ classes.link } onClick={()=> window.open("https://yearn.finance", "_blank")} >
+            <AttachMoneyIcon height='15px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >yearn.finance</Typography>
+          </div>
+          <div  className={ classes.link } onClick={()=> window.open("https://ygov.finance", "_blank")} >
+            <HowToVoteIcon height='15px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >ygov.finance</Typography>
+          </div>
+          <div  className={ classes.link } onClick={()=> window.open("https://yinsure.finance", "_blank")} >
+            <SecurityIcon height='15px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >yinsure.finance</Typography>
+          </div>
+          <div  className={ classes.link } onClick={()=> window.open("https://yborrow.finance", "_blank")} >
+            <MonetizationOnIcon height='15px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >yborrow.finance</Typography>
+          </div>
+          <div  className={ classes.link } onClick={()=> window.open("https://docs.yearn.finance", "_blank")} >
+            <DescriptionIcon height='15px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >docs.yearn.finance</Typography>
+          </div>
+        </div>
+        <div className={ classes.community }>
           <Typography className={ classes.heading } variant={ 'h6'}>Community</Typography>
-          <div  className={ classes.link }>
+          <div  className={ classes.link } onClick={()=> window.open("https://ycosystem.info", "_blank")} >
             <DescriptionIcon height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://ycosystem.info", "_blank")} variant={ 'h4'} >ycosystem.info</Typography>
+            <Typography variant={ 'h4'} >ycosystem.info</Typography>
           </div>
-          <div  className={ classes.link }>
+          <div  className={ classes.link } onClick={()=> window.open("https://www.learnyearn.finance", "_blank")}>
             <DescriptionIcon height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://www.learnyearn.finance", "_blank")} variant={ 'h4'} >learnyearn.finance</Typography>
+            <Typography variant={ 'h4'} >learnyearn.finance</Typography>
           </div>
-          <div  className={ classes.link }>
+          <div  className={ classes.link } onClick={()=> window.open("https://stats.finance/yearn", "_blank")} >
             <BarChartIcon height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://stats.finance/yearn", "_blank")} variant={ 'h4'} >stats.finance</Typography>
+            <Typography variant={ 'h4'} >stats.finance</Typography>
           </div>
-          <div  className={ classes.link }>
+          <div  className={ classes.link } onClick={()=> window.open("https://yieldfarming.info", "_blank")} >
             <BarChartIcon height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://yieldfarming.info", "_blank")} variant={ 'h4'} >yieldfarming.info</Typography>
+            <Typography variant={ 'h4'} >yieldfarming.info</Typography>
           </div>
-          <div  className={ classes.link }>
+          <div  className={ classes.link } onClick={()=> window.open("https://feel-the-yearn.app", "_blank")} >
             <BarChartIcon height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://feel-the-yearn.app", "_blank")} variant={ 'h4'} >feel-the-yearn.app</Typography>
+            <Typography variant={ 'h4'} >feel-the-yearn.app</Typography>
           </div>
-          <div  className={ classes.link }>
+          <div  className={ classes.link } onClick={()=> window.open("https://yearn.snapshot.page", "_blank")} >
             <ForumIcon height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://yearn.snapshot.page", "_blank")} variant={ 'h4'} >yearn.snapshot.page</Typography>
+            <Typography variant={ 'h4'} >yearn.snapshot.page</Typography>
           </div>
         </div>
         <div className={ classes.socials }>
           <Typography className={ classes.heading } variant={ 'h6'}>Socials</Typography>
-          <div  className={ classes.link }>
-            <img alt="" src={ require('../../assets/twitter.svg') } height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://twitter.com/iearnfinance", "_blank")} variant={ 'h4'} >Twitter</Typography>
+          <div  className={ classes.link } onClick={()=> window.open("https://twitter.com/iearnfinance", "_blank")} >
+            <img alt="" src={ require('../../assets/twitter.svg') } height='24px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >Twitter</Typography>
           </div>
-          <div  className={ classes.link }>
-            <img alt="" src={ require('../../assets/medium.svg') } height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://medium.com/iearn", "_blank")} variant={ 'h4'} >Medium</Typography>
+          <div  className={ classes.link } onClick={()=> window.open("https://medium.com/iearn", "_blank")} >
+            <img alt="" src={ require('../../assets/medium.svg') } height='24px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >Medium</Typography>
           </div>
-          <div  className={ classes.link }>
-            <img alt="" src={ require('../../assets/discord.svg') } height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://discord.gg/GcjxhWR", "_blank")} variant={ 'h4'} >Discord</Typography>
+          <div  className={ classes.link } onClick={()=> window.open("https://discord.gg/GcjxhWR", "_blank")} >
+            <img alt="" src={ require('../../assets/discord.svg') } height='24px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >Discord</Typography>
           </div>
-          <div  className={ classes.link }>
-            <img alt="" src={ require('../../assets/telegram.svg') } height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://t.me/yearnfinance", "_blank")} variant={ 'h4'} >Telegram</Typography>
+          <div  className={ classes.link } onClick={()=> window.open("https://t.me/yearnfinance", "_blank")} >
+            <img alt="" src={ require('../../assets/telegram.svg') } height='24px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >Telegram</Typography>
           </div>
-          <div  className={ classes.link }>
-            <img alt="" src={ require('../../assets/github.svg') } height='15px' className={ classes.icon } />
-            <Typography onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} variant={ 'h4'} >Github</Typography>
+          <div  className={ classes.link } onClick={()=> window.open("https://github.com/iearn-finance", "_blank")} >
+            <img alt="" src={ require('../../assets/github.svg') } height='24px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >Github</Typography>
           </div>
         </div>
         { modalBuiltWithOpen && this.renderBuiltWithModal() }
