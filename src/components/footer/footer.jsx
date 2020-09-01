@@ -26,12 +26,13 @@ const styles = theme => ({
     borderRadius: '50px 50px 0px 0px',
     border: '1px solid '+colors.borderBlue,
     borderBottom: 'none',
-    marginTop: '12px'
+    marginTop: '48px'
   },
   heading: {
     marginBottom: '12px',
     paddingBottom: '9px',
     borderBottom: "3px solid "+colors.borderBlue,
+    width: 'fit-content'
   },
   link: {
     paddingBottom: '12px',
@@ -67,7 +68,7 @@ class Footer extends Component {
     return (
       <div className={classes.footer}>
         <div className={ classes.socials }>
-          <Typography className={ classes.heading } variant={ 'h6'}>Our products</Typography>
+          <Typography className={ classes.heading } variant={ 'h6'}>Products</Typography>
           <Typography onClick={()=> window.open("https://yearn.finance", "_blank")} className={ classes.link } variant={ 'h4'} >yearn.finance</Typography>
           <Typography onClick={()=> window.open("https://ygov.finance", "_blank")} className={ classes.link } variant={ 'h4'} >ygov.finance</Typography>
           <Typography onClick={()=> window.open("https://yinsure.finance", "_blank")} className={ classes.link } variant={ 'h4'} >yinsure.finance</Typography>
@@ -75,7 +76,7 @@ class Footer extends Component {
           <Typography onClick={()=> window.open("https://docs.yearn.finance", "_blank")} className={ classes.link } variant={ 'h4'} >docs.yearn.finance</Typography>
         </div>
         <div className={ classes.socials }>
-          <Typography className={ classes.heading } variant={ 'h6'}>Community products</Typography>
+          <Typography className={ classes.heading } variant={ 'h6'}>Community</Typography>
           <Typography onClick={()=> window.open("https://ycosystem.info", "_blank")} className={ classes.link } variant={ 'h4'} >ycosystem.info</Typography>
           <Typography onClick={()=> window.open("https://www.learnyearn.finance", "_blank")} className={ classes.link } variant={ 'h4'} >learnyearn.finance</Typography>
           <Typography onClick={()=> window.open("https://stats.finance/yearn", "_blank")} className={ classes.link } variant={ 'h4'} >stats.finance</Typography>
