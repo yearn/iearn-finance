@@ -801,6 +801,7 @@ class Store {
           withdrawAll: true,
           lastMeasurement: 10774489,
           measurement: 1e18,
+          depositDisabled: true,
         },
         {
           id: 'WETH',
@@ -820,6 +821,7 @@ class Store {
           withdrawAll: true,
           lastMeasurement: 10774489,
           measurement: 1e18,
+          depositDisabled: true,
         },
         {
           id: 'YFI',
