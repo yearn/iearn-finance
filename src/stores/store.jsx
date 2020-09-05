@@ -722,7 +722,11 @@ class Store {
         {
           language: 'Chinese',
           code: 'zh'
-        }
+        },
+        {
+          language: 'European Portuguese',
+          code: 'pt_pt'
+        },
       ],
       curvBalance: 0,
       curveContracts: [

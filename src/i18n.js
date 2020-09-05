@@ -5,6 +5,8 @@ import { reactI18nextModule } from "react-i18next";
 import translationEN from './locales/en/translation.json';
 import translationZH from './locales/zh/translation.json';
 import translationJA from './locales/ja/translation.json';
+import translationPTPT from './locales/pt_pt/translation.json';
+
 
 // the translations
 const resources = {
@@ -16,7 +18,11 @@ const resources = {
   },
   ja: {
     translation: translationJA
+  },
+  pt_pt: {
+    translation: translationPTPT
   }
+
 };
 
 i18n
