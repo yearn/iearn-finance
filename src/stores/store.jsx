@@ -40,6 +40,10 @@ import {
   WITHDRAW_VAULT_RETURNED,
   WITHDRAW_ALL_VAULT,
   WITHDRAW_ALL_VAULT_RETURNED,
+  GET_DASHBOARD_SNAPSHOT,
+  DASHBOARD_SNAPSHOT_RETURNED,
+  GET_USD_PRICE,
+  USD_PRICE_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 
@@ -594,6 +598,9 @@ class Store {
           idai: true
         },
       ],
+      usdPrices: [
+
+      ],
       account: {},
       web3: null,
       pricePerFullShare: 0,
@@ -1082,6 +1089,9 @@ class Store {
             break;
           case WITHDRAW_ALL_VAULT:
             this.withdrawAllVault(payload)
+            break;
+          case GET_DASHBOARD_SNAPSHOT:
+            this.getDashboardSnapshot(payload)
             break;
           default: {
           }
@@ -2065,11 +2075,7 @@ class Store {
     let nonce = await web3.eth.getTransactionCount(account.address)
 
     // You will want to get the real gas price from https://ethgasstation.info/json/ethgasAPI.json
-    let gasPrice = web3.utils.toWei(await this._getGasPrice(), 'gwei');;
-    if (trade.metadata.gasPrice) {
-        // Use the contract gas price if specified (Bancor)
-        gasPrice = trade.metadata.gasPrice
-    }
+    let gasPrice = web3.utils.toWei(await this._getGasPrice(), 'gwei');
 
     let transaction = trade.trade;
     transaction.nonce = nonce;
@@ -2687,6 +2693,72 @@ class Store {
         pricePerFullShare: 0,
         apy: 0
       })
+    }
+  }
+
+  getUSDPrices = async () => {
+    try {
+      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,bitcoin&vs_currencies=usd'
+      const priceString = await rp(url);
+      const priceJSON = JSON.parse(priceString)
+
+      store.setStore({ usdPrices: priceJSON })
+      return emitter.emit(USD_PRICE_RETURNED, priceJSON)
+
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  getDashboardSnapshot = (payload) => {
+    // get vaults, get vault balances (invested)
+    // get earn, get earn balances (invested)
+    // get all account balances (not-invested)
+    // get USD prices
+    // get insurance?
+    // aggregate into categories (earn, vault, available)
+
+    emitter.on(VAULT_BALANCES_RETURNED, this._calculateDashboard)
+    emitter.on(BALANCES_LIGHT_RETURNED, this._calculateDashboard)
+    emitter.on(USD_PRICE_RETURNED, this._calculateDashboard)
+
+    this.getVaultBalances()
+    this.getBalancesLight()
+    this.getUSDPrices()
+  }
+
+  _calculateDashboard = () => {
+    const account = store.getStore('account')
+    const vaults = store.getStore('vaultAssets')
+    const earn = store.getStore('assets')
+    const prices = store.getStore('usdPrices')
+
+    if(vaults && vaults.length > 0 && earn && earn.length > 0 && prices && prices.length > 0) {
+
+      let dashboard = {
+        vault_balance_eth: 0,
+        vault_balance_usd: 0,
+        vault_growth_eth: 0,
+        vault_growth_usd: 0,
+        vault_growth_eth_perc: 0,
+        vault_growth_usd_perc: 0,
+
+        earn_balance_eth: 0,
+        earn_balance_usd: 0,
+        earn_growth_eth: 0,
+        earn_growth_usd: 0,
+        earn_growth_eth_perc: 0,
+        earn_growth_usd_perc: 0,
+
+        portfolio_balance_eth: 0,
+        portfolio_balance_usd: 0,
+        portfolio_growth_eth: 0,
+        portfolio_growth_usd: 0,
+        portfolio_growth_eth_perc: 0,
+        portfolio_growth_usd_perc: 0,
+      }
+
+
     }
   }
 

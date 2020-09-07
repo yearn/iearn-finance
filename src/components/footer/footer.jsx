@@ -3,12 +3,7 @@ import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
-  Select,
-  MenuItem,
-  FormControl
 } from '@material-ui/core';
-import { withNamespaces } from 'react-i18next';
-import i18n from '../../i18n';
 import { colors } from '../../theme'
 
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
@@ -22,9 +17,6 @@ import BarChartIcon from '@material-ui/icons/BarChart';
 import BuildIcon from '@material-ui/icons/Build';
 
 import BuiltWithModal from '../builtwith/builtwithModal.jsx'
-
-import Store from "../../stores";
-const store = Store.store
 
 const styles = theme => ({
   footer: {
@@ -70,6 +62,7 @@ const styles = theme => ({
   builtWith:{
     display: 'flex',
     flexDirection: 'column',
+    alignItems: 'center',
     [theme.breakpoints.down('md')]: {
       display: 'none',
     }
@@ -112,7 +105,7 @@ class Footer extends Component {
   }
 
   render() {
-    const { classes, t, location } = this.props;
+    const { classes, location } = this.props;
     const {
       modalBuiltWithOpen
     } = this.state
@@ -129,6 +122,7 @@ class Footer extends Component {
             alt=""
             src={ require('../../assets/YFI-logo.png') }
             height={ '120px' }
+            width={ '120px' }
           />
           <div  className={ `${classes.link} ${classes.builtWithLink}` } onClick={ () => { this.builtWithOverlayClicked() } } >
             <BuildIcon height='15px' className={ classes.icon } />
@@ -228,4 +222,4 @@ class Footer extends Component {
   }
 }
 
-export default withNamespaces()(withRouter(withStyles(styles)(Footer)));
+export default withRouter(withStyles(styles)(Footer));

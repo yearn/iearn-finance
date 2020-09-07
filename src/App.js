@@ -20,7 +20,7 @@ import Footer from './components/footer';
 import Home from './components/home';
 import Header from './components/header';
 import Vaults from './components/vault';
-
+import Dashboard from './components/dashboard';
 
 import { injected } from "./stores/connectors";
 
@@ -92,6 +92,10 @@ class App extends Component {
               <Route path="/vaults">
                 <Header />
                 <Vaults />
+              </Route>
+              <Route path='/dashboard'>
+                <Header />
+                <Dashboard />
               </Route>
               <Route path="/">
                 <Home />
