@@ -189,6 +189,7 @@ class Dashboard extends Component {
     super()
 
     const dashboard = store.getStore('dashboard')
+    const account = store.getStore('account')
 
     this.state = {
       dashboard: dashboard,
@@ -196,7 +197,9 @@ class Dashboard extends Component {
       growth: 1 // 0=daily 1=weekly 2=yearly
     }
 
-    dispatcher.dispatch({ type: GET_DASHBOARD_SNAPSHOT, content: {} })
+    if(account && account.address) {
+      dispatcher.dispatch({ type: GET_DASHBOARD_SNAPSHOT, content: {} })
+    }
   }
 
   componentWillMount() {
@@ -273,14 +276,18 @@ class Dashboard extends Component {
                 </Typography> }
             </div>
           </div>
-          <div className={ classes.vaultContainer }>
-            <Typography variant={ 'h3' } className={ classes.sectionHeading }>Vaults Overview</Typography>
-            { this.renderVaults() }
-          </div>
-          <div className={ classes.earnContainer }>
-            <Typography variant={ 'h3' } className={ classes.sectionHeading }>Earn Overview</Typography>
-            { this.renderEarn() }
-          </div>
+          { (dashboard.vaults && dashboard.vaults.length > 0) &&
+            <div className={ classes.vaultContainer }>
+              <Typography variant={ 'h3' } className={ classes.sectionHeading }>Vaults Overview</Typography>
+              { this.renderVaults() }
+            </div>
+          }
+          { (dashboard.assets && dashboard.assets.length > 0) && 
+            <div className={ classes.earnContainer }>
+              <Typography variant={ 'h3' } className={ classes.sectionHeading }>Earn Overview</Typography>
+              { this.renderEarn() }
+            </div>
+          }
         </div>
         { loading && <Loader /> }
       </div>
@@ -316,7 +323,7 @@ class Dashboard extends Component {
     }
 
     return vaults.map((asset) => {
-      return (<div className={ classes.vault }>
+      return (<div className={ classes.vault } key={asset.id}>
         <div className={ classes.assetSummary }>
           <div className={classes.headingName}>
             <div className={ classes.assetIcon }>
@@ -362,7 +369,7 @@ class Dashboard extends Component {
     }
 
     return assets.map((asset) => {
-      return (<div className={ classes.vault }>
+      return (<div className={ classes.vault } key={asset.id}>
         <div className={ classes.assetSummary }>
           <div className={classes.headingName}>
             <div className={ classes.assetIcon }>

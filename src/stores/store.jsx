@@ -931,7 +931,7 @@ class Store {
           depositDisabled: false,
           lastMeasurement: 10709740,
           measurement: 1e18,
-          price_id: 'LP-bCurve',
+          price_id: 'lp-bcurve',
         },
         {
           id: 'crvBTC',
@@ -1471,6 +1471,7 @@ class Store {
 
   getBalancesLight = async () => {
     const account = store.getStore('account')
+
     const assets = store.getStore('assets')
 
     if(!account || !account.address) {
@@ -1505,6 +1506,7 @@ class Store {
 
   getBalances = async () => {
     const account = store.getStore('account')
+
     const assets = store.getStore('assets')
 
     if(!account || !account.address) {
@@ -2351,6 +2353,7 @@ class Store {
 
   getVaultBalances = async () => {
     const account = store.getStore('account')
+
     const assets = store.getStore('vaultAssets')
 
     if(!account || !account.address) {
@@ -2746,7 +2749,7 @@ class Store {
 
   getUSDPrices = async () => {
     try {
-      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,binance-usd,wrapped-bitcoin,ethereum,nusd,chainlink,aave-link,lp-sbtc-curve,LP-bCurve,curve-fi-ydai-yusdc-yusdt-ytusd&vs_currencies=usd,eth'
+      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,binance-usd,wrapped-bitcoin,ethereum,nusd,chainlink,aave-link,lp-sbtc-curve,lp-bcurve,curve-fi-ydai-yusdc-yusdt-ytusd&vs_currencies=usd,eth'
       const priceString = await rp(url);
       const priceJSON = JSON.parse(priceString)
 
@@ -2788,12 +2791,14 @@ class Store {
           return false
         }
 
-        return vault.vaultBalance > 0
+        return vault.vaultBalance > 0.01
       }).map((vault) => {
         const price = prices[vault.price_id]
         vault.prices = price
         return vault
       })
+
+      console.log(vaultsInUse)
 
       const vaultBalance_usd = vaultsInUse.reduce((accumulator, vault) => {
         const usdBalance = vault.vaultBalance * vault.pricePerFullShare * vault.prices.usd
@@ -2828,9 +2833,14 @@ class Store {
         return asset.investedBalance > 0.01
       }).map((asset) => {
         const price = prices[asset.price_id]
+        if(price == null) {
+          console.log(asset.price_id)
+        }
         asset.prices = price
         return asset
       })
+
+      console.log(assetsInUse)
 
       const earnBalance_usd = assetsInUse.reduce((accumulator, asset) => {
         const usdBalance = asset.investedBalance * asset.price * asset.prices.usd
