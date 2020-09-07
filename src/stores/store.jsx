@@ -579,7 +579,6 @@ class Store {
           disabled: true,
           invest: 'invest',
           redeem: 'redeem',
-          curve: true,
         },
         {
           id: 'iDAIv1',
