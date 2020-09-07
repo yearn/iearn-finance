@@ -175,10 +175,10 @@ class Header extends Component {
             <Typography variant={ 'h3'} className={ classes.name } onClick={ () => { this.nav('') } }>yearn.finance</Typography>
           </div>
           <div className={ classes.links }>
+            { this.renderLink('dashboard') }
             { this.renderLink('vaults') }
             { this.renderLink('earn') }
             { this.renderLink('zap') }
-            { this.renderLink('apr') }
             { this.renderLink('cover') }
           </div>
           <div className={ classes.account }>

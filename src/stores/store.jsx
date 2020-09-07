@@ -74,6 +74,31 @@ class Store {
   constructor() {
 
     this.store = {
+      dashboard: {
+        vault_balance_usd: 0,
+        vault_growth_usd_daily: 0,
+        vault_growth_usd_weekly: 0,
+        vault_growth_usd_yearly: 0,
+        vault_growth_usd_daily_perc: 0,
+        vault_growth_usd_weekly_perc: 0,
+        vault_growth_usd_yearly_perc: 0,
+
+        earn_balance_usd: 0,
+        earn_growth_usd_daily: 0,
+        earn_growth_usd_weekly: 0,
+        earn_growth_usd_yearly: 0,
+        earn_growth_usd_daily_perc: 0,
+        earn_growth_usd_weekly_perc: 0,
+        earn_growth_usd_yearly_perc: 0,
+
+        portfolio_balance_usd: 0,
+        portfolio_growth_usd_daily: 0,
+        portfolio_growth_usd_weekly: 0,
+        portfolio_growth_usd_yearly: 0,
+        portfolio_growth_usd_daily_perc: 0,
+        portfolio_growth_usd_weekly_perc: 0,
+        portfolio_growth_usd_yearly_perc: 0,
+      },
       universalGasPrice: '70',
       ethPrice: 0,
       aprs: [{
@@ -203,7 +228,8 @@ class Store {
           disabled: false,
           invest: 'deposit',
           redeem: 'withdraw',
-          curve: false
+          curve: false,
+          price_id: 'dai'
         },
         {
           id: 'USDCv3',
@@ -225,7 +251,8 @@ class Store {
           disabled: false,
           invest: 'deposit',
           redeem: 'withdraw',
-          curve: false
+          curve: false,
+          price_id: 'usd-coin'
         },
         {
           id: 'USDTv3',
@@ -248,6 +275,7 @@ class Store {
           invest: 'deposit',
           redeem: 'withdraw',
           curve: false,
+          price_id: 'tether'
         },
         {
           id: 'BUSDv3',
@@ -270,6 +298,7 @@ class Store {
           invest: 'deposit',
           redeem: 'withdraw',
           curve: true,
+          price_id: 'binance-usd'
         },
         {
           id: 'DAIv2',
@@ -292,7 +321,8 @@ class Store {
           disabled: false,
           invest: 'deposit',
           redeem: 'withdraw',
-          curve: true
+          curve: true,
+          price_id: 'dai'
         },
         {
           id: 'USDCv2',
@@ -316,7 +346,8 @@ class Store {
           disabled: false,
           invest: 'deposit',
           redeem: 'withdraw',
-          curve: true
+          curve: true,
+          price_id: 'usd-coin'
         },
         {
           id: 'USDTv2',
@@ -341,6 +372,7 @@ class Store {
           invest: 'deposit',
           redeem: 'withdraw',
           curve: true,
+          price_id: 'tether',
         },
         {
           id: 'TUSDv2',
@@ -365,6 +397,7 @@ class Store {
           invest: 'deposit',
           redeem: 'withdraw',
           curve: true,
+          price_id: 'true-usd',
         },
         {
           id: 'SUSDv2',
@@ -389,6 +422,7 @@ class Store {
           invest: 'deposit',
           redeem: 'withdraw',
           curve: false,
+          price_id: 'nusd',
         },
         {
           id: 'wBTCv2',
@@ -413,6 +447,7 @@ class Store {
           invest: 'deposit',
           redeem: 'withdraw',
           curve: false,
+          price_id: 'wrapped-bitcoin',
         },
         {
           id: 'DAIv1',
@@ -436,6 +471,7 @@ class Store {
           invest: 'invest',
           redeem: 'redeem',
           curve: false,
+          price_id: 'dai',
         },
         {
           id: 'USDCv1',
@@ -460,6 +496,7 @@ class Store {
           invest: 'invest',
           redeem: 'redeem',
           curve: false,
+          price_id: 'usd-coin',
         },
         {
           id: 'USDTv1',
@@ -484,6 +521,7 @@ class Store {
           invest: 'invest',
           redeem: 'redeem',
           curve: false,
+          price_id: 'tether',
         },
         {
           id: 'SUSDv1',
@@ -508,6 +546,7 @@ class Store {
           invest: 'invest',
           redeem: 'redeem',
           curve: false,
+          price_id: 'nusd',
         },
         {
           id: 'wBTCv1',
@@ -533,6 +572,7 @@ class Store {
           invest: 'invest',
           redeem: 'redeem',
           curve: false,
+          price_id: 'wrapped-bitcoin',
         },
         {
           id: 'CRVv1',
@@ -558,6 +598,7 @@ class Store {
           invest: 'invest',
           redeem: 'redeem',
           curve: false,
+          price_id: 'dai',
         },
         {
           id: 'ETHv1',
@@ -579,6 +620,7 @@ class Store {
           disabled: true,
           invest: 'invest',
           redeem: 'redeem',
+          price_id: 'ethereum',
         },
         {
           id: 'iDAIv1',
@@ -594,12 +636,11 @@ class Store {
           poolValue: 0,
           version: 2,
           disabled: true,
-          idai: true
+          idai: true,
+          price_id: 'dai',
         },
       ],
-      usdPrices: [
-
-      ],
+      usdPrices: null,
       account: {},
       web3: null,
       pricePerFullShare: 0,
@@ -812,6 +853,7 @@ class Store {
           lastMeasurement: 10774489,
           measurement: 1e18,
           depositDisabled: true,
+          price_id: 'ethereum',
         },
         {
           id: 'WETH',
@@ -832,6 +874,7 @@ class Store {
           lastMeasurement: 10774489,
           measurement: 1e18,
           depositDisabled: true,
+          price_id: 'ethereum',
         },
         {
           id: 'YFI',
@@ -851,6 +894,7 @@ class Store {
           withdrawAll: true,
           lastMeasurement: 10695309,
           measurement: 1e18,
+          price_id: 'yearn-finance',
         },
         {
           id: 'CRV',
@@ -870,6 +914,7 @@ class Store {
           withdrawAll: false,
           lastMeasurement: 10559448,
           measurement: 1e18,
+          price_id: 'curve-fi-ydai-yusdc-yusdt-ytusd',
         },
         {
           id: 'crvBUSD',
@@ -890,6 +935,7 @@ class Store {
           depositDisabled: false,
           lastMeasurement: 10709740,
           measurement: 1e18,
+          price_id: 'LP-bCurve',
         },
         {
           id: 'crvBTC',
@@ -909,6 +955,7 @@ class Store {
           withdrawAll: true,
           lastMeasurement: 10734341,
           measurement: 1e18,
+          price_id: 'lp-sbtc-curve'
         },
         {
           id: 'DAI',
@@ -928,6 +975,7 @@ class Store {
           withdrawAll: true,
           lastMeasurement: 10650116,
           measurement: 1e18,
+          price_id: 'dai',
         },
         {
           id: 'TUSD',
@@ -947,6 +995,7 @@ class Store {
           withdrawAll: true,
           lastMeasurement: 10603368,
           measurement: 1e18,
+          price_id: 'true-usd',
         },
         {
           id: 'USDC',
@@ -966,6 +1015,7 @@ class Store {
           withdrawAll: false,
           lastMeasurement: 10532708,
           measurement: 1e18,
+          price_id: 'usd-coin',
         },
         {
           id: 'USDT',
@@ -985,6 +1035,7 @@ class Store {
           withdrawAll: true,
           lastMeasurement: 10651402,
           measurement: 1e18,
+          price_id: 'tether',
         },
         {
           id: 'aLINK',
@@ -1004,6 +1055,7 @@ class Store {
           withdrawAll: true,
           lastMeasurement: 10599617,
           measurement: 1e18,
+          price_id: 'aave-link',
         },
         {
           id: 'LINK',
@@ -1024,6 +1076,7 @@ class Store {
           depositDisabled: true,
           lastMeasurement: 10604016,
           measurement: 1e18,
+          price_id: 'chainlink',
         }
       ],
       sCrvBalance:  0
@@ -2697,7 +2750,7 @@ class Store {
 
   getUSDPrices = async () => {
     try {
-      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,bitcoin&vs_currencies=usd'
+      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,binance-usd,wrapped-bitcoin,ethereum,nusd,chainlink,aave-link,lp-sbtc-curve,LP-bCurve,curve-fi-ydai-yusdc-yusdt-ytusd&vs_currencies=usd,eth'
       const priceString = await rp(url);
       const priceJSON = JSON.parse(priceString)
 
@@ -2729,34 +2782,124 @@ class Store {
   _calculateDashboard = () => {
     const account = store.getStore('account')
     const vaults = store.getStore('vaultAssets')
-    const earn = store.getStore('assets')
+    const assets = store.getStore('assets')
     const prices = store.getStore('usdPrices')
 
-    if(vaults && vaults.length > 0 && earn && earn.length > 0 && prices && prices.length > 0) {
+    if(vaults && vaults.length > 0 && assets && assets.length > 0 && prices !== null) {
+
+      const vaultsInUse = vaults.filter((vault) => {
+        if(vault.id === 'WETH') {
+          return false
+        }
+
+        return vault.vaultBalance > 0
+      }).map((vault) => {
+        const price = prices[vault.price_id]
+        vault.prices = price
+        return vault
+      })
+
+      const vaultBalance_usd = vaultsInUse.reduce((accumulator, vault) => {
+        const usdBalance = vault.vaultBalance * vault.pricePerFullShare * vault.prices.usd
+        return accumulator + usdBalance
+      }, 0)
+
+      const vaultGrowthDaily_usd = vaultsInUse.reduce((accumulator, vault) => {
+        const usdBalance = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/36500) * vault.prices.usd
+        return accumulator + usdBalance
+      }, 0)
+
+      const vaultGrowthWeekly_usd = vaultsInUse.reduce((accumulator, vault) => {
+        const usdBalance = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/5200) * vault.prices.usd
+        return accumulator + usdBalance
+      }, 0)
+
+      const vaultGrowthYearly_usd = vaultsInUse.reduce((accumulator, vault) => {
+        const usdBalance = vault.vaultBalance * vault.pricePerFullShare * vault.apy/100 * vault.prices.usd
+        return accumulator + usdBalance
+      }, 0)
+
+      const vaultGrowthDailyPerc_usd = vaultGrowthDaily_usd * 100 / vaultBalance_usd
+      const vaultGrowthWeeklyPerc_usd = vaultGrowthWeekly_usd * 100 / vaultBalance_usd
+      const vaultGrowthYearlyPerc_usd = vaultGrowthYearly_usd * 100 / vaultBalance_usd
+
+      // const vaultBalance_eth = vaultsInUse.reduce((accumulator, vault) => {
+      //   const usdBalance = vault.vaultBalance * vault.pricePerFullShare * vault.prices.eth
+      //   return accumulator + usdBalance
+      // }, 0)
+
+      const assetsInUse = assets.filter((asset) => {
+        return asset.investedBalance > 0.01
+      }).map((asset) => {
+        const price = prices[asset.price_id]
+        asset.prices = price
+        return asset
+      })
+
+      const earnBalance_usd = assetsInUse.reduce((accumulator, asset) => {
+        const usdBalance = asset.investedBalance * asset.price * asset.prices.usd
+        return accumulator + usdBalance
+      }, 0)
+
+      const earnGrowthDaily_usd = assetsInUse.reduce((accumulator, asset) => {
+        const usdBalance = asset.investedBalance * asset.price * (asset.maxApr/36500) * asset.prices.usd
+        return accumulator + usdBalance
+      }, 0)
+
+      const earnGrowthWeekly_usd = assetsInUse.reduce((accumulator, asset) => {
+        const usdBalance = asset.investedBalance * asset.price * (asset.maxApr/5200) * asset.prices.usd
+        return accumulator + usdBalance
+      }, 0)
+
+      const earnGrowthYearly_usd = assetsInUse.reduce((accumulator, asset) => {
+        const usdBalance = asset.investedBalance * asset.price * asset.maxApr/100 * asset.prices.usd
+        return accumulator + usdBalance
+      }, 0)
+
+      const earnGrowthDailyPerc_usd = earnGrowthDaily_usd * 100 / earnBalance_usd
+      const earnGrowthWeeklyPerc_usd = earnGrowthWeekly_usd * 100 / earnBalance_usd
+      const earnGrowthYearlyPerc_usd = earnGrowthYearly_usd * 100 / earnBalance_usd
+
+      const portfolioBalance_usd = vaultBalance_usd + earnBalance_usd
+      const portfolioGrowthDaily_usd = vaultGrowthDaily_usd + earnGrowthDaily_usd
+      const portfolioGrowthWeekly_usd = vaultGrowthWeekly_usd + earnGrowthWeekly_usd
+      const portfolioGrowthYearly_usd = vaultGrowthYearly_usd + earnGrowthYearly_usd
+      const portfolioGrowthDailyPerc_usd = (vaultGrowthDaily_usd + earnGrowthDaily_usd) * 100 / (vaultBalance_usd + earnBalance_usd)
+      const portfolioGrowthWeeklyPerc_usd = (vaultGrowthWeekly_usd + earnGrowthWeekly_usd) * 100 / (vaultBalance_usd + earnBalance_usd)
+      const portfolioGrowthYearlyPerc_usd = (vaultGrowthYearly_usd + earnGrowthYearly_usd) * 100 / (vaultBalance_usd + earnBalance_usd)
+
 
       let dashboard = {
-        vault_balance_eth: 0,
-        vault_balance_usd: 0,
-        vault_growth_eth: 0,
-        vault_growth_usd: 0,
-        vault_growth_eth_perc: 0,
-        vault_growth_usd_perc: 0,
+        vault_balance_usd: vaultBalance_usd,
+        vault_growth_usd_daily: vaultGrowthDaily_usd,
+        vault_growth_usd_weekly: vaultGrowthWeekly_usd,
+        vault_growth_usd_yearly: vaultGrowthYearly_usd,
+        vault_growth_usd_daily_perc: vaultGrowthDailyPerc_usd,
+        vault_growth_usd_weekly_perc: vaultGrowthWeeklyPerc_usd,
+        vault_growth_usd_yearly_perc: vaultGrowthYearlyPerc_usd,
 
-        earn_balance_eth: 0,
-        earn_balance_usd: 0,
-        earn_growth_eth: 0,
-        earn_growth_usd: 0,
-        earn_growth_eth_perc: 0,
-        earn_growth_usd_perc: 0,
+        earn_balance_usd: earnBalance_usd,
+        earn_growth_usd_daily: earnGrowthDaily_usd,
+        earn_growth_usd_weekly: earnGrowthWeekly_usd,
+        earn_growth_usd_yearly: earnGrowthYearly_usd,
+        earn_growth_usd_daily_perc: earnGrowthDailyPerc_usd,
+        earn_growth_usd_weekly_perc: earnGrowthWeeklyPerc_usd,
+        earn_growth_usd_yearly_perc: earnGrowthYearlyPerc_usd,
 
-        portfolio_balance_eth: 0,
-        portfolio_balance_usd: 0,
-        portfolio_growth_eth: 0,
-        portfolio_growth_usd: 0,
-        portfolio_growth_eth_perc: 0,
-        portfolio_growth_usd_perc: 0,
+        portfolio_balance_usd: portfolioBalance_usd,
+        portfolio_growth_usd_daily: portfolioGrowthDaily_usd,
+        portfolio_growth_usd_weekly: portfolioGrowthWeekly_usd,
+        portfolio_growth_usd_yearly: portfolioGrowthYearly_usd,
+        portfolio_growth_usd_daily_perc: portfolioGrowthDailyPerc_usd,
+        portfolio_growth_usd_weekly_perc: portfolioGrowthWeeklyPerc_usd,
+        portfolio_growth_usd_yearly_perc: portfolioGrowthYearlyPerc_usd,
+
+        vaults: vaultsInUse,
+        assets: assetsInUse,
       }
 
+      store.setStore({ dashboard: dashboard })
+      emitter.emit(DASHBOARD_SNAPSHOT_RETURNED, dashboard)
 
     }
   }
