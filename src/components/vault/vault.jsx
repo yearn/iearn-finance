@@ -281,6 +281,7 @@ class Vault extends Component {
 
     this.state = {
       assets: store.getStore('vaultAssets'),
+      usdPrices: store.getStore('usdPrices'),
       account: account,
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null,
       snackbarType: null,
