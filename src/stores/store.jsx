@@ -75,29 +75,54 @@ class Store {
 
     this.store = {
       dashboard: {
-        vault_balance_usd: 0,
-        vault_growth_usd_daily: 0,
-        vault_growth_usd_weekly: 0,
-        vault_growth_usd_yearly: 0,
-        vault_growth_usd_daily_perc: 0,
-        vault_growth_usd_weekly_perc: 0,
-        vault_growth_usd_yearly_perc: 0,
+          vault_balance_usd: 0,
+          vault_growth_usd_daily: 0,
+          vault_growth_usd_weekly: 0,
+          vault_growth_usd_yearly: 0,
+          vault_growth_usd_daily_perc: 0,
+          vault_growth_usd_weekly_perc: 0,
+          vault_growth_usd_yearly_perc: 0,
 
-        earn_balance_usd: 0,
-        earn_growth_usd_daily: 0,
-        earn_growth_usd_weekly: 0,
-        earn_growth_usd_yearly: 0,
-        earn_growth_usd_daily_perc: 0,
-        earn_growth_usd_weekly_perc: 0,
-        earn_growth_usd_yearly_perc: 0,
+          vault_balance_eth: 0,
+          vault_growth_eth_daily: 0,
+          vault_growth_eth_weekly: 0,
+          vault_growth_eth_yearly: 0,
+          vault_growth_eth_daily_perc: 0,
+          vault_growth_eth_weekly_perc: 0,
+          vault_growth_eth_yearly_perc: 0,
 
-        portfolio_balance_usd: 0,
-        portfolio_growth_usd_daily: 0,
-        portfolio_growth_usd_weekly: 0,
-        portfolio_growth_usd_yearly: 0,
-        portfolio_growth_usd_daily_perc: 0,
-        portfolio_growth_usd_weekly_perc: 0,
-        portfolio_growth_usd_yearly_perc: 0,
+
+          earn_balance_usd: 0,
+          earn_growth_usd_daily: 0,
+          earn_growth_usd_weekly: 0,
+          earn_growth_usd_yearly: 0,
+          earn_growth_usd_daily_perc: 0,
+          earn_growth_usd_weekly_perc: 0,
+          earn_growth_usd_yearly_perc: 0,
+
+          earn_balance_eth: 0,
+          earn_growth_eth_daily: 0,
+          earn_growth_eth_weekly: 0,
+          earn_growth_eth_yearly: 0,
+          earn_growth_eth_daily_perc: 0,
+          earn_growth_eth_weekly_perc: 0,
+          earn_growth_eth_yearly_perc: 0,
+
+          portfolio_balance_usd: 0,
+          portfolio_growth_usd_daily: 0,
+          portfolio_growth_usd_weekly: 0,
+          portfolio_growth_usd_yearly: 0,
+          portfolio_growth_usd_daily_perc: 0,
+          portfolio_growth_usd_weekly_perc: 0,
+          portfolio_growth_usd_yearly_perc: 0,
+
+          portfolio_balance_eth: 0,
+          portfolio_growth_eth_daily: 0,
+          portfolio_growth_eth_weekly: 0,
+          portfolio_growth_eth_yearly: 0,
+          portfolio_growth_eth_daily_perc: 0,
+          portfolio_growth_eth_weekly_perc: 0,
+          portfolio_growth_eth_yearly_perc: 0,
       },
       universalGasPrice: '70',
       ethPrice: 0,
@@ -2766,13 +2791,6 @@ class Store {
   }
 
   getDashboardSnapshot = (payload) => {
-    // get vaults, get vault balances (invested)
-    // get earn, get earn balances (invested)
-    // get all account balances (not-invested)
-    // get USD prices
-    // get insurance?
-    // aggregate into categories (earn, vault, available)
-
     emitter.on(VAULT_BALANCES_RETURNED, this._calculateDashboard)
     emitter.on(BALANCES_LIGHT_RETURNED, this._calculateDashboard)
     emitter.on(USD_PRICE_RETURNED, this._calculateDashboard)
@@ -2783,118 +2801,177 @@ class Store {
   }
 
   _calculateDashboard = () => {
-    const account = store.getStore('account')
     const vaults = store.getStore('vaultAssets')
     const assets = store.getStore('assets')
     const prices = store.getStore('usdPrices')
 
     if(vaults && vaults.length > 0 && assets && assets.length > 0 && prices !== null) {
 
+      // FILTER USED VAULTS AND CALCULATE VAULT ASSET BALANCES
       const vaultsInUse = vaults.filter((vault) => {
         if(vault.id === 'WETH') {
           return false
         }
 
-        return vault.vaultBalance > 0.01
+        return vault.vaultBalance > 0.0001
       }).map((vault) => {
         const price = prices[vault.price_id]
         vault.prices = price
+        vault.usdBalance = vault.vaultBalance * vault.pricePerFullShare * vault.prices.usd
+        vault.vaultGrowth_daily_usd = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/36500) * vault.prices.usd
+        vault.vaultGrowth_weekly_usd = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/5200) * vault.prices.usd
+        vault.vaultGrowth_yearly_usd = vault.vaultBalance * vault.pricePerFullShare * vault.apy/100 * vault.prices.usd
+
+        vault.ethBalance = vault.vaultBalance * vault.pricePerFullShare * vault.prices.eth
+        vault.vaultGrowth_daily_eth = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/36500) * vault.prices.eth
+        vault.vaultGrowth_weekly_eth = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/5200) * vault.prices.eth
+        vault.vaultGrowth_yearly_eth = vault.vaultBalance * vault.pricePerFullShare * vault.apy/100 * vault.prices.eth
+
         return vault
       })
 
-      console.log(vaultsInUse)
+      // CALCULATE VAULT BALANCES AND DAILY GROWTH
+      const vaultBalances = vaultsInUse.reduce((accumulator, vault) => {
+        accumulator.vaultBalance_usd = accumulator.vaultBalance_usd + vault.usdBalance
+        accumulator.vaultGrowth_daily_usd = accumulator.vaultGrowth_daily_usd + vault.vaultGrowth_daily_usd
+        accumulator.vaultGrowth_weekly_usd = accumulator.vaultGrowth_weekly_usd + vault.vaultGrowth_weekly_usd
+        accumulator.vaultGrowth_yearly_usd = accumulator.vaultGrowth_yearly_usd + vault.vaultGrowth_yearly_usd
 
-      const vaultBalance_usd = vaultsInUse.reduce((accumulator, vault) => {
-        const usdBalance = vault.vaultBalance * vault.pricePerFullShare * vault.prices.usd
-        return accumulator + usdBalance
-      }, 0)
+        accumulator.vaultBalance_eth = accumulator.vaultBalance_eth + vault.ethBalance
+        accumulator.vaultGrowth_daily_eth = accumulator.vaultGrowth_daily_eth + vault.vaultGrowth_daily_eth
+        accumulator.vaultGrowth_weekly_eth = accumulator.vaultGrowth_weekly_eth + vault.vaultGrowth_weekly_eth
+        accumulator.vaultGrowth_yearly_eth = accumulator.vaultGrowth_yearly_eth + vault.vaultGrowth_yearly_eth
+        return accumulator
+      }, {
+        vaultBalance_usd: 0,
+        vaultGrowth_daily_usd: 0,
+        vaultGrowth_weekly_usd: 0,
+        vaultGrowth_yearly_usd: 0,
+        vaultBalance_eth: 0,
+        vaultGrowth_daily_eth: 0,
+        vaultGrowth_weekly_eth: 0,
+        vaultGrowth_yearly_eth: 0
+      })
 
-      const vaultGrowthDaily_usd = vaultsInUse.reduce((accumulator, vault) => {
-        const usdBalance = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/36500) * vault.prices.usd
-        return accumulator + usdBalance
-      }, 0)
+      // CALCULATE VAULT GROWth PERCENTAGES
+      const vaultGrowthDailyPerc_usd = vaultBalances.vaultGrowth_daily_usd * 100 / vaultBalances.vaultBalance_usd
+      const vaultGrowthWeeklyPerc_usd = vaultBalances.vaultGrowth_weekly_usd * 100 / vaultBalances.vaultBalance_usd
+      const vaultGrowthYearlyPerc_usd = vaultBalances.vaultGrowth_yearly_usd * 100 / vaultBalances.vaultBalance_usd
 
-      const vaultGrowthWeekly_usd = vaultsInUse.reduce((accumulator, vault) => {
-        const usdBalance = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/5200) * vault.prices.usd
-        return accumulator + usdBalance
-      }, 0)
+      const vaultGrowthDailyPerc_eth = vaultBalances.vaultGrowth_daily_eth * 100 / vaultBalances.vaultBalance_eth
+      const vaultGrowthWeeklyPerc_eth = vaultBalances.vaultGrowth_weekly_eth * 100 / vaultBalances.vaultBalance_eth
+      const vaultGrowthYearlyPerc_eth = vaultBalances.vaultGrowth_yearly_eth * 100 / vaultBalances.vaultBalance_eth
 
-      const vaultGrowthYearly_usd = vaultsInUse.reduce((accumulator, vault) => {
-        const usdBalance = vault.vaultBalance * vault.pricePerFullShare * vault.apy/100 * vault.prices.usd
-        return accumulator + usdBalance
-      }, 0)
 
-      const vaultGrowthDailyPerc_usd = vaultGrowthDaily_usd * 100 / vaultBalance_usd
-      const vaultGrowthWeeklyPerc_usd = vaultGrowthWeekly_usd * 100 / vaultBalance_usd
-      const vaultGrowthYearlyPerc_usd = vaultGrowthYearly_usd * 100 / vaultBalance_usd
-
-      // const vaultBalance_eth = vaultsInUse.reduce((accumulator, vault) => {
-      //   const usdBalance = vault.vaultBalance * vault.pricePerFullShare * vault.prices.eth
-      //   return accumulator + usdBalance
-      // }, 0)
-
+      // FILTER USED EARN AND CALCULATE EARN ASSET BALANCES
       const assetsInUse = assets.filter((asset) => {
-        return asset.investedBalance > 0.01
+        return asset.investedBalance > 0.0001
       }).map((asset) => {
         const price = prices[asset.price_id]
         if(price == null) {
           console.log(asset.price_id)
         }
         asset.prices = price
+        asset.usdBalance = asset.investedBalance * asset.price * asset.prices.usd
+        asset.earnGrowth_daily_usd = asset.investedBalance * asset.price * (asset.maxApr/36500) * asset.prices.usd
+        asset.earnGrowth_weekly_usd = asset.investedBalance * asset.price * (asset.maxApr/5200) * asset.prices.usd
+        asset.earnGrowth_yearly_usd = asset.investedBalance * asset.price * asset.maxApr/100 * asset.prices.usd
+
+        asset.ethBalance = asset.investedBalance * asset.price * asset.prices.eth
+        asset.earnGrowth_daily_eth = asset.investedBalance * asset.price * (asset.maxApr/36500) * asset.prices.eth
+        asset.earnGrowth_weekly_eth = asset.investedBalance * asset.price * (asset.maxApr/5200) * asset.prices.eth
+        asset.earnGrowth_yearly_eth = asset.investedBalance * asset.price * asset.maxApr/100 * asset.prices.eth
         return asset
       })
 
-      console.log(assetsInUse)
 
-      const earnBalance_usd = assetsInUse.reduce((accumulator, asset) => {
-        const usdBalance = asset.investedBalance * asset.price * asset.prices.usd
-        return accumulator + usdBalance
-      }, 0)
+      // CALCULATE EARN BALANCES AND DAILY GROWTH
+      const earnBalances = assetsInUse.reduce((accumulator, asset) => {
+        accumulator.earnBalance_usd = accumulator.earnBalance_usd + asset.usdBalance
+        accumulator.earnGrowth_daily_usd = accumulator.earnGrowth_daily_usd + asset.earnGrowth_daily_usd
+        accumulator.earnGrowth_weekly_usd = accumulator.earnGrowth_weekly_usd + asset.earnGrowth_weekly_usd
+        accumulator.earnGrowth_yearly_usd = accumulator.earnGrowth_yearly_usd + asset.earnGrowth_yearly_usd
 
-      const earnGrowthDaily_usd = assetsInUse.reduce((accumulator, asset) => {
-        const usdBalance = asset.investedBalance * asset.price * (asset.maxApr/36500) * asset.prices.usd
-        return accumulator + usdBalance
-      }, 0)
+        accumulator.earnBalance_eth = accumulator.earnBalance_eth + asset.ethBalance
+        accumulator.earnGrowth_daily_eth = accumulator.earnGrowth_daily_eth + asset.earnGrowth_daily_eth
+        accumulator.earnGrowth_weekly_eth = accumulator.earnGrowth_weekly_eth + asset.earnGrowth_weekly_eth
+        accumulator.earnGrowth_yearly_eth = accumulator.earnGrowth_yearly_eth + asset.earnGrowth_yearly_eth
+        return accumulator
+      }, {
+        earnBalance_usd: 0,
+        earnGrowth_daily_usd: 0,
+        earnGrowth_weekly_usd: 0,
+        earnGrowth_yearly_usd: 0,
+        earnBalance_eth: 0,
+        earnGrowth_daily_eth: 0,
+        earnGrowth_weekly_eth: 0,
+        earnGrowth_yearly_eth: 0
+      })
 
-      const earnGrowthWeekly_usd = assetsInUse.reduce((accumulator, asset) => {
-        const usdBalance = asset.investedBalance * asset.price * (asset.maxApr/5200) * asset.prices.usd
-        return accumulator + usdBalance
-      }, 0)
+      // CALCULATE EARN GROWth PERCENTAGES
+      const earnGrowthDailyPerc_usd = earnBalances.earnGrowth_daily_usd * 100 / earnBalances.earnBalance_usd
+      const earnGrowthWeeklyPerc_usd = earnBalances.earnGrowth_weekly_usd * 100 / earnBalances.earnBalance_usd
+      const earnGrowthYearlyPerc_usd = earnBalances.earnGrowth_yearly_usd * 100 / earnBalances.earnBalance_usd
 
-      const earnGrowthYearly_usd = assetsInUse.reduce((accumulator, asset) => {
-        const usdBalance = asset.investedBalance * asset.price * asset.maxApr/100 * asset.prices.usd
-        return accumulator + usdBalance
-      }, 0)
+      const earnGrowthDailyPerc_eth = earnBalances.earnGrowth_daily_eth * 100 / earnBalances.earnBalance_eth
+      const earnGrowthWeeklyPerc_eth = earnBalances.earnGrowth_weekly_eth * 100 / earnBalances.earnBalance_eth
+      const earnGrowthYearlyPerc_eth = earnBalances.earnGrowth_yearly_eth * 100 / earnBalances.earnBalance_eth
 
-      const earnGrowthDailyPerc_usd = earnGrowthDaily_usd * 100 / earnBalance_usd
-      const earnGrowthWeeklyPerc_usd = earnGrowthWeekly_usd * 100 / earnBalance_usd
-      const earnGrowthYearlyPerc_usd = earnGrowthYearly_usd * 100 / earnBalance_usd
 
-      const portfolioBalance_usd = vaultBalance_usd + earnBalance_usd
-      const portfolioGrowthDaily_usd = vaultGrowthDaily_usd + earnGrowthDaily_usd
-      const portfolioGrowthWeekly_usd = vaultGrowthWeekly_usd + earnGrowthWeekly_usd
-      const portfolioGrowthYearly_usd = vaultGrowthYearly_usd + earnGrowthYearly_usd
-      const portfolioGrowthDailyPerc_usd = (vaultGrowthDaily_usd + earnGrowthDaily_usd) * 100 / (vaultBalance_usd + earnBalance_usd)
-      const portfolioGrowthWeeklyPerc_usd = (vaultGrowthWeekly_usd + earnGrowthWeekly_usd) * 100 / (vaultBalance_usd + earnBalance_usd)
-      const portfolioGrowthYearlyPerc_usd = (vaultGrowthYearly_usd + earnGrowthYearly_usd) * 100 / (vaultBalance_usd + earnBalance_usd)
+
+
+      // CALCULATE PORTFOLIO (earn + vault) BALANCES
+      const portfolioBalance_usd = vaultBalances.vaultBalance_usd + earnBalances.earnBalance_usd
+      const portfolioGrowthDaily_usd = vaultBalances.vaultGrowth_daily_usd + earnBalances.earnGrowth_daily_usd
+      const portfolioGrowthWeekly_usd = vaultBalances.vaultGrowth_weekly_usd + earnBalances.earnGrowth_weekly_usd
+      const portfolioGrowthYearly_usd = vaultBalances.vaultGrowth_yearly_usd + earnBalances.earnGrowth_yearly_usd
+      const portfolioGrowthDailyPerc_usd = (vaultBalances.vaultGrowth_daily_usd + earnBalances.earnGrowth_daily_usd) * 100 / (vaultBalances.vaultBalance_usd + earnBalances.earnBalance_usd)
+      const portfolioGrowthWeeklyPerc_usd = (vaultBalances.vaultGrowth_weekly_usd + earnBalances.earnGrowth_weekly_usd) * 100 / (vaultBalances.vaultBalance_usd + earnBalances.earnBalance_usd)
+      const portfolioGrowthYearlyPerc_usd = (vaultBalances.vaultGrowth_yearly_usd + earnBalances.earnGrowth_yearly_usd) * 100 / (vaultBalances.vaultBalance_usd + earnBalances.earnBalance_usd)
+
+
+      const portfolioBalance_eth = vaultBalances.vaultBalance_eth + earnBalances.earnBalance_eth
+      const portfolioGrowthDaily_eth = vaultBalances.vaultGrowth_daily_eth + earnBalances.earnGrowth_daily_eth
+      const portfolioGrowthWeekly_eth = vaultBalances.vaultGrowth_weekly_eth + earnBalances.earnGrowth_weekly_eth
+      const portfolioGrowthYearly_eth = vaultBalances.vaultGrowth_yearly_eth + earnBalances.earnGrowth_yearly_eth
+      const portfolioGrowthDailyPerc_eth = (vaultBalances.vaultGrowth_daily_eth + earnBalances.earnGrowth_daily_eth) * 100 / (vaultBalances.vaultBalance_eth + earnBalances.earnBalance_eth)
+      const portfolioGrowthWeeklyPerc_eth = (vaultBalances.vaultGrowth_weekly_eth + earnBalances.earnGrowth_weekly_eth) * 100 / (vaultBalances.vaultBalance_eth + earnBalances.earnBalance_eth)
+      const portfolioGrowthYearlyPerc_eth = (vaultBalances.vaultGrowth_yearly_eth + earnBalances.earnGrowth_yearly_eth) * 100 / (vaultBalances.vaultBalance_eth + earnBalances.earnBalance_eth)
 
 
       let dashboard = {
-        vault_balance_usd: vaultBalance_usd,
-        vault_growth_usd_daily: vaultGrowthDaily_usd,
-        vault_growth_usd_weekly: vaultGrowthWeekly_usd,
-        vault_growth_usd_yearly: vaultGrowthYearly_usd,
+        vault_balance_usd: vaultBalances.vaultBalance_usd,
+        vault_growth_usd_daily: vaultBalances.vaultGrowth_daily_usd,
+        vault_growth_usd_weekly: vaultBalances.vaultGrowth_weekly_usd,
+        vault_growth_usd_yearly: vaultBalances.vaultGrowth_yearly_usd,
         vault_growth_usd_daily_perc: vaultGrowthDailyPerc_usd,
         vault_growth_usd_weekly_perc: vaultGrowthWeeklyPerc_usd,
         vault_growth_usd_yearly_perc: vaultGrowthYearlyPerc_usd,
 
-        earn_balance_usd: earnBalance_usd,
-        earn_growth_usd_daily: earnGrowthDaily_usd,
-        earn_growth_usd_weekly: earnGrowthWeekly_usd,
-        earn_growth_usd_yearly: earnGrowthYearly_usd,
+        vault_balance_eth: vaultBalances.vaultBalance_eth,
+        vault_growth_eth_daily: vaultBalances.vaultGrowth_daily_eth,
+        vault_growth_eth_weekly: vaultBalances.vaultGrowth_weekly_eth,
+        vault_growth_eth_yearly: vaultBalances.vaultGrowth_yearly_eth,
+        vault_growth_eth_daily_perc: vaultGrowthDailyPerc_eth,
+        vault_growth_eth_weekly_perc: vaultGrowthWeeklyPerc_eth,
+        vault_growth_eth_yearly_perc: vaultGrowthYearlyPerc_eth,
+
+
+        earn_balance_usd: earnBalances.earnBalance_usd,
+        earn_growth_usd_daily: earnBalances.earnGrowth_daily_usd,
+        earn_growth_usd_weekly: earnBalances.earnGrowth_weekly_usd,
+        earn_growth_usd_yearly: earnBalances.earnGrowth_yearly_usd,
         earn_growth_usd_daily_perc: earnGrowthDailyPerc_usd,
         earn_growth_usd_weekly_perc: earnGrowthWeeklyPerc_usd,
         earn_growth_usd_yearly_perc: earnGrowthYearlyPerc_usd,
+
+        earn_balance_eth: earnBalances.earnBalance_eth,
+        earn_growth_eth_daily: earnBalances.earnGrowth_daily_eth,
+        earn_growth_eth_weekly: earnBalances.earnGrowth_weekly_eth,
+        earn_growth_eth_yearly: earnBalances.earnGrowth_yearly_eth,
+        earn_growth_eth_daily_perc: earnGrowthDailyPerc_eth,
+        earn_growth_eth_weekly_perc: earnGrowthWeeklyPerc_eth,
+        earn_growth_eth_yearly_perc: earnGrowthYearlyPerc_eth,
 
         portfolio_balance_usd: portfolioBalance_usd,
         portfolio_growth_usd_daily: portfolioGrowthDaily_usd,
@@ -2903,6 +2980,14 @@ class Store {
         portfolio_growth_usd_daily_perc: portfolioGrowthDailyPerc_usd,
         portfolio_growth_usd_weekly_perc: portfolioGrowthWeeklyPerc_usd,
         portfolio_growth_usd_yearly_perc: portfolioGrowthYearlyPerc_usd,
+
+        portfolio_balance_eth: portfolioBalance_eth,
+        portfolio_growth_eth_daily: portfolioGrowthDaily_eth,
+        portfolio_growth_eth_weekly: portfolioGrowthWeekly_eth,
+        portfolio_growth_eth_yearly: portfolioGrowthYearly_eth,
+        portfolio_growth_eth_daily_perc: portfolioGrowthDailyPerc_eth,
+        portfolio_growth_eth_weekly_perc: portfolioGrowthWeeklyPerc_eth,
+        portfolio_growth_eth_yearly_perc: portfolioGrowthYearlyPerc_eth,
 
         vaults: vaultsInUse,
         assets: assetsInUse,
