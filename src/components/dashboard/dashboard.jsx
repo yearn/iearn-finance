@@ -192,12 +192,14 @@ class Dashboard extends Component {
 
     const dashboard = store.getStore('dashboard')
     const account = store.getStore('account')
+    const growth = localStorage.getItem('yearn.finance-dashboard-growth')
+    const currency = localStorage.getItem('yearn.finance-dashboard-currency')
 
     this.state = {
       dashboard: dashboard,
       loading: true,
-      growth: 1, // 0=daily 1=weekly 2=yearly
-      currency: 'USD' // USD / ETH
+      growth: growth ? parseInt(growth) : 1, // 0=daily 1=weekly 2=yearly
+      currency: currency ? currency : 'USd' // USD / ETH
     }
 
     if(account && account.address) {
@@ -346,11 +348,15 @@ class Dashboard extends Component {
         newGrowth = 0
     }
     this.setState({ growth: newGrowth })
+
+    localStorage.setItem('yearn.finance-dashboard-growth', newGrowth.toString())
   }
 
   balanceClicked = () => {
     const { currency } = this.state
     this.setState({ currency: (currency === 'USD' ? 'ETH' : 'USD') })
+
+    localStorage.setItem('yearn.finance-dashboard-currency', (currency === 'USD' ? 'ETH' : 'USD'))
   }
 
   renderVaults = () => {
