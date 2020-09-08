@@ -106,9 +106,7 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1
-  },
-  growth: {
+    flex: 1,
     cursor: 'pointer'
   },
   prettyAlign: {
@@ -180,6 +178,10 @@ const styles = theme => ({
   },
   symbol: {
     paddingLeft: '6px'
+  },
+  symbolAt: {
+    paddingLeft: '6px',
+    color: colors.darkGray
   }
 });
 
@@ -194,7 +196,8 @@ class Dashboard extends Component {
     this.state = {
       dashboard: dashboard,
       loading: true,
-      growth: 1 // 0=daily 1=weekly 2=yearly
+      growth: 1, // 0=daily 1=weekly 2=yearly
+      currency: 'USD' // USD / ETH
     }
 
     if(account && account.address) {
@@ -234,47 +237,79 @@ class Dashboard extends Component {
     const {
       loading,
       dashboard,
-      growth
+      growth,
+      currency
     } = this.state
 
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer}>
           <div className={ classes.portfolioContainer }>
-            <div className={ classes.titleBalance }>
-              <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_balance_usd.toFixed(2)).toLocaleString() }</Typography>
+            <div className={ classes.titleBalance } onClick={ this.balanceClicked }>
+              { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_balance_usd.toFixed(2)).toLocaleString() }</Typography> }
+              { currency === 'ETH' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_balance_eth.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
+                </div>
+              }
               <Typography variant={ 'h4' } className={ classes.gray }>Portfolio Balance</Typography>
             </div>
             <div className={ classes.between }>
             </div>
-            <div className={ `${classes.titleBalance} ${classes.growth}` } onClick={ this.growthClicked }>
-              { growth === 0 && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_daily.toFixed(2)).toLocaleString() }</Typography> }
-              { growth === 0 &&
+            { growth === 0 &&
+              <div className={ classes.titleBalance } onClick={ this.growthClicked }>
+                { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_daily.toFixed(2)).toLocaleString() }</Typography> }
+                { currency === 'ETH' &&
+                  <div className={ classes.inline }>
+                    <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_growth_eth_daily.toFixed(2)).toLocaleString() }</Typography >
+                    <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
+                  </div>
+                }
                 <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
                   Daily Growth
                   <Tooltip title="Estimated - based on the vault's perfomance since the vault was created" arrow>
                     <InfoIcon className={ classes.infoIcon } />
                   </Tooltip>
                 </Typography>
-              }
-              { growth === 1 && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_weekly.toFixed(2)).toLocaleString() }</Typography> }
-              { growth === 1 &&
+              </div>
+            }
+
+            { growth === 1 &&
+              <div className={ classes.titleBalance } onClick={ this.growthClicked }>
+                { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_weekly.toFixed(2)).toLocaleString() }</Typography> }
+                { currency === 'ETH' &&
+                  <div className={ classes.inline }>
+                    <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_growth_eth_weekly.toFixed(2)).toLocaleString() }</Typography >
+                    <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
+                  </div>
+                }
                 <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
                   Weekly Growth
                   <Tooltip title="Estimated - based on the vault's perfomance since the vault was created" arrow>
                     <InfoIcon className={ classes.infoIcon } />
                   </Tooltip>
-                </Typography> }
+                </Typography>
+              </div>
+            }
 
-              { growth === 2 && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_yearly.toFixed(2)).toLocaleString() }</Typography> }
-              { growth === 2 &&
+            { growth === 2 &&
+              <div className={ classes.titleBalance } onClick={ this.growthClicked }>
+                { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_yearly.toFixed(2)).toLocaleString() }</Typography> }
+                { currency === 'ETH' &&
+                  <div className={ classes.inline }>
+                    <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_growth_eth_yearly.toFixed(2)).toLocaleString() }</Typography >
+                    <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
+                  </div>
+                }
                 <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
                   Yearly Growth
                   <Tooltip title="Estimated - based on the vault's perfomance since the vault was created" arrow>
                     <InfoIcon className={ classes.infoIcon } />
                   </Tooltip>
-                </Typography> }
-            </div>
+                </Typography>
+              </div>
+            }
           </div>
           { (dashboard.vaults && dashboard.vaults.length > 0) &&
             <div className={ classes.vaultContainer }>
@@ -282,7 +317,7 @@ class Dashboard extends Component {
               { this.renderVaults() }
             </div>
           }
-          { (dashboard.assets && dashboard.assets.length > 0) && 
+          { (dashboard.assets && dashboard.assets.length > 0) &&
             <div className={ classes.earnContainer }>
               <Typography variant={ 'h3' } className={ classes.sectionHeading }>Earn Overview</Typography>
               { this.renderEarn() }
@@ -313,8 +348,13 @@ class Dashboard extends Component {
     this.setState({ growth: newGrowth })
   }
 
+  balanceClicked = () => {
+    const { currency } = this.state
+    this.setState({ currency: (currency === 'USD' ? 'ETH' : 'USD') })
+  }
+
   renderVaults = () => {
-    const { growth } = this.state
+    const { growth, currency } = this.state
     const { vaults } = this.state.dashboard
     const { classes } = this.props
 
@@ -338,21 +378,75 @@ class Dashboard extends Component {
               <Typography variant={ 'h5' } noWrap className={ classes.gray }>{ asset.description }</Typography>
             </div>
           </div>
-          <div className={classes.heading}>
-            { growth === 0 && <Typography variant={ 'h5' } className={ classes.gray }>Daily Growth</Typography> }
-            { growth === 0 && <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy/365).toFixed(2) : '0.00') }% </Typography> }
-
-            { growth === 1 && <Typography variant={ 'h5' } className={ classes.gray }>Weekly Growth</Typography> }
-            { growth === 1 && <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy/52).toFixed(2) : '0.00') }% </Typography> }
-
-            { growth === 2 && <Typography variant={ 'h5' } className={ classes.gray }>Yearly Growth</Typography> }
-            { growth === 2 && <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(2) : '0.00') }% </Typography> }
-          </div>
-          <div className={classes.heading}>
-            <Typography variant={ 'h5' } className={ classes.gray }>Invested</Typography>
-            <div className={ classes.inline }>
-              <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.vaultBalance ? (asset.vaultBalance).toFixed(2) : '0.00').toLocaleString() }</Typography ><Typography className={ classes.symbol } variant={ 'h5' }>{asset.vaultSymbol}</Typography>
+          { growth === 0 &&
+            <div className={classes.heading}>
+              <Typography variant={ 'h5' } className={ classes.gray }>Daily Growth</Typography>
+              { currency === 'USD' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_daily_usd.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/365).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
+              { currency === 'ETH' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.vaultGrowth_daily_eth.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/365).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
             </div>
+          }
+          { growth === 1 &&
+            <div className={classes.heading}>
+              <Typography variant={ 'h5' } className={ classes.gray }>Weekly Growth</Typography>
+              { currency === 'USD' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_weekly_usd.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/52).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
+              { currency === 'ETH' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.vaultGrowth_weekly_eth.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/52).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
+            </div>
+          }
+          { growth === 2 &&
+            <div className={classes.heading}>
+              <Typography variant={ 'h5' } className={ classes.gray }>Yearly Growth</Typography>
+              { currency === 'USD' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_yearly_usd.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/1).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
+              { currency === 'ETH' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.vaultGrowth_yearly_eth.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/1).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
+            </div>
+          }
+          <div className={classes.heading}>
+            <Typography variant={ 'h5' } className={ classes.gray }>Net worth</Typography>
+            { currency === 'USD' && <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.usdBalance ? (asset.usdBalance).toFixed(2) : '0.00').toLocaleString() }</Typography > }
+            { currency === 'ETH' &&
+              <div className={ classes.inline }>
+                <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.ethBalance ? (asset.ethBalance).toFixed(2) : '0.00').toLocaleString() }</Typography >
+                <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
+              </div>
+            }
           </div>
         </div>
       </div>)
@@ -360,7 +454,7 @@ class Dashboard extends Component {
   }
 
   renderEarn = () => {
-    const { growth } = this.state
+    const { growth, currency } = this.state
     const { assets } = this.state.dashboard
     const { classes } = this.props
 
@@ -384,21 +478,75 @@ class Dashboard extends Component {
               <Typography variant={ 'h5' } noWrap className={ classes.gray }>{ asset.description }</Typography>
             </div>
           </div>
-          <div className={classes.heading}>
-            { growth === 0 && <Typography variant={ 'h5' } className={ classes.gray }>Daily Growth</Typography> }
-            { growth === 0 && <Typography variant={ 'h3' } noWrap>{ (asset.maxApr ? (asset.maxApr*100/365).toFixed(2) : '0.00') }% </Typography> }
-
-            { growth === 1 && <Typography variant={ 'h5' } className={ classes.gray }>Weekly Growth</Typography> }
-            { growth === 1 && <Typography variant={ 'h3' } noWrap>{ (asset.maxApr ? (asset.maxApr*100/52).toFixed(2) : '0.00') }% </Typography> }
-
-            { growth === 2 && <Typography variant={ 'h5' } className={ classes.gray }>Yearly Growth</Typography> }
-            { growth === 2 && <Typography variant={ 'h3' } noWrap>{ (asset.maxApr ? (asset.maxApr*100).toFixed(2) : '0.00') }% </Typography> }
-          </div>
-          <div className={classes.heading}>
-            <Typography variant={ 'h5' } className={ classes.gray }>Invested</Typography>
-            <div className={ classes.inline }>
-              <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.investedBalance ? (asset.investedBalance).toFixed(2) : '0.00').toLocaleString() }</Typography ><Typography className={ classes.symbol } variant={ 'h5' }>{asset.investSymbol}</Typography>
+          { growth === 0 &&
+            <div className={classes.heading}>
+              <Typography variant={ 'h5' } className={ classes.gray }>Daily Growth</Typography>
+              { currency === 'USD' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.earnGrowth_daily_usd.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100/365).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
+              { currency === 'ETH' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.earnGrowth_daily_eth.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100/365).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
             </div>
+          }
+          { growth === 1 &&
+            <div className={classes.heading}>
+              <Typography variant={ 'h5' } className={ classes.gray }>Weekly Growth</Typography>
+              { currency === 'USD' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.earnGrowth_weekly_usd.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100/52).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
+              { currency === 'ETH' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.earnGrowth_weekly_eth.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100/52).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
+            </div>
+          }
+          { growth === 2 &&
+            <div className={classes.heading}>
+              <Typography variant={ 'h5' } className={ classes.gray }>Yearly Growth</Typography>
+              { currency === 'USD' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.earnGrowth_yearly_usd.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
+              { currency === 'ETH' &&
+                <div className={ classes.inline }>
+                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.earnGrowth_yearly_eth.toFixed(2)).toLocaleString() }</Typography >
+                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
+                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100).toFixed(2) : '0.00') }%</Typography>
+                </div>
+              }
+            </div>
+          }
+          <div className={classes.heading}>
+            <Typography variant={ 'h5' } className={ classes.gray }>Net worth</Typography>
+            { currency === 'USD' && <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.usdBalance ? (asset.usdBalance).toFixed(2) : '0.00').toLocaleString() }</Typography > }
+            { currency === 'ETH' &&
+              <div className={ classes.inline }>
+                <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.ethBalance ? (asset.ethBalance).toFixed(2) : '0.00').toLocaleString() }</Typography >
+                <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
+              </div>
+            }
           </div>
         </div>
       </div>)
