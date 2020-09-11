@@ -461,7 +461,7 @@ class Vault extends Component {
               </div>
               {
                 (!['LINK'].includes(asset.id) && asset.vaultBalance > 0) &&
-                <div className={classes.headingEarning}>
+                <div className={classes.heading}>
                   <Typography variant={ 'h5' } className={ classes.grey }>APY:</Typography>
                   <div className={ classes.flexy }>
                     <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(2) : '0.00') }% </Typography>
@@ -472,7 +472,7 @@ class Vault extends Component {
               }
               {
                 (!['LINK'].includes(asset.id) && asset.vaultBalance === 0) &&
-                <div className={classes.headingEarning}>
+                <div className={classes.heading}>
                   <Typography variant={ 'h5' } className={ classes.grey }>APY:</Typography>
                   <div className={ classes.flexy }>
                     <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(2) : '0.00') }% </Typography>
@@ -481,7 +481,7 @@ class Vault extends Component {
               }
               {
                 ['LINK'].includes(asset.id) &&
-                <div className={classes.headingEarning}>
+                <div className={classes.heading}>
                   <Typography variant={ 'h5' } className={ classes.grey }>APY:</Typography>
                   <Typography variant={ 'h3' } noWrap>Not Available</Typography>
                 </div>
@@ -489,6 +489,10 @@ class Vault extends Component {
               <div className={classes.heading}>
                 <Typography variant={ 'h5' } className={ classes.grey }>Your wallet:</Typography>
                 <Typography variant={ 'h3' } noWrap>{ (asset.balance ? (asset.balance).toFixed(2) : '0.00')+' '+asset.symbol }</Typography>
+              </div>
+              <div className={classes.heading}>
+                <Typography variant={ 'h5' } className={ classes.grey }>Your vault:</Typography>
+                <Typography variant={ 'h3' } noWrap>{ (asset.vaultBalance ? ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(2) : '0.00')+' '+asset.symbol }</Typography>
               </div>
             </div>
           </AccordionSummary>
