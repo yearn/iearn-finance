@@ -1,35 +1,3 @@
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@fameal 
-fameal
-/
-iearn-finance
-forked from iearn-finance/iearn-finance
-0
-0101
-Code
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-Settings
-iearn-finance/src/components/vault/asset.jsx
-@antonnell
-antonnell Cleaned up old, unused code.
-…
-Latest commit 53ff870 15 days ago
- History
- 1 contributor
-417 lines (380 sloc)  11.9 KB
-  
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
@@ -447,15 +415,3 @@ class Asset extends Component {
 }
 
 export default withRouter(withStyles(styles, { withTheme: true })(Asset));
-© 2020 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
