@@ -222,7 +222,7 @@ class Home extends Component {
         <Card className={ `${classes.card} ${classes.vault}` } onClick={ () => { this.nav(location.pathname+'vaults') }}>
           <PieChartIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Vaults") }</Typography>
-          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Vaults follow a unique strategy that are designed to maximize the yield of the deposited asset and minimize risk." }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Vaults follow unique strategies that are designed to maximize the yield of the deposited asset and minimize risk." }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.earn}` } onClick={ () => { this.nav(location.pathname+'earn') } }>
           <AttachMoneyIcon className={ `${classes.icon} icon` } />
