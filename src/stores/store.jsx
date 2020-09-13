@@ -1425,7 +1425,7 @@ class Store {
 
     var amountSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals !== 18) {
-      amountSend = amount*10**asset.decimals;
+      amountSend = Math.round(amount*10**asset.decimals);
     }
 
     iEarnContract.methods.transfer(asset.iEarnContract, amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
@@ -1469,7 +1469,7 @@ class Store {
 
     var amountSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals !== 18) {
-      amountSend = amount*10**asset.decimals;
+      amountSend = Math.round(amount*10**asset.decimals);
     }
 
     iEarnContract.methods[asset.redeem](amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
@@ -2663,7 +2663,7 @@ class Store {
 
     var amountSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals !== 18) {
-      amountSend = amount*10**asset.decimals;
+      amountSend = Math.round(amount*10**asset.decimals);
     }
 
     let functionCall = vaultContract.methods.withdraw(amountSend)
