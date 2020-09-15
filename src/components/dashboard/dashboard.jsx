@@ -199,7 +199,7 @@ class Dashboard extends Component {
       dashboard: dashboard,
       loading: true,
       growth: growth ? parseInt(growth) : 1, // 0=daily 1=weekly 2=yearly
-      currency: currency ? currency : 'USd' // USD / ETH
+      currency: currency ? currency : 'USD' // USD / ETH
     }
 
     if(account && account.address) {
