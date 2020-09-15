@@ -466,7 +466,7 @@ class Vault extends Component {
                   <div className={ classes.flexy }>
                     <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(2) : '0.00') }% </Typography>
                     <Typography variant={ 'h5' } className={ classes.on }> on </Typography>
-                    <Typography variant={ 'h3' } noWrap>{ (asset.vaultBalance ? (asset.vaultBalance).toFixed(2) : '0.00') } {asset.vaultSymbol}</Typography>
+                    <Typography variant={ 'h3' } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(2) : '0.00') } {asset.vaultSymbol}</Typography>
                   </div>
                 </div>
               }

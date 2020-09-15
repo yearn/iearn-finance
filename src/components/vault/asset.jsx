@@ -165,7 +165,7 @@ class Asset extends Component {
     return (<div className={ classes.actionsContainer }>
       <div className={ classes.tradeContainer }>
         <div className={ classes.balances }>
-            <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Balance: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
+            <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
         </div>
         <TextField
           fullWidth
@@ -204,14 +204,6 @@ class Asset extends Component {
             onClick={ () => { this.setAmount(75) } }>
             <Typography variant={'h5'}>75%</Typography>
           </Button>
-          <Button
-            className={ classes.scale }
-            variant='text'
-            disabled={ loading }
-            color="primary"
-            onClick={ () => { this.setAmount(100) } }>
-            <Typography variant={'h5'}>100%</Typography>
-          </Button>
         </div>
         <div className={ classes.buttons }>
           { asset.deposit === true &&
@@ -248,7 +240,7 @@ class Asset extends Component {
       <div className={ classes.sepperator }></div>
       <div className={classes.tradeContainer}>
         <div className={ classes.balances }>
-          <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ asset.vaultBalance ? (Math.floor(asset.vaultBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol } ({ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol }) </Typography>
+          <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.vaultBalance ? (Math.floor(asset.vaultBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography>
         </div>
         <TextField
           fullWidth
@@ -286,14 +278,6 @@ class Asset extends Component {
             color="primary"
             onClick={ () => { this.setRedeemAmount(75) } }>
             <Typography variant={'h5'}>75%</Typography>
-          </Button>
-          <Button
-            className={ classes.scale }
-            variant='text'
-            disabled={ loading }
-            color="primary"
-            onClick={ () => { this.setRedeemAmount(100) } }>
-            <Typography variant={'h5'}>100%</Typography>
           </Button>
         </div>
         <div className={ classes.buttons }>
@@ -365,8 +349,8 @@ class Asset extends Component {
   onWithdraw = () => {
     this.setState({ redeemAmountError: false })
 
-    const { redeemAmount } = this.state
     const { asset, startLoading  } = this.props
+    const redeemAmount = this.state.redeemAmount/asset.pricePerFullShare
 
     if(!redeemAmount || isNaN(redeemAmount) || redeemAmount <= 0 || redeemAmount > asset.vaultBalance) {
       this.setState({ redeemAmountError: true })
@@ -406,7 +390,7 @@ class Asset extends Component {
       return
     }
 
-    const balance = this.props.asset.vaultBalance
+    const balance = this.props.asset.vaultBalance*this.props.asset.pricePerFullShare
     let amount = balance*percent/100
     amount = Math.floor(amount*10000)/10000;
 
