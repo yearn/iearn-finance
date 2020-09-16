@@ -183,6 +183,10 @@ class Footer extends Component {
             <ForumIcon height='15px' className={ classes.icon } />
             <Typography variant={ 'h4'} >yearn.snapshot.page</Typography>
           </div>
+          <div  className={ classes.link } onClick={()=> window.open("https://vaults.finance", "_blank")} >
+            <AttachMoneyIcon height='15px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >vaults.finance</Typography>
+          </div>
         </div>
         <div className={ classes.socials }>
           <Typography className={ classes.heading } variant={ 'h6'}>Socials</Typography>
