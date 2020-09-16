@@ -204,6 +204,14 @@ class Asset extends Component {
             onClick={ () => { this.setAmount(75) } }>
             <Typography variant={'h5'}>75%</Typography>
           </Button>
+          <Button
+            className={ classes.scale }
+            variant='text'
+            disabled={ loading }
+            color="primary"
+            onClick={ () => { this.setAmount(100) } }>
+            <Typography variant={'h5'}>100%</Typography>
+          </Button>
         </div>
         <div className={ classes.buttons }>
           { asset.deposit === true &&
@@ -279,6 +287,14 @@ class Asset extends Component {
             onClick={ () => { this.setRedeemAmount(75) } }>
             <Typography variant={'h5'}>75%</Typography>
           </Button>
+          <Button
+            className={ classes.scale }
+            variant='text'
+            disabled={ loading }
+            color="primary"
+            onClick={ () => { this.setRedeemAmount(100) } }>
+            <Typography variant={'h5'}>100%</Typography>
+          </Button>
         </div>
         <div className={ classes.buttons }>
           { asset.withdraw === true &&
@@ -350,7 +366,8 @@ class Asset extends Component {
     this.setState({ redeemAmountError: false })
 
     const { asset, startLoading  } = this.props
-    const redeemAmount = this.state.redeemAmount/asset.pricePerFullShare
+    let redeemAmount = this.state.redeemAmount/asset.pricePerFullShare
+    redeemAmount = (Math.floor(redeemAmount*10000)/10000).toFixed(4);
 
     if(!redeemAmount || isNaN(redeemAmount) || redeemAmount <= 0 || redeemAmount > asset.vaultBalance) {
       this.setState({ redeemAmountError: true })
