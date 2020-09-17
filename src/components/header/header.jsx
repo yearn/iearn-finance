@@ -180,6 +180,7 @@ class Header extends Component {
             { this.renderLink('earn') }
             { this.renderLink('zap') }
             { this.renderLink('cover') }
+            { this.renderLink('stats') }
           </div>
           <div className={ classes.account }>
             { address &&

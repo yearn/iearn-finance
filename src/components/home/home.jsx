@@ -38,7 +38,6 @@ const styles = theme => ({
     transition: 'background-color 0.2s linear',
     [theme.breakpoints.up('sm')]: {
       height: '100vh',
-      minWidth: '20%',
       minHeight: '50vh',
     }
   },
@@ -238,6 +237,11 @@ class Home extends Component {
           <SecurityIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Cover") }</Typography>
           <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Get cover with Nexus Mutual from yinsure.finance" }</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav(location.pathname+'stats') } }>
+          <BarChartIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>Stats</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Get a quick glance at how yearn's vaults are performing." }</Typography>
         </Card>
       </div>
     )

@@ -66,7 +66,7 @@ class App extends Component {
             background: "#f9fafb"
           }}>
             <Switch>
-              <Route path="/apr">
+              <Route path="/stats">
                 <Header />
                 <APR />
               </Route>
