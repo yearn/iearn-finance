@@ -11,7 +11,6 @@ import HowToVoteIcon from '@material-ui/icons/HowToVote';
 import SecurityIcon from '@material-ui/icons/Security';
 import DescriptionIcon from '@material-ui/icons/Description';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
-import CreditCardIcon from '@material-ui/icons/CreditCard';
 
 import ForumIcon from '@material-ui/icons/Forum';
 import BarChartIcon from '@material-ui/icons/BarChart';
@@ -147,10 +146,6 @@ class Footer extends Component {
           <div  className={ classes.link } onClick={()=> window.open("https://yborrow.finance", "_blank")} >
             <MonetizationOnIcon height='15px' className={ classes.icon } />
             <Typography variant={ 'h4'} >yborrow.finance</Typography>
-          </div>
-          <div  className={ classes.link } onClick={()=> window.open("https://ycredit.finance", "_blank")} >
-            <CreditCardIcon height='15px' className={ classes.icon } />
-            <Typography variant={ 'h4'} >ycredit.finance</Typography>
           </div>
           <div  className={ classes.link } onClick={()=> window.open("https://docs.yearn.finance", "_blank")} >
             <DescriptionIcon height='15px' className={ classes.icon } />
