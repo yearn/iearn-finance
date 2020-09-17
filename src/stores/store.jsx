@@ -2424,6 +2424,7 @@ class Store {
         asset.vaultBalance = data[1]
         asset.strategy = data[2].strategy
         asset.strategyHoldings = data[2].holdings
+        asset.strategyName = data[2].name
         asset.stats = data[3]
         asset.vaultHoldings = data[4]
         asset.pricePerFullShare = data[5].pricePerFullShare
@@ -2465,9 +2466,10 @@ class Store {
 
   _getStrategy = async (web3, asset, account, callback) => {
 
-    if(['ETH', 'LINK'].includes(asset.id) ) {
+    if(['LINK'].includes(asset.id) ) {
       return callback(null, {
         strategy: '',
+        name: '',
         holdings: 0
       })
     }
@@ -2481,14 +2483,24 @@ class Store {
       if(['LINK', 'aLINK'].includes(asset.id)) {
         strategyAddress = await controllerContract.methods.strategies(asset.vaultContractAddress).call({ from: account.address })
       } else {
+
+        if(asset.erc20address === 'Ethereum') {
+          asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+        }
         strategyAddress = await controllerContract.methods.strategies(asset.erc20address).call({ from: account.address })
       }
 
       const strategyContract = new web3.eth.Contract(config.vaultStrategyABI, strategyAddress)
       const holdings = await strategyContract.methods.balanceOf().call({ from: account.address })
+      let strategyName = 'StrategyDForceUSDC'
+
+      if(!['USDC'].includes(asset.id)) {
+        strategyName = await strategyContract.methods.getName().call({ from: account.address })
+      }
 
       callback(null, {
         strategy: strategyAddress,
+        name: strategyName,
         holdings: holdings/(10**(asset.id === 'aLINK' ? 6 : asset.decimals))
       })
     } catch (ex) {
@@ -2496,6 +2508,7 @@ class Store {
       console.log(ex)
       callback(null, {
         strategy: '',
+        name: '',
         holdings: 0
       })
     }

@@ -184,7 +184,6 @@ class APR extends Component {
   }
 
   statisticsReturned = (balances) => {
-    console.log(store.getStore('vaultAssets'))
     this.setState({ assets: store.getStore('vaultAssets') })
   };
 
@@ -266,11 +265,6 @@ class APR extends Component {
         return asset.symbol !== 'ETH'
       }).map((asset) => {
 
-        var address = 'Unknown';
-        if (asset.strategy) {
-          address = asset.strategy.substring(0,6)+'...'+asset.strategy.substring(asset.strategy.length-4,asset.strategy.length)
-        }
-
         return (
           <tr key={ asset.id } className={ classes.pair }>
             <td className={ classes.name } onClick={() => { window.open(`https://etherscan.io/address/${asset.vaultContractAddress}#code`, "_blank")} }>
@@ -283,8 +277,8 @@ class APR extends Component {
               </div>
               <Typography align='right' variant={'h4'} >{ asset.name }</Typography>
             </td>
-            <td className={ classes.strategy } onClick={() => { if(address === 'Unknown') { return; } window.open(`https://etherscan.io/address/${asset.strategy}#code`, "_blank")} }>
-              <Typography align='right' variant='h5'>{ address }</Typography>
+            <td className={ classes.strategy } onClick={() => { window.open(`https://etherscan.io/address/${asset.strategy}#code`, "_blank")} }>
+              <Typography align='right' variant='h5'>{ asset.strategyName }</Typography>
             </td>
             <td className={ classes.apr2 }>
               <Typography align='right' variant='h5' className={ classes.inline }>{ asset.vaultHoldings ? parseFloat(asset.vaultHoldings.toFixed(2)).toLocaleString() : '0.00'  } <div className={classes.symbol}>{ asset.symbol }</div></Typography>
