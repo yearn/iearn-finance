@@ -147,6 +147,25 @@ const iswapTheme =  {
         fontSize: '1rem'
       }
     },
+    MuiInput: {
+      underline: {
+        '&:before': { //underline color when textfield is inactive
+          display: 'none !important',
+          height: '0px',
+          borderBottom: 'none !important'
+        },
+        '&:after': { //underline color when textfield is inactive
+          display: 'none !important',
+          height: '0px',
+          borderBottom: 'none !important'
+        },
+        '&:hover:not($disabled):before': { //underline color when hovered
+          display: 'none !important',
+          height: '0px',
+          borderBottom: 'none !important'
+        },
+      }
+    },
     MuiInputBase: {
       input: {
         fontSize: '16px',

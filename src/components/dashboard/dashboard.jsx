@@ -4,7 +4,9 @@ import { withStyles } from '@material-ui/core/styles';
 import * as moment from 'moment';
 import {
   Typography,
-  Tooltip
+  Tooltip,
+  TextField,
+  MenuItem
 } from '@material-ui/core';
 import { colors } from '../../theme'
 
@@ -71,7 +73,6 @@ const styles = theme => ({
     justifyContent: 'space-between',
   },
   vaultContainer: {
-    marginTop: '40px',
     padding: '28px 30px',
     borderRadius: '50px',
     border: '1px solid '+colors.borderBlue,
@@ -115,7 +116,7 @@ const styles = theme => ({
   },
   infoIcon: {
     fontSize: '1em',
-    marginLeft: '6px'
+    marginRight: '6px'
   },
   assetSummary: {
     display: 'flex',
@@ -182,6 +183,12 @@ const styles = theme => ({
   symbolAt: {
     paddingLeft: '6px',
     color: colors.darkGray
+  },
+  basedOnContainer: {
+    display: 'flex',
+    width: '100%',
+    justifyContent: 'flex-end',
+    alignItems: 'center'
   }
 });
 
@@ -194,12 +201,14 @@ class Dashboard extends Component {
     const account = store.getStore('account')
     const growth = localStorage.getItem('yearn.finance-dashboard-growth')
     const currency = localStorage.getItem('yearn.finance-dashboard-currency')
+    const basedOn = localStorage.getItem('yearn.finance-dashboard-basedon')
 
     this.state = {
       dashboard: dashboard,
       loading: true,
       growth: growth ? parseInt(growth) : 1, // 0=daily 1=weekly 2=yearly
-      currency: currency ? currency : 'USD' // USD / ETH
+      currency: currency ? currency : 'USD', // USD / ETH,
+      basedOn: basedOn ? parseInt(basedOn) : 1 // 1=apyOneDaySample  2=apyThreeDaySample  3= apyOneWeekSample  4=apyInceptionSample
     }
 
     if(account && account.address) {
@@ -270,9 +279,6 @@ class Dashboard extends Component {
                 }
                 <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
                   Daily Growth
-                  <Tooltip title="Estimated - based on the vault's perfomance since the vault was created" arrow>
-                    <InfoIcon className={ classes.infoIcon } />
-                  </Tooltip>
                 </Typography>
               </div>
             }
@@ -288,9 +294,6 @@ class Dashboard extends Component {
                 }
                 <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
                   Weekly Growth
-                  <Tooltip title="Estimated - based on the vault's perfomance since the vault was created" arrow>
-                    <InfoIcon className={ classes.infoIcon } />
-                  </Tooltip>
                 </Typography>
               </div>
             }
@@ -306,13 +309,11 @@ class Dashboard extends Component {
                 }
                 <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
                   Yearly Growth
-                  <Tooltip title="Estimated - based on the vault's perfomance since the vault was created" arrow>
-                    <InfoIcon className={ classes.infoIcon } />
-                  </Tooltip>
                 </Typography>
               </div>
             }
           </div>
+          { this.renderBasedOn() }
           { (dashboard.vaults && dashboard.vaults.length > 0) &&
             <div className={ classes.vaultContainer }>
               <Typography variant={ 'h3' } className={ classes.sectionHeading }>Vaults Overview</Typography>
@@ -331,6 +332,71 @@ class Dashboard extends Component {
     )
   };
 
+  renderBasedOn = () => {
+
+    const { classes } = this.props
+    const { basedOn, loading } = this.state
+
+    const options = [
+      {
+        value: 1,
+        description: '1 day'
+      },
+      {
+        value: 2,
+        description: '3 days'
+      },
+      {
+        value: 3,
+        description: '1 week'
+      },
+      {
+        value: 4,
+        description: 'Inception'
+      }
+    ]
+
+    return (
+      <div className={ classes.basedOnContainer }>
+        <InfoIcon className={ classes.infoIcon } />
+        <Typography>Growth is based on the vault's performance { basedOn === 4 ? 'since' : 'for the past' }</Typography>
+        <TextField
+          id={ 'basedOn' }
+          name={ 'basedOn' }
+          select
+          value={ basedOn }
+          onChange={ this.onSelectChange }
+          SelectProps={{
+            native: false
+          }}
+          disabled={ loading }
+          className={ classes.assetSelectRoot }
+        >
+        { options &&
+          options.map((option) => {
+            return (
+              <MenuItem key={ option.value } value={ option.value }>
+                <Typography variant='h4'>{ option.description }</Typography>
+              </MenuItem>
+            )
+          })
+        }
+      </TextField>
+      </div>
+    )
+  }
+
+  onSelectChange = (event) => {
+    let val = []
+    val[event.target.name] = event.target.value
+    this.setState(val)
+
+    localStorage.setItem('yearn.finance-dashboard-basedon', event.target.value)
+
+    this.setState({ loading: true })
+    dispatcher.dispatch({ type: GET_DASHBOARD_SNAPSHOT, content: {} })
+  }
+
   growthClicked = () => {
     const { growth } = this.state
     let newGrowth = 0
@@ -348,7 +414,6 @@ class Dashboard extends Component {
         newGrowth = 0
     }
     this.setState({ growth: newGrowth })
-
     localStorage.setItem('yearn.finance-dashboard-growth', newGrowth.toString())
   }
 
@@ -391,7 +456,7 @@ class Dashboard extends Component {
                 <div className={ classes.inline }>
                   <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_daily_usd.toFixed(2)).toLocaleString() }</Typography >
                   <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/365).toFixed(2) : '0.00') }%</Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/365).toFixed(2) }%</Typography>
                 </div>
               }
               { currency === 'ETH' &&
@@ -399,7 +464,7 @@ class Dashboard extends Component {
                   <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.vaultGrowth_daily_eth.toFixed(2)).toLocaleString() }</Typography >
                   <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
                   <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/365).toFixed(2) : '0.00') }%</Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/365).toFixed(2) }%</Typography>
                 </div>
               }
             </div>
@@ -411,7 +476,7 @@ class Dashboard extends Component {
                 <div className={ classes.inline }>
                   <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_weekly_usd.toFixed(2)).toLocaleString() }</Typography >
                   <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/52).toFixed(2) : '0.00') }%</Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/52).toFixed(2) }%</Typography>
                 </div>
               }
               { currency === 'ETH' &&
@@ -419,7 +484,7 @@ class Dashboard extends Component {
                   <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.vaultGrowth_weekly_eth.toFixed(2)).toLocaleString() }</Typography >
                   <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
                   <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/52).toFixed(2) : '0.00') }%</Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/52).toFixed(2) }%</Typography>
                 </div>
               }
             </div>
@@ -431,7 +496,7 @@ class Dashboard extends Component {
                 <div className={ classes.inline }>
                   <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_yearly_usd.toFixed(2)).toLocaleString() }</Typography >
                   <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/1).toFixed(2) : '0.00') }%</Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/1).toFixed(2) }%</Typography>
                 </div>
               }
               { currency === 'ETH' &&
@@ -439,7 +504,7 @@ class Dashboard extends Component {
                   <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.vaultGrowth_yearly_eth.toFixed(2)).toLocaleString() }</Typography >
                   <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
                   <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.apy ? (asset.apy/1).toFixed(2) : '0.00') }%</Typography>
+                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/1).toFixed(2) }%</Typography>
                 </div>
               }
             </div>
@@ -557,6 +622,29 @@ class Dashboard extends Component {
         </div>
       </div>)
     })
+  }
+
+  _getAPY = (asset) => {
+    const { basedOn } = this.state
+
+    if(asset && asset.stats) {
+      switch (basedOn) {
+        case 1:
+          return asset.stats.apyOneDaySample
+        case 2:
+          return asset.stats.apyThreeDaySample
+        case 3:
+          return asset.stats.apyOneWeekSample
+        case 4:
+          return asset.stats.apyInceptionSample
+        default:
+          return asset.apy
+      }
+    } else if (asset.apy) {
+      return asset.apy
+    } else {
+      return '0.00'
+    }
   }
 
 }

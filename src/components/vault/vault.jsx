@@ -10,7 +10,8 @@ import {
   InputAdornment,
   FormControlLabel,
   Checkbox,
-  Tooltip
+  Tooltip,
+  MenuItem
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
@@ -24,8 +25,8 @@ import Loader from '../loader'
 
 import {
   ERROR,
-  GET_VAULT_BALANCES,
-  VAULT_BALANCES_RETURNED,
+  GET_VAULT_BALANCES_FULL,
+  VAULT_BALANCES_FULL_RETURNED,
   DEPOSIT_VAULT_RETURNED,
   WITHDRAW_VAULT_RETURNED,
   CONNECTION_CONNECTED,
@@ -269,7 +270,17 @@ const styles = theme => ({
   },
   positive: {
     color: colors.compoundGreen
-  }
+  },
+  basedOnContainer: {
+    display: 'flex',
+    width: '100%',
+    justifyContent: 'flex-end',
+    alignItems: 'center'
+  },
+  infoIcon: {
+    fontSize: '1em',
+    marginRight: '6px'
+  },
 });
 
 class Vault extends Component {
@@ -278,6 +289,7 @@ class Vault extends Component {
     super()
 
     const account = store.getStore('account')
+    const basedOn = localStorage.getItem('yearn.finance-dashboard-basedon')
 
     this.state = {
       assets: store.getStore('vaultAssets'),
@@ -288,18 +300,19 @@ class Vault extends Component {
       snackbarMessage: null,
       search: '',
       searchError: false,
-      hideZero: localStorage.getItem('yearn.finance-hideZero') === '1' ? true : false
+      hideZero: localStorage.getItem('yearn.finance-hideZero') === '1' ? true : false,
+      basedOn: basedOn ? parseInt(basedOn) : 1
     }
 
     if(account && account.address) {
-      dispatcher.dispatch({ type: GET_VAULT_BALANCES, content: {} })
+      dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
     }
   }
   componentWillMount() {
     emitter.on(DEPOSIT_VAULT_RETURNED, this.showHash);
     emitter.on(WITHDRAW_VAULT_RETURNED, this.showHash);
     emitter.on(ERROR, this.errorReturned);
-    emitter.on(VAULT_BALANCES_RETURNED, this.balancesReturned);
+    emitter.on(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
   }
@@ -310,16 +323,14 @@ class Vault extends Component {
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-    emitter.removeListener(VAULT_BALANCES_RETURNED, this.balancesReturned);
+    emitter.removeListener(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
   };
 
-  refresh() {
-    dispatcher.dispatch({ type: GET_VAULT_BALANCES, content: {} })
-  }
-
   balancesReturned = (balances) => {
-    this.setState({ assets: store.getStore('vaultAssets') })
-    setTimeout(this.refresh, 300000);
+    this.setState({
+      assets: store.getStore('vaultAssets') ,
+      loading: false
+    })
   };
 
   connectionConnected = () => {
@@ -330,7 +341,7 @@ class Vault extends Component {
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null
     })
 
-    dispatcher.dispatch({ type: GET_VAULT_BALANCES, content: {} })
+    dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
 
     const that = this
     setTimeout(() => {
@@ -395,6 +406,7 @@ class Vault extends Component {
         <div className={ classes.investedContainer }>
           <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
           { this.renderFilters() }
+          { this.renderBasedOn() }
           { this.renderAssetBlocks() }
         </div>
         { loading && <Loader /> }
@@ -462,9 +474,9 @@ class Vault extends Component {
               {
                 (!['LINK'].includes(asset.id) && asset.vaultBalance > 0) &&
                 <div className={classes.headingEarning}>
-                  <Typography variant={ 'h5' } className={ classes.grey }>You are earning:</Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
                   <div className={ classes.flexy }>
-                    <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(2) : '0.00') }% </Typography>
+                    <Typography variant={ 'h3' } noWrap>{ (this._getAPY(asset)/1).toFixed(2) }% </Typography>
                     <Typography variant={ 'h5' } className={ classes.on }> on </Typography>
                     <Typography variant={ 'h3' } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(2) : '0.00') } {asset.vaultSymbol}</Typography>
                   </div>
@@ -473,16 +485,16 @@ class Vault extends Component {
               {
                 (!['LINK'].includes(asset.id) && asset.vaultBalance === 0) &&
                 <div className={classes.headingEarning}>
-                  <Typography variant={ 'h5' } className={ classes.grey }>This vault is earning:</Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
                   <div className={ classes.flexy }>
-                    <Typography variant={ 'h3' } noWrap>{ (asset.apy ? (asset.apy).toFixed(2) : '0.00') }% </Typography>
+                    <Typography variant={ 'h3' } noWrap>{ (this._getAPY(asset)/1).toFixed(2) }% </Typography>
                   </div>
                 </div>
               }
               {
                 ['LINK'].includes(asset.id) &&
                 <div className={classes.headingEarning}>
-                  <Typography variant={ 'h5' } className={ classes.grey }>You are earning:</Typography>
+                  <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
                   <Typography variant={ 'h3' } noWrap>Not Available</Typography>
                 </div>
               }
@@ -567,6 +579,94 @@ class Vault extends Component {
     } = this.state
     return <Snackbar type={ snackbarType } message={ snackbarMessage } open={true}/>
   };
+
+  _getAPY = (asset) => {
+    const { basedOn } = this.state
+
+    if(asset && asset.stats) {
+      switch (basedOn) {
+        case 1:
+          return asset.stats.apyOneDaySample
+        case 2:
+          return asset.stats.apyThreeDaySample
+        case 3:
+          return asset.stats.apyOneWeekSample
+        case 4:
+          return asset.stats.apyInceptionSample
+        default:
+          return asset.apy
+      }
+    } else if (asset.apy) {
+      return asset.apy
+    } else {
+      return '0.00'
+    }
+  }
+
+  renderBasedOn = () => {
+
+    const { classes } = this.props
+    const { basedOn, loading } = this.state
+
+    const options = [
+      {
+        value: 1,
+        description: '1 day'
+      },
+      {
+        value: 2,
+        description: '3 days'
+      },
+      {
+        value: 3,
+        description: '1 week'
+      },
+      {
+        value: 4,
+        description: 'Inception'
+      }
+    ]
+
+    return (
+      <div className={ classes.basedOnContainer }>
+        <InfoIcon className={ classes.infoIcon } />
+        <Typography>Growth is based on the vault's performance { basedOn === 4 ? 'since' : 'for the past' }</Typography>
+        <TextField
+          id={ 'basedOn' }
+          name={ 'basedOn' }
+          select
+          value={ basedOn }
+          onChange={ this.onSelectChange }
+          SelectProps={{
+            native: false
+          }}
+          disabled={ loading }
+          className={ classes.assetSelectRoot }
+        >
+        { options &&
+          options.map((option) => {
+            return (
+              <MenuItem key={ option.value } value={ option.value }>
+                <Typography variant='h4'>{ option.description }</Typography>
+              </MenuItem>
+            )
+          })
+        }
+      </TextField>
+      </div>
+    )
+  }
+
+  onSelectChange = (event) => {
+    let val = []
+    val[event.target.name] = event.target.value
+    this.setState(val)
+
+    localStorage.setItem('yearn.finance-dashboard-basedon', event.target.value)
+
+    this.setState({ loading: true })
+    dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+  }
 }
 
 export default withNamespaces()(withRouter(withStyles(styles)(Vault)));

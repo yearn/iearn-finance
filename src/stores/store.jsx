@@ -6,6 +6,8 @@ import {
   BALANCES_RETURNED,
   GET_BALANCES_LIGHT,
   BALANCES_LIGHT_RETURNED,
+  GET_VAULT_BALANCES_FULL,
+  VAULT_BALANCES_FULL_RETURNED,
   INVEST,
   INVEST_RETURNED,
   REDEEM,
@@ -44,6 +46,8 @@ import {
   DASHBOARD_SNAPSHOT_RETURNED,
   GET_USD_PRICE,
   USD_PRICE_RETURNED,
+  GET_STATISTICS,
+  STATISTICS_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 
@@ -74,6 +78,8 @@ class Store {
   constructor() {
 
     this.store = {
+      statisticsProvider: 'raw',
+      statistics: [],
       dashboard: {
           vault_balance_usd: 0,
           vault_growth_usd_daily: 0,
@@ -909,7 +915,7 @@ class Store {
           vaultSymbol: 'yYFI',
           erc20address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
           vaultContractAddress: '0xBA2E7Fed597fd0E3e70f5130BcDbbFE06bB94fe1',
-          vaultContractABI: config.vaultContractV2ABI,
+          vaultContractABI: config.vaultContractV3ABI,
           balance: 0,
           vaultBalance: 0,
           decimals: 18,
@@ -990,7 +996,7 @@ class Store {
           vaultSymbol: 'yDAI',
           erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
           vaultContractAddress: '0xACd43E627e64355f1861cEC6d3a6688B31a6F952',
-          vaultContractABI: config.vaultContractV2ABI,
+          vaultContractABI: config.vaultContractV3ABI,
           balance: 0,
           vaultBalance: 0,
           decimals: 18,
@@ -1010,7 +1016,7 @@ class Store {
           vaultSymbol: 'yTUSD',
           erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
           vaultContractAddress: '0x37d19d1c4E1fa9DC47bD1eA12f742a0887eDa74a',
-          vaultContractABI: config.vaultContractV2ABI,
+          vaultContractABI: config.vaultContractV3ABI,
           balance: 0,
           vaultBalance: 0,
           decimals: 18,
@@ -1050,7 +1056,7 @@ class Store {
           vaultSymbol: 'yUSDT',
           erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
           vaultContractAddress: '0x2f08119C6f07c006695E079AAFc638b8789FAf18',
-          vaultContractABI: config.vaultContractV2ABI,
+          vaultContractABI: config.vaultContractV3ABI,
           balance: 0,
           vaultBalance: 0,
           decimals: 6,
@@ -1090,7 +1096,7 @@ class Store {
           vaultSymbol: 'yLINK',
           erc20address: '0x514910771af9ca656af840dff83e8264ecf986ca',
           vaultContractAddress: '0x881b06da56BB5675c54E4Ed311c21E54C5025298',
-          vaultContractABI: config.vaultContractV2ABI,
+          vaultContractABI: config.vaultContractV3ABI,
           balance: 0,
           vaultBalance: 0,
           decimals: 18,
@@ -1155,6 +1161,9 @@ class Store {
           case GET_VAULT_BALANCES:
             this.getVaultBalances(payload);
             break;
+          case GET_VAULT_BALANCES_FULL:
+            this.getVaultBalancesFull(payload);
+            break;
           case DEPOSIT_VAULT:
             this.depositVault(payload)
             break;
@@ -1170,6 +1179,9 @@ class Store {
           case GET_DASHBOARD_SNAPSHOT:
             this.getDashboardSnapshot(payload)
             break;
+          case GET_STATISTICS:
+            this.getStatistics(payload)
+            break
           default: {
           }
         }
@@ -2380,6 +2392,163 @@ class Store {
     })
   }
 
+  getVaultBalancesFull = async () => {
+    const account = store.getStore('account')
+    const assets = store.getStore('vaultAssets')
+
+    if(!account || !account.address) {
+      return false
+    }
+
+    const web3 = await this._getWeb3Provider()
+
+    const vaultStatistics = await this._getStatistics()
+
+    const usdPrices = await this._getUSDPrices()
+
+    async.map(assets, (asset, callback) => {
+      async.parallel([
+        (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getVaultBalance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getStrategy(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getStatsAPY(vaultStatistics, asset, callbackInner) },
+        (callbackInner) => { this._getVaultHoldings(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getAssetUSDPrices(web3, asset, account, usdPrices, callbackInner) },
+        (callbackInner) => { this._getVaultAPY(web3, asset, account, callbackInner) },
+      ], (err, data) => {
+        if(err) {
+          return callback(err)
+        }
+
+        asset.balance = data[0]
+        asset.vaultBalance = data[1]
+        asset.strategy = data[2].strategy
+        asset.strategyHoldings = data[2].holdings
+        asset.stats = data[3]
+        asset.vaultHoldings = data[4]
+        asset.pricePerFullShare = data[5].pricePerFullShare
+        asset.usdPrice = data[5].usdPrice
+        asset.pricePerFullShare = data[6].pricePerFullShare
+        asset.apy = data[6].apy
+
+        callback(null, asset)
+      })
+    }, (err, assets) => {
+      if(err) {
+        console.log(err)
+        return emitter.emit(ERROR, err)
+      }
+
+      store.setStore({ vaultAssets: assets })
+      return emitter.emit(VAULT_BALANCES_FULL_RETURNED, assets)
+    })
+  }
+
+  _getAssetUSDPrices = async (web3, asset, account, usdPrices, callback) => {
+    try {
+      const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+      const pricePerFullShare = await vaultContract.methods.getPricePerFullShare().call({ from: account.address })
+
+      const usdPrice = usdPrices[asset.price_id]
+
+      const returnObj = {
+        pricePerFullShare: pricePerFullShare/1e18,
+        usdPrice: usdPrice.usd
+      }
+
+      callback(null, returnObj)
+
+    } catch (ex) {
+      callback(null, {})
+    }
+  }
+
+  _getStrategy = async (web3, asset, account, callback) => {
+
+    if(['ETH', 'LINK'].includes(asset.id) ) {
+      return callback(null, {
+        strategy: '',
+        holdings: 0
+      })
+    }
+
+    try {
+      const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+      const controllerAddress = await vaultContract.methods.controller().call({ from: account.address })
+      const controllerContract = new web3.eth.Contract(config.vaultControllerABI, controllerAddress)
+
+      let strategyAddress = ''
+      if(['LINK', 'aLINK'].includes(asset.id)) {
+        strategyAddress = await controllerContract.methods.strategies(asset.vaultContractAddress).call({ from: account.address })
+      } else {
+        strategyAddress = await controllerContract.methods.strategies(asset.erc20address).call({ from: account.address })
+      }
+
+      const strategyContract = new web3.eth.Contract(config.vaultStrategyABI, strategyAddress)
+      const holdings = await strategyContract.methods.balanceOf().call({ from: account.address })
+
+      callback(null, {
+        strategy: strategyAddress,
+        holdings: holdings/(10**(asset.id === 'aLINK' ? 6 : asset.decimals))
+      })
+    } catch (ex) {
+      console.log(asset)
+      console.log(ex)
+      callback(null, {
+        strategy: '',
+        holdings: 0
+      })
+    }
+  }
+
+  _getStatsAPY = (vaultStatistics, asset, callback) => {
+    try {
+
+      if(asset.erc20address === 'Ethereum') {
+        asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+      }
+
+      const vault = vaultStatistics.filter((stats) => {
+        return stats.tokenAddress.toLowerCase() === asset.erc20address.toLowerCase()
+      })
+
+      if(vault.length === 0) {
+        return callback(null, {})
+      }
+
+      callback(null, vault[0])
+    } catch(ex) {
+      callback(null, {})
+    }
+  }
+
+  _getVaultHoldings = async (web3, asset, account, callback) => {
+    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+    var balance = await vaultContract.methods.balance().call({ from: account.address });
+    balance = parseFloat(balance)/10**asset.decimals
+    callback(null, parseFloat(balance))
+  }
+
+  _getStrategyHoldings = async (web3, asset, account, callback) => {
+    try {
+      let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+      let balance = await vaultContract.methods.balance().call({ from: account.address });
+
+      let available = 0
+      if(asset.id === 'aLINK') {
+        available = await vaultContract.methods.credit().call({ from: account.address });
+      } else {
+        available = await vaultContract.methods.available().call({ from: account.address });
+      }
+      balance = parseFloat(balance-available)/10**asset.decimals
+      callback(null, parseFloat(balance))
+    } catch(ex) {
+      console.log(asset)
+      console.log(ex)
+    }
+
+  }
+
   getVaultBalances = async () => {
     const account = store.getStore('account')
 
@@ -2778,9 +2947,7 @@ class Store {
 
   getUSDPrices = async () => {
     try {
-      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,binance-usd,wrapped-bitcoin,ethereum,nusd,chainlink,aave-link,lp-sbtc-curve,lp-bcurve,curve-fi-ydai-yusdc-yusdt-ytusd&vs_currencies=usd,eth'
-      const priceString = await rp(url);
-      const priceJSON = JSON.parse(priceString)
+      const priceJSON = await this._getUSDPrices()
 
       store.setStore({ usdPrices: priceJSON })
       return emitter.emit(USD_PRICE_RETURNED, priceJSON)
@@ -2790,42 +2957,91 @@ class Store {
     }
   }
 
+  _getUSDPrices = async () => {
+    try {
+      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,binance-usd,wrapped-bitcoin,ethereum,nusd,chainlink,aave-link,lp-sbtc-curve,lp-bcurve,curve-fi-ydai-yusdc-yusdt-ytusd&vs_currencies=usd,eth'
+      const priceString = await rp(url);
+      const priceJSON = JSON.parse(priceString)
+
+      return priceJSON
+    } catch(e) {
+      console.log(e)
+      return null
+    }
+  }
+
   getDashboardSnapshot = (payload) => {
-    emitter.on(VAULT_BALANCES_RETURNED, this._calculateDashboard)
+    emitter.on(VAULT_BALANCES_FULL_RETURNED, this._calculateDashboard)
     emitter.on(BALANCES_LIGHT_RETURNED, this._calculateDashboard)
     emitter.on(USD_PRICE_RETURNED, this._calculateDashboard)
+    emitter.on(STATISTICS_RETURNED, this._calculateDashboard)
 
-    this.getVaultBalances()
+    this.getVaultBalancesFull()
     this.getBalancesLight()
     this.getUSDPrices()
+    this.getStatistics()
   }
 
   _calculateDashboard = () => {
     const vaults = store.getStore('vaultAssets')
     const assets = store.getStore('assets')
     const prices = store.getStore('usdPrices')
+    const statistics = store.getStore('statistics')
 
-    if(vaults && vaults.length > 0 && assets && assets.length > 0 && prices !== null) {
+    if(vaults && vaults.length > 0 && assets && assets.length > 0 && prices !== null && statistics && statistics.length > 0) {
+      let basedOn = localStorage.getItem('yearn.finance-dashboard-basedon')
+
+      if(!basedOn) {
+        basedOn = '1'
+      }
 
       // FILTER USED VAULTS AND CALCULATE VAULT ASSET BALANCES
       const vaultsInUse = vaults.filter((vault) => {
-        if(vault.id === 'WETH') {
+        if(vault.id === 'ETH') {
           return false
         }
 
         return vault.vaultBalance > 0.0001
       }).map((vault) => {
+
+        let apy = 0
+
+        const vaultStats = statistics.filter((stats) => {
+          return stats.tokenAddress.toLowerCase() === vault.erc20address.toLowerCase()
+        })
+
+        if(vaultStats.length === 0) {
+          apy = vault.apy
+        } else {
+          switch (basedOn) {
+            case '1':
+              apy = vaultStats[0].apyOneDaySample
+              break;
+            case '2':
+              apy = vaultStats[0].apyThreeDaySample
+              break;
+            case '3':
+              apy = vaultStats[0].apyOneWeekSample
+              break;
+            case '4':
+              apy = vaultStats[0].apyInceptionSample
+              break;
+            default:
+              apy = vault.apy
+          }
+        }
+
         const price = prices[vault.price_id]
         vault.prices = price
         vault.usdBalance = vault.vaultBalance * vault.pricePerFullShare * vault.prices.usd
-        vault.vaultGrowth_daily_usd = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/36500) * vault.prices.usd
-        vault.vaultGrowth_weekly_usd = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/5200) * vault.prices.usd
-        vault.vaultGrowth_yearly_usd = vault.vaultBalance * vault.pricePerFullShare * vault.apy/100 * vault.prices.usd
+        vault.vaultGrowth_daily_usd = vault.vaultBalance * vault.pricePerFullShare * (apy/36500) * vault.prices.usd
+        vault.vaultGrowth_weekly_usd = vault.vaultBalance * vault.pricePerFullShare * (apy/5200) * vault.prices.usd
+        vault.vaultGrowth_yearly_usd = vault.vaultBalance * vault.pricePerFullShare * apy/100 * vault.prices.usd
 
         vault.ethBalance = vault.vaultBalance * vault.pricePerFullShare * vault.prices.eth
-        vault.vaultGrowth_daily_eth = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/36500) * vault.prices.eth
-        vault.vaultGrowth_weekly_eth = vault.vaultBalance * vault.pricePerFullShare * (vault.apy/5200) * vault.prices.eth
-        vault.vaultGrowth_yearly_eth = vault.vaultBalance * vault.pricePerFullShare * vault.apy/100 * vault.prices.eth
+        vault.vaultGrowth_daily_eth = vault.vaultBalance * vault.pricePerFullShare * (apy/36500) * vault.prices.eth
+        vault.vaultGrowth_weekly_eth = vault.vaultBalance * vault.pricePerFullShare * (apy/5200) * vault.prices.eth
+        vault.vaultGrowth_yearly_eth = vault.vaultBalance * vault.pricePerFullShare * apy/100 * vault.prices.eth
 
         return vault
       })
@@ -2991,11 +3207,37 @@ class Store {
 
         vaults: vaultsInUse,
         assets: assetsInUse,
+        statistics: statistics
       }
 
       store.setStore({ dashboard: dashboard })
       emitter.emit(DASHBOARD_SNAPSHOT_RETURNED, dashboard)
 
+    }
+  }
+
+  getStatistics = async () => {
+    try {
+      const statistics = await this._getStatistics()
+
+      store.setStore({ statistics: statistics })
+      emitter.emit(STATISTICS_RETURNED, statistics)
+    } catch(e) {
+      console.log(e)
+      return store.getStore('universalGasPrice')
+    }
+  }
+
+  _getStatistics = async () => {
+    try {
+      const url = config.statsProvider
+      const statisticsString = await rp(url);
+      const statistics = JSON.parse(statisticsString)
+
+      return statistics
+    } catch(e) {
+      console.log(e)
+      return store.getStore('universalGasPrice')
     }
   }
 

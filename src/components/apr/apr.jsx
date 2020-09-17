@@ -6,12 +6,13 @@ import {
   TextField,
   Card,
 } from '@material-ui/core';
-import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
 
 import {
-  GET_AGGREGATED_YIELD,
-  GET_AGGREGATED_YIELD_RETURNED,
+  CONNECTION_CONNECTED,
+  CONNECTION_DISCONNECTED,
+  GET_VAULT_BALANCES_FULL,
+  VAULT_BALANCES_FULL_RETURNED,
 } from '../../constants'
 
 import Store from "../../stores";
@@ -24,7 +25,6 @@ const styles = theme => ({
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    maxWidth: '1000px',
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
@@ -34,122 +34,89 @@ const styles = theme => ({
       marginTop: '0px',
     }
   },
-  actionInput: {
-    padding: '0px 0px 12px 0px',
-    fontSize: '0.5rem'
-  },
-  investedContainer: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    flexDirection: 'column'
-  },
-  intro: {
-    padding: '36px',
-    textAlign: 'center',
-    width: '100%',
-  },
   pairs: {
     padding: '42px 36px',
     borderRadius: '50px',
     border: '1px solid ' + colors.borderBlue,
-    marginTop: '40px',
+    margin: '40px',
+    width: 'calc(100% - 80px)'
   },
   pair: {
     display: 'flex',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    borderBottom: '1px solid rgba(25, 101, 233, 0.2)',
+    padding: '10px 0px'
   },
   name: {
-    width: '60px',
     display: 'flex',
     alignItems: 'center',
-    padding: '6px',
-    position: 'absolute',
+    padding: '8px 0px',
+    width: '260px',
     top: 'auto',
-    background: '#fff',
-    [theme.breakpoints.up('md')]: {
-      width: '100px',
-    }
+    cursor: 'pointer'
   },
-  apr: {
-    flex: '1',
-    padding: '6px 25px',
-    width: '133px',
+  strategy: {
+    display: 'flex',
+    alignItems: 'center',
+    top: 'auto',
+    padding: '8px 0px',
+    width: '130px',
+    cursor: 'pointer'
+  },
+  apr1: {
+    padding: '8px 0px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    height: '42px',
-    '&:nth-child(2)': {
-      marginLeft: '60px'
-    },
-    [theme.breakpoints.up('md')]: {
-      '&:nth-child(2)': {
-        marginLeft: '100px'
-      }
-    }
+    flex: 1
   },
-  headerName: {
-    flex: '1',
-    fontWeight: 'bold',
-    padding: '6px 12px',
-    width: '60px',
-    paddingBottom: '6px',
-    [theme.breakpoints.up('md')]: {
-      width: '100px',
-    }
-  },
-  headerApr: {
-    fontWeight: 'bold',
-    flex: '1',
-    padding: '6px 12px',
-    width: '100px',
-    paddingBottom: '6px'
+  apr2: {
+    padding: '8px 0px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    flex: 2
   },
   headerValue: {
     fontWeight: 'bold',
-    flex: '1',
-    width: '135px',
-    padding: '6px 12px',
-    paddingBottom: '12px',
-    '&:nth-child(2)': {
-      marginLeft: '60px'
-    },
-    [theme.breakpoints.up('md')]: {
-      '&:nth-child(2)': {
-        marginLeft: '100px'
-      }
-    }
+    padding: '8px 0px',
+    flex: 2
   },
-  headerValueName: {
+  headerHoldings: {
     fontWeight: 'bold',
-    width: '60px',
-    padding: '6px 12px',
-    paddingBottom: '12px',
-    position: 'absolute',
-    top: 'auto',
-    background: '#fff',
-    height: '42px',
-    [theme.breakpoints.up('md')]: {
-      width: '100px',
-    }
+    padding: '8px 0px',
+    flex: 2
+  },
+  headerROI: {
+    fontWeight: 'bold',
+    padding: '8px 0px',
+    flex: 3
+  },
+  headerName: {
+    fontWeight: 'bold',
+    padding: '8px 0px',
+    width: '260px'
+  },
+  headerStrategy: {
+    fontWeight: 'bold',
+    padding: '8px 0px',
+    width: '130px'
   },
   aggregatedHeader: {
+    textAlign: 'left',
+  },
+  aggregatedHeaderCenter: {
     textAlign: 'center',
   },
-  aggregatedHeaderVal: {
-    textAlign: 'center',
-    display: 'none',
-    [theme.breakpoints.up('md')]: {
-      display: 'block',
-    }
+  aggregatedHeaderRight: {
+    textAlign: 'right',
   },
   tablesContainer: {
-    display: 'flex'
+    display: 'flex',
+    width: '100%'
   },
   tableContainer: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    maxWidth: 'calc(100vw - 68px)',
-    overflowX: 'auto'
+    width: '100%'
   },
   assetIcon: {
     display: 'inline-block',
@@ -161,6 +128,21 @@ const styles = theme => ({
     cursor: 'pointer',
     marginRight: '12px'
   },
+  subHeader: {
+    display: 'flex',
+    width: '100%'
+  },
+  symbol: {
+    color: colors.darkGray,
+    paddingLeft: '6px'
+  },
+  preSymbol: {
+    color: colors.darkGray,
+    paddingRight: '6px'
+  },
+  inline: {
+    display: 'flex'
+  }
 });
 
 class APR extends Component {
@@ -168,172 +150,167 @@ class APR extends Component {
   constructor() {
     super()
 
+    const account = store.getStore('account')
+
     this.state = {
-      yields: store.getStore('yields'),
-      aggregatedYields: store.getStore('aggregatedYields'),
-      aggregatedHeaders: store.getStore('aggregatedHeaders'),
-      amount: '',
-      amountError: false,
+      assets: store.getStore('vaultAssets'),
       loading: false
+    }
+
+    if(account && account.address) {
+      dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: { } })
     }
   }
 
   componentWillMount() {
-    emitter.on(GET_AGGREGATED_YIELD_RETURNED, this.aggregatedYieldReturned);
-
-    dispatcher.dispatch({ type: GET_AGGREGATED_YIELD, content: { amount: 0 } })
+    emitter.on(VAULT_BALANCES_FULL_RETURNED, this.statisticsReturned);
+    emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
+    emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
   }
 
   componentWillUnmount() {
-    emitter.removeListener(GET_AGGREGATED_YIELD_RETURNED, this.aggregatedYieldReturned);
+    emitter.removeListener(VAULT_BALANCES_FULL_RETURNED, this.statisticsReturned);
+    emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
+    emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
   };
 
-  yieldReturned = (balances) => {
-    this.setState({ yields: store.getStore('yields') })
-    console.log(store.getStore('yields'))
+  connectionConnected = () => {
+    this.setState({ account: store.getStore('account') })
+    dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: { } })
   };
 
-  dispatch(val) {
-    dispatcher.dispatch({ type: GET_AGGREGATED_YIELD, content: { amount: val } })
+  connectionDisconnected = () => {
+    this.setState({ account: store.getStore('account') })
   }
 
-  aggregatedYieldReturned = (balances) => {
-    this.setState({ aggregatedYields: store.getStore('aggregatedYields'), aggregatedHeaders: store.getStore('aggregatedHeaders') })
-  };
-
-  uniswapcommparrisonReturned = (balances) => {
-    this.setState({ uniswapLiquidity: store.getStore('uniswapLiquidity') })
+  statisticsReturned = (balances) => {
+    console.log(store.getStore('vaultAssets'))
+    this.setState({ assets: store.getStore('vaultAssets') })
   };
 
   render() {
     const { classes, t } = this.props;
     const {
-      amountError,
-      amount,
       loading,
+      assets
     } = this.state
 
     return (
       <div className={ classes.root }>
-        <div className={ classes.tablesContainer }>
-          <div className={ classes.investedContainer }>
-            <Card className={ classes.pairs }>
-              <TextField
-                fullWidth
-                className={ classes.actionInput }
-                id='amount'
-                value={ amount }
-                error={ amountError }
-                onChange={ this.onChange }
-                disabled={ loading }
-                label=""
-                size="small"
-                helperText={ t("APR.HowMuch")}
-                placeholder="0.00"
-                variant="outlined"
-              />
-              <table className={ classes.tableContainer }>
-                <thead>
-                  { this.renderAggregatedHeader() }
-                </thead>
-                <tbody>
-                  { this.renderAggregatedYields() }
-                </tbody>
-              </table>
-            </Card>
-          </div>
-        </div>
+        <Card className={ classes.pairs }>
+          <table className={ classes.tableContainer }>
+            <thead>
+              { this.renderHeaders() }
+            </thead>
+            <tbody>
+              { this.renderStats() }
+            </tbody>
+          </table>
+        </Card>
       </div>
     )
   };
 
-  renderAggregatedHeader = () => {
+  renderHeaders = () => {
     const { classes } = this.props
-    const { aggregatedHeaders } = this.state
 
     return (
       <tr className={ classes.pair }>
-        <th key={ 'token' } className={ classes.headerValueName }>
-          <Typography variant={'h3'} className={classes.aggregatedHeader}></Typography>
+        <th className={ classes.headerName }>
+          <Typography  align='right' variant={'h4'} className={classes.aggregatedHeader}>{ 'Vault' }</Typography>
         </th>
-        { aggregatedHeaders.map((header) => {
-          return (<th key={ header }  className={ classes.headerValue }>
-            <Typography  align='right' variant={'h4'} className={classes.aggregatedHeader}>{ this.renderTableHeader(header) }</Typography>
-          </th>)
-        })}
+        <th className={ classes.headerStrategy }>
+          <Typography  align='right' variant={'h4'} className={classes.aggregatedHeader}>{ 'Current Strategy' }</Typography>
+        </th>
+        <th className={ classes.headerValue }>
+          <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ 'Vault holdings' }</Typography>
+        </th>
+        <th className={ classes.headerValue }>
+          <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ 'Strategy holdings' }</Typography>
+        </th>
+        <th className={ classes.headerHoldings }>
+          <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ 'Your holdings ( Token & USD)' }</Typography>
+          <div className={ classes.subHeader }>
+            <div className={ classes.headerValue }>
+              <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ 'Token' }</Typography>
+            </div>
+            <div className={ classes.headerValue }>
+              <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ 'USD' }</Typography>
+            </div>
+          </div>
+        </th>
+        <th className={ classes.headerROI }>
+          <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderCenter}>{ 'ROI based on sampled period' }</Typography>
+          <div className={ classes.subHeader }>
+            <div className={ classes.headerValue }>
+              <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ '1 Day' }</Typography>
+            </div>
+            <div className={ classes.headerValue }>
+              <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ '3 Days' }</Typography>
+            </div>
+            <div className={ classes.headerValue }>
+              <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ 'Inception' }</Typography>
+            </div>
+          </div>
+        </th>
       </tr>
     )
   }
 
-  renderAggregatedYields = () => {
+  renderStats = () => {
     const { classes } = this.props
-    const { aggregatedYields } = this.state
+    const { assets } = this.state
 
     return (
-      aggregatedYields.map((y) => {
+      assets.filter((asset) => {
+        return asset.symbol !== 'ETH'
+      }).map((asset) => {
 
-        const keys = Object.keys(y.apr)
-        if (y.token === 'WBTC') {
-          y.token = 'wBTC';
+        var address = 'Unknown';
+        if (asset.strategy) {
+          address = asset.strategy.substring(0,6)+'...'+asset.strategy.substring(asset.strategy.length-4,asset.strategy.length)
         }
 
         return (
-          <tr key={ y.token } className={ classes.pair }>
-            <td className={ classes.name }>
+          <tr key={ asset.id } className={ classes.pair }>
+            <td className={ classes.name } onClick={() => { window.open(`https://etherscan.io/address/${asset.vaultContractAddress}#code`, "_blank")} }>
               <div className={ classes.assetIcon }>
                 <img
                   alt=""
-                  src={ require('../../assets/'+y.token+'-logo.png') }
+                  src={ require('../../assets/'+asset.symbol+'-logo.png') }
                   height="30px"
                 />
               </div>
-              <Typography variant={'h4'} className={classes.aggregatedHeaderVal}>{ y.token }</Typography>
+              <Typography align='right' variant={'h4'} >{ asset.name }</Typography>
             </td>
-            { keys.map((key) => {
-
-                let val = parseFloat(y.apr[key])
-                if((key === '_uniswap' || key === 'unicapr') && val !== 0) {
-                  val = val*100 - 100
-                } else {
-                  val = val*100
-                }
-
-                return (<td key={ key } className={ classes.apr }>
-                  <Typography align='right' color='secondary'>{ val === 0 ? '' : ((val).toFixed(4) + ' %') }</Typography>
-                </td>)
-              })
-            }
+            <td className={ classes.strategy } onClick={() => { if(address === 'Unknown') { return; } window.open(`https://etherscan.io/address/${asset.strategy}#code`, "_blank")} }>
+              <Typography align='right' variant='h5'>{ address }</Typography>
+            </td>
+            <td className={ classes.apr2 }>
+              <Typography align='right' variant='h5' className={ classes.inline }>{ asset.vaultHoldings ? parseFloat(asset.vaultHoldings.toFixed(2)).toLocaleString() : '0.00'  } <div className={classes.symbol}>{ asset.symbol }</div></Typography>
+            </td>
+            <td className={ classes.apr2 }>
+              <Typography align='right' variant='h5' className={ classes.inline }>{ asset.strategyHoldings ? parseFloat(asset.strategyHoldings.toFixed(2)).toLocaleString() : '0.00' } <div className={classes.symbol}>{ asset.symbol }</div></Typography>
+            </td>
+            <td className={ classes.apr1 }>
+              <Typography align='right' variant='h5' className={ classes.inline }>{ asset.vaultBalance ? parseFloat((asset.vaultBalance*asset.pricePerFullShare).toFixed(2)).toLocaleString() : '0.00' } <div className={classes.symbol}>{ asset.symbol }</div></Typography>
+            </td>
+            <td className={ classes.apr1 }>
+              <Typography align='right' variant='h5' className={ classes.inline }><div className={classes.preSymbol}>$</div>{ asset.vaultBalance ? parseFloat((asset.vaultBalance*asset.pricePerFullShare*asset.usdPrice).toFixed(2)).toLocaleString() : '0.00' }</Typography>
+            </td>
+            <td className={ classes.apr1 }>
+              <Typography align='right' variant='h5' className={ classes.inline }>{ asset.stats && asset.stats.apyOneDaySample ? parseFloat(asset.stats.apyOneDaySample.toFixed(2)).toLocaleString() : '0.00' }<div className={classes.symbol}>%</div></Typography>
+            </td>
+            <td className={ classes.apr1 }>
+            <Typography align='right' variant='h5' className={ classes.inline }>{ asset.stats && asset.stats.apyThreeDaySample ? parseFloat(asset.stats.apyThreeDaySample.toFixed(2)).toLocaleString() : '0.00' }<div className={classes.symbol}>%</div></Typography>
+            </td>
+            <td className={ classes.apr1 }>
+              <Typography align='right' variant='h5' className={ classes.inline }>{ asset.stats && asset.stats.apyInceptionSample ? parseFloat(asset.stats.apyInceptionSample.toFixed(2)).toLocaleString() : '0.00' }<div className={classes.symbol}>%</div></Typography>
+            </td>
           </tr>)
       })
     )
   }
-
-  onChange = (event) => {
-    let val = []
-    val[event.target.id] = event.target.value
-    this.setState(val)
-    setTimeout(this.dispatch(event.target.value));
-  }
-
-  renderTableHeader = (name) => {
-    if (name === '_uniswap') {
-      return 'Uniswap (APY)';
-    } else if (name.startsWith('_compound')) {
-      return 'Compound';
-    } else if (name.startsWith('_fulcrum')) {
-      return 'Fulcrum';
-    } else if (name.startsWith('_aave')) {
-      return 'Aave';
-    } else if (name.startsWith('_dydx')) {
-      return 'dYdX';
-    } else if (name.startsWith('_ddex')) {
-      return 'ddex';
-    } else if (name.startsWith('_lendf')) {
-      return 'dForce';
-    } else {
-      return name;
-    }
-  }
 }
 
-export default withNamespaces()(withRouter(withStyles(styles)(APR)));
+export default withRouter(withStyles(styles)(APR));
