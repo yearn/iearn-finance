@@ -392,7 +392,7 @@ class Asset extends Component {
   };
 
   _getAPY = (asset) => {
-    const { basedOn } = this.state
+    const { basedOn } = this.props
 
     if(asset && asset.stats) {
       switch (basedOn) {
