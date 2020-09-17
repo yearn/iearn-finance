@@ -428,7 +428,7 @@ class Vault extends Component {
   };
 
   renderAssetBlocks = () => {
-    const { assets, expanded, search, hideZero } = this.state
+    const { assets, expanded, search, hideZero, basedOn } = this.state
     const { classes } = this.props
     const width = window.innerWidth
 
@@ -505,7 +505,7 @@ class Vault extends Component {
             </div>
           </AccordionSummary>
           <AccordionDetails>
-            <Asset asset={ asset } startLoading={ this.startLoading } />
+            <Asset asset={ asset } startLoading={ this.startLoading } basedOn={ basedOn } />
           </AccordionDetails>
         </Accordion>
       )
