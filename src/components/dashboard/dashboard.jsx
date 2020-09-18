@@ -340,19 +340,19 @@ class Dashboard extends Component {
     const options = [
       {
         value: 1,
-        description: '1 day'
-      },
-      {
-        value: 2,
         description: '3 days'
       },
       {
-        value: 3,
+        value: 2,
         description: '1 week'
       },
       {
+        value: 3,
+        description: '1 month'
+      },
+      {
         value: 4,
-        description: 'Inception'
+        description: 'inception'
       }
     ]
 
@@ -630,11 +630,11 @@ class Dashboard extends Component {
     if(asset && asset.stats) {
       switch (basedOn) {
         case 1:
-          return asset.stats.apyOneDaySample
-        case 2:
           return asset.stats.apyThreeDaySample
-        case 3:
+        case 2:
           return asset.stats.apyOneWeekSample
+        case 3:
+          return asset.stats.apyOneMonthSample
         case 4:
           return asset.stats.apyInceptionSample
         default:

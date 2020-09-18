@@ -3028,13 +3028,13 @@ class Store {
         } else {
           switch (basedOn) {
             case '1':
-              apy = vaultStats[0].apyOneDaySample
-              break;
-            case '2':
               apy = vaultStats[0].apyThreeDaySample
               break;
-            case '3':
+            case '2':
               apy = vaultStats[0].apyOneWeekSample
+              break;
+            case '3':
+              apy = vaultStats[0].apyOneMonthSample
               break;
             case '4':
               apy = vaultStats[0].apyInceptionSample
