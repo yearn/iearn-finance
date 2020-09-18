@@ -29,6 +29,8 @@ import {
   VAULT_BALANCES_FULL_RETURNED,
   DEPOSIT_VAULT_RETURNED,
   WITHDRAW_VAULT_RETURNED,
+  DEPOSIT_ALL_VAULT_RETURNED,
+  WITHDRAW_ALL_VAULT_RETURNED,
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED
 } from '../../constants'
@@ -311,6 +313,8 @@ class Vault extends Component {
   componentWillMount() {
     emitter.on(DEPOSIT_VAULT_RETURNED, this.showHash);
     emitter.on(WITHDRAW_VAULT_RETURNED, this.showHash);
+    emitter.on(DEPOSIT_ALL_VAULT_RETURNED, this.showHash);
+    emitter.on(WITHDRAW_ALL_VAULT_RETURNED, this.showHash);
     emitter.on(ERROR, this.errorReturned);
     emitter.on(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
@@ -320,6 +324,8 @@ class Vault extends Component {
   componentWillUnmount() {
     emitter.removeListener(DEPOSIT_VAULT_RETURNED, this.showHash);
     emitter.removeListener(WITHDRAW_VAULT_RETURNED, this.showHash);
+    emitter.removeListener(DEPOSIT_ALL_VAULT_RETURNED, this.showHash);
+    emitter.removeListener(WITHDRAW_ALL_VAULT_RETURNED, this.showHash);
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
