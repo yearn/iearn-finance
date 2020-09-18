@@ -890,7 +890,7 @@ class Store {
           id: 'WETH',
           name: 'WETH',
           symbol: 'WETH',
-          description: 'Wrappeth Ether',
+          description: 'Wrapped Ether',
           vaultSymbol: 'yWETH',
           erc20address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
           vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
