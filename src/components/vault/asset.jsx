@@ -213,15 +213,15 @@ class Asset extends Component {
             </div>
           </div>
           <div className={classes.headingEarning}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Weekly Growth:</Typography>
+            <Typography variant={ 'h5' } className={ classes.grey }>Monthly Growth:</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/52).toFixed(2) }% </Typography>
+              <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/12).toFixed(2) }% </Typography>
             </div>
           </div>
           <div className={classes.headingEarning}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Daily Growth:</Typography>
+            <Typography variant={ 'h5' } className={ classes.grey }>Weekly Growth:</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/365).toFixed(2) }% </Typography>
+              <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/52).toFixed(2) }% </Typography>
             </div>
           </div>
         </div>
@@ -397,11 +397,11 @@ class Asset extends Component {
     if(asset && asset.stats) {
       switch (basedOn) {
         case 1:
-          return asset.stats.apyOneDaySample
-        case 2:
           return asset.stats.apyThreeDaySample
-        case 3:
+        case 2:
           return asset.stats.apyOneWeekSample
+        case 3:
+          return asset.stats.apyOneMonthSample
         case 4:
           return asset.stats.apyInceptionSample
         default:
