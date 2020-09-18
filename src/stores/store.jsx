@@ -1228,6 +1228,29 @@ class Store {
     }
   }
 
+  _checkApprovalForProxy = async (asset, account, amount, contract, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+    try {
+      const allowance = await vaultContract.methods.allowance(account.address, contract).call({ from: account.address })
+
+      const ethAllowance = web3.utils.fromWei(allowance, "ether")
+
+      if(parseFloat(ethAllowance) < parseFloat(amount)) {
+        await vaultContract.methods.approve(contract, web3.utils.toWei('999999999999', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+        callback()
+      } else {
+        callback()
+      }
+    } catch(error) {
+      if(error.message) {
+        return callback(error.message)
+      }
+      callback(error)
+    }
+  }
+
   _checkApproval = async (asset, account, amount, contract, callback) => {
 
     if(asset.erc20address === 'Ethereum') {
@@ -2834,11 +2857,60 @@ class Store {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
 
-    this._callWithdrawVault(asset, account, amount, (err, withdrawResult) => {
-      if(err) {
-        return emitter.emit(ERROR, err);
+
+    if(asset.id === 'DAI') {
+      this._checkApprovalForProxy(asset, account, amount, config.yVaultCheckAddress, (err) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        this._callWithdrawVaultProxy(asset, account, amount, (err, withdrawResult) => {
+          if(err) {
+            return emitter.emit(ERROR, err);
+          }
+
+          return emitter.emit(WITHDRAW_VAULT_RETURNED, withdrawResult)
+        })
+      })
+    } else {
+      this._callWithdrawVault(asset, account, amount, (err, withdrawResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+        return emitter.emit(WITHDRAW_VAULT_RETURNED, withdrawResult)
+      })
+    }
+  }
+
+  _callWithdrawVaultProxy = async (asset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let yVaultCheckContract = new web3.eth.Contract(config.yVaultCheckABI, config.yVaultCheckAddress)
+
+    var amountSend = web3.utils.toWei(amount, "ether")
+    if (asset.decimals !== 18) {
+      amountSend = Math.round(amount*10**asset.decimals);
+    }
+
+    yVaultCheckContract.methods.withdraw(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    .on('transactionHash', function(hash){
+      console.log(hash)
+      callback(null, hash)
+    })
+    .on('confirmation', function(confirmationNumber, receipt){
+      console.log(confirmationNumber, receipt);
+    })
+    .on('receipt', function(receipt){
+      console.log(receipt);
+    })
+    .on('error', function(error) {
+      console.log(error);
+      if (!error.toString().includes("-32601")) {
+        if(error.message) {
+          return callback(error.message)
+        }
+        callback(error)
       }
-      return emitter.emit(WITHDRAW_VAULT_RETURNED, withdrawResult)
     })
   }
 
@@ -2883,11 +2955,54 @@ class Store {
     const account = store.getStore('account')
     const { asset } = payload.content
 
-    this._callWithdrawAllVault(asset, account, (err, withdrawResult) => {
-      if(err) {
-        return emitter.emit(ERROR, err);
+    if(asset.id === 'DAI') {
+      this._checkApprovalForProxy(asset, account, asset.vaultBalance, config.yVaultCheckAddress, (err) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        this._callWithdrawAllVaultProxy(asset, account, (err, withdrawResult) => {
+          if(err) {
+            return emitter.emit(ERROR, err);
+          }
+
+          return emitter.emit(WITHDRAW_ALL_VAULT_RETURNED, withdrawResult)
+        })
+      })
+    } else {
+      this._callWithdrawAllVault(asset, account, (err, withdrawResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+        return emitter.emit(WITHDRAW_ALL_VAULT_RETURNED, withdrawResult)
+      })
+    }
+  }
+
+  _callWithdrawAllVaultProxy = async (asset, account, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let vaultContract = new web3.eth.Contract(config.yVaultCheckABI, config.yVaultCheckAddress)
+
+    vaultContract.methods.withdrawAll().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    .on('transactionHash', function(hash){
+      console.log(hash)
+      callback(null, hash)
+    })
+    .on('confirmation', function(confirmationNumber, receipt){
+      console.log(confirmationNumber, receipt);
+    })
+    .on('receipt', function(receipt){
+      console.log(receipt);
+    })
+    .on('error', function(error) {
+      console.log(error);
+      if (!error.toString().includes("-32601")) {
+        if(error.message) {
+          return callback(error.message)
+        }
+        callback(error)
       }
-      return emitter.emit(WITHDRAW_ALL_VAULT_RETURNED, withdrawResult)
     })
   }
 
