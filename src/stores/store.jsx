@@ -967,6 +967,7 @@ class Store {
           lastMeasurement: 10709740,
           measurement: 1e18,
           price_id: 'lp-bcurve',
+          yVaultCheckAddress: '0xe309978497dfc15bb4f04755005f6410cadb4103'
         },
         {
           id: 'crvBTC',
@@ -1007,6 +1008,7 @@ class Store {
           lastMeasurement: 10650116,
           measurement: 1e18,
           price_id: 'dai',
+          yVaultCheckAddress: '0x1bbe0f9af0cf852f9ff14637da2f0bc477a6d1ad'
         },
         {
           id: 'TUSD',
@@ -2858,8 +2860,8 @@ class Store {
     const { asset, amount } = payload.content
 
 
-    if(asset.id === 'DAI') {
-      this._checkApprovalForProxy(asset, account, amount, config.yVaultCheckAddress, (err) => {
+    if(asset.yVaultCheckAddress) {
+      this._checkApprovalForProxy(asset, account, amount, asset.yVaultCheckAddress, (err) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
@@ -2885,7 +2887,7 @@ class Store {
   _callWithdrawVaultProxy = async (asset, account, amount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    let yVaultCheckContract = new web3.eth.Contract(config.yVaultCheckABI, config.yVaultCheckAddress)
+    let yVaultCheckContract = new web3.eth.Contract(config.yVaultCheckABI, asset.yVaultCheckAddress)
 
     var amountSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals !== 18) {
@@ -2955,8 +2957,8 @@ class Store {
     const account = store.getStore('account')
     const { asset } = payload.content
 
-    if(asset.id === 'DAI') {
-      this._checkApprovalForProxy(asset, account, asset.vaultBalance, config.yVaultCheckAddress, (err) => {
+    if(asset.yVaultCheckAddress) {
+      this._checkApprovalForProxy(asset, account, asset.vaultBalance, asset.yVaultCheckAddress, (err) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
@@ -2982,7 +2984,7 @@ class Store {
   _callWithdrawAllVaultProxy = async (asset, account, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
-    let vaultContract = new web3.eth.Contract(config.yVaultCheckABI, config.yVaultCheckAddress)
+    let vaultContract = new web3.eth.Contract(config.yVaultCheckABI, asset.yVaultCheckAddress)
 
     vaultContract.methods.withdrawAll().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
