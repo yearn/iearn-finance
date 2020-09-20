@@ -5,6 +5,7 @@ import {
 } from '@material-ui/core';
 import { withRouter } from "react-router-dom";
 import { colors } from '../../theme'
+import ENS from 'ethjs-ens';
 
 import {
   CONNECTION_CONNECTED,
@@ -141,10 +142,23 @@ class Header extends Component {
 
   connectionConnected = () => {
     this.setState({ account: store.getStore('account') })
+    this.setAddressEnsName();
   };
 
   connectionDisconnected = () => {
     this.setState({ account: store.getStore('account') })
+  }
+
+  setAddressEnsName = async () => {
+    const provider = store.getStore('web3context').library.provider
+    const account = store.getStore('account')
+    const { address } = account
+    const network = provider.networkVersion
+    const ens = new ENS({ provider, network })
+    const addressEnsName = await ens.reverse(address).catch(() => {})
+    if (addressEnsName) {
+      this.setState({ addressEnsName })
+    }
   }
 
   render() {
@@ -154,6 +168,7 @@ class Header extends Component {
 
     const {
       account,
+      addressEnsName,
       modalOpen
     } = this.state
 
@@ -161,6 +176,7 @@ class Header extends Component {
     if (account.address) {
       address = account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length)
     }
+    const addressAlias = addressEnsName || address
 
     return (
       <div className={ classes.root }>
@@ -185,7 +201,7 @@ class Header extends Component {
           <div className={ classes.account }>
             { address &&
               <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap onClick={this.addressClicked} >
-                { address }
+                { addressAlias }
                 <div className={ classes.connectedDot }></div>
               </Typography>
             }
