@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
-import * as moment from 'moment';
 import {
   Typography,
-  Tooltip,
   TextField,
   MenuItem
 } from '@material-ui/core';
@@ -16,7 +14,6 @@ import InfoIcon from '@material-ui/icons/Info';
 import {
   ERROR,
   CONNECTION_CONNECTED,
-  CONNECTION_DISCONNECTED,
   GET_DASHBOARD_SNAPSHOT,
   DASHBOARD_SNAPSHOT_RETURNED,
 } from '../../constants'

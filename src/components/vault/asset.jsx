@@ -49,6 +49,7 @@ const styles = theme => ({
     paddingBottom: '12px',
     display: 'flex',
     flex: '1',
+    padding: '24px',
     [theme.breakpoints.down('sm')]: {
       flexDirection: 'column'
     }
@@ -118,17 +119,15 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     flex: 1,
-    flexWrap: 'nowrap',
-    padding: '12px',
-    borderRadius: '24px',
+    padding: '12px 24px',
     background: '#dedede',
     width: '100%',
-    marginBottom: '24px'
+    marginBottom: '24px',
+    flexWrap: 'wrap'
   },
   headingEarning: {
     flex: 1,
     padding: '12px',
-    textAlign: 'right'
   },
   headingStrategy: {
     padding: '12px',
@@ -140,8 +139,16 @@ const styles = theme => ({
   flexy: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-start'
   },
+  fullWidth: {
+    minWidth: '100%',
+    margin: '18px 0px',
+    borderBottom: '1px solid '+colors.borderBlue
+  },
+  assetSummarySectionheader: {
+    width: '83px'
+  }
 });
 
 
@@ -200,9 +207,12 @@ class Asset extends Component {
     return (
       <div className={ classes.vaultContainer }>
         <div className={ classes.assetSummary }>
+          <div className={ classes.assetSummarySectionheader }>
+            <Typography variant={ 'h4' } color='primary' noWrap>Strategy:</Typography>
+          </div>
           <div className={classes.headingStrategy}>
             <div>
-              <Typography variant={ 'h5' } className={ classes.grey }>Current Strategy:</Typography>
+              <Typography variant={ 'h5' } className={ classes.grey }>Currently Active:</Typography>
               <Typography variant={ 'h4' } noWrap>{ asset.strategyName }</Typography>
             </div>
           </div>
@@ -222,6 +232,40 @@ class Asset extends Component {
             <Typography variant={ 'h5' } className={ classes.grey }>Weekly Growth:</Typography>
             <div className={ classes.flexy }>
               <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/52).toFixed(2) }% </Typography>
+            </div>
+          </div>
+          <div className={ classes.fullWidth }></div>
+          <div className={ classes.assetSummarySectionheader }>
+            <Typography variant={ 'h4' } color='primary' noWrap>Statistics:</Typography>
+          </div>
+          <div className={classes.headingEarning}>
+            <Typography variant={ 'h5' } className={ classes.grey }>Total Earnings:</Typography>
+            <div className={ classes.flexy }>
+              <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.earnings/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
+            </div>
+          </div>
+          <div className={classes.headingEarning}>
+            <Typography variant={ 'h5' } className={ classes.grey }>Deposits:</Typography>
+            <div className={ classes.flexy }>
+              <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalDeposits/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
+            </div>
+          </div>
+          <div className={classes.headingEarning}>
+            <Typography variant={ 'h5' } className={ classes.grey }>Withdrawals:</Typography>
+            <div className={ classes.flexy }>
+              <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalWithdrawals/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
+            </div>
+          </div>
+          <div className={classes.headingEarning}>
+            <Typography variant={ 'h5' } className={ classes.grey }>Transferred In:</Typography>
+            <div className={ classes.flexy }>
+              <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalTransferredIn/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
+            </div>
+          </div>
+          <div className={classes.headingEarning}>
+            <Typography variant={ 'h5' } className={ classes.grey }>Transferred Out:</Typography>
+            <div className={ classes.flexy }>
+              <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalTransferredOut/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
             </div>
           </div>
         </div>

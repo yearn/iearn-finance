@@ -3,7 +3,6 @@ import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
-  TextField,
   Card,
 } from '@material-ui/core';
 import { colors } from '../../theme'
@@ -188,11 +187,7 @@ class APR extends Component {
   };
 
   render() {
-    const { classes, t } = this.props;
-    const {
-      loading,
-      assets
-    } = this.state
+    const { classes } = this.props;
 
     return (
       <div className={ classes.root }>
