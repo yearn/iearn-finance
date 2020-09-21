@@ -1558,6 +1558,9 @@ class Store {
     }
 
     const web3 = await this._getWeb3Provider();
+    if(!web3) {
+      return null
+    }
 
     async.map(assets, (asset, callback) => {
       async.parallel([
@@ -2439,6 +2442,9 @@ class Store {
     }
 
     const web3 = await this._getWeb3Provider()
+    if(!web3) {
+      return null
+    }
 
     const vaultStatistics = await this._getStatistics()
     const addressStatistics = await this._getAddressStatistics(account.address)

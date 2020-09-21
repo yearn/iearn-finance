@@ -14,6 +14,7 @@ import InfoIcon from '@material-ui/icons/Info';
 import {
   ERROR,
   CONNECTION_CONNECTED,
+  CONNECTION_DISCONNECTED,
   GET_DASHBOARD_SNAPSHOT,
   DASHBOARD_SNAPSHOT_RETURNED,
 } from '../../constants'
@@ -202,6 +203,7 @@ class Dashboard extends Component {
 
     this.state = {
       dashboard: dashboard,
+      account: account,
       loading: true,
       growth: growth ? parseInt(growth) : 1, // 0=daily 1=weekly 2=yearly
       currency: currency ? currency : 'USD', // USD / ETH,
@@ -216,12 +218,14 @@ class Dashboard extends Component {
   componentWillMount() {
     emitter.on(ERROR, this.errorReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
+    emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(DASHBOARD_SNAPSHOT_RETURNED, this.dashboardSnapshotReturned);
   }
 
   componentWillUnmount() {
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
+    emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(DASHBOARD_SNAPSHOT_RETURNED, this.dashboardSnapshotReturned);
   };
 
@@ -233,8 +237,13 @@ class Dashboard extends Component {
   }
 
   connectionConnected = () => {
-    this.setState({ loading: true })
+    const account = store.getStore('account')
+    this.setState({ loading: true, account: account })
     dispatcher.dispatch({ type: GET_DASHBOARD_SNAPSHOT, content: {} })
+  };
+
+  connectionDisconnected = () => {
+    this.setState({ account: null })
   };
 
   errorReturned = (error) => {
@@ -247,8 +256,22 @@ class Dashboard extends Component {
       loading,
       dashboard,
       growth,
-      currency
+      currency,
+      account,
     } = this.state
+
+    if(!account || !account.address) {
+      return (
+        <div className={ classes.root }>
+          <div className={ classes.investedContainerLoggedOut }>
+          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+            <div className={ classes.introCenter }>
+              <Typography variant='h3'>Connect your wallet to continue</Typography>
+            </div>
+          </div>
+        </div>
+      )
+    }
 
     return (
       <div className={ classes.root }>

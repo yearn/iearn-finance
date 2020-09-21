@@ -150,14 +150,17 @@ class Header extends Component {
   }
 
   setAddressEnsName = async () => {
-    const provider = store.getStore('web3context').library.provider
-    const account = store.getStore('account')
-    const { address } = account
-    const network = provider.networkVersion
-    const ens = new ENS({ provider, network })
-    const addressEnsName = await ens.reverse(address).catch(() => {})
-    if (addressEnsName) {
-      this.setState({ addressEnsName })
+    const context = store.getStore('web3context')
+    if(context && context.library && context.library.provider) {
+      const provider = context.library.provider
+      const account = store.getStore('account')
+      const { address } = account
+      const network = provider.networkVersion
+      const ens = new ENS({ provider, network })
+      const addressEnsName = await ens.reverse(address).catch(() => {})
+      if (addressEnsName) {
+        this.setState({ addressEnsName })
+      }
     }
   }
 
