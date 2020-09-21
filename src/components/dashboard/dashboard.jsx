@@ -233,6 +233,7 @@ class Dashboard extends Component {
   }
 
   connectionConnected = () => {
+    this.setState({ loading: true })
     dispatcher.dispatch({ type: GET_DASHBOARD_SNAPSHOT, content: {} })
   };
 

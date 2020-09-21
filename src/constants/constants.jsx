@@ -1,5 +1,5 @@
 export const ERROR = 'ERROR'
-
+export const RESET_PROFILE = 'RESET_PROFILE'
 
 // #Accounts
 export const CONNECTION_CONNECTED = 'CONNECTION_CONNECTED'

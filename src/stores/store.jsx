@@ -77,167 +77,307 @@ class Store {
   constructor() {
 
     this.store = {
-      statisticsProvider: 'raw',
       statistics: [],
-      dashboard: {
-          vault_balance_usd: 0,
-          vault_growth_usd_daily: 0,
-          vault_growth_usd_weekly: 0,
-          vault_growth_usd_yearly: 0,
-          vault_growth_usd_daily_perc: 0,
-          vault_growth_usd_weekly_perc: 0,
-          vault_growth_usd_yearly_perc: 0,
-
-          vault_balance_eth: 0,
-          vault_growth_eth_daily: 0,
-          vault_growth_eth_weekly: 0,
-          vault_growth_eth_yearly: 0,
-          vault_growth_eth_daily_perc: 0,
-          vault_growth_eth_weekly_perc: 0,
-          vault_growth_eth_yearly_perc: 0,
-
-
-          earn_balance_usd: 0,
-          earn_growth_usd_daily: 0,
-          earn_growth_usd_weekly: 0,
-          earn_growth_usd_yearly: 0,
-          earn_growth_usd_daily_perc: 0,
-          earn_growth_usd_weekly_perc: 0,
-          earn_growth_usd_yearly_perc: 0,
-
-          earn_balance_eth: 0,
-          earn_growth_eth_daily: 0,
-          earn_growth_eth_weekly: 0,
-          earn_growth_eth_yearly: 0,
-          earn_growth_eth_daily_perc: 0,
-          earn_growth_eth_weekly_perc: 0,
-          earn_growth_eth_yearly_perc: 0,
-
-          portfolio_balance_usd: 0,
-          portfolio_growth_usd_daily: 0,
-          portfolio_growth_usd_weekly: 0,
-          portfolio_growth_usd_yearly: 0,
-          portfolio_growth_usd_daily_perc: 0,
-          portfolio_growth_usd_weekly_perc: 0,
-          portfolio_growth_usd_yearly_perc: 0,
-
-          portfolio_balance_eth: 0,
-          portfolio_growth_eth_daily: 0,
-          portfolio_growth_eth_weekly: 0,
-          portfolio_growth_eth_yearly: 0,
-          portfolio_growth_eth_daily_perc: 0,
-          portfolio_growth_eth_weekly_perc: 0,
-          portfolio_growth_eth_yearly_perc: 0,
-      },
       universalGasPrice: '70',
       ethPrice: 0,
-      aprs: [{
-          token: 'DAI',
-          address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-          earnAddress: '0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01',
-          lastMeasurement: 9465912,
-          measurement: 1000037230456849197,
-          mod: 1,
-          decimals: 18
-        },{
-          token: 'TUSD',
-          address: '0x0000000000085d4780B73119b644AE5ecd22b376',
-          earnAddress: '0x73a052500105205d34daf004eab301916da8190f',
-          lastMeasurement: 9479531,
-          measurement: 1000197346651007837 ,
-          created: 0,
-          mod: 1,
-          decimals: 18
-        },{
-          token: 'USDC',
-          address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-          earnAddress: '0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA',
-          lastMeasurement: 9400732,
-          measurement: 1001761741440856097,
-          mod: 1,
-          decimals: 6
-        },{
-          token: 'USDT',
-          address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-          earnAddress: '0x83f798e925BcD4017Eb265844FDDAbb448f1707D',
-          lastMeasurement: 9465880,
-          measurement: 1000030025124779312,
-          mod: 1,
-          decimals: 6
-        },{
-          token: 'SUSD',
-          address: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
-          earnAddress: '0x36324b8168f960A12a8fD01406C9C78143d41380',
-          lastMeasurement: 9400732,
-          measurement: 1029186724259834543,
-          mod: 1,
-          decimals: 18
-        },{
-          token: 'BAT',
-          address: '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
-          created: 0,
-          mod: 1,
-          earnAddress: '',
-          decimals: 18
-        },{
-          token: 'ETH',
-          address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
-          created: 0,
-          mod: 1,
-          earnAddress: '',
-          decimals: 18
-        },{
-          token: 'LINK',
-          address: '0x514910771AF9Ca656af840dff83E8264EcF986CA',
-          created: 0,
-          mod: 1,
-          earnAddress: '',
-          decimals: 18
-        },{
-          token: 'KNC',
-          address: '0xdd974D5C2e2928deA5F71b9825b8b646686BD200',
-          created: 0,
-          mod: 1,
-          earnAddress: '',
-          decimals: 18
-        },{
-          token: 'REP',
-          address: '0x1985365e9f78359a9B6AD760e32412f4a445E862',
-          created: 0,
-          mod: 1,
-          earnAddress: '',
-          decimals: 18
-        },{
-          token: 'MKR',
-          address: '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2',
-          created: 0,
-          mod: 1,
-          earnAddress: '',
-          decimals: 18
-        },{
-          token: 'ZRX',
-          address: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
-          created: 0,
-          mod: 1,
-          earnAddress: '',
-          decimals: 18
-        },{
-          token: 'SNX',
-          address: '0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F',
-          created: 0,
-          mod: 1,
-          earnAddress: '',
-          decimals: 18
-        },{
-          token: 'wBTC',
-          address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
-          earnAddress: '0x04EF8121aD039ff41d10029c91EA1694432514e9',
-          lastMeasurement: 9427488,
-          measurement: 2000175540087812685,
-          mod: 1,
-          decimals: 18
+      dashboard: this._getDefaultValues().dashboard,
+      aprs: this._getDefaultValues().aprs,
+      assets: this._getDefaultValues().assets,
+      vaultAssets: this._getDefaultValues().vaultAssets,
+      usdPrices: null,
+      account: {},
+      web3: null,
+      pricePerFullShare: 0,
+      yields: [],
+      aggregatedYields: [],
+      aggregatedHeaders: [],
+      uniswapYields: [],
+      uniswapLiquidity: [],
+      events: [],
+      connectorsByName: {
+        MetaMask: injected,
+        TrustWallet: injected,
+        WalletConnect: walletconnect,
+        WalletLink: walletlink,
+        Ledger: ledger,
+        Trezor: trezor,
+        Frame: frame,
+        Fortmatic: fortmatic,
+        Portis: portis,
+        Squarelink: squarelink,
+        Torus: torus,
+        Authereum: authereum
+      },
+      builtWith: [
+        {
+          website: 'https://DeFiZap.com',
+          logo: 'defizap.png',
+          name: 'DeFi Zap'
+        },
+        {
+          website: 'https://1inch.exchange',
+          logo: 'oneinch.svg',
+          name: '1inch'
+        },
+        {
+          website: 'https://www.defisnap.io',
+          logo: 'defisnap.svg',
+          name: 'DefiSnap'
+        },
+        {
+          website: 'https://www.defipulse.com',
+          logo: 'defipulse.png',
+          name: 'DeFi Pulse'
+        },
+        {
+          website: 'https://www.curve.fi',
+          logo: 'curvefi.jpg',
+          name: 'Curve'
+        },
+        {
+          website: 'https://bzx.network',
+          logo: 'bzx.png',
+          name: 'bZx'
+        },
+        {
+          website: 'http://aave.com',
+          logo: 'aave.png',
+          name: 'Aave'
+        },
+        {
+          website: 'https://compound.finance',
+          logo: 'compound.png',
+          name: 'Compound'
+        },
+        {
+          website: 'http://dydx.exchange',
+          logo: 'dydx.jpg',
+          name: 'dYdX'
+        },
+        {
+          website: 'https://ddex.io',
+          logo: 'ddex.jpg',
+          name: 'HydroProtocol'
+        },
+        {
+          website: 'https://lendf.me',
+          logo: 'lendf.png',
+          name: 'LendfMe'
+        },
+        {
+          website: 'https://uniswap.io',
+          logo: 'uniswap.png',
+          name: 'Uniswap'
+        },
+        {
+          website: 'http://kyber.network',
+          logo: 'kybernetwork.png',
+          name: 'KyberNetwork'
+        },
+        {
+          website: 'https://synthetix.io',
+          logo: 'synthetix.png',
+          name: 'Synthetix'
+        },
+        {
+          website: 'https://www.ethereum.org',
+          logo: 'ethereum.png',
+          name: 'ethereum'
+        },
+        {
+          website: 'https://trufflesuite.com',
+          logo: 'truffle.png',
+          name: 'Truffle Suite'
+        },
+        {
+          website: 'https://etherscan.io',
+          logo: 'etherscan.png',
+          name: 'Etherscan'
+        },
+        {
+          website: 'https://alchemyapi.io/',
+          logo: 'alchemy.png',
+          name: 'Alchemy'
         },
       ],
+      web3context: null,
+      languages: [
+        {
+          language: 'English',
+          code: 'en'
+        },
+        {
+          language: 'Japanese',
+          code: 'ja'
+        },
+        {
+          language: 'Chinese',
+          code: 'zh'
+        },
+        {
+          language: 'European Portuguese',
+          code: 'pt_pt'
+        },
+      ],
+      curvBalance: 0,
+      curveContracts: [
+        {
+          id: 'crvV1',
+          symbol: 'compound.curve.fi',
+          version: 1,
+          erc20address: '0x3740fb63ab7a09891d7c0d4299442a551d06f5fd',
+          decimals: 18,
+          balance: 0
+        },
+        {
+          id: 'crvV2',
+          symbol: 'usdt.curve.fi',
+          version: 2,
+          erc20address: '0x9fc689ccada600b6df723d9e47d84d76664a1f23',
+          decimals: 18,
+          balance: 0
+        },
+        {
+          id: 'crvV3',
+          symbol: 'y.curve.fi',
+          version: 3,
+          erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
+          decimals: 18,
+          balance: 0
+        },
+        {
+          id: 'crvV4',
+          symbol: 'busd.curve.fi',
+          version: 4,
+          erc20address: '0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B',
+          decimals: 18,
+          balance: 0
+        }
+      ],
+      insuranceAssets: [
+        {
+          id: 'oCurve.fi',
+          symbol: '$Curve.fi',
+          insuredSymbol: 'oCRV',
+          name: 'oCurve.fi',
+          description: 'yDAI/yUSDC/yUSDT/yTUSD',
+          erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
+          insuranceAddress: '0x4BA8C6Ce0e855C051e65DfC37883360efAf7c82B',
+          insuranceABI:  config.insuranceABI,
+          uniswapInsuranceAddress: '0x21f5e9d4ec20571402a5396084b1634314a68c97',
+          uniswapInsuranceABI: config.uniswapInsuranceABI,
+          decimals: 18,
+          insuredDecimals: 15,
+          balance: 0,
+          insuredBalance: 0,
+          apr: 0,
+          insuredApr: 0,
+          pricePerInsurance: 0,
+          tokenPrice: 0
+        }
+      ],
+      ethBalance: 0,
+      sCrvBalance:  0
+    }
+
+    dispatcher.register(
+      function (payload) {
+        switch (payload.type) {
+          case GET_BALANCES_LIGHT:
+            this.getBalancesLight(payload);
+            break;
+          case GET_BALANCES:
+            this.getBalances(payload);
+            break;
+          case INVEST:
+            this.invest(payload)
+            break;
+          case REDEEM:
+            this.redeem(payload)
+            break;
+          case REBALANCE:
+            this.rebalance(payload)
+            break;
+          case DONATE:
+            this.donate(payload)
+            break;
+          case GET_AGGREGATED_YIELD:
+            this.getAPR(payload)
+            break;
+          case GET_CONTRACT_EVENTS:
+            this.getContractEvents(payload)
+            break;
+          case ZAP:
+            this.zap(payload)
+            break;
+          case IDAI:
+            this.idai(payload)
+            break;
+          case SWAP:
+            this.swap(payload)
+            break;
+          case TRADE:
+            this.trade(payload)
+            break;
+          case GET_CURV_BALANCE:
+            this.getCurveBalances(payload)
+            break;
+          case GET_BEST_PRICE:
+            this.getBestPrice(payload)
+            break;
+          case GET_VAULT_BALANCES:
+            this.getVaultBalances(payload);
+            break;
+          case GET_VAULT_BALANCES_FULL:
+            this.getVaultBalancesFull(payload);
+            break;
+          case DEPOSIT_VAULT:
+            this.depositVault(payload)
+            break;
+          case DEPOSIT_ALL_VAULT:
+            this.depositAllVault(payload)
+            break;
+          case WITHDRAW_VAULT:
+            this.withdrawVault(payload)
+            break;
+          case WITHDRAW_ALL_VAULT:
+            this.withdrawAllVault(payload)
+            break;
+          case GET_DASHBOARD_SNAPSHOT:
+            this.getDashboardSnapshot(payload)
+            break;
+          case GET_STATISTICS:
+            this.getStatistics(payload)
+            break
+          default: {
+          }
+        }
+      }.bind(this)
+    );
+  }
+
+  getStore(index) {
+    return(this.store[index]);
+  };
+
+  setStore(obj) {
+    this.store = {...this.store, ...obj}
+    // console.log(this.store)
+    return emitter.emit('StoreUpdated');
+  };
+
+  resetProfile = () => {
+    const defaultvalues = this._getDefaultValues()
+
+    store.setStore({
+      aprs: defaultvalues.aprs,
+      assets: defaultvalues.assets,
+      vaultAssets: defaultvalues.vaultAssets
+    })
+  }
+
+  _getDefaultValues = () => {
+    return {
       assets: [
         {
           id: 'DAIv3',
@@ -670,199 +810,6 @@ class Store {
           price_id: 'dai',
         },
       ],
-      usdPrices: null,
-      account: {},
-      web3: null,
-      pricePerFullShare: 0,
-      yields: [],
-      aggregatedYields: [],
-      aggregatedHeaders: [],
-      uniswapYields: [],
-      uniswapLiquidity: [],
-      events: [],
-      connectorsByName: {
-        MetaMask: injected,
-        TrustWallet: injected,
-        WalletConnect: walletconnect,
-        WalletLink: walletlink,
-        Ledger: ledger,
-        Trezor: trezor,
-        Frame: frame,
-        Fortmatic: fortmatic,
-        Portis: portis,
-        Squarelink: squarelink,
-        Torus: torus,
-        Authereum: authereum
-      },
-      builtWith: [
-        {
-          website: 'https://DeFiZap.com',
-          logo: 'defizap.png',
-          name: 'DeFi Zap'
-        },
-        {
-          website: 'https://1inch.exchange',
-          logo: 'oneinch.svg',
-          name: '1inch'
-        },
-        {
-          website: 'https://www.defisnap.io',
-          logo: 'defisnap.svg',
-          name: 'DefiSnap'
-        },
-        {
-          website: 'https://www.defipulse.com',
-          logo: 'defipulse.png',
-          name: 'DeFi Pulse'
-        },
-        {
-          website: 'https://www.curve.fi',
-          logo: 'curvefi.jpg',
-          name: 'Curve'
-        },
-        {
-          website: 'https://bzx.network',
-          logo: 'bzx.png',
-          name: 'bZx'
-        },
-        {
-          website: 'http://aave.com',
-          logo: 'aave.png',
-          name: 'Aave'
-        },
-        {
-          website: 'https://compound.finance',
-          logo: 'compound.png',
-          name: 'Compound'
-        },
-        {
-          website: 'http://dydx.exchange',
-          logo: 'dydx.jpg',
-          name: 'dYdX'
-        },
-        {
-          website: 'https://ddex.io',
-          logo: 'ddex.jpg',
-          name: 'HydroProtocol'
-        },
-        {
-          website: 'https://lendf.me',
-          logo: 'lendf.png',
-          name: 'LendfMe'
-        },
-        {
-          website: 'https://uniswap.io',
-          logo: 'uniswap.png',
-          name: 'Uniswap'
-        },
-        {
-          website: 'http://kyber.network',
-          logo: 'kybernetwork.png',
-          name: 'KyberNetwork'
-        },
-        {
-          website: 'https://synthetix.io',
-          logo: 'synthetix.png',
-          name: 'Synthetix'
-        },
-        {
-          website: 'https://www.ethereum.org',
-          logo: 'ethereum.png',
-          name: 'ethereum'
-        },
-        {
-          website: 'https://trufflesuite.com',
-          logo: 'truffle.png',
-          name: 'Truffle Suite'
-        },
-        {
-          website: 'https://etherscan.io',
-          logo: 'etherscan.png',
-          name: 'Etherscan'
-        },
-        {
-          website: 'https://alchemyapi.io/',
-          logo: 'alchemy.png',
-          name: 'Alchemy'
-        },
-      ],
-      web3context: null,
-      languages: [
-        {
-          language: 'English',
-          code: 'en'
-        },
-        {
-          language: 'Japanese',
-          code: 'ja'
-        },
-        {
-          language: 'Chinese',
-          code: 'zh'
-        },
-        {
-          language: 'European Portuguese',
-          code: 'pt_pt'
-        },
-      ],
-      curvBalance: 0,
-      curveContracts: [
-        {
-          id: 'crvV1',
-          symbol: 'compound.curve.fi',
-          version: 1,
-          erc20address: '0x3740fb63ab7a09891d7c0d4299442a551d06f5fd',
-          decimals: 18,
-          balance: 0
-        },
-        {
-          id: 'crvV2',
-          symbol: 'usdt.curve.fi',
-          version: 2,
-          erc20address: '0x9fc689ccada600b6df723d9e47d84d76664a1f23',
-          decimals: 18,
-          balance: 0
-        },
-        {
-          id: 'crvV3',
-          symbol: 'y.curve.fi',
-          version: 3,
-          erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
-          decimals: 18,
-          balance: 0
-        },
-        {
-          id: 'crvV4',
-          symbol: 'busd.curve.fi',
-          version: 4,
-          erc20address: '0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B',
-          decimals: 18,
-          balance: 0
-        }
-      ],
-      insuranceAssets: [
-        {
-          id: 'oCurve.fi',
-          symbol: '$Curve.fi',
-          insuredSymbol: 'oCRV',
-          name: 'oCurve.fi',
-          description: 'yDAI/yUSDC/yUSDT/yTUSD',
-          erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
-          insuranceAddress: '0x4BA8C6Ce0e855C051e65DfC37883360efAf7c82B',
-          insuranceABI:  config.insuranceABI,
-          uniswapInsuranceAddress: '0x21f5e9d4ec20571402a5396084b1634314a68c97',
-          uniswapInsuranceABI: config.uniswapInsuranceABI,
-          decimals: 18,
-          insuredDecimals: 15,
-          balance: 0,
-          insuredBalance: 0,
-          apr: 0,
-          insuredApr: 0,
-          pricePerInsurance: 0,
-          tokenPrice: 0
-        }
-      ],
-      ethBalance: 0,
       vaultAssets: [
         {
           id: 'ETH',
@@ -1111,94 +1058,165 @@ class Store {
           price_id: 'chainlink',
         }
       ],
-      sCrvBalance:  0
+      aprs: [{
+          token: 'DAI',
+          address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          earnAddress: '0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01',
+          lastMeasurement: 9465912,
+          measurement: 1000037230456849197,
+          mod: 1,
+          decimals: 18
+        },{
+          token: 'TUSD',
+          address: '0x0000000000085d4780B73119b644AE5ecd22b376',
+          earnAddress: '0x73a052500105205d34daf004eab301916da8190f',
+          lastMeasurement: 9479531,
+          measurement: 1000197346651007837 ,
+          created: 0,
+          mod: 1,
+          decimals: 18
+        },{
+          token: 'USDC',
+          address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+          earnAddress: '0xa2609B2b43AC0F5EbE27deB944d2a399C201E3dA',
+          lastMeasurement: 9400732,
+          measurement: 1001761741440856097,
+          mod: 1,
+          decimals: 6
+        },{
+          token: 'USDT',
+          address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+          earnAddress: '0x83f798e925BcD4017Eb265844FDDAbb448f1707D',
+          lastMeasurement: 9465880,
+          measurement: 1000030025124779312,
+          mod: 1,
+          decimals: 6
+        },{
+          token: 'SUSD',
+          address: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
+          earnAddress: '0x36324b8168f960A12a8fD01406C9C78143d41380',
+          lastMeasurement: 9400732,
+          measurement: 1029186724259834543,
+          mod: 1,
+          decimals: 18
+        },{
+          token: 'BAT',
+          address: '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
+          decimals: 18
+        },{
+          token: 'ETH',
+          address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
+          decimals: 18
+        },{
+          token: 'LINK',
+          address: '0x514910771AF9Ca656af840dff83E8264EcF986CA',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
+          decimals: 18
+        },{
+          token: 'KNC',
+          address: '0xdd974D5C2e2928deA5F71b9825b8b646686BD200',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
+          decimals: 18
+        },{
+          token: 'REP',
+          address: '0x1985365e9f78359a9B6AD760e32412f4a445E862',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
+          decimals: 18
+        },{
+          token: 'MKR',
+          address: '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
+          decimals: 18
+        },{
+          token: 'ZRX',
+          address: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
+          decimals: 18
+        },{
+          token: 'SNX',
+          address: '0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F',
+          created: 0,
+          mod: 1,
+          earnAddress: '',
+          decimals: 18
+        },{
+          token: 'wBTC',
+          address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+          earnAddress: '0x04EF8121aD039ff41d10029c91EA1694432514e9',
+          lastMeasurement: 9427488,
+          measurement: 2000175540087812685,
+          mod: 1,
+          decimals: 18
+        },
+      ],
+      dashboard: {
+          vault_balance_usd: 0,
+          vault_growth_usd_daily: 0,
+          vault_growth_usd_weekly: 0,
+          vault_growth_usd_yearly: 0,
+          vault_growth_usd_daily_perc: 0,
+          vault_growth_usd_weekly_perc: 0,
+          vault_growth_usd_yearly_perc: 0,
+
+          vault_balance_eth: 0,
+          vault_growth_eth_daily: 0,
+          vault_growth_eth_weekly: 0,
+          vault_growth_eth_yearly: 0,
+          vault_growth_eth_daily_perc: 0,
+          vault_growth_eth_weekly_perc: 0,
+          vault_growth_eth_yearly_perc: 0,
+
+
+          earn_balance_usd: 0,
+          earn_growth_usd_daily: 0,
+          earn_growth_usd_weekly: 0,
+          earn_growth_usd_yearly: 0,
+          earn_growth_usd_daily_perc: 0,
+          earn_growth_usd_weekly_perc: 0,
+          earn_growth_usd_yearly_perc: 0,
+
+          earn_balance_eth: 0,
+          earn_growth_eth_daily: 0,
+          earn_growth_eth_weekly: 0,
+          earn_growth_eth_yearly: 0,
+          earn_growth_eth_daily_perc: 0,
+          earn_growth_eth_weekly_perc: 0,
+          earn_growth_eth_yearly_perc: 0,
+
+          portfolio_balance_usd: 0,
+          portfolio_growth_usd_daily: 0,
+          portfolio_growth_usd_weekly: 0,
+          portfolio_growth_usd_yearly: 0,
+          portfolio_growth_usd_daily_perc: 0,
+          portfolio_growth_usd_weekly_perc: 0,
+          portfolio_growth_usd_yearly_perc: 0,
+
+          portfolio_balance_eth: 0,
+          portfolio_growth_eth_daily: 0,
+          portfolio_growth_eth_weekly: 0,
+          portfolio_growth_eth_yearly: 0,
+          portfolio_growth_eth_daily_perc: 0,
+          portfolio_growth_eth_weekly_perc: 0,
+          portfolio_growth_eth_yearly_perc: 0,
+      }
     }
-
-    dispatcher.register(
-      function (payload) {
-        switch (payload.type) {
-          case GET_BALANCES_LIGHT:
-            this.getBalancesLight(payload);
-            break;
-          case GET_BALANCES:
-            this.getBalances(payload);
-            break;
-          case INVEST:
-            this.invest(payload)
-            break;
-          case REDEEM:
-            this.redeem(payload)
-            break;
-          case REBALANCE:
-            this.rebalance(payload)
-            break;
-          case DONATE:
-            this.donate(payload)
-            break;
-          case GET_AGGREGATED_YIELD:
-            this.getAPR(payload)
-            break;
-          case GET_CONTRACT_EVENTS:
-            this.getContractEvents(payload)
-            break;
-          case ZAP:
-            this.zap(payload)
-            break;
-          case IDAI:
-            this.idai(payload)
-            break;
-          case SWAP:
-            this.swap(payload)
-            break;
-          case TRADE:
-            this.trade(payload)
-            break;
-          case GET_CURV_BALANCE:
-            this.getCurveBalances(payload)
-            break;
-          case GET_BEST_PRICE:
-            this.getBestPrice(payload)
-            break;
-          case GET_VAULT_BALANCES:
-            this.getVaultBalances(payload);
-            break;
-          case GET_VAULT_BALANCES_FULL:
-            this.getVaultBalancesFull(payload);
-            break;
-          case DEPOSIT_VAULT:
-            this.depositVault(payload)
-            break;
-          case DEPOSIT_ALL_VAULT:
-            this.depositAllVault(payload)
-            break;
-          case WITHDRAW_VAULT:
-            this.withdrawVault(payload)
-            break;
-          case WITHDRAW_ALL_VAULT:
-            this.withdrawAllVault(payload)
-            break;
-          case GET_DASHBOARD_SNAPSHOT:
-            this.getDashboardSnapshot(payload)
-            break;
-          case GET_STATISTICS:
-            this.getStatistics(payload)
-            break
-          default: {
-          }
-        }
-      }.bind(this)
-    );
   }
-
-  getStore(index) {
-    return(this.store[index]);
-  };
-
-  setStore(obj) {
-    this.store = {...this.store, ...obj}
-    // console.log(this.store)
-    return emitter.emit('StoreUpdated');
-  };
 
   invest = (payload) => {
     const account = store.getStore('account')

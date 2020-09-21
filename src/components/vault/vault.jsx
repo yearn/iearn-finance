@@ -348,6 +348,7 @@ class Vault extends Component {
     const { t } = this.props
     const account = store.getStore('account')
     this.setState({
+      loading: true,
       account: account,
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null
     })
