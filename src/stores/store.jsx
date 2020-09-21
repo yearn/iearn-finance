@@ -44,7 +44,6 @@ import {
   WITHDRAW_ALL_VAULT_RETURNED,
   GET_DASHBOARD_SNAPSHOT,
   DASHBOARD_SNAPSHOT_RETURNED,
-  GET_USD_PRICE,
   USD_PRICE_RETURNED,
   GET_STATISTICS,
   STATISTICS_RETURNED,
@@ -2424,8 +2423,11 @@ class Store {
     const web3 = await this._getWeb3Provider()
 
     const vaultStatistics = await this._getStatistics()
+    const addressStatistics = await this._getAddressStatistics(account.address)
+    const addressTXHitory = await this._getAddressTxHistory(account.address)
 
     const usdPrices = await this._getUSDPrices()
+
 
     async.map(assets, (asset, callback) => {
       async.parallel([
@@ -2436,6 +2438,8 @@ class Store {
         (callbackInner) => { this._getVaultHoldings(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getAssetUSDPrices(web3, asset, account, usdPrices, callbackInner) },
         (callbackInner) => { this._getVaultAPY(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getAddressStats(addressStatistics, asset, callbackInner) },
+        (callbackInner) => { this._getAddressTransactions(addressTXHitory, asset, callbackInner) },
       ], (err, data) => {
         if(err) {
           return callback(err)
@@ -2452,6 +2456,8 @@ class Store {
         asset.usdPrice = data[5].usdPrice
         asset.pricePerFullShare = data[6].pricePerFullShare
         asset.apy = data[6].apy
+        asset.addressStatistics = data[7]
+        asset.addressTransactions = data[8]
 
         callback(null, asset)
       })
@@ -2544,6 +2550,47 @@ class Store {
 
       const vault = vaultStatistics.filter((stats) => {
         return stats.tokenAddress.toLowerCase() === asset.erc20address.toLowerCase()
+      })
+
+      if(vault.length === 0) {
+        return callback(null, {})
+      }
+
+      callback(null, vault[0])
+    } catch(ex) {
+      callback(null, {})
+    }
+  }
+
+  _getAddressStats = (addressStatistics, asset, callback) => {
+    try {
+      if(asset.erc20address === 'Ethereum') {
+        asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+      }
+
+      const vault = addressStatistics.filter((stats) => {
+        return stats.vaultAddress.toLowerCase() === asset.vaultContractAddress.toLowerCase()
+      })
+
+      if(vault.length === 0) {
+        return callback(null, null)
+      }
+
+      callback(null, vault[0])
+    } catch(ex) {
+      callback(null, {})
+    }
+  }
+
+  _getAddressTransactions = (addressTXHitory, asset, callback) => {
+    try {
+
+      if(asset.erc20address === 'Ethereum') {
+        asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+      }
+
+      const vault = addressTXHitory.filter((stats) => {
+        return stats.vaultAddress.toLowerCase() === asset.vaultContractAddress.toLowerCase()
       })
 
       if(vault.length === 0) {
@@ -3356,7 +3403,33 @@ class Store {
 
   _getStatistics = async () => {
     try {
-      const url = config.statsProvider
+      const url = config.statsProvider+'vaults/apy'
+      const statisticsString = await rp(url);
+      const statistics = JSON.parse(statisticsString)
+
+      return statistics
+    } catch(e) {
+      console.log(e)
+      return store.getStore('universalGasPrice')
+    }
+  }
+
+  _getAddressStatistics = async (address) => {
+    try {
+      const url = config.statsProvider+'user/'+address+'/vaults/statistics'
+      const statisticsString = await rp(url);
+      const statistics = JSON.parse(statisticsString)
+
+      return statistics
+    } catch(e) {
+      console.log(e)
+      return store.getStore('universalGasPrice')
+    }
+  }
+
+  _getAddressTxHistory = async (address) => {
+    try {
+      const url = config.statsProvider+'user/'+address+'/vaults/transactions'
       const statisticsString = await rp(url);
       const statistics = JSON.parse(statisticsString)
 
