@@ -42,7 +42,6 @@ class App extends Component {
         .then((a) => {
           store.setStore({ account: { address: a.account }, web3context: { library: { provider: a.provider } } })
           emitter.emit(CONNECTION_CONNECTED)
-          console.log(a)
         })
         .catch((e) => {
           console.log(e)
@@ -51,6 +50,12 @@ class App extends Component {
 
       }
     });
+
+    window.ethereum.on('accountsChanged', function (accounts) {
+      store.setStore({ account: { address: accounts[0] } })
+      emitter.emit(CONNECTION_CONNECTED)
+    })
+
   }
 
   render() {
