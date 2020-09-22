@@ -213,6 +213,10 @@ class Store {
         {
           language: 'Chinese',
           code: 'zh'
+        },
+        {
+          languages: 'European Portuguese',
+          code: 'pt'
         }
       ],
       curvBalance: 0,

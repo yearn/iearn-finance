@@ -1,0 +1,105 @@
+{
+  "InvestSimple.Intro": "Ganha Juros. Fácil.",
+  "InvestSimple.Connect": "Ligar Carteira",
+  "InvestSimple.Show": "Mostrar V1",
+  "InvestSimple.Hide": "Esconder V1",
+  "InvestSimple.InterestRate": "Taxa de Juro",
+  "InvestSimple.AvailableBalance": "Saldo Disponível",
+
+  "Asset.InterestRate": "Taxa de Juro",
+  "Asset.AvailableBalance": "Saldo Disponível",
+  "Asset.Disabled": "Desativado",
+  "Asset.Earn": "Lucrar",
+  "Asset.Claim": "Requerer",
+  "Asset.Deposit": "Depositar",
+  "Asset.Withdraw": "Levantar",
+  "Asset.ClaimRewards": "Pedir Recompensas",
+
+  "Unlock.Deactivate": "Desativar",
+  "Unlock.WalletConnected": "Carteira ligada com sucesso.",
+
+  "APR.HowMuch": "Quanto queres investir?",
+
+  "Snackbar.Error": "Error",
+  "Snackbar.Warning": "Aviso",
+  "Snackbar.Info": "Informação",
+  "Snackbar.Succecss": "Sucesso",
+  "Snackbar.Hash": "Hash",
+
+  "Zap.Intro": "Zap In & Out. Fácil.",
+  "Zap.Zap": "Zap",
+  "Zap.Swap": "Substituir",
+  "Zap.Trade": "Trocar",
+
+  "IDai.Intro": "De iDAI para DAI. Fácil",
+  "IDai.Swap": "Substituir",
+
+  "Footer.Home": "home",
+  "Footer.About": "sobre",
+  "Footer.Docs": "docs",
+  "Footer.Code": "código",
+  "Footer.Telegram": "telegram",
+  "Footer.Yield": "retorno",
+  "Footer.BuiltWith": "feitocom",
+  "Footer.Zap": "zap",
+  "Footer.Insure": "assegurar",
+
+  "Insure.Intro": "Seguro garantia. Fácil.",
+  "Insure.Connect": "Ligar carteira",
+  "Insure.Balance": "Saldo atual",
+  "Insure.Insured": "Percentagem assegurada",
+  "Insure.UninsuredYield": "Retorno não assegurado",
+  "Insure.InsuredYield": "Retorno assegurado",
+  "Insure.BuyInsurance": "Comprar Cobertura",
+  "Insure.Disabled": "Desativado",
+  "Insure.ClaimInsurance": "Requerer",
+  "Insure.MintInsurance": "Cunhar Seguro",
+  "Insure.TotalCost": "Custo Total ",
+  "Insure.Expiration": "Validade",
+  "Insure.Premium": "Prémio",
+  "Insure.ExpectedReturns": "Retorno esperado",
+  "Insure.Unknown": "Desconhecido",
+  "Insure.TotalCost": "Custo Total",
+  "Insure.Balance": "Saldo: ",
+  "Insure.TokensMinted": "Tokens Cunhados",
+  "Insure.CostPerToken": "Custo por Token",
+  "Insure.CollateralizationRatio": "Rácio de Colaterização",
+  "Insure.MinimumCollateralizationRatio": "Rácio Mínimo de Colaterização",
+
+  "Home.Earn": "Lucrar",
+  "Home.Zap": "Zap",
+  "Home.Apr": "TANB",
+  "Home.Cover": "Cobertura",
+  "Home.Pool": "Pool",
+  "Home.Vaults": "Cofrer",
+  "Home.Balancer": "Balanceador",
+
+  "Zap.IWillReceive": "Vou receber",
+  "Zap.IHave": "Tenho",
+  "Zap.SendAmount": "Enviar valor",
+
+  "PoolDeposit.Intro": "Depositar. Fácil.",
+  "PoolDeposit.Connect": "Ligar carteira",
+  "PoolDeposit.Deposit": "Depositar",
+  "PoolDeposit.IWillReceive": "Vou receber",
+  "PoolDeposit.Ideal": "Divisão recomendada",
+
+  "PoolWithdraw.Intro": "Levantar. Fácil.",
+  "PoolWithdraw.Connect": "Ligar carteira",
+  "PoolWithdraw.Withdraw": "Levantar",
+  "PoolWithdraw.IWillReceive": "Vou receber",
+
+  "PoolExchange.Intro": "Trocar. Fácil.",
+  "PoolExchange.Connect": "Ligar carteira",
+  "PoolExchange.Exchange": "Trocar",
+  "PoolExchange.From": "De",
+  "PoolExchange.To": "Para",
+
+  "Pool.Intro": "Pooling. Fácil.",
+  "Pool.Connect": "Ligar carteira",
+
+  "Balancer.Intro": "Balancear. Simple.",
+  "Balancer.Connect": "Ligar carteira"
+
+}
+
