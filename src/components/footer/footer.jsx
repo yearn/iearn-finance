@@ -193,7 +193,7 @@ class Footer extends Component {
             <img alt="" src={ require('../../assets/medium.svg') } height='24px' className={ classes.icon } />
             <Typography variant={ 'h4'} >Medium</Typography>
           </div>
-          <div  className={ classes.link } onClick={()=> window.open("https://discord.gg/GcjxhWR", "_blank")} >
+          <div  className={ classes.link } onClick={()=> window.open("http://discord.yearn.finance", "_blank")} >
             <img alt="" src={ require('../../assets/discord.svg') } height='24px' className={ classes.icon } />
             <Typography variant={ 'h4'} >Discord</Typography>
           </div>
