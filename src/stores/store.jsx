@@ -2543,10 +2543,11 @@ class Store {
 
       const strategyContract = new web3.eth.Contract(config.vaultStrategyABI, strategyAddress)
       const holdings = await strategyContract.methods.balanceOf().call({ from: account.address })
-      let strategyName = 'StrategyDForceUSDC'
+      let strategyName = 'DForceUSDC'
 
       if(!['USDC'].includes(asset.id)) {
         strategyName = await strategyContract.methods.getName().call({ from: account.address })
+        strategyName = strategyName.replace(/^Strategy/, '')
       }
 
       callback(null, {
