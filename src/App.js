@@ -54,7 +54,11 @@ class App extends Component {
     if(window.ethereum) {
       window.ethereum.on('accountsChanged', function (accounts) {
         store.setStore({ account: { address: accounts[0] } })
-        emitter.emit(CONNECTION_CONNECTED)
+
+        const web3context = store.getStore('web3context')
+        if(web3context) {
+          emitter.emit(CONNECTION_CONNECTED)
+        }
       })
     }
   }
