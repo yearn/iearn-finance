@@ -51,11 +51,12 @@ class App extends Component {
       }
     });
 
-    window.ethereum.on('accountsChanged', function (accounts) {
-      store.setStore({ account: { address: accounts[0] } })
-      emitter.emit(CONNECTION_CONNECTED)
-    })
-
+    if(window.ethereum) {
+      window.ethereum.on('accountsChanged', function (accounts) {
+        store.setStore({ account: { address: accounts[0] } })
+        emitter.emit(CONNECTION_CONNECTED)
+      })
+    }
   }
 
   render() {
