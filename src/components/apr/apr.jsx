@@ -91,7 +91,7 @@ const styles = theme => ({
   headerROI: {
     fontWeight: 'bold',
     padding: '8px 0px',
-    flex: 4
+    flex: 3
   },
   headerName: {
     fontWeight: 'bold',
@@ -247,9 +247,6 @@ class APR extends Component {
           <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderCenter}>{ 'ROI based on sampled period' }</Typography>
           <div className={ classes.subHeader }>
             <div className={ classes.headerValue }>
-              <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ '3 Days' }</Typography>
-            </div>
-            <div className={ classes.headerValue }>
               <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ '1 Week' }</Typography>
             </div>
             <div className={ classes.headerValue }>
@@ -299,9 +296,6 @@ class APR extends Component {
             </td>
             <td className={ classes.apr1 }>
               <Typography align='right' variant='h5' className={ classes.inline }><div className={classes.preSymbol}>$</div>{ asset.vaultBalance ? parseFloat((asset.vaultBalance*asset.pricePerFullShare*asset.usdPrice).toFixed(2)).toLocaleString() : '0.00' }</Typography>
-            </td>
-            <td className={ classes.apr1 }>
-              <Typography align='right' variant='h5' className={ classes.inline }>{ asset.stats && asset.stats.apyThreeDaySample ? parseFloat(asset.stats.apyThreeDaySample.toFixed(2)).toLocaleString() : '0.00' }<div className={classes.symbol}>%</div></Typography>
             </td>
             <td className={ classes.apr1 }>
               <Typography align='right' variant='h5' className={ classes.inline }>{ asset.stats && asset.stats.apyOneWeekSample ? parseFloat(asset.stats.apyOneWeekSample.toFixed(2)).toLocaleString() : '0.00' }<div className={classes.symbol}>%</div></Typography>
