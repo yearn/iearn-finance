@@ -52,7 +52,7 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     padding: '8px 0px',
-    width: '260px',
+    width: '240px',
     top: 'auto',
     cursor: 'pointer'
   },
@@ -61,7 +61,7 @@ const styles = theme => ({
     alignItems: 'center',
     top: 'auto',
     padding: '8px 0px',
-    width: '130px',
+    width: '160px',
     cursor: 'pointer'
   },
   apr1: {
@@ -96,12 +96,12 @@ const styles = theme => ({
   headerName: {
     fontWeight: 'bold',
     padding: '8px 0px',
-    width: '260px'
+    width: '240px'
   },
   headerStrategy: {
     fontWeight: 'bold',
     padding: '8px 0px',
-    width: '130px'
+    width: '160px'
   },
   aggregatedHeader: {
     textAlign: 'left',
