@@ -207,7 +207,7 @@ class Dashboard extends Component {
       loading: true,
       growth: growth ? parseInt(growth) : 1, // 0=daily 1=weekly 2=yearly
       currency: currency ? currency : 'USD', // USD / ETH,
-      basedOn: basedOn ? parseInt(basedOn) : 1 // 1=apyOneDaySample  2=apyThreeDaySample  3= apyOneWeekSample  4=apyInceptionSample
+      basedOn: basedOn ? parseInt(basedOn > 3 ? 3 : basedOn) : 1 // 1=apyThreeDaySample  2=apyOneWeekSample  3= apyInceptionSample  4=apyInceptionSample (old)
     }
 
     if(account && account.address) {
@@ -376,7 +376,7 @@ class Dashboard extends Component {
     return (
       <div className={ classes.basedOnContainer }>
         <InfoIcon className={ classes.infoIcon } />
-        <Typography>Growth is based on the vault's performance { basedOn === 4 ? 'since' : 'for the past' }</Typography>
+        <Typography>Growth is based on the vault's performance { basedOn === 3 ? 'since' : 'for the past' }</Typography>
         <TextField
           id={ 'basedOn' }
           name={ 'basedOn' }
@@ -647,12 +647,10 @@ class Dashboard extends Component {
     if(asset && asset.stats) {
       switch (basedOn) {
         case 1:
-          return asset.stats.apyThreeDaySample
-        case 2:
           return asset.stats.apyOneWeekSample
-        case 3:
+        case 2:
           return asset.stats.apyOneMonthSample
-        case 4:
+        case 3:
           return asset.stats.apyInceptionSample
         default:
           return asset.apy
