@@ -625,18 +625,14 @@ class Vault extends Component {
     const options = [
       {
         value: 1,
-        description: '3 days'
-      },
-      {
-        value: 2,
         description: '1 week'
       },
       {
-        value: 3,
+        value: 2,
         description: '1 month'
       },
       {
-        value: 4,
+        value: 3,
         description: 'inception'
       }
     ]
