@@ -49,7 +49,10 @@ const styles = theme => ({
     cursor: 'pointer'
   },
   links: {
-    display: 'flex'
+    display: 'flex',
+    [theme.breakpoints.down('sm')]: {
+      flexWrap: 'wrap',
+    }
   },
   link: {
     padding: '12px 0px',
@@ -58,7 +61,7 @@ const styles = theme => ({
     '&:hover': {
       paddingBottom: '9px',
       borderBottom: "3px solid "+colors.borderBlue,
-    },
+    }
   },
   title: {
     textTransform: 'capitalize'
@@ -93,7 +96,7 @@ const styles = theme => ({
     [theme.breakpoints.down('sm')]: {
       display: 'flex',
       position: 'absolute',
-      top: '90px',
+      transform: 'translate(0, 200%)',
       border: "1px solid "+colors.borderBlue,
       background: colors.white
     }
