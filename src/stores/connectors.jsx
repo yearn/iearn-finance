@@ -36,7 +36,7 @@ export const walletconnect = new WalletConnectConnector({
 
 export const walletlink = new WalletLinkConnector({
   url: RPC_URLS[1],
-  appName: "iearn.financaae"
+  appName: "yearn.finance"
 });
 
 export const ledger = new LedgerConnector({
