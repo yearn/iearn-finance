@@ -317,11 +317,11 @@ function MyComponent(props) {
         )
       }) }
 
-      <div style={{ width: '252px', margin: '12px 0px'  }}>
+      <div style={{ width: '252px', margin: '12px 0px', marginLeft: '12px'  }}>
         <Button style={ {
-            padding: '12px',
+            padding: '16px',
             backgroundColor: 'white',
-            borderRadius: '20px',
+            borderRadius: '1rem',
             border: '1px solid #E1E1E1',
             fontWeight: 500,
             minWidth: '250px'

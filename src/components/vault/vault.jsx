@@ -22,6 +22,8 @@ import { colors } from '../../theme'
 import Snackbar from '../snackbar'
 import Asset from './asset'
 import Loader from '../loader'
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 
 import {
   ERROR,
@@ -70,8 +72,12 @@ const styles = theme => ({
     justifyContent: 'flex-start',
     minWidth: '100%',
     marginTop: '40px',
+    marginBottom: '40px',
     [theme.breakpoints.up('md')]: {
       minWidth: '900px',
+    },
+    [theme.breakpoints.down('sm')]: {
+      marginTop: '100px',
     }
   },
   balancesContainer: {
@@ -308,7 +314,8 @@ class Vault extends Component {
       searchError: false,
       hideZero: localStorage.getItem('yearn.finance-hideZero') === '1' ? true : false,
       basedOn: basedOn ? parseInt(basedOn > 3 ? 3 : basedOn) : 1,
-      loading: true
+      loading: true,
+      expanded: 'USDT'
     }
 
     if(account && account.address) {
@@ -418,9 +425,10 @@ class Vault extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.investedContainer }>
-          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+          {/* <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
           { this.renderFilters() }
-          { this.renderBasedOn() }
+          { this.renderBasedOn() } */}
+          { this.renderChart() }
           { this.renderAssetBlocks() }
         </div>
         { loading && <Loader /> }
@@ -440,6 +448,36 @@ class Vault extends Component {
     val[event.target.id] = event.target.checked
     this.setState(val)
   };
+
+  renderChart = () => {
+    const options = {
+      chart: {
+        width: 800
+      },
+      title: {
+        text: 'Historical Earn & Vault Performance'
+      },
+      series: [
+        {
+          name: 'Earn',
+          data: [1, 2, 1, 4, 3, 6]
+        },
+        {
+          name: 'Vault',
+          data: [3, 1, 3, 4, 3, 8]
+        }
+      ],
+      credits: {
+        enabled: false
+      }
+    };
+
+    return (
+      <div>
+        <HighchartsReact highcharts={Highcharts} options={options} />
+      </div>
+    );
+  }
 
   renderAssetBlocks = () => {
     const { assets, expanded, search, hideZero, basedOn } = this.state

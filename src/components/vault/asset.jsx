@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
   TextField,
-  Button
+  Button, Slider, Grid
 } from '@material-ui/core';
 
 import {
@@ -50,9 +50,22 @@ const styles = theme => ({
     display: 'flex',
     flex: '1',
     padding: '24px',
-    [theme.breakpoints.down('sm')]: {
-      flexDirection: 'column'
-    }
+    flexDirection: 'column'
+    // [theme.breakpoints.down('sm')]: {
+    //   flexDirection: 'column'
+    // }
+  },
+  ratioContainer: {
+    paddingBottom: '12px',
+    display: 'flex',
+    flex: '1',
+    padding: '24px'
+  },
+  withdrawContainer: {
+    paddingBottom: '12px',
+    display: 'flex',
+    flex: '1',
+    width: '100%'
   },
   title: {
     paddingRight: '24px'
@@ -69,11 +82,11 @@ const styles = theme => ({
   sepperator: {
     borderBottom: '1px solid #E1E1E1',
     margin: '24px',
-    [theme.breakpoints.up('sm')]: {
-      width: '40px',
-      borderBottom: 'none',
-      margin: '0px'
-    }
+    // [theme.breakpoints.up('sm')]: {
+    //   width: '40px',
+    //   borderBottom: 'none',
+    //   margin: '0px'
+    // }
   },
   scaleContainer: {
     display: 'flex',
@@ -148,9 +161,35 @@ const styles = theme => ({
   },
   assetSummarySectionheader: {
     width: '83px'
+  },
+  rail: {
+    height: 8
+  },
+  track: {
+    height: 8
+  },
+  thumb: {
+    width: 18,
+    height: 18
+  },
+  slider: {
+    width: '80%',
+    display: 'flex',
+    justifyContent: 'center',
+    margin: 'auto',
+    marginBottom: 16
+  },
+  projected: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    textAlign: 'center'
+  },
+  withdrawalText: {
+    marginTop: 20,
+    marginBottom: 10
   }
 });
-
 
 class Asset extends Component {
 
@@ -160,9 +199,13 @@ class Asset extends Component {
     this.state = {
       amount: '',
       amountError: false,
+      redeemEarnAmount: '',
       redeemAmount: '',
       redeemAmountError: false,
       account: store.getStore('account'),
+      ratio: 50,
+      earnRatio: 50,
+      vaultRatio: 50
     }
   }
 
@@ -199,9 +242,13 @@ class Asset extends Component {
     const {
       amount,
       amountError,
+      redeemEarnAmount,
       redeemAmount,
       redeemAmountError,
-      loading
+      loading,
+      ratio,
+      earnRatio,
+      vaultRatio
     } = this.state
 
     return (
@@ -269,6 +316,32 @@ class Asset extends Component {
             </div>
           </div>
         </div>
+        <Grid container className={classes.slider}>
+          <Grid item xs={9}>
+            <div className={ classes.ratioContainer }>
+              <div className={ classes.tradeContainer }>
+                <Typography variant='h4' color='primary' noWrap>{ 'Earn: '+ earnRatio + '%' }</Typography>
+              </div>
+              <div className={ classes.tradeContainer }>
+                <Typography variant='h4' color='secondary' noWrap>{ 'Vault: '+ vaultRatio + '%' }</Typography>
+              </div>
+            </div>
+            <Slider 
+              value={ratio}
+              step={10}
+              classes={{
+                rail: classes.rail,
+                track: classes.track,
+                thumb: classes.thumb
+              }}
+              onChange={this.handleSliderChange}
+              aria-labelledby="continuous-slider" />
+          </Grid>
+          <Grid item xs={3} className={classes.projected}>
+            <Typography variant={'caption'} style={{ marginTop: 5 }}>Project APY %</Typography>
+            <Typography variant={'h3'} style={{ marginTop: 5 }}>6.7</Typography>
+          </Grid>
+        </Grid>
         <div className={ classes.actionsContainer }>
           <div className={ classes.tradeContainer }>
             <div className={ classes.balances }>
@@ -357,51 +430,105 @@ class Asset extends Component {
             <div className={ classes.balances }>
               <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.vaultBalance ? (Math.floor(asset.vaultBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography>
             </div>
-            <TextField
-              fullWidth
-              className={ classes.actionInput }
-              id='redeemAmount'
-              value={ redeemAmount }
-              error={ redeemAmountError }
-              onChange={ this.onChange }
-              disabled={ loading }
-              placeholder="0.00"
-              variant="outlined"
-              onKeyDown={ this.inputRedeemKeyDown }
-            />
-            <div className={ classes.scaleContainer }>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setRedeemAmount(25) } }>
-                <Typography variant={'h5'}>25%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setRedeemAmount(50) } }>
-                <Typography variant={'h5'}>50%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setRedeemAmount(75) } }>
-                <Typography variant={'h5'}>75%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setRedeemAmount(100) } }>
-                <Typography variant={'h5'}>100%</Typography>
-              </Button>
+            <div className={ classes.withdrawContainer }>
+              <div className={ classes.tradeContainer }>
+                <Typography variant='h5' color='primary' className={ classes.withdrawalText }>Earn</Typography>
+                <TextField
+                  fullWidth
+                  className={ classes.actionInput }
+                  id='redeemEarnAmount'
+                  value={ redeemEarnAmount }
+                  error={ redeemAmountError }
+                  onChange={ this.onChange }
+                  disabled={ loading }
+                  placeholder="0.00"
+                  variant="outlined"
+                  onKeyDown={ this.inputRedeemKeyDown }
+                />
+                <div className={ classes.scaleContainer }>
+                  <Button
+                    className={ classes.scale }
+                    variant='text'
+                    disabled={ loading }
+                    color="primary"
+                    onClick={ () => { this.setRedeemEarnAmount(25) } }>
+                    <Typography variant={'h5'}>25%</Typography>
+                  </Button>
+                  <Button
+                    className={ classes.scale }
+                    variant='text'
+                    disabled={ loading }
+                    color="primary"
+                    onClick={ () => { this.setRedeemEarnAmount(50) } }>
+                    <Typography variant={'h5'}>50%</Typography>
+                  </Button>
+                  <Button
+                    className={ classes.scale }
+                    variant='text'
+                    disabled={ loading }
+                    color="primary"
+                    onClick={ () => { this.setRedeemEarnAmount(75) } }>
+                    <Typography variant={'h5'}>75%</Typography>
+                  </Button>
+                  <Button
+                    className={ classes.scale }
+                    variant='text'
+                    disabled={ loading }
+                    color="primary"
+                    onClick={ () => { this.setRedeemEarnAmount(100) } }>
+                    <Typography variant={'h5'}>100%</Typography>
+                  </Button>
+                </div>
+              </div>
+              <div className={ classes.tradeContainer }>
+                <Typography variant='h5' color='secondary' className={ classes.withdrawalText }>Vault</Typography>
+                <TextField
+                  fullWidth
+                  className={ classes.actionInput }
+                  id='redeemAmount'
+                  value={ redeemAmount }
+                  error={ redeemAmountError }
+                  onChange={ this.onChange }
+                  disabled={ loading }
+                  placeholder="0.00"
+                  variant="outlined"
+                  onKeyDown={ this.inputRedeemKeyDown }
+                  />
+                <div className={ classes.scaleContainer }>
+                  <Button
+                    className={ classes.scale }
+                    variant='text'
+                    disabled={ loading }
+                    color="primary"
+                    onClick={ () => { this.setRedeemAmount(25) } }>
+                    <Typography variant={'h5'}>25%</Typography>
+                  </Button>
+                  <Button
+                    className={ classes.scale }
+                    variant='text'
+                    disabled={ loading }
+                    color="primary"
+                    onClick={ () => { this.setRedeemAmount(50) } }>
+                    <Typography variant={'h5'}>50%</Typography>
+                  </Button>
+                  <Button
+                    className={ classes.scale }
+                    variant='text'
+                    disabled={ loading }
+                    color="primary"
+                    onClick={ () => { this.setRedeemAmount(75) } }>
+                    <Typography variant={'h5'}>75%</Typography>
+                  </Button>
+                  <Button
+                    className={ classes.scale }
+                    variant='text'
+                    disabled={ loading }
+                    color="primary"
+                    onClick={ () => { this.setRedeemAmount(100) } }>
+                    <Typography variant={'h5'}>100%</Typography>
+                  </Button>
+                </div>
+              </div>
             </div>
             <div className={ classes.buttons }>
               { asset.withdraw === true &&
@@ -456,6 +583,14 @@ class Asset extends Component {
     } else {
       return '0.00'
     }
+  }
+
+  handleSliderChange = (event, newValue) => {
+    this.setState({ 
+      ratio: newValue,
+      earnRatio: 100 - newValue,
+      vaultRatio: newValue
+    })
   }
 
   onChange = (event) => {
@@ -544,6 +679,18 @@ class Asset extends Component {
     amount = Math.floor(amount*10000)/10000;
 
     this.setState({ redeemAmount: amount.toFixed(4) })
+  }
+
+  setRedeemEarnAmount = (percent) => {
+    if(this.state.loading) {
+      return
+    }
+
+    const balance = this.props.asset.vaultBalance*this.props.asset.pricePerFullShare
+    let amount = balance*percent/100
+    amount = Math.floor(amount*10000)/10000;
+
+    this.setState({ redeemEarnAmount: amount.toFixed(4) })
   }
 }
 

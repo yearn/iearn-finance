@@ -3,7 +3,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import {
   Switch,
-  Route
+  Route, Redirect
 } from "react-router-dom";
 import IpfsRouter from 'ipfs-react-router'
 
@@ -13,14 +13,16 @@ import interestTheme from './theme';
 import APR from './components/apr';
 import InvestSimple from './components/investSimple';
 import Manage from './components/manage';
-import Performance from './components/performance';
+// import Performance from './components/performance';
 import Zap from './components/zap';
 import IDai from './components/idai';
-import Footer from './components/footer';
-import Home from './components/home';
+// import Footer from './components/footer';
+// import Home from './components/home';
 import Header from './components/header';
 import Vaults from './components/vault';
 import Dashboard from './components/dashboard';
+import SideDrawer from './components/sideDrawer';
+import MainContainer from './components/mainContainer';
 
 import { injected } from "./stores/connectors";
 
@@ -80,10 +82,6 @@ class App extends Component {
                 <Header />
                 <APR />
               </Route>
-              <Route path="/earn">
-                <Header />
-                <InvestSimple />
-              </Route>
               <Route path="/zap">
                 <Header />
                 <Zap />
@@ -91,27 +89,42 @@ class App extends Component {
               <Route path="/idai">
                 <IDai />
               </Route>
-              <Route path="/performance">
+              {/* <Route path="/performance">
                 <Header />
                 <Performance />
-              </Route>
+              </Route> */}
               <Route path="/manage">
                 <Header />
                 <Manage />
               </Route>
-              <Route path="/vaults">
+              {/* <Route path="/vaults">
                 <Header />
                 <Vaults />
-              </Route>
-              <Route path='/dashboard'>
+              </Route> */}
+              <Route path='/portfolio'>
                 <Header />
+                <SideDrawer />
+                <MainContainer />
                 <Dashboard />
               </Route>
+              {/* <Route path="/earn">
+                <Header />
+                <SideDrawer />
+                <MainContainer />
+                <InvestSimple />
+              </Route> */}
+              <Route path="/dashboard">
+                <Header />
+                <SideDrawer />
+                <MainContainer />
+                <Vaults />
+              </Route>
               <Route path="/">
-                <Home />
+                {/* <Home /> */}
+                <Redirect to="/dashboard" />
               </Route>
             </Switch>
-            <Footer />
+            {/* <Footer /> */}
           </div>
         </IpfsRouter>
       </MuiThemeProvider>

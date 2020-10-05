@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { withStyles } from '@material-ui/core/styles';
 import {
+  IconButton,
   Typography
 } from '@material-ui/core';
+import MenuIcon from '@material-ui/icons/Menu';
 import { withRouter } from "react-router-dom";
 import { colors } from '../../theme'
 import ENS from 'ethjs-ens';
@@ -10,12 +12,14 @@ import ENS from 'ethjs-ens';
 import {
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED,
+  TOGGLE_DRAWER,
 } from '../../constants'
 
 import UnlockModal from '../unlock/unlockModal.jsx'
 
 import Store from "../../stores";
 const emitter = Store.emitter
+const dispatcher = Store.dispatcher
 const store = Store.store
 
 const styles = theme => ({
@@ -25,14 +29,15 @@ const styles = theme => ({
     display: 'flex',
     [theme.breakpoints.down('sm')]: {
       marginBottom: '40px'
-    }
+    },
+    zIndex: theme.zIndex.drawer + 1,
+    position: 'fixed'
   },
   headerV2: {
     background: colors.white,
-    border: '1px solid '+colors.borderBlue,
+    border: '1px solid '+colors.darkGray,
     borderTop: 'none',
     width: '100%',
-    borderRadius: '0px 0px 50px 50px',
     display: 'flex',
     padding: '24px 32px',
     alignItems: 'center',
@@ -60,7 +65,7 @@ const styles = theme => ({
     cursor: 'pointer',
     '&:hover': {
       paddingBottom: '9px',
-      borderBottom: "3px solid "+colors.borderBlue,
+      borderBottom: "3px solid "+colors.darkGray,
     }
   },
   title: {
@@ -71,7 +76,7 @@ const styles = theme => ({
     margin: '0px 12px',
     cursor: 'pointer',
     paddingBottom: '9px',
-    borderBottom: "3px solid "+colors.borderBlue,
+    borderBottom: "3px solid "+colors.darkGray,
   },
   account: {
     display: 'flex',
@@ -85,7 +90,7 @@ const styles = theme => ({
   walletAddress: {
     padding: '12px',
     border: '2px solid rgb(174, 174, 174)',
-    borderRadius: '50px',
+    borderRadius: '10px',
     display: 'flex',
     alignItems: 'center',
     cursor: 'pointer',
@@ -119,7 +124,11 @@ const styles = theme => ({
     [theme.breakpoints.down('sm')]: {
       display: 'none',
     }
-  }
+  },
+  menuButton: {
+    marginLeft: -5,
+    marginRight: 20,
+  },
 });
 
 class Header extends Component {
@@ -129,7 +138,8 @@ class Header extends Component {
 
     this.state = {
       account: store.getStore('account'),
-      modalOpen: false
+      modalOpen: false,
+      hideNav: true
     }
   }
 
@@ -138,9 +148,22 @@ class Header extends Component {
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
   }
 
+  componentDidMount() {
+    window.addEventListener("resize", this.resize.bind(this));
+    this.resize();
+  }
+
+  resize() {
+    let currentHideNav = (window.innerWidth <= 760);
+    if (currentHideNav !== this.state.hideNav) {
+        this.setState({hideNav: currentHideNav});
+    }
+  }
+
   componentWillUnmount() {
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
+    window.removeEventListener("resize", this.resize.bind(this));
   }
 
   connectionConnected = () => {
@@ -175,7 +198,8 @@ class Header extends Component {
     const {
       account,
       addressEnsName,
-      modalOpen
+      modalOpen,
+      hideNav
     } = this.state
 
     var address = null;
@@ -187,22 +211,23 @@ class Header extends Component {
     return (
       <div className={ classes.root }>
         <div className={ classes.headerV2 }>
+          {hideNav && this.renderToggleButton()}
           <div className={ classes.icon }>
             <img
               alt=""
-              src={ require('../../assets/YFI-logo.png') }
+              src={ require('../../assets/DAOventures-logo.png') }
               height={ '40px' }
               onClick={ () => { this.nav('') } }
             />
-            <Typography variant={ 'h3'} className={ classes.name } onClick={ () => { this.nav('') } }>yearn.finance</Typography>
+            {/* <Typography variant={ 'h3'} className={ classes.name } onClick={ () => { this.nav('') } }>DAOVentures</Typography> */}
           </div>
           <div className={ classes.links }>
-            { this.renderLink('dashboard') }
-            { this.renderLink('vaults') }
-            { this.renderLink('earn') }
-            { this.renderLink('zap') }
+            {/* { this.renderLink('dashboard') } */}
+            {/* { this.renderLink('vaults') } */}
+            {/* { this.renderLink('portfolio') } */}
+            {/* { this.renderLink('zap') }
             { this.renderLink('cover') }
-            { this.renderLink('stats') }
+            { this.renderLink('stats') } */}
           </div>
           <div className={ classes.account }>
             { address &&
@@ -213,7 +238,7 @@ class Header extends Component {
             }
             { !address &&
               <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap onClick={this.addressClicked} >
-                Connect your wallet
+                Connect to Metamask wallet
               </Typography>
             }
           </div>
@@ -223,6 +248,21 @@ class Header extends Component {
     )
   }
 
+  renderToggleButton = () => {
+    const { classes } = this.props;
+
+    return (
+      <IconButton
+        color="inherit"
+        aria-label="Open drawer"
+        onClick={this.handleDrawerOpen}
+        className={classes.menuButton}
+      >
+        <MenuIcon />
+      </IconButton>
+    );
+  }
+
   renderLink = (screen) => {
     const {
       classes
@@ -230,9 +270,13 @@ class Header extends Component {
 
     return (
       <div className={ (window.location.pathname==='/'+screen)?classes.linkActive:classes.link } onClick={ () => { this.nav(screen) } }>
-        <Typography variant={'h4'} className={ `title` }>{ screen }</Typography>
+        <Typography variant={'h4'} className={ `title` }>{ this.captializeFirstLetter(screen) }</Typography>
       </div>
     )
+  }
+
+  captializeFirstLetter = (name) => {
+    return name.charAt(0).toUpperCase() + name.slice(1)
   }
 
   nav = (screen) => {
@@ -255,6 +299,14 @@ class Header extends Component {
     return (
       <UnlockModal closeModal={ this.closeModal } modalOpen={ this.state.modalOpen } />
     )
+  }
+
+  handleDrawerOpen = () => {
+    if (store.getStore('openDrawer')) {
+      dispatcher.dispatch({ type: TOGGLE_DRAWER, content: { open: false } })
+    } else {
+      dispatcher.dispatch({ type: TOGGLE_DRAWER, content: { open: true } })
+    }
   }
 }
 
