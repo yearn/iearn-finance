@@ -6,6 +6,10 @@ COPY . /iearn-finance
 RUN npm install
 RUN npm run build
 
+EXPOSE 3000
+
+CMD ["npm", "start"]
+
 # FROM nginx:alpine
 
 # COPY --from=build /iearn-finance/certbot/conf /etc/letsencrypt
