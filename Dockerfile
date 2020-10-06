@@ -1,10 +1,11 @@
-FROM node:alpine as build
+FROM node:10 as build
 
 WORKDIR /iearn-finance
 COPY . /iearn-finance
 
 RUN npm install
 RUN npm run build
+
 
 FROM nginx:alpine
 
