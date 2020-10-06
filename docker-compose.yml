@@ -5,27 +5,23 @@ services:
     restart: always
     build: 
       context: .
-      dockerfile: 
-        Dockerfile
     volumes:
-      - ./build:/iearn-finance/build
-    ports: 
-      - "3000:3000"
-  nginx:
-    image: nginx:1.13
-    container_name: frontend_nginx
-    restart: always
-    ports:
-      - 80:80
-      - 443:443
-    volumes: 
       - ./nginx:/etc/nginx/conf.d
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-      - ./build:/usr/share/nginx/html
+    ports: 
+      - "3000:80"
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-    depends_on: 
-      - frontend
+  # nginx:
+  #   image: nginx:1.13
+  #   container_name: frontend_nginx
+  #   restart: always
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   volumes: 
+  #   depends_on: 
+  #     - frontend
   certbot:
     image: certbot/certbot
     volumes: 
