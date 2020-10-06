@@ -9,8 +9,8 @@ RUN npm run build
 
 FROM nginx:alpine
 
-ADD ./certbot/conf /etc/letsencrypt
-ADD ./certbot/www /var/www/certbot
+# ADD ./certbot/conf /etc/letsencrypt
+# ADD ./certbot/www /var/www/certbot
 COPY --from=build /iearn-finance/build /usr/share/nginx/html
 
 RUN rm /etc/nginx/conf.d/default.conf
