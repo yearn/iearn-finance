@@ -9,13 +9,13 @@ RUN npm run build
 
 FROM nginx:alpine
 
-# ADD ./certbot/conf /etc/letsencrypt
-# ADD ./certbot/www /var/www/certbot
+COPY --from=build /iearn-finance/certbot/conf /etc/letsencrypt
+COPY --from=build /iearn-finance/certbot/www /var/www/certbot
 COPY --from=build /iearn-finance/build /usr/share/nginx/html
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx/default.conf /etc/nginx/conf.d
 
-EXPOSE 80
+EXPOSE 3000
 
 CMD ["nginx", "-g", "daemon off;"]
