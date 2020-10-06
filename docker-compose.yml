@@ -1,16 +1,17 @@
 version: '3'
 services: 
-  frontend:
+  nginx:
     container_name: 'frontend'
     restart: always
     build: 
       context: .
-    volumes:
+    ports: 
+      - 80:80
+      - 443:443
+    volumes: 
       - ./nginx:/etc/nginx/conf.d
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    ports: 
-      - "3000:80"
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
   # nginx:
   #   image: nginx:1.13
@@ -19,7 +20,7 @@ services:
   #   ports:
   #     - 80:80
   #     - 443:443
-  #   volumes: 
+    
   #   depends_on: 
   #     - frontend
   certbot:
