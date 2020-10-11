@@ -913,7 +913,8 @@ class Store {
           lastMeasurement: 10709740,
           measurement: 1e18,
           price_id: 'lp-bcurve',
-          yVaultCheckAddress: '0xe309978497dfc15bb4f04755005f6410cadb4103'
+          yVaultCheckAddress: '0xe309978497dfc15bb4f04755005f6410cadb4103',
+          yVaultCheckDisabled: true
         },
         {
           id: 'crvBTC',
@@ -954,7 +955,8 @@ class Store {
           lastMeasurement: 10650116,
           measurement: 1e18,
           price_id: 'dai',
-          yVaultCheckAddress: '0x1bbe0f9af0cf852f9ff14637da2f0bc477a6d1ad'
+          yVaultCheckAddress: '0x1bbe0f9af0cf852f9ff14637da2f0bc477a6d1ad',
+          yVaultCheckDisabled: true
         },
         {
           id: 'TUSD',
@@ -2932,7 +2934,7 @@ class Store {
     const { asset, amount } = payload.content
 
 
-    if(asset.yVaultCheckAddress) {
+    if(asset.yVaultCheckAddress && !asset.yVaultCheckDisabled) {
       this._checkApprovalForProxy(asset, account, amount, asset.yVaultCheckAddress, (err) => {
         if(err) {
           return emitter.emit(ERROR, err);
@@ -3029,7 +3031,7 @@ class Store {
     const account = store.getStore('account')
     const { asset } = payload.content
 
-    if(asset.yVaultCheckAddress) {
+    if(asset.yVaultCheckAddress && !asset.yVaultCheckDisabled) {
       this._checkApprovalForProxy(asset, account, asset.vaultBalance, asset.yVaultCheckAddress, (err) => {
         if(err) {
           return emitter.emit(ERROR, err);
