@@ -812,6 +812,27 @@ class Store {
       ],
       vaultAssets: [
         {
+          id: '3Crv',
+          name: 'curve.fi/3pool LP',
+          symbol: '3Crv',
+          description: 'yDAI/yUSDC/yUSDT',
+          vaultSymbol: 'y3Crv',
+          erc20address: '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490',
+          vaultContractAddress: '0x9cA85572E6A3EbF24dEDd195623F188735A5179f',
+          vaultContractABI: config.vaultContractV5ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 11039340,
+          measurement: 1e18,
+          depositDisabled: false,
+          price_id: 'curve-fi-ydai-yusdc-yusdt-ytusd', // TODO: Update this when Coingecko adds token
+        },
+        {
           id: 'ETH',
           name: 'ETH',
           symbol: 'ETH',

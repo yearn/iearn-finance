@@ -437,24 +437,25 @@ class Asset extends Component {
 
   _getAPY = (asset) => {
     const { basedOn } = this.props
+    const initialApy = '0.00'
 
     if(asset && asset.stats) {
       switch (basedOn) {
         case 1:
-          return asset.stats.apyThreeDaySample
+          return asset.stats.apyThreeDaySample || initialApy
         case 2:
-          return asset.stats.apyOneWeekSample
+          return asset.stats.apyOneWeekSample || initialApy
         case 3:
-          return asset.stats.apyOneMonthSample
+          return asset.stats.apyOneMonthSample || initialApy
         case 4:
-          return asset.stats.apyInceptionSample
+          return asset.stats.apyInceptionSample || initialApy
         default:
           return asset.apy
       }
     } else if (asset.apy) {
       return asset.apy
     } else {
-      return '0.00'
+      return initialApy
     }
   }
 
