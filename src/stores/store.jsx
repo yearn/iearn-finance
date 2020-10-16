@@ -832,6 +832,27 @@ class Store {
           price_id: 'gemini-dollar',
         },
         {
+          id: '3Crv',
+          name: 'curve.fi/3pool LP',
+          symbol: '3Crv',
+          description: 'yDAI/yUSDC/yUSDT',
+          vaultSymbol: 'y3Crv',
+          erc20address: '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490',
+          vaultContractAddress: '0x9cA85572E6A3EbF24dEDd195623F188735A5179f',
+          vaultContractABI: config.vaultContractV5ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 11039340,
+          measurement: 1e18,
+          depositDisabled: false,
+          price_id: 'curve-fi-ydai-yusdc-yusdt-ytusd', // TODO: Update this when Coingecko adds token
+        },
+        {
           id: 'ETH',
           name: 'ETH',
           symbol: 'ETH',
@@ -933,7 +954,8 @@ class Store {
           lastMeasurement: 10709740,
           measurement: 1e18,
           price_id: 'lp-bcurve',
-          yVaultCheckAddress: '0xe309978497dfc15bb4f04755005f6410cadb4103'
+          yVaultCheckAddress: '0xe309978497dfc15bb4f04755005f6410cadb4103',
+          yVaultCheckDisabled: true
         },
         {
           id: 'crvBTC',
@@ -974,7 +996,8 @@ class Store {
           lastMeasurement: 10650116,
           measurement: 1e18,
           price_id: 'dai',
-          yVaultCheckAddress: '0x1bbe0f9af0cf852f9ff14637da2f0bc477a6d1ad'
+          yVaultCheckAddress: '0x1bbe0f9af0cf852f9ff14637da2f0bc477a6d1ad',
+          yVaultCheckDisabled: true
         },
         {
           id: 'TUSD',
@@ -2968,7 +2991,7 @@ class Store {
     const { asset, amount } = payload.content
 
 
-    if(asset.yVaultCheckAddress) {
+    if(asset.yVaultCheckAddress && !asset.yVaultCheckDisabled) {
       this._checkApprovalForProxy(asset, account, amount, asset.yVaultCheckAddress, (err) => {
         if(err) {
           return emitter.emit(ERROR, err);
@@ -3065,7 +3088,7 @@ class Store {
     const account = store.getStore('account')
     const { asset } = payload.content
 
-    if(asset.yVaultCheckAddress) {
+    if(asset.yVaultCheckAddress && !asset.yVaultCheckDisabled) {
       this._checkApprovalForProxy(asset, account, asset.vaultBalance, asset.yVaultCheckAddress, (err) => {
         if(err) {
           return emitter.emit(ERROR, err);
