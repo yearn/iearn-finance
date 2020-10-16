@@ -597,7 +597,7 @@ class Vault extends Component {
   _getAPY = (asset) => {
     const { basedOn } = this.state
 
-    if(asset && asset.stats) {
+    if(asset && asset.stats && asset.stats.apyOneWeekSample) {
       switch (basedOn) {
         case 1:
           return asset.stats.apyOneWeekSample
