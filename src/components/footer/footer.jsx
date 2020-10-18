@@ -158,10 +158,6 @@ class Footer extends Component {
             <DescriptionIcon height='15px' className={ classes.icon } />
             <Typography variant={ 'h4'} >ycosystem.info</Typography>
           </div>
-          <div  className={ classes.link } onClick={()=> window.open("https://www.learnyearn.finance", "_blank")}>
-            <DescriptionIcon height='15px' className={ classes.icon } />
-            <Typography variant={ 'h4'} >learnyearn.finance</Typography>
-          </div>
           <div  className={ classes.link } onClick={()=> window.open("https://stats.finance/yearn", "_blank")} >
             <BarChartIcon height='15px' className={ classes.icon } />
             <Typography variant={ 'h4'} >stats.finance</Typography>
