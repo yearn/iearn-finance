@@ -151,6 +151,11 @@ class Footer extends Component {
             <DescriptionIcon height='15px' className={ classes.icon } />
             <Typography variant={ 'h4'} >docs.yearn.finance</Typography>
           </div>
+
+          <div  className={ classes.link } onClick={()=> window.open("https://github.com/iearn-finance/yearn-protocol/blob/develop/SECURITY.md", "_blank")} >
+            <DescriptionIcon height='15px' className={ classes.icon } />
+            <Typography variant={ 'h4'} >docs.yearn.protocol</Typography>
+          </div>
         </div>
         <div className={ classes.community }>
           <Typography className={ classes.heading } variant={ 'h6'}>Community</Typography>
