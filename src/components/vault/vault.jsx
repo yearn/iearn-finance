@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
+  Grid,
   Typography,
   Accordion,
   AccordionDetails,
@@ -16,6 +17,7 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
 import InfoIcon from '@material-ui/icons/Info';
+import HelpIcon from '@material-ui/icons/Help';
 import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'
 
@@ -451,9 +453,6 @@ class Vault extends Component {
         return false
       }
 
-      if (asset.id === 'LINK')
-        return false
-
       if(search && search !== '') {
         return asset.id.toLowerCase().includes(search.toLowerCase()) ||
               asset.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -515,10 +514,39 @@ class Vault extends Component {
                   <Typography variant={ 'h3' } noWrap>Not Available</Typography>
                 </div>
               }
-              <div className={classes.heading}>
-                <Typography variant={ 'h5' } className={ classes.grey }>Available to deposit:</Typography>
-                <Typography variant={ 'h3' } noWrap>{ (asset.balance ? (asset.balance).toFixed(2) : '0.00')+' '+asset.symbol }</Typography>
-              </div>
+
+              { !(asset.depositDisabled === true) &&
+                <div className={classes.heading}>
+                  <Typography variant={ 'h5' } className={ classes.grey }>Available to deposit:</Typography>
+                  <Typography variant={ 'h3' } noWrap>{ (asset.balance ? (asset.balance).toFixed(2) : '0.00')+' '+asset.symbol }</Typography>
+                </div>
+              }
+
+              { asset.depositDisabled === true &&
+                <div className={classes.heading}>
+                  <Tooltip title={
+                      <React.Fragment>
+                        <Typography variant={'h5'} className={ classes.fees }>
+                          This vault is currently inactive and is not taking deposits. 
+                        </Typography>
+                      </React.Fragment>
+                    } arrow>
+                  <Grid container spacing={1} direction="row" alignItems="center">
+
+                    
+                      <Grid item>
+                          <HelpIcon fontSize="small" className={ classes.grey } style={{ marginBottom: '-5px' }} />
+                      </Grid>
+                      <Grid item xs>
+                        <Typography variant="h5" className={ classes.grey } >
+                          Inactive
+                        </Typography>
+                      </Grid>
+                  </Grid>
+                  </Tooltip>
+                </div>
+              }
+
             </div>
           </AccordionSummary>
           <AccordionDetails className={ classes.removePadding }>
