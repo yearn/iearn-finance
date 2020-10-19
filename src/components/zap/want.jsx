@@ -86,29 +86,7 @@ class Want extends Component {
       const a = props.assets
       const b = props.curveContracts
       const assetOptions = [...a, ...b]
-
-      const _assetOption = assetOptions.filter((option) => {
-
-        if(props.sendAsset && ['crvV1', 'crvV2'].includes(props.sendAsset.id)) {
-          return ['crvV3'].includes(option.id) === true
-        }
-        if(props.sendAsset && ['crvV3'].includes(props.sendAsset.id)) {
-          return ['crvV1', 'crvV2', 'crvV3', 'ETHv1'].includes(option.id) === false
-        }
-        if(props.sendAsset && ['crvV4'].includes(props.sendAsset.id)) {
-          return ['crvV1', 'crvV2', 'crvV3', 'crvV4', 'ETHv1'].includes(option.id) === false
-        }
-        if(props.sendAsset && ['BUSDv3'].includes(props.sendAsset.id)) {
-          return ['crvV4'].includes(option.id) === true
-        }
-        if(props.sendAsset && ['TUSDv2'].includes(props.sendAsset.id)) {
-          return ['crvV3'].includes(option.id) === true
-        }
-
-        return ['crvV4', 'crvV3'].includes(option.id) === true
-      })[0]
-
-      const _asset = this.state.asset?this.state.asset:_assetOption.symbol
+      const _asset = this.state.asset?this.state.asset:''
 
       this.setState({ assetOptions: assetOptions, assets: props.assets, curveContracts: props.curveContracts, asset: _asset })
     }
