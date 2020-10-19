@@ -1,0 +1,52 @@
+1) Intel
+
+Intel's bounty program mainly targets the company's hardware, firmware, and software.
+
+Limitations: It does not include recent acquisitions, the company's web infrastructure, third-party products, or anything relating to McAfee.
+
+Minimum Payout: Intel offers a minimum amount of $500 for finding bugs in their system.
+
+Maximum Payout: The Company pays $30,000 maximum for detecting critical bugs.
+
+###Bounty Link: https://security-center.intel.com/BugBountyProgram.aspx 
+2) Yahoo
+
+Yahoo has its dedicated team that accepts vulnerability reports from security researchers and ethical hackers.
+
+Limitations: The Company does not offer any reward for finding bugs in yahoo.net, Yahoo 7 Yahoo Japan, Onwander and Yahoo operated Word press blogs.
+
+Minimum Payout: There is no set limit on Yahoo for minimum payout.
+
+Maximum Payout: Yahoo can pay $15000 for detecting important bugs in their system
+###Bounty Link:https://safety.yahoo.com/Security/REPORTING-ISSUES.html 
+
+3) Snapchat
+
+Snapchat security team reviews all vulnerability reports and acts upon them by responsible disclosure. The company, we will acknowledge your submission within 30 days.
+
+Minimum Payout: Snapchat will pay minimum $2000.
+
+Maximum Payout: Maximum they will pay is $15,000.
+
+###Bounty Link:https://support.snapchat.com/en-US/i-need-help 
+4) Cisco
+
+Cisco encourages individuals or organization that are experiencing a product security issue to report them to the company.
+
+Minimum Payout: Cisco's minimum payout amount is $100.
+
+Maximum Payout: Company will give maximum $2,500 to finding serious vulnerabilities.
+
+###Bounty Link: https://www.cisco.com/c/en/us/about/security-center/security-vulnerability-policy.html 
+
+5)Apple
+
+When Apple first launched its bug bounty program it allowed just 24 security researchers. The framework then expanded to include more bug bounty hunters.
+
+The company will pay $100,000 to those who can extract data protected by Apple's Secure Enclave technology.
+
+Minimum Payout: There is no limited amount fixed by Apple Inc.
+
+Maximum payout: The highest bounty given by Apple is $200,000 for security issues affecting its firmware.
+
+###Bounty Link: https://support.apple.com/en-au/HT201220 
