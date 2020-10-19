@@ -158,7 +158,7 @@ class Header extends Component {
       const provider = context.library.provider
       const account = store.getStore('account')
       const { address } = account
-      const network = provider.networkVersion
+      const network = provider.chainId || provider.networkVersion
       const ens = new ENS({ provider, network })
       const addressEnsName = await ens.reverse(address).catch(() => {})
       if (addressEnsName) {
