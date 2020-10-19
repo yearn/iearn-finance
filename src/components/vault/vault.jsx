@@ -451,6 +451,9 @@ class Vault extends Component {
         return false
       }
 
+      if (asset.id === 'LINK')
+        return false
+
       if(search && search !== '') {
         return asset.id.toLowerCase().includes(search.toLowerCase()) ||
               asset.name.toLowerCase().includes(search.toLowerCase()) ||
