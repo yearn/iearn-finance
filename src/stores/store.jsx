@@ -812,6 +812,26 @@ class Store {
       ],
       vaultAssets: [
         {
+          id: 'GUSD',
+          name: 'Gemini Dollar',
+          symbol: 'GUSD',
+          description: 'Gemini Dollar',
+          vaultSymbol: 'yGUSD',
+          erc20address: '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd',
+          vaultContractAddress: '0xec0d8D3ED5477106c6D4ea27D90a60e594693C90',
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 2,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 11065127,
+          measurement: 1e18,
+          price_id: 'gemini-dollar',
+        },
+        {
           id: '3Crv',
           name: 'curve.fi/3pool LP',
           symbol: '3Crv',
@@ -1304,7 +1324,15 @@ class Store {
     try {
       const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
 
-      const ethAllowance = web3.utils.fromWei(allowance, "ether")
+      let ethAllowance = web3.utils.fromWei(allowance, "ether")
+      if (asset.decimals != 18) {
+        ethAllowance = (allowance*10**asset.decimals).toFixed(0);
+      }
+
+      var amountToSend = web3.utils.toWei('999999999', "ether")
+      if (asset.decimals != 18) {
+        amountToSend = (999999999*10**asset.decimals).toFixed(0);
+      }
 
       if(parseFloat(ethAllowance) < parseFloat(amount)) {
         /*
@@ -1315,7 +1343,7 @@ class Store {
           await erc20Contract.methods.approve(contract, web3.utils.toWei('0', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         }
 
-        await erc20Contract.methods.approve(contract, web3.utils.toWei('999999999999', "ether")).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+        await erc20Contract.methods.approve(contract, amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         callback()
       } else {
         callback()
@@ -2656,10 +2684,14 @@ class Store {
   }
 
   _getVaultHoldings = async (web3, asset, account, callback) => {
-    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-    var balance = await vaultContract.methods.balance().call({ from: account.address });
-    balance = parseFloat(balance)/10**asset.decimals
-    callback(null, parseFloat(balance))
+    try {
+      let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+      var balance = await vaultContract.methods.balance().call({ from: account.address });
+      balance = parseFloat(balance)/10**asset.decimals
+      callback(null, parseFloat(balance))
+    } catch(ex) {
+      callback(null, 0)
+    }
   }
 
   _getStrategyHoldings = async (web3, asset, account, callback) => {
@@ -2725,10 +2757,14 @@ class Store {
       return callback(null, 0)
     }
 
-    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-    var  balance = await vaultContract.methods.balanceOf(account.address).call({ from: account.address });
-    balance = parseFloat(balance)/10**asset.decimals
-    callback(null, parseFloat(balance))
+    try {
+      let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+      var  balance = await vaultContract.methods.balanceOf(account.address).call({ from: account.address });
+      balance = parseFloat(balance)/10**asset.decimals
+      callback(null, parseFloat(balance))
+    } catch(ex) {
+      callback(null, 0)
+    }
   }
 
   _getVaultPricePerShare = async (web3, asset, account, callback) => {
@@ -3152,6 +3188,13 @@ class Store {
       balance = balance / 1e18;
       let diff = block - asset.lastMeasurement;
 
+      if(diff === 0) {
+        return callback(null, {
+          pricePerFullShare: 0,
+          apy: 0
+        })
+      }
+
       balance = balance / diff;
       balance = balance * 242584600;
 
@@ -3184,7 +3227,7 @@ class Store {
 
   _getUSDPrices = async () => {
     try {
-      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,binance-usd,wrapped-bitcoin,ethereum,nusd,chainlink,aave-link,lp-sbtc-curve,lp-bcurve,curve-fi-ydai-yusdc-yusdt-ytusd&vs_currencies=usd,eth'
+      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,binance-usd,wrapped-bitcoin,ethereum,nusd,chainlink,aave-link,lp-sbtc-curve,lp-bcurve,curve-fi-ydai-yusdc-yusdt-ytusd,gemini-dollar&vs_currencies=usd,eth'
       const priceString = await rp(url);
       const priceJSON = JSON.parse(priceString)
 
