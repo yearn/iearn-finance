@@ -233,7 +233,7 @@ class APR extends Component {
           <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ 'Strategy holdings' }</Typography>
         </th>
         <th className={ classes.headerHoldings }>
-          <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ 'Your holdings ( Token & USD)' }</Typography>
+          <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ 'Your holdings' }</Typography>
           <div className={ classes.subHeader }>
             <div className={ classes.headerValue }>
               <Typography  align='right' variant={'h4'} className={classes.aggregatedHeaderRight}>{ 'Token' }</Typography>
