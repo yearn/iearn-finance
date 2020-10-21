@@ -216,8 +216,20 @@ function MyComponent(props) {
 
   React.useEffect(() => {
     if (account && active && library) {
-      store.setStore({ account: { address: account }, web3context: context })
+      
+    store.setStore({ web3context: context });      
+    const networkChainId = library.provider.chainId
+
+    if ( networkChainId === '0x1') {
+      store.setStore({ account: { address: account }})
       emitter.emit(CONNECTION_CONNECTED)
+    } else {
+      deactivate();
+      emitter.emit(CONNECTION_DISCONNECTED)
+      store.setStore({ account: { }, web3context: null })
+      emitter.emit(ERROR, "You are not connected to the Main Ethereum Network. Please change your network in your Ethereum wallet.")
+    }
+      
     }
   }, [account, active, closeModal, context, library]);
 

@@ -7,7 +7,7 @@ import {
   MenuItem
 } from '@material-ui/core';
 import { colors } from '../../theme'
-
+import Snackbar from '../snackbar'
 import Loader from '../loader'
 import InfoIcon from '@material-ui/icons/Info';
 
@@ -247,8 +247,16 @@ class Dashboard extends Component {
   };
 
   errorReturned = (error) => {
+    const snackbarObj = { snackbarMessage: null, snackbarType: null }
+    this.setState(snackbarObj)
     this.setState({ loading: false })
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: error.toString(), snackbarType: 'Error' }
+      that.setState(snackbarObj)
+    })
   };
+
 
   render() {
     const { classes } = this.props;
@@ -258,6 +266,7 @@ class Dashboard extends Component {
       growth,
       currency,
       account,
+      snackbarMessage
     } = this.state
 
     if(!account || !account.address) {
@@ -269,6 +278,7 @@ class Dashboard extends Component {
               <Typography variant='h3'>Connect your wallet to continue</Typography>
             </div>
           </div>
+          { snackbarMessage && this.renderSnackbar() }
         </div>
       )
     }
@@ -661,6 +671,14 @@ class Dashboard extends Component {
       return '0.00'
     }
   }
+
+  renderSnackbar = () => {
+    var {
+      snackbarType,
+      snackbarMessage
+    } = this.state
+    return <Snackbar type={ snackbarType } message={snackbarMessage} open={true}/>
+  };
 
 }
 

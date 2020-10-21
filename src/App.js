@@ -26,6 +26,8 @@ import { injected } from "./stores/connectors";
 
 import {
   CONNECTION_CONNECTED,
+  CONNECTION_DISCONNECTED,
+  ERROR
 } from './constants'
 
 import Store from "./stores";
@@ -40,8 +42,18 @@ class App extends Component {
       if (isAuthorized) {
         injected.activate()
         .then((a) => {
-          store.setStore({ account: { address: a.account }, web3context: { library: { provider: a.provider } } })
-          emitter.emit(CONNECTION_CONNECTED)
+          store.setStore({ web3context: { library: { provider: a.provider } } })
+          const networkChainId = a.provider.chainId
+
+          if ( networkChainId === "0x1" ) {
+            store.setStore({ account: { address: a.account } })
+            emitter.emit(CONNECTION_CONNECTED)
+          } else {
+            store.setStore({ account: { }, web3context: null })
+            emitter.emit(CONNECTION_DISCONNECTED)
+            emitter.emit(ERROR, "You are not connected to the Main Ethereum Network. Please change your network in your Ethereum wallet.")
+          }
+        
         })
         .catch((e) => {
           console.log(e)
@@ -60,6 +72,9 @@ class App extends Component {
           emitter.emit(CONNECTION_CONNECTED)
         }
       })
+
+      
+
     }
   }
 

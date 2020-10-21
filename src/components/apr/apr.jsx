@@ -15,6 +15,7 @@ import {
 } from '../../constants'
 
 import Loader from '../loader'
+import Snackbar from '../snackbar'
 
 import Store from "../../stores";
 const emitter = Store.emitter
@@ -187,6 +188,18 @@ class APR extends Component {
     this.setState({ account: store.getStore('account') })
   }
 
+  errorReturned = (error) => {
+    const snackbarObj = { snackbarMessage: null, snackbarType: null }
+    this.setState(snackbarObj)
+    this.setState({ loading: false })
+    const that = this
+    setTimeout(() => {
+      const snackbarObj = { snackbarMessage: error.toString(), snackbarType: 'Error' }
+      that.setState(snackbarObj)
+    })
+  };
+
+
   statisticsReturned = (balances) => {
     this.setState({
       assets: store.getStore('vaultAssets'),
@@ -196,7 +209,7 @@ class APR extends Component {
 
   render() {
     const { classes } = this.props;
-    const { loading } = this.state
+    const { loading, snackbarMessage } = this.state
 
     return (
       <div className={ classes.root }>
@@ -211,6 +224,7 @@ class APR extends Component {
           </table>
         </Card>
         { loading && <Loader /> }
+        { snackbarMessage && this.renderSnackbar() }
       </div>
     )
   };
@@ -310,6 +324,15 @@ class APR extends Component {
       })
     )
   }
+
+  renderSnackbar = () => {
+    var {
+      snackbarType,
+      snackbarMessage
+    } = this.state
+    return <Snackbar type={snackbarType} message={snackbarMessage} open={true}/>
+  };
+
 }
 
 export default withRouter(withStyles(styles)(APR));
