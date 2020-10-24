@@ -442,12 +442,10 @@ class Asset extends Component {
     if(asset && asset.stats) {
       switch (basedOn) {
         case 1:
-          return asset.stats.apyThreeDaySample || initialApy
-        case 2:
           return asset.stats.apyOneWeekSample || initialApy
-        case 3:
+        case 2:
           return asset.stats.apyOneMonthSample || initialApy
-        case 4:
+        case 3:
           return asset.stats.apyInceptionSample || initialApy
         default:
           return asset.apy
