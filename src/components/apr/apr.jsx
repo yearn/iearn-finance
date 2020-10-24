@@ -4,7 +4,11 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
   Card,
+  Grid,
+  CircularProgress,
+  Tooltip
 } from '@material-ui/core';
+import InfoIcon from '@material-ui/icons/Info';
 import { colors } from '../../theme'
 
 import {
@@ -143,6 +147,9 @@ const styles = theme => ({
   },
   inline: {
     display: 'flex'
+  },
+  statistic: {
+    fontSize: '24px'
   }
 });
 
@@ -195,25 +202,182 @@ class APR extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes } = this.props
     const { loading } = this.state
 
     return (
       <div className={ classes.root }>
-        <Card className={ classes.pairs }>
-          <table className={ classes.tableContainer }>
-            <thead>
-              { this.renderHeaders() }
-            </thead>
-            <tbody>
-              { this.renderStats() }
-            </tbody>
-          </table>
-        </Card>
+
+        { !loading && this.renderAggStats() }
+
+        { !loading && 
+          <Card className={ classes.pairs }>
+            <table className={ classes.tableContainer }>
+              <thead>
+                { this.renderHeaders() }
+              </thead>
+              <tbody>
+                { this.renderStats() }
+              </tbody>
+            </table>
+          </Card>
+        }
+
+        { loading && <CircularProgress /> }
+
         { loading && <Loader /> }
       </div>
     )
   };
+
+  renderAggStats = () => { 
+    
+    const { classes } = this.props
+
+    return(
+        <Grid container>
+          <Grid item md={3}>
+            <Card className={ classes.pairs }>
+              <b>
+                Total Holdings 
+              </b>
+              <div>
+                { this.renderStatTh() }
+              </div>
+            </Card>
+          </Grid>
+          <Grid item md={3}>
+            <Card className={ classes.pairs }>
+              <b>Total Vault Holdings</b>
+              <div>
+                { this.renderStatTsh() }
+              </div>
+            </Card>
+          </Grid>
+          <Grid item md={3}>
+            <Card className={ classes.pairs }>
+              <b>
+                Total Strategy Holdings
+                <Tooltip title="Total holdings deployed into vault strategies" arrow>
+                  <InfoIcon fontSize="small" style={{ color: colors.darkGray, marginLeft: '5px', marginBottom: '-5px' }} />
+                </Tooltip>
+              </b> 
+              <div>
+                { this.renderStatTvh() }
+              </div>
+            </Card>
+          </Grid>
+          <Grid item md={3}>
+            <Card className={ classes.pairs }>
+              <b>
+                Est. Annual Yield
+                <Tooltip title="Estimated annual yield (unstable) based on 1 month sample" arrow>
+                  <InfoIcon fontSize="small" style={{ color: colors.darkGray, marginLeft: '5px', marginBottom: '-5px' }} />
+                </Tooltip>
+              </b>
+              <div>
+                { this.renderStatRevenue() } 
+              </div>
+            </Card>
+          </Grid>
+        </Grid>
+      )
+
+  }
+
+  renderStatTh = () => {
+    const { classes } = this.props
+    const { assets } = this.state
+
+    var statTvl = 0
+
+    assets.filter((asset) => {
+      return asset.symbol !== 'ETH';
+    }).map((asset) => {
+      statTvl += asset.vaultHoldings ? asset.vaultHoldings * asset.usdPrice : 0
+      statTvl += asset.strategyHoldings ? asset.strategyHoldings * asset.usdPrice : 0
+    })
+
+    return (
+      <span className={classes.statistic}>
+        { '$' + parseFloat( statTvl.toFixed(2) ).toLocaleString() }
+      </span>
+    )
+}
+
+  renderStatTvh = () => {
+      const { classes } = this.props
+      const { assets } = this.state
+
+      var statTvl = 0
+
+      assets.filter((asset) => {
+        return asset.symbol !== 'ETH';
+      }).map((asset) => {
+        statTvl += asset.vaultHoldings ? asset.vaultHoldings * asset.usdPrice : 0
+      })
+  
+      return (
+        <span className={classes.statistic}>
+          { '$' + parseFloat( statTvl.toFixed(2) ).toLocaleString() }
+        </span>
+      )
+  }
+
+  renderStatTsh = () => {
+    const { classes } = this.props
+    const { assets } = this.state
+
+    var statTvl = 0
+
+    assets.filter((asset) => {
+      return asset.symbol !== 'ETH';
+    }).map((asset) => {
+      statTvl += asset.strategyHoldings ? asset.strategyHoldings * asset.usdPrice : 0
+    })
+
+    return (
+      <span className={classes.statistic}>
+        { '$' + parseFloat( statTvl.toFixed(2) ).toLocaleString() }
+      </span>
+    )
+  }
+
+  renderStatRevenue = () => {
+    const { classes } = this.props
+    const { assets } = this.state
+
+    var statTvl = 0
+    var statYield = 0
+    var assetTvl = 0
+    var assetYield = 0
+
+    assets.filter((asset) => {
+      return asset.symbol !== 'ETH' && asset.depositDisabled !== true; // For yield, calculate only on active vaults
+    }).map((asset) => {
+      assetTvl = 0
+      assetTvl += asset.vaultHoldings ? asset.vaultHoldings * asset.usdPrice : 0
+      assetTvl += asset.strategyHoldings ? asset.strategyHoldings * asset.usdPrice : 0
+
+      assetYield = asset.stats.apyOneMonthSample ? assetTvl * (asset.stats.apyOneMonthSample / 100) : 0
+
+      console.log('Yield for ' + asset.symbol + ': $' + assetYield)
+
+      if ( assetYield > 0 ) { 
+        statTvl += assetTvl
+        statYield += assetYield
+      }
+    })
+
+    var statApy = statYield / statTvl
+
+    return (
+      <span className={classes.statistic}>
+        { ( statApy * 100 ).toFixed(2) }%
+        <span style={{ fontSize: '0.7em', color: colors.darkGray, paddingLeft: '6px' }}>{ '$' + parseFloat( statYield.toFixed(2) ).toLocaleString() }</span>
+      </span>
+    )
+  }
 
   renderHeaders = () => {
     const { classes } = this.props
@@ -267,7 +431,7 @@ class APR extends Component {
 
     return (
       assets.filter((asset) => {
-        return asset.symbol !== 'ETH'
+        return asset.symbol !== 'ETH';
       }).map((asset) => {
 
         return (
