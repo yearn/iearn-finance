@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - master
-      - y
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,23 +21,23 @@ jobs:
       - name: Create a production bundle.
         run: |
           npm run-script build
-    
+
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@master
         with:
-          args: --acl public-read --delete
+          args: --delete
         env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_PRODUCTION_BUCKET_NAME }}
+          AWS_S3_BUCKET: "prod.yearn.finance"
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_REGION: "us-east-1"
           SOURCE_DIR: "build"
-      
+
       - name: Invalidate CloudFront caches
         uses: awact/cloudfront-action@master
         env:
-          SOURCE_PATH: '/*'
+          SOURCE_PATH: "/*"
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          DISTRIBUTION_ID: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+          DISTRIBUTION_ID: "E3TW4P7PMXBZVC"
