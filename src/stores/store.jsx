@@ -1325,12 +1325,12 @@ class Store {
       const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
 
       let ethAllowance = web3.utils.fromWei(allowance, "ether")
-      if (asset.decimals != 18) {
+      if (asset.decimals !== 18) {
         ethAllowance = (allowance*10**asset.decimals).toFixed(0);
       }
 
       var amountToSend = web3.utils.toWei('999999999', "ether")
-      if (asset.decimals != 18) {
+      if (asset.decimals !== 18) {
         amountToSend = (999999999*10**asset.decimals).toFixed(0);
       }
 
