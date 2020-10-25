@@ -64,7 +64,13 @@
       "last 1 safari version"
     ]
   },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
   "devDependencies": {
+    "@commitlint/config-conventional": "^11.0.0",
     "husky": "^4.3.0",
     "npm-force-resolutions": "0.0.3"
   }
