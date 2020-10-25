@@ -148,6 +148,15 @@ const styles = theme => ({
   inline: {
     display: 'flex'
   },
+  statisticsContainer : {
+    width: 'calc(100% - 80px)'
+  },
+  statisticCard : {
+    padding: '42px 36px',
+    borderRadius: '25px',
+    border: '1px solid ' + colors.borderBlue,
+    marginTop: '40px'
+  },
   statistic: {
     fontSize: '24px'
   }
@@ -235,52 +244,57 @@ class APR extends Component {
     const { classes } = this.props
 
     return(
-        <Grid container>
-          <Grid item md={3}>
-            <Card className={ classes.pairs }>
-              <b>
-                Total Holdings 
-              </b>
-              <div>
-                { this.renderStatTh() }
-              </div>
-            </Card>
+        <div className={classes.statisticsContainer}>
+          <Grid container spacing={3}>
+            <Grid item md={3}>
+              <Card className={classes.statisticCard}>
+                <b>
+                  Total Value Locked (TVL)
+                </b>
+                <div>
+                  { this.renderStatTh() }
+                </div>
+              </Card>
+            </Grid>
+            <Grid item md={3}>
+              <Card className={classes.statisticCard}>
+                <b>Vault Holdings</b>
+                <Tooltip title="Total assets held in vaults, excluding assets that are deployed into other protocols" arrow>
+                    <InfoIcon fontSize="small" style={{ color: colors.darkGray, marginLeft: '5px', marginBottom: '-5px' }} />
+                  </Tooltip>
+                <div>
+                  { this.renderStatTsh() }
+                </div>
+              </Card>
+            </Grid>
+            <Grid item md={3}>
+              <Card className={classes.statisticCard}>
+                <b>
+                  Strategy Holdings
+                  <Tooltip title="Total assets deployed to other protocols as part of vault strategies" arrow>
+                    <InfoIcon fontSize="small" style={{ color: colors.darkGray, marginLeft: '5px', marginBottom: '-5px' }} />
+                  </Tooltip>
+                </b> 
+                <div>
+                  { this.renderStatTvh() }
+                </div>
+              </Card>
+            </Grid>
+            <Grid item md={3}>
+              <Card className={classes.statisticCard}>
+                <b>
+                  Annual Yield
+                  <Tooltip title="Average annual yield (unstable) based on 1 month sampled period, across active vaults" arrow>
+                    <InfoIcon fontSize="small" style={{ color: colors.darkGray, marginLeft: '5px', marginBottom: '-5px' }} />
+                  </Tooltip>
+                </b>
+                <div>
+                  { this.renderStatRevenue() } 
+                </div>
+              </Card>
+            </Grid>
           </Grid>
-          <Grid item md={3}>
-            <Card className={ classes.pairs }>
-              <b>Total Vault Holdings</b>
-              <div>
-                { this.renderStatTsh() }
-              </div>
-            </Card>
-          </Grid>
-          <Grid item md={3}>
-            <Card className={ classes.pairs }>
-              <b>
-                Total Strategy Holdings
-                <Tooltip title="Total holdings deployed into vault strategies" arrow>
-                  <InfoIcon fontSize="small" style={{ color: colors.darkGray, marginLeft: '5px', marginBottom: '-5px' }} />
-                </Tooltip>
-              </b> 
-              <div>
-                { this.renderStatTvh() }
-              </div>
-            </Card>
-          </Grid>
-          <Grid item md={3}>
-            <Card className={ classes.pairs }>
-              <b>
-                Est. Annual Yield
-                <Tooltip title="Estimated annual yield (unstable) based on 1 month sample" arrow>
-                  <InfoIcon fontSize="small" style={{ color: colors.darkGray, marginLeft: '5px', marginBottom: '-5px' }} />
-                </Tooltip>
-              </b>
-              <div>
-                { this.renderStatRevenue() } 
-              </div>
-            </Card>
-          </Grid>
-        </Grid>
+        </div>
       )
 
   }
