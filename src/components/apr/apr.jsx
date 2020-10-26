@@ -375,8 +375,6 @@ class APR extends Component {
 
       assetYield = asset.stats.apyOneMonthSample ? assetTvl * (asset.stats.apyOneMonthSample / 100) : 0
 
-      console.log('Yield for ' + asset.symbol + ': $' + assetYield)
-
       if ( assetYield > 0 ) { 
         statTvl += assetTvl
         statYield += assetYield
