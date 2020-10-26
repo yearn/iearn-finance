@@ -2581,29 +2581,16 @@ class Store {
     }
 
     try {
-      const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-      const controllerAddress = await vaultContract.methods.controller().call({ from: account.address })
-      const controllerContract = new web3.eth.Contract(config.vaultControllerABI, controllerAddress)
+      const url = config.statsProvider + 'vaults'
+      const vaultsApiResultString = await rp(url);
+      const vaults = JSON.parse(vaultsApiResultString)
+      const vault = vaults.find((vault) => vault.address.toLowerCase() === asset.vaultContractAddress.toLowerCase())
 
-      let strategyAddress = ''
-      if(['LINK', 'aLINK'].includes(asset.id)) {
-        strategyAddress = await controllerContract.methods.strategies(asset.vaultContractAddress).call({ from: account.address })
-      } else {
-
-        if(asset.erc20address === 'Ethereum') {
-          asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-        }
-        strategyAddress = await controllerContract.methods.strategies(asset.erc20address).call({ from: account.address })
-      }
+      const strategyAddress = vault["strategyAddress"]
+      const strategyName = vault["strategyName"].replace(/^Strategy/, '')
 
       const strategyContract = new web3.eth.Contract(config.vaultStrategyABI, strategyAddress)
       const holdings = await strategyContract.methods.balanceOf().call({ from: account.address })
-      let strategyName = 'DForceUSDC'
-
-      if(!['USDC'].includes(asset.id)) {
-        strategyName = await strategyContract.methods.getName().call({ from: account.address })
-        strategyName = strategyName.replace(/^Strategy/, '')
-      }
 
       callback(null, {
         strategy: strategyAddress,

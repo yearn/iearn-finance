@@ -16,6 +16,7 @@ import {
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
+import TimelineIcon from '@material-ui/icons/Timeline';
 import InfoIcon from '@material-ui/icons/Info';
 import HelpIcon from '@material-ui/icons/Help';
 import { withNamespaces } from 'react-i18next';
@@ -229,7 +230,15 @@ const styles = theme => ({
     borderRadius: '0.75rem',
     marginBottom: '24px',
     lineHeight: '1.2',
-    background: colors.white
+    background: colors.white,
+    '& a' : {
+      color: colors.black,
+      textDecoration: 'none',
+      fontWeight: 'bold',
+    },
+    '& a:hover' : {
+      textDecoration: 'underline',
+    },
   },
   fees: {
     paddingRight: '75px',
@@ -424,6 +433,7 @@ class Vault extends Component {
           { this.renderFilters() }
           { this.renderBasedOn() }
           { this.renderAssetBlocks() }
+          { this.renderStrategyRewards() }
         </div>
         { loading && <Loader /> }
         { snackbarMessage && this.renderSnackbar() }
@@ -694,6 +704,29 @@ class Vault extends Component {
         }
       </TextField>
       </div>
+    )
+  }
+
+  renderStrategyRewards = () => {
+
+    const { classes } = this.props
+
+    return( 
+          <div className={ classes.disaclaimer } style={{ marginTop: '25px', maxWidth: '500px' }}>
+
+            <Grid container spacing={1}>
+              <Grid item><TimelineIcon fontsize="small" /></Grid>
+              <Grid item xs>
+                <Typography variant="h4" style={{ display: 'inline', fontWeight: 'bold' }}>
+                Strategy Rewards
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Typography variant="body1">
+              Yearn is only possible due to community contributions. Vault strategy contributors are rewarded with <b>0.5%</b> of yield generated from by the vault. <a href="https://docs.yearn.finance/how-to-guides/how-to-contribute-a-yvault-strategy/" target="_blank">Learn more &rarr;</a>
+            </Typography>
+          </div>
     )
   }
 

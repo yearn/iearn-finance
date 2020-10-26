@@ -34,7 +34,16 @@ const store = Store.store
 
 class App extends Component {
   state = {};
+  updateAccount () {
+    window.ethereum.on('accountsChanged', function (accounts) {
+      store.setStore({ account: { address: accounts[0] } })
 
+      const web3context = store.getStore('web3context')
+      if(web3context) {
+        emitter.emit(CONNECTION_CONNECTED)
+      }
+    })
+  }
   componentWillMount() {
     injected.isAuthorized().then(isAuthorized => {
       if (isAuthorized) {
@@ -52,14 +61,11 @@ class App extends Component {
     });
 
     if(window.ethereum) {
-      window.ethereum.on('accountsChanged', function (accounts) {
-        store.setStore({ account: { address: accounts[0] } })
-
-        const web3context = store.getStore('web3context')
-        if(web3context) {
-          emitter.emit(CONNECTION_CONNECTED)
-        }
-      })
+      this.updateAccount()
+    } else {
+      window.addEventListener('ethereum#initialized', this.updateAccount, {
+        once: true,
+      });
     }
   }
 
