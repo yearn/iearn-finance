@@ -307,7 +307,7 @@ class APR extends Component {
 
     assets.filter((asset) => {
       return asset.symbol !== 'ETH';
-    }).map((asset) => {
+    }).forEach((asset) => {
       statTvl += asset.vaultHoldings ? asset.vaultHoldings * asset.usdPrice : 0
       statTvl += asset.strategyHoldings ? asset.strategyHoldings * asset.usdPrice : 0
     })
@@ -327,7 +327,7 @@ class APR extends Component {
 
       assets.filter((asset) => {
         return asset.symbol !== 'ETH';
-      }).map((asset) => {
+      }).forEach((asset) => {
         statTvl += asset.vaultHoldings ? asset.vaultHoldings * asset.usdPrice : 0
       })
   
@@ -346,7 +346,7 @@ class APR extends Component {
 
     assets.filter((asset) => {
       return asset.symbol !== 'ETH';
-    }).map((asset) => {
+    }).forEach((asset) => {
       statTvl += asset.strategyHoldings ? asset.strategyHoldings * asset.usdPrice : 0
     })
 
@@ -368,7 +368,7 @@ class APR extends Component {
 
     assets.filter((asset) => {
       return asset.symbol !== 'ETH' && asset.depositDisabled !== true; // For yield, calculate only on active vaults
-    }).map((asset) => {
+    }).forEach((asset) => {
       assetTvl = 0
       assetTvl += asset.vaultHoldings ? asset.vaultHoldings * asset.usdPrice : 0
       assetTvl += asset.strategyHoldings ? asset.strategyHoldings * asset.usdPrice : 0
