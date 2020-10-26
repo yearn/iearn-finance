@@ -71,6 +71,7 @@
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^11.0.0",
+    "commitlint": "^11.0.0",
     "husky": "^4.3.0",
     "npm-force-resolutions": "0.0.3"
   }
