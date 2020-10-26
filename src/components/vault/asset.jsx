@@ -7,6 +7,8 @@ import {
   Button
 } from '@material-ui/core';
 
+import WarningIcon from '@material-ui/icons/Warning';
+
 import {
   ERROR,
   DEPOSIT_VAULT,
@@ -349,6 +351,14 @@ class Asset extends Component {
             { asset.depositDisabled === true &&
               <div className={classes.disabledContainer}>
                 <Typography variant='h4'>Deposits are currently disabled for this vault</Typography>
+              </div>
+            }
+            { asset.symbol === 'DAI' &&
+              <div className={classes.disabledContainer}>
+                <Typography variant='h4'>
+                  <WarningIcon fontSize="small" style={{ marginBottom: '-5px' }} />
+                  Withdrawals might be subject to high slippage due to recent large <a style={{ color: '#000' }} target="_blank" href="https://etherscan.io/tx/0x7207d444430344d4d8384d4dd8c12a8a343c9c01ccdb17c8962b84f40955c59f">withdrawal</a>
+                </Typography>
               </div>
             }
           </div>
