@@ -7,6 +7,8 @@ import {
   Button
 } from '@material-ui/core';
 
+import WarningIcon from '@material-ui/icons/Warning';
+
 import {
   ERROR,
   DEPOSIT_VAULT,
@@ -148,6 +150,10 @@ const styles = theme => ({
   },
   assetSummarySectionheader: {
     width: '83px'
+  },
+  link: {
+    cursor: 'pointer',
+    textDecoration: 'underline',
   }
 });
 
@@ -429,6 +435,14 @@ class Asset extends Component {
                 </Button>
               }
             </div>
+            { asset.symbol === 'DAI' &&
+              <div className={classes.disabledContainer}>
+                <Typography variant='h4'>
+                  <WarningIcon fontSize="small" style={{ marginBottom: '-5px' }} />
+                  Withdrawals might be subject to high slippage due to recent large <a className={classes.link} href="https://etherscan.io/tx/0x7207d444430344d4d8384d4dd8c12a8a343c9c01ccdb17c8962b84f40955c59f" target="_blank" rel="noopener noreferrer">withdrawal</a>
+                </Typography>
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -547,3 +561,4 @@ class Asset extends Component {
 }
 
 export default withRouter(withStyles(styles, { withTheme: true })(Asset));
+
