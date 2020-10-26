@@ -150,6 +150,10 @@ const styles = theme => ({
   },
   assetSummarySectionheader: {
     width: '83px'
+  },
+  link: {
+    cursor: 'pointer',
+    textDecoration: 'underline',
   }
 });
 
@@ -435,7 +439,7 @@ class Asset extends Component {
               <div className={classes.disabledContainer}>
                 <Typography variant='h4'>
                   <WarningIcon fontSize="small" style={{ marginBottom: '-5px' }} />
-                  Withdrawals might be subject to high slippage due to recent large <a style={{ color: '#000' }} target="_blank" href="https://etherscan.io/tx/0x7207d444430344d4d8384d4dd8c12a8a343c9c01ccdb17c8962b84f40955c59f">withdrawal</a>
+                  Withdrawals might be subject to high slippage due to recent large <a className={classes.link} onClick={()=> window.open("https://etherscan.io/tx/0x7207d444430344d4d8384d4dd8c12a8a343c9c01ccdb17c8962b84f40955c59f", "_blank")}>withdrawal</a>
                 </Typography>
               </div>
             }
