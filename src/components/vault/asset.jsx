@@ -557,3 +557,4 @@ class Asset extends Component {
 }
 
 export default withRouter(withStyles(styles, { withTheme: true })(Asset));
+
