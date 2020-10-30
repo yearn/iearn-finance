@@ -498,7 +498,7 @@ class Vault extends Component {
                 </div>
               </div>
               {
-                (!['LINK'].includes(asset.id) && asset.vaultBalance > 0) &&
+                (!['LINK'].includes(asset.id) && !['GUSD'].includes(asset.id) && asset.vaultBalance > 0) &&
                 <div className={classes.headingEarning}>
                   <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
                   <div className={ classes.flexy }>
