@@ -509,7 +509,7 @@ class Vault extends Component {
                 </div>
               }
               {
-                (!['LINK'].includes(asset.id) && asset.vaultBalance === 0) &&
+                (!['LINK'].includes(asset.id) && !['GUSD'].includes(asset.id) && asset.vaultBalance === 0) &&
                 <div className={classes.headingEarning}>
                   <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
                   <div className={ classes.flexy }>
@@ -524,7 +524,18 @@ class Vault extends Component {
                   <Typography variant={ 'h3' } noWrap>Not Available</Typography>
                 </div>
               }
-
+              {
+                ['GUSD'].includes(asset.id) &&
+                <div className={classes.headingEarning}>
+                  <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
+                  <Typography variant={ 'h3' }  noWrap>
+                    Not Available
+                    <Tooltip title="The GUSD strategy is temporally disabled due to misleading APY calculation. It is safe to withdraw your funds, you are not charged 0.5% withdrawal fee." arrow>
+                      <InfoIcon fontSize="small" style={{ color: colors.darkGray, marginLeft: '5px', marginBottom: '-5px' }} />
+                    </Tooltip>
+                  </Typography>
+                </div>
+              }
               { !(asset.depositDisabled === true) &&
                 <div className={classes.heading}>
                   <Typography variant={ 'h5' } className={ classes.grey }>Available to deposit:</Typography>
