@@ -529,8 +529,8 @@ class Vault extends Component {
                 <div className={classes.headingEarning}>
                   <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
                   <Typography variant={ 'h3' }  noWrap>
-                    Strategy Disabled
-                    <Tooltip title="The GUSD strategy has been disabled due to a recent bug that caused a misleading APY calculation. It is safe to withdraw your funds. You will not be charged the 0.5% fee for this withdrawal." arrow>
+                    Not Available
+                    <Tooltip title="The GUSD strategy is temporally disabled due to misleading APY calculation. It is safe to withdraw your funds, you are not charged 0.5% withdrawal fee." arrow>
                       <InfoIcon fontSize="small" style={{ color: colors.darkGray, marginLeft: '5px', marginBottom: '-5px' }} />
                     </Tooltip>
                   </Typography>
