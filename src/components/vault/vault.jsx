@@ -140,7 +140,7 @@ const styles = theme => ({
   headingName: {
     display: 'flex',
     alignItems: 'center',
-    width: '325px',
+    width: '350px',
     [theme.breakpoints.down('sm')]: {
       width: 'auto',
       flex: 1
@@ -148,7 +148,7 @@ const styles = theme => ({
   },
   headingEarning: {
     display: 'none',
-    width: '300px',
+    width: '340px',
     [theme.breakpoints.up('sm')]: {
       display: 'block'
     }
@@ -164,6 +164,11 @@ const styles = theme => ({
     flexWrap: 'wrap',
     [theme.breakpoints.up('sm')]: {
       flexWrap: 'nowrap'
+    }
+  },
+  assetName: {
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '14px'
     }
   },
   assetIcon: {
@@ -296,7 +301,7 @@ const styles = theme => ({
   },
   removePadding: {
     padding: '0px',
-    maxWidth: '900px'
+    maxWidth: '1040px'
   }
 });
 
@@ -488,12 +493,12 @@ class Vault extends Component {
                   <img
                     alt=""
                     src={ require('../../assets/'+asset.symbol+'-logo.png') }
-                    height={ width > 600 ? '40px' : '30px'}
+                    height={ width > 600 ? '40px' : '30px' }
                     style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                   />
                 </div>
                 <div>
-                  <Typography variant={ 'h3' } noWrap>{ asset.name }</Typography>
+                  <Typography variant={ 'h3' } className={ classes.assetName } noWrap>{ asset.name }</Typography>
                   <Typography variant={ 'h5' } className={ classes.grey }>{ asset.description }</Typography>
                 </div>
               </div>
