@@ -457,7 +457,7 @@ class Dashboard extends Component {
             <div className={ classes.assetIcon }>
               <img
                 alt=""
-                src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                src={ require('../../assets/'+asset.symbol.replace(/\+/g, '')+'-logo.png') }
                 height={ '30px'}
               />
             </div>
@@ -557,7 +557,7 @@ class Dashboard extends Component {
             <div className={ classes.assetIcon }>
               <img
                 alt=""
-                src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                src={ require('../../assets/'+asset.symbol.replace(/\+/g, '')+'-logo.png') }
                 height={ '30px'}
               />
             </div>

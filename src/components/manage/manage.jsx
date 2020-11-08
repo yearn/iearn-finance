@@ -405,7 +405,7 @@ class Manage extends Component {
               <div className={ classes.assetIcon }>
                 <img
                   alt=""
-                  src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                  src={ require('../../assets/'+asset.symbol.replace(/\+/g, '')+'-logo.png') }
                   height="40px"
                 />
               </div>
