@@ -812,6 +812,27 @@ class Store {
       ],
       vaultAssets: [
         {
+          id: "cDAIcUSDC",
+          name: "curve.fi/Compound LP",
+          symbol: "cDAI+cUSDC",
+          description: "cDAI/cUSDC",
+          vaultSymbol: "yvcDAI+cUSDC",
+          erc20address: "0x845838df265dcd2c412a1dc9e959c7d08537f8a2",
+          vaultContractAddress: "0x629c759D1E83eFbF63d84eb3868B564d9521C129",
+          vaultContractABI: config.vaultContractV5ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 11210773,
+          measurement: 1e18,
+          depositDisabled: false,
+          price_id: "curve-fi-ydai-yusdc-yusdt-ytusd", // TODO: Update this when Coingecko adds token
+        },
+        {
           id: '3Crv',
           name: 'curve.fi/3pool LP',
           symbol: '3Crv',
