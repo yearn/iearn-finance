@@ -11,7 +11,7 @@ import FlashOnIcon from '@material-ui/icons/FlashOn';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PieChartIcon from '@material-ui/icons/PieChart';
-import SecurityIcon from '@material-ui/icons/Security';
+import WarningIcon from '@material-ui/icons/Warning';
 
 const styles = theme => ({
   root: {
@@ -154,10 +154,10 @@ const styles = theme => ({
       display: 'none'
     }
   },
-  cover: {
+  experimental: {
     backgroundColor: colors.white,
     '&:hover': {
-      backgroundColor: colors.compoundGreen,
+      backgroundColor: colors.orange,
       '& .title': {
         color: colors.white,
       },
@@ -172,10 +172,10 @@ const styles = theme => ({
       }
     },
     '& .title': {
-      color: colors.compoundGreen,
+      color: colors.orange,
     },
     '& .icon': {
-      color: colors.compoundGreen
+      color: colors.orange
     },
     '& .description': {
       display: 'none'
@@ -233,10 +233,10 @@ class Home extends Component {
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Zap") }</Typography>
           <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Zaps help you save on gas fees. Zap directly into or out of Curve pools from the base assets." }</Typography>
         </Card>
-        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { window.open("https://yinsure.finance", "_blank") } }>
-          <SecurityIcon className={ `${classes.icon} icon` } />
-          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Cover") }</Typography>
-          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Get cover with Nexus Mutual from yinsure.finance" }</Typography>
+        <Card className={ `${classes.card} ${classes.experimental}` } onClick={ () => { this.nav('experimental') } }>
+          <WarningIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Experimental") }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Home for experimental vaults." }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('stats') } }>
           <BarChartIcon className={ `${classes.icon} icon` } />

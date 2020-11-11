@@ -47,6 +47,16 @@ import {
   USD_PRICE_RETURNED,
   GET_STATISTICS,
   STATISTICS_RETURNED,
+  GET_EXPERIMENTAL_VAULT_BALANCES_FULL,
+  EXPERIMENTAL_VAULT_BALANCES_FULL_RETURNED,
+  DEPOSIT_EXPERIMENTAL_VAULT,
+  DEPOSIT_EXPERIMENTAL_VAULT_RETURNED,
+  DEPOSIT_ALL_EXPERIMENTAL_VAULT,
+  DEPOSIT_ALL_EXPERIMENTAL_VAULT_RETURNED,
+  CLAIM_EXPERIMENTAL_VAULT,
+  CLAIM_EXPERIMENTAL_VAULT_RETURNED,
+  ZAP_EXPERIMENTAL_VAULT,
+  ZAP_EXPERIMENTAL_VAULT_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 
@@ -84,6 +94,7 @@ class Store {
       aprs: this._getDefaultValues().aprs,
       assets: this._getDefaultValues().assets,
       vaultAssets: this._getDefaultValues().vaultAssets,
+      experimentalVaultAssets: this._getDefaultValues().experimentalVaultAssets,
       usdPrices: null,
       account: {},
       web3: null,
@@ -348,7 +359,22 @@ class Store {
             break;
           case GET_STATISTICS:
             this.getStatistics(payload)
-            break
+            break;
+          case GET_EXPERIMENTAL_VAULT_BALANCES_FULL:
+            this.getExperimentalVaultBalancesFull(payload);
+            break;
+          case DEPOSIT_EXPERIMENTAL_VAULT:
+            this.depositExperimentalVault(payload)
+            break;
+          case DEPOSIT_ALL_EXPERIMENTAL_VAULT:
+            this.depositAllExperimentalVault(payload)
+            break;
+          case CLAIM_EXPERIMENTAL_VAULT:
+            this.claimExperimentalVault(payload)
+            break;
+          case ZAP_EXPERIMENTAL_VAULT:
+            this.zapExperimentalVault(payload)
+            break;
           default: {
           }
         }
@@ -372,7 +398,8 @@ class Store {
     store.setStore({
       aprs: defaultvalues.aprs,
       assets: defaultvalues.assets,
-      vaultAssets: defaultvalues.vaultAssets
+      vaultAssets: defaultvalues.vaultAssets,
+      experimentalVaultAssets: defaultvalues.experimentalVaultAssets
     })
   }
 
@@ -854,275 +881,305 @@ class Store {
           price_id: 'curve-fi-ydai-yusdc-yusdt-ytusd', // TODO: Update this when Coingecko adds token
         },
         {
-            id: 'CRV',
-            name: 'curve.fi/y LP',
-            symbol: 'yCRV',
-            description: 'yDAI/yUSDC/yUSDT/yTUSD',
-            vaultSymbol: 'yUSD',
-            erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
-            vaultContractAddress: '0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c',
-            vaultContractABI: config.vaultContractABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 18,
-            deposit: true,
-            depositAll: false,
-            withdraw: true,
-            withdrawAll: false,
-            lastMeasurement: 10559448,
-            measurement: 1e18,
-            price_id: 'curve-fi-ydai-yusdc-yusdt-ytusd',
-          },
-          {
-            id: 'crvBUSD',
-            name: 'curve.fi/busd LP',
-            symbol: 'crvBUSD',
-            description: 'yDAI/yUSDC/yUSDT/yBUSD',
-            vaultSymbol: 'ycrvBUSD',
-            erc20address: '0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B',
-            vaultContractAddress: '0x2994529c0652d127b7842094103715ec5299bbed',
-            vaultContractABI: config.vaultContractV3ABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 18,
-            deposit: true,
-            depositAll: true,
-            withdraw: true,
-            withdrawAll: true,
-            depositDisabled: false,
-            lastMeasurement: 10709740,
-            measurement: 1e18,
-            price_id: 'lp-bcurve',
-            yVaultCheckAddress: '0xe309978497dfc15bb4f04755005f6410cadb4103',
-            yVaultCheckDisabled: true
-          },
-          {
-            id: 'crvBTC',
-            name: 'curve.fi/sbtc LP',
-            symbol: 'crvBTC',
-            description: 'renBTC/wBTC/sBTC',
-            vaultSymbol: 'ycrvBTC',
-            erc20address: '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3',
-            vaultContractAddress: '0x7Ff566E1d69DEfF32a7b244aE7276b9f90e9D0f6',
-            vaultContractABI: config.vaultContractV3ABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 18,
-            deposit: true,
-            depositAll: true,
-            withdraw: true,
-            withdrawAll: true,
-            lastMeasurement: 10734341,
-            measurement: 1e18,
-            price_id: 'lp-sbtc-curve'
-          },
+          id: 'CRV',
+          name: 'curve.fi/y LP',
+          symbol: 'yCRV',
+          description: 'yDAI/yUSDC/yUSDT/yTUSD',
+          vaultSymbol: 'yUSD',
+          erc20address: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
+          vaultContractAddress: '0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c',
+          vaultContractABI: config.vaultContractABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: false,
+          lastMeasurement: 10559448,
+          measurement: 1e18,
+          price_id: 'curve-fi-ydai-yusdc-yusdt-ytusd',
+        },
+        {
+          id: 'crvBUSD',
+          name: 'curve.fi/busd LP',
+          symbol: 'crvBUSD',
+          description: 'yDAI/yUSDC/yUSDT/yBUSD',
+          vaultSymbol: 'ycrvBUSD',
+          erc20address: '0x3B3Ac5386837Dc563660FB6a0937DFAa5924333B',
+          vaultContractAddress: '0x2994529c0652d127b7842094103715ec5299bbed',
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          depositDisabled: false,
+          lastMeasurement: 10709740,
+          measurement: 1e18,
+          price_id: 'lp-bcurve',
+          yVaultCheckAddress: '0xe309978497dfc15bb4f04755005f6410cadb4103',
+          yVaultCheckDisabled: true
+        },
+        {
+          id: 'crvBTC',
+          name: 'curve.fi/sbtc LP',
+          symbol: 'crvBTC',
+          description: 'renBTC/wBTC/sBTC',
+          vaultSymbol: 'ycrvBTC',
+          erc20address: '0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3',
+          vaultContractAddress: '0x7Ff566E1d69DEfF32a7b244aE7276b9f90e9D0f6',
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10734341,
+          measurement: 1e18,
+          price_id: 'lp-sbtc-curve'
+        },
 
-          {
-            id: 'YFI',
-            name: 'yearn.finance',
-            symbol: 'YFI',
-            description: 'yearn.finance',
-            vaultSymbol: 'yYFI',
-            erc20address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
-            vaultContractAddress: '0xBA2E7Fed597fd0E3e70f5130BcDbbFE06bB94fe1',
-            vaultContractABI: config.vaultContractV3ABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 18,
-            deposit: true,
-            depositAll: true,
-            withdraw: true,
-            withdrawAll: true,
-            lastMeasurement: 10695309,
-            measurement: 1e18,
-            price_id: 'yearn-finance',
-          },
-          {
-            id: 'DAI',
-            name: 'DAI',
-            symbol: 'DAI',
-            description: 'DAI Stablecoin',
-            vaultSymbol: 'yDAI',
-            erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-            vaultContractAddress: '0xACd43E627e64355f1861cEC6d3a6688B31a6F952',
-            vaultContractABI: config.vaultContractV3ABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 18,
-            deposit: true,
-            depositAll: true,
-            withdraw: true,
-            withdrawAll: true,
-            lastMeasurement: 10650116,
-            measurement: 1e18,
-            price_id: 'dai',
-            yVaultCheckAddress: '0x1bbe0f9af0cf852f9ff14637da2f0bc477a6d1ad',
-            yVaultCheckDisabled: true
-          },
-          {
-            id: 'TUSD',
-            name: 'TUSD',
-            symbol: 'TUSD',
-            description: 'TrueUSD',
-            vaultSymbol: 'yTUSD',
-            erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
-            vaultContractAddress: '0x37d19d1c4E1fa9DC47bD1eA12f742a0887eDa74a',
-            vaultContractABI: config.vaultContractV3ABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 18,
-            deposit: true,
-            depositAll: true,
-            withdraw: true,
-            withdrawAll: true,
-            lastMeasurement: 10603368,
-            measurement: 1e18,
-            price_id: 'true-usd',
-          },
-          {
-            id: 'USDC',
-            name: 'USD Coin',
-            symbol: 'USDC',
-            description: 'USD Coin',
-            vaultSymbol: 'yUSDC',
-            erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-            vaultContractAddress: '0x597aD1e0c13Bfe8025993D9e79C69E1c0233522e',
-            vaultContractABI: config.vaultContractABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 6,
-            deposit: true,
-            depositAll: false,
-            withdraw: true,
-            withdrawAll: false,
-            lastMeasurement: 10532708,
-            measurement: 1e18,
-            price_id: 'usd-coin',
-          },
-          {
-            id: 'USDT',
-            name: 'USDT',
-            symbol: 'USDT',
-            description: 'Tether USD',
-            vaultSymbol: 'yUSDT',
-            erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-            vaultContractAddress: '0x2f08119C6f07c006695E079AAFc638b8789FAf18',
-            vaultContractABI: config.vaultContractV3ABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 6,
-            deposit: true,
-            depositAll: true,
-            withdraw: true,
-            withdrawAll: true,
-            lastMeasurement: 10651402,
-            measurement: 1e18,
-            price_id: 'tether',
-          },
-          {
-            id: 'GUSD',
-            name: 'Gemini Dollar',
-            symbol: 'GUSD',
-            description: 'Gemini Dollar',
-            vaultSymbol: 'yGUSD',
-            erc20address: '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd',
-            vaultContractAddress: '0xec0d8D3ED5477106c6D4ea27D90a60e594693C90',
-            vaultContractABI: config.vaultContractV3ABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 2,
-            deposit: true,
-            depositAll: true,
-            withdraw: true,
-            withdrawAll: true,
-            lastMeasurement: 11065127,
-            measurement: 1e18,
-            price_id: 'gemini-dollar',
-          },
-          {
-            id: 'aLINK',
-            name: 'aLINK',
-            symbol: 'aLINK',
-            description: 'Aave Interest bearing LINK',
-            vaultSymbol: 'yaLINK',
-            erc20address: '0xA64BD6C70Cb9051F6A9ba1F163Fdc07E0DfB5F84',
-            vaultContractAddress: '0x29E240CFD7946BA20895a7a02eDb25C210f9f324',
-            vaultContractABI: config.vaultContractV2ABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 18,
-            deposit: true,
-            depositAll: true,
-            withdraw: true,
-            withdrawAll: true,
-            lastMeasurement: 10599617,
-            measurement: 1e18,
-            price_id: 'aave-link',
-          },
-          {
-            id: 'LINK',
-            name: 'ChainLink',
-            symbol: 'LINK',
-            description: 'ChainLink',
-            vaultSymbol: 'yLINK',
-            erc20address: '0x514910771af9ca656af840dff83e8264ecf986ca',
-            vaultContractAddress: '0x881b06da56BB5675c54E4Ed311c21E54C5025298',
-            vaultContractABI: config.vaultContractV3ABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 18,
-            deposit: true,
-            depositAll: true,
-            withdraw: true,
-            withdrawAll: true,
-            depositDisabled: true,
-            lastMeasurement: 10604016,
-            measurement: 1e18,
-            price_id: 'chainlink',
-          },
-          {
-            id: 'WETH',
-            name: 'WETH',
-            symbol: 'WETH',
-            description: 'Wrapped Ether',
-            vaultSymbol: 'yWETH',
-            erc20address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-            vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
-            vaultContractABI: config.vaultContractV4ABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 18,
-            deposit: true,
-            depositAll: true,
-            withdraw: true,
-            withdrawAll: true,
-            lastMeasurement: 10774489,
-            measurement: 1e18,
-            depositDisabled: true,
-            price_id: 'ethereum',
-          },
-          {
-            id: 'ETH',
-            name: 'ETH',
-            symbol: 'ETH',
-            description: 'Ether',
-            vaultSymbol: 'yETH',
-            erc20address: 'Ethereum',
-            vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
-            vaultContractABI: config.vaultContractV4ABI,
-            balance: 0,
-            vaultBalance: 0,
-            decimals: 18,
-            deposit: true,
-            depositAll: false,
-            withdraw: true,
-            withdrawAll: true,
-            lastMeasurement: 10774489,
-            measurement: 1e18,
-            depositDisabled: true,
-            price_id: 'ethereum',
-          },
-    ],
+        {
+          id: 'YFI',
+          name: 'yearn.finance',
+          symbol: 'YFI',
+          description: 'yearn.finance',
+          vaultSymbol: 'yYFI',
+          erc20address: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+          vaultContractAddress: '0xBA2E7Fed597fd0E3e70f5130BcDbbFE06bB94fe1',
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10695309,
+          measurement: 1e18,
+          price_id: 'yearn-finance',
+        },
+        {
+          id: 'DAI',
+          name: 'DAI',
+          symbol: 'DAI',
+          description: 'DAI Stablecoin',
+          vaultSymbol: 'yDAI',
+          erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          vaultContractAddress: '0xACd43E627e64355f1861cEC6d3a6688B31a6F952',
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10650116,
+          measurement: 1e18,
+          price_id: 'dai',
+          yVaultCheckAddress: '0x1bbe0f9af0cf852f9ff14637da2f0bc477a6d1ad',
+          yVaultCheckDisabled: true
+        },
+        {
+          id: 'TUSD',
+          name: 'TUSD',
+          symbol: 'TUSD',
+          description: 'TrueUSD',
+          vaultSymbol: 'yTUSD',
+          erc20address: '0x0000000000085d4780B73119b644AE5ecd22b376',
+          vaultContractAddress: '0x37d19d1c4E1fa9DC47bD1eA12f742a0887eDa74a',
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10603368,
+          measurement: 1e18,
+          price_id: 'true-usd',
+        },
+        {
+          id: 'USDC',
+          name: 'USD Coin',
+          symbol: 'USDC',
+          description: 'USD Coin',
+          vaultSymbol: 'yUSDC',
+          erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          vaultContractAddress: '0x597aD1e0c13Bfe8025993D9e79C69E1c0233522e',
+          vaultContractABI: config.vaultContractABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 6,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: false,
+          lastMeasurement: 10532708,
+          measurement: 1e18,
+          price_id: 'usd-coin',
+        },
+        {
+          id: 'USDT',
+          name: 'USDT',
+          symbol: 'USDT',
+          description: 'Tether USD',
+          vaultSymbol: 'yUSDT',
+          erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+          vaultContractAddress: '0x2f08119C6f07c006695E079AAFc638b8789FAf18',
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 6,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10651402,
+          measurement: 1e18,
+          price_id: 'tether',
+        },
+        {
+          id: 'GUSD',
+          name: 'Gemini Dollar',
+          symbol: 'GUSD',
+          description: 'Gemini Dollar',
+          vaultSymbol: 'yGUSD',
+          erc20address: '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd',
+          vaultContractAddress: '0xec0d8D3ED5477106c6D4ea27D90a60e594693C90',
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 2,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 11065127,
+          measurement: 1e18,
+          price_id: 'gemini-dollar',
+        },
+        {
+          id: 'aLINK',
+          name: 'aLINK',
+          symbol: 'aLINK',
+          description: 'Aave Interest bearing LINK',
+          vaultSymbol: 'yaLINK',
+          erc20address: '0xA64BD6C70Cb9051F6A9ba1F163Fdc07E0DfB5F84',
+          vaultContractAddress: '0x29E240CFD7946BA20895a7a02eDb25C210f9f324',
+          vaultContractABI: config.vaultContractV2ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10599617,
+          measurement: 1e18,
+          price_id: 'aave-link',
+        },
+        {
+          id: 'LINK',
+          name: 'ChainLink',
+          symbol: 'LINK',
+          description: 'ChainLink',
+          vaultSymbol: 'yLINK',
+          erc20address: '0x514910771af9ca656af840dff83e8264ecf986ca',
+          vaultContractAddress: '0x881b06da56BB5675c54E4Ed311c21E54C5025298',
+          vaultContractABI: config.vaultContractV3ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          depositDisabled: true,
+          lastMeasurement: 10604016,
+          measurement: 1e18,
+          price_id: 'chainlink',
+        },
+        {
+          id: 'WETH',
+          name: 'WETH',
+          symbol: 'WETH',
+          description: 'Wrapped Ether',
+          vaultSymbol: 'yWETH',
+          erc20address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+          vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
+          vaultContractABI: config.vaultContractV4ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10774489,
+          measurement: 1e18,
+          depositDisabled: true,
+          price_id: 'ethereum',
+        },
+        {
+          id: 'ETH',
+          name: 'ETH',
+          symbol: 'ETH',
+          description: 'Ether',
+          vaultSymbol: 'yETH',
+          erc20address: 'Ethereum',
+          vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
+          vaultContractABI: config.vaultContractV4ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10774489,
+          measurement: 1e18,
+          depositDisabled: true,
+          price_id: 'ethereum',
+        },
+      ],
+      experimentalVaultAssets: [
+        {
+          id: "veCrv",
+          name: "Curve DAO",
+          symbol: "CRV",
+          description: "veCRV DAO Admin Rewards",
+          vaultSymbol: "yveCRV-DAO",
+          erc20address: "0xd533a949740bb3306d119cc777fa900ba034cd52",
+          vaultContractAddress: "0xc5bDdf9843308380375a611c18B50Fb9341f502A",
+          vaultContractABI: config.veCRVvaultContractABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: false,
+          withdrawAll: false,
+          lastMeasurement: 11196772,
+          measurement: 1e18,
+          depositDisabled: false,
+          price_id: "curve-dao-token",
+          cliamableAssetSymbol: '3Crv',
+          vestingContractAddress: "0x575CCD8e2D300e2377B43478339E364000318E2c",
+          vestingContractABI: config.crvVestingContractABI,
+          zapContractAddress: "0x5249dD8DB02EeFB08600C4A70110B0f6B9CDA3cA",
+          zapContractABI: config.crvZapContractABI,
+          minterContractAddress: "0xd061D61a4d941c39E5453435B6345Dc261C2fcE0",
+          minterContractABI: config.crvMinterContractABI,
+        }
+      ],
       aprs: [{
           token: 'DAI',
           address: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -1327,6 +1384,29 @@ class Store {
       } else {
         callback()
       }
+    } catch(error) {
+      if(error.message) {
+        return callback(error.message)
+      }
+      callback(error)
+    }
+  }
+
+  _checkCurveMintApproval = async (asset, account, contract, callback) => {
+    try {
+
+      const web3 = new Web3(store.getStore('web3context').library.provider);
+      const curveContracts = new web3.eth.Contract(asset.minterContractABI, asset.minterContractAddress)
+
+      const allowedToMintFor = await curveContracts.methods.allowed_to_mint_for(contract, account.address).call({ from: account.address })
+
+      if(allowedToMintFor) {
+        return callback()
+      } else {
+        await curveContracts.methods.toggle_approve_mint(contract).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+        callback()
+      }
+
     } catch(error) {
       if(error.message) {
         return callback(error.message)
@@ -3236,7 +3316,7 @@ class Store {
 
   _getUSDPrices = async () => {
     try {
-      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,binance-usd,wrapped-bitcoin,ethereum,nusd,chainlink,aave-link,lp-sbtc-curve,lp-bcurve,curve-fi-ydai-yusdc-yusdt-ytusd,gemini-dollar&vs_currencies=usd,eth'
+      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,binance-usd,wrapped-bitcoin,ethereum,nusd,chainlink,aave-link,lp-sbtc-curve,lp-bcurve,curve-fi-ydai-yusdc-yusdt-ytusd,gemini-dollar,curve-dao-token&vs_currencies=usd,eth'
       const priceString = await rp(url);
       const priceJSON = JSON.parse(priceString)
 
@@ -3571,6 +3651,341 @@ class Store {
     // const web3 = createAlchemyWeb3(config.infuraProvider, { writeProvider: provider });
 
     return web3
+  }
+
+  getExperimentalVaultBalancesFull = async () => {
+    const account = store.getStore('account')
+    const assets = store.getStore('experimentalVaultAssets')
+
+    if(!account || !account.address) {
+      return false
+    }
+
+    const web3 = await this._getWeb3Provider()
+    if(!web3) {
+      return null
+    }
+
+    const usdPrices = await this._getUSDPrices()
+
+    async.map(assets, (asset, callback) => {
+      async.parallel([
+        (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getVaultBalance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getAssetUSDPrices(web3, asset, account, usdPrices, callbackInner) },
+        (callbackInner) => { this._getExperimentalVaultClaimable(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getExperimentalVaultVested(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getExperimentalVaultGauges(web3, asset, account, callbackInner) },
+      ], (err, data) => {
+        if(err) {
+          return callback(err)
+        }
+
+        asset.balance = data[0]
+        asset.vaultBalance = data[1]
+        asset.usdPrice = data[2].usdPrice
+        asset.claimable = data[3]
+        asset.vested = data[4]
+        asset.gaugeBalance = data[5].gaugeBalance
+        asset.gauges = data[5].userGauges
+        console.log(asset.gauges)
+
+        callback(null, asset)
+      })
+    }, (err, assets) => {
+      if(err) {
+        console.log(err)
+        return emitter.emit(ERROR, err)
+      }
+
+      store.setStore({ experimentalVaultAssets: assets })
+      return emitter.emit(EXPERIMENTAL_VAULT_BALANCES_FULL_RETURNED, assets)
+    })
+  }
+
+  _getExperimentalVaultClaimable = async (web3, asset, account, callback) => {
+    try {
+      let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+      let balance = await vaultContract.methods.claimable(account.address).call({ from: account.address });
+      balance = parseFloat(balance)/10**asset.decimals
+      callback(null, parseFloat(balance))
+    } catch(ex) {
+      callback(null, 0)
+    }
+  }
+
+  _getExperimentalVaultVested = async (web3, asset, account, callback) => {
+    try {
+      let vaultContract = new web3.eth.Contract(asset.vestingContractABI, asset.vestingContractAddress)
+      let balance = await vaultContract.methods.balanceOf(account.address).call({ from: account.address });
+      balance = parseFloat(balance)/10**asset.decimals
+      callback(null, parseFloat(balance))
+    } catch(ex) {
+      callback(null, 0)
+    }
+  }
+
+  _getExperimentalVaultGauges = async (web3, asset, account, callback) => {
+    const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+    try {
+      const curveRegistryContract = new web3.eth.Contract(config.curveRegistryContractABI, config.curveRegistryContractAddress)
+
+      const poolCount = await curveRegistryContract.methods.pool_count().call()
+      console.log(poolCount)
+      const pools = await Promise.all([...Array(parseInt(poolCount)).keys()].map(
+        i => curveRegistryContract.methods.pool_list(i).call()
+      ))
+      console.log(pools)
+      const resp = await Promise.all(pools.map(
+        pool => curveRegistryContract.methods.get_gauges(pool).call()
+      ))
+      console.log(resp)
+      let gauges = []
+      for (let x of resp) gauges.push(...x[0])
+      gauges = gauges.filter(gauge => gauge !== ZERO_ADDRESS)
+
+      let balances = await Promise.all(gauges.map(this._gagueClaimable))
+      let userGauges = gauges.filter((gauge, i) => { return balances[i] > 0 })
+      while (userGauges.length < 20) userGauges.push(ZERO_ADDRESS)
+      const gaugeBalance = balances.reduce((prev, curr) => { return curr + prev })
+
+      console.log(gaugeBalance)
+      console.log(userGauges)
+      callback(null, { gaugeBalance: gaugeBalance, userGauges: userGauges })
+    } catch(ex) {
+      console.log(ex)
+      const emptyGauges = []
+      while (emptyGauges.length < 20) emptyGauges.push(ZERO_ADDRESS)
+      callback(null, { gaugeBalance: 0, userGauges: emptyGauges })
+    }
+  }
+
+  _gagueClaimable = async (gauge) => {
+    const web3 = await this._getWeb3Provider()
+    const account = store.getStore('account')
+
+    const contract = new web3.eth.Contract(config.curveGaugeContractABI, gauge)
+    let balance = await contract.methods.claimable_tokens(account.address).call()
+    return parseFloat(web3.utils.fromWei(balance, "ether"))
+  }
+
+  depositExperimentalVault = (payload) => {
+    const account = store.getStore('account')
+    const { asset, amount } = payload.content
+
+    this._checkApproval(asset, account, amount, asset.vaultContractAddress, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callDepositExperimentalVault(asset, account, amount, (err, depositResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(DEPOSIT_EXPERIMENTAL_VAULT_RETURNED, depositResult)
+      })
+    })
+  }
+
+  _callDepositExperimentalVault = async (asset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+
+    var amountToSend = web3.utils.toWei(amount, "ether")
+    if (asset.decimals !== 18) {
+      amountToSend = amount*10**asset.decimals;
+    }
+
+    vaultContract.methods.deposit(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  depositAllExperimentalVault = (payload) => {
+    const account = store.getStore('account')
+    const { asset } = payload.content
+
+    this._checkApproval(asset, account, asset.balance, asset.vaultContractAddress, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callDepositAllExperimentalVault(asset, account, (err, depositResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(DEPOSIT_ALL_EXPERIMENTAL_VAULT_RETURNED, depositResult)
+      })
+    })
+  }
+
+  _callDepositAllExperimentalVault = async (asset, account, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+
+    vaultContract.methods.depositAll().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  claimExperimentalVault = (payload) => {
+    const account = store.getStore('account')
+    const { asset } = payload.content
+
+    this._callClaimExperimentalVault(asset, account, (err, claimResult) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(CLAIM_EXPERIMENTAL_VAULT_RETURNED, claimResult)
+    })
+  }
+
+  _callClaimExperimentalVault = async (asset, account, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+
+    vaultContract.methods.claim().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  zapExperimentalVault = (payload) => {
+    const account = store.getStore('account')
+    const { asset } = payload.content
+
+    this._checkApproval(asset, account, asset.balance, asset.zapContractAddress, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._checkCurveMintApproval(asset, account, asset.zapContractAddress, (err) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        this._callZapExperimentalVault(asset, account, (err, depositResult) => {
+          if(err) {
+            return emitter.emit(ERROR, err);
+          }
+
+          return emitter.emit(ZAP_EXPERIMENTAL_VAULT_RETURNED, depositResult)
+        })
+      })
+    })
+  }
+
+  _callZapExperimentalVault = async (asset, account, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let zapContract = new web3.eth.Contract(asset.zapContractABI, asset.zapContractAddress)
+
+    console.log(asset.gauges)
+
+    zapContract.methods.zap(asset.gauges).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
   }
 }
 
