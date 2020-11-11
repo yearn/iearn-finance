@@ -21,6 +21,7 @@ import Home from './components/home';
 import Header from './components/header';
 import Vaults from './components/vault';
 import Dashboard from './components/dashboard';
+import Experimental from './components/experimental';
 
 import { injected } from "./stores/connectors";
 
@@ -112,6 +113,10 @@ class App extends Component {
               <Route path='/dashboard'>
                 <Header />
                 <Dashboard />
+              </Route>
+              <Route path='/experimental'>
+                <Header />
+                <Experimental />
               </Route>
               <Route path="/">
                 <Home />
