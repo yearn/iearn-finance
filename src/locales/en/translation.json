@@ -73,6 +73,7 @@
   "Home.Pool": "Pool",
   "Home.Vaults": "Vaults",
   "Home.Balancer": "Balancer",
+  "Home.Experimental": "Experimental",
 
   "Zap.IWillReceive": "I will receive",
   "Zap.IHave": "I have",

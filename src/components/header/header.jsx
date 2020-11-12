@@ -202,7 +202,7 @@ class Header extends Component {
             { this.renderLink('vaults') }
             { this.renderLink('earn') }
             { this.renderLink('zap') }
-            { this.renderLink('cover') }
+            { this.renderLink('experimental') }
             { this.renderLink('stats') }
           </div>
           <div className={ classes.account }>
@@ -237,10 +237,10 @@ class Header extends Component {
   }
 
   nav = (screen) => {
-    if(screen === 'cover') {
-      window.open("https://yinsure.finance", "_blank")
-      return
-    }
+    // if(screen === 'cover') {
+    //   window.open("https://yinsure.finance", "_blank")
+    //   return
+    // }
     this.props.history.push('/'+screen)
   }
 

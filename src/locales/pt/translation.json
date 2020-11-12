@@ -73,6 +73,7 @@
   "Home.Pool": "Pool",
   "Home.Vaults": "Cofrer",
   "Home.Balancer": "Balanceador",
+  "Home.Experimental": "Experimental",
 
   "Zap.IWillReceive": "Vou receber",
   "Zap.IHave": "Tenho",
@@ -102,4 +103,3 @@
   "Balancer.Connect": "Ligar carteira"
 
 }
-
