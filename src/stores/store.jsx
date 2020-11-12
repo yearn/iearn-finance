@@ -1000,15 +1000,35 @@ class Store {
         //   measurement: 1e18,
         //   price_id: 'usd-coin',
         // },
+        // {
+        //   id: 'USDT',
+        //   name: 'USDT',
+        //   symbol: 'USDT',
+        //   description: 'Tether USD',
+        //   vaultSymbol: 'dUSDT',
+        //   erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+        //   vaultContractAddress: '0x2f08119C6f07c006695E079AAFc638b8789FAf18',
+        //   vaultContractABI: config.vaultContractV3ABI,
+        //   balance: 0,
+        //   vaultBalance: 0,
+        //   decimals: 6,
+        //   deposit: true,
+        //   depositAll: true,
+        //   withdraw: true,
+        //   withdrawAll: true,
+        //   lastMeasurement: 10651402,
+        //   measurement: 1e18,
+        //   price_id: 'tether',
+        // },
         {
           id: 'USDT',
           name: 'USDT',
           symbol: 'USDT',
           description: 'Tether USD',
           vaultSymbol: 'dUSDT',
-          erc20address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-          vaultContractAddress: '0x2f08119C6f07c006695E079AAFc638b8789FAf18',
-          vaultContractABI: config.vaultContractV3ABI,
+          erc20address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+          vaultContractAddress: '0xE8c9F440677bDC8bA915734e6c7C1b232916877d',
+          vaultContractABI: config.vaultContractNewABI,
           balance: 0,
           vaultBalance: 0,
           decimals: 6,
@@ -2508,7 +2528,11 @@ class Store {
   _getAssetUSDPrices = async (web3, asset, account, usdPrices, callback) => {
     try {
       const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-      const pricePerFullShare = await vaultContract.methods.getPricePerFullShare().call({ from: account.address })
+      const earnPool = await vaultContract.methods.earnPool().call({ from: account.address })
+      const vaultPool = await vaultContract.methods.vaultPool().call({ from: account.address })
+      const totalSupply = await vaultContract.methods.totalSupply().call({ from: account.address })
+      const pricePerFullShare = (earnPool + vaultPool) * 1e18 / totalSupply;
+      // const pricePerFullShare = await vaultContract.methods.getPricePerFullShare().call({ from: account.address })
 
       const usdPrice = usdPrices[asset.price_id]
 
@@ -2638,9 +2662,14 @@ class Store {
   }
 
   _getVaultHoldings = async (web3, asset, account, callback) => {
+    // let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+    // var balance = await vaultContract.methods.balance().call({ from: account.address });
+    // balance = parseFloat(balance)/10**asset.decimals
+    // callback(null, parseFloat(balance))
     let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-    var balance = await vaultContract.methods.balance().call({ from: account.address });
-    balance = parseFloat(balance)/10**asset.decimals
+    var earnPool = await vaultContract.methods.earnPool().call({ from: account.address });
+    var vaultPool = await vaultContract.methods.vaultPool().call({ from: account.address });
+    let balance = parseFloat(earnPool + vaultPool)/10**asset.decimals
     callback(null, parseFloat(balance))
   }
 
@@ -2849,7 +2878,9 @@ class Store {
           }
         })
     } else {
-      vaultContract.methods.deposit(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      var amountWei = amountToSend / 2;
+      console.log(amountWei);
+      vaultContract.methods.deposit(amountWei, amountWei).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
           callback(null, hash)
@@ -2877,6 +2908,34 @@ class Store {
           }
         })
     }
+    //   vaultContract.methods.deposit(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    //     .on('transactionHash', function(hash){
+    //       console.log(hash)
+    //       callback(null, hash)
+    //     })
+    //     .on('confirmation', function(confirmationNumber, receipt){
+    //       console.log(confirmationNumber, receipt);
+    //     })
+    //     .on('receipt', function(receipt){
+    //       console.log(receipt);
+    //     })
+    //     .on('error', function(error) {
+    //       if (!error.toString().includes("-32601")) {
+    //         if(error.message) {
+    //           return callback(error.message)
+    //         }
+    //         callback(error)
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       if (!error.toString().includes("-32601")) {
+    //         if(error.message) {
+    //           return callback(error.message)
+    //         }
+    //         callback(error)
+    //       }
+    //     })
+    // }
   }
 
   depositAllVault = (payload) => {
@@ -3128,7 +3187,12 @@ class Store {
 
       const block = await web3.eth.getBlockNumber();
       const contract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
-      let pricePerFullShare = await contract.methods.getPricePerFullShare().call();
+      const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+      const earnPool = await vaultContract.methods.earnPool().call({ from: account.address })
+      const vaultPool = await vaultContract.methods.vaultPool().call({ from: account.address })
+      const totalSupply = await vaultContract.methods.totalSupply().call({ from: account.address })
+      const pricePerFullShare = (earnPool + vaultPool) * 1e18 / totalSupply;
+      // let pricePerFullShare = await contract.methods.getPricePerFullShare().call();
 
       let balance = pricePerFullShare - asset.measurement;
       balance = balance / 1e18;
