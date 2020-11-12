@@ -16,7 +16,6 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
 import TimelineIcon from '@material-ui/icons/Timeline';
-import InfoIcon from '@material-ui/icons/Info';
 import HelpIcon from '@material-ui/icons/Help';
 import { withNamespaces } from 'react-i18next';
 import { colors } from '../../theme'

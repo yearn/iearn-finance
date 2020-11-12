@@ -7,8 +7,6 @@ import {
   Button
 } from '@material-ui/core';
 
-import WarningIcon from '@material-ui/icons/Warning';
-
 import {
   ERROR,
   DEPOSIT_EXPERIMENTAL_VAULT,
