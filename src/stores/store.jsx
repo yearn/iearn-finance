@@ -3930,8 +3930,8 @@ class Store {
   zapExperimentalVault = (payload) => {
     const account = store.getStore('account')
     const { asset } = payload.content
-
-    this._checkApproval(asset, account, asset.balance, asset.zapContractAddress, (err) => {
+    const zappableCrv = asset.balance + asset.gaugeBalance + asset.vested;
+    this._checkApproval(asset, account, zappableCrv, asset.zapContractAddress, (err) => {
       if(err) {
         return emitter.emit(ERROR, err);
       }
