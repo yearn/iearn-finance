@@ -11,7 +11,7 @@ import {
   ERROR,
   DEPOSIT_VAULT,
   DEPOSIT_VAULT_RETURNED,
-  WITHDRAW_VAULT,
+  WITHDRAW_BOTH,
   WITHDRAW_VAULT_RETURNED,
   DEPOSIT_ALL_VAULT,
   DEPOSIT_ALL_VAULT_RETURNED,
@@ -428,11 +428,12 @@ class Asset extends Component {
           <div className={ classes.sepperator }></div>
           <div className={classes.tradeContainer}>
             <div className={ classes.balances }>
-              <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.vaultBalance ? (Math.floor(asset.vaultBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography>
+              {/* <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.vaultBalance ? (Math.floor(asset.vaultBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography> */}
             </div>
             <div className={ classes.withdrawContainer }>
               <div className={ classes.tradeContainer }>
                 <Typography variant='h5' color='primary' className={ classes.withdrawalText }>Earn</Typography>
+                <Typography variant='h4' onClick={ () => { this.setRedeemEarnAmount(100) } }  className={ classes.value } noWrap>{ (asset.earnBalance ? (Math.floor(asset.earnBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.earnBalance ? (Math.floor(asset.earnBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography>
                 <TextField
                   fullWidth
                   className={ classes.actionInput }
@@ -482,6 +483,7 @@ class Asset extends Component {
               </div>
               <div className={ classes.tradeContainer }>
                 <Typography variant='h5' color='secondary' className={ classes.withdrawalText }>Vault</Typography>
+                <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.vaultBalance ? (Math.floor(asset.vaultBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography>
                 <TextField
                   fullWidth
                   className={ classes.actionInput }
@@ -633,18 +635,24 @@ class Asset extends Component {
     this.setState({ redeemAmountError: false })
 
     const { asset, startLoading  } = this.props
-    let redeemAmount = this.state.redeemAmount/asset.pricePerFullShare
+    let redeemAmount = this.state.redeemAmount
     redeemAmount = (Math.floor(redeemAmount*10000)/10000).toFixed(4);
+    if(!redeemAmount || isNaN(redeemAmount) || redeemAmount < 0 || redeemAmount > asset.vaultBalance) {
+      this.setState({ redeemAmountError: true })
+      return false
+    }
 
-    if(!redeemAmount || isNaN(redeemAmount) || redeemAmount <= 0 || redeemAmount > asset.vaultBalance) {
+    let redeemEarnAmount = this.state.redeemEarnAmount
+    redeemEarnAmount = (Math.floor(redeemEarnAmount*10000)/10000).toFixed(4);
+    if(!redeemEarnAmount || isNaN(redeemEarnAmount) || redeemEarnAmount < 0 || redeemEarnAmount > asset.earnBalance) {
       this.setState({ redeemAmountError: true })
       return false
     }
 
     this.setState({ loading: true })
     startLoading()
-
-    dispatcher.dispatch({ type: WITHDRAW_VAULT, content: { amount: redeemAmount, asset: asset } })
+    
+    dispatcher.dispatch({ type: WITHDRAW_BOTH, content: { earnAmount: redeemEarnAmount, vaultAmount: redeemAmount, asset: asset } })
   }
 
   onWithdrawAll = () => {
@@ -674,7 +682,8 @@ class Asset extends Component {
       return
     }
 
-    const balance = this.props.asset.vaultBalance*this.props.asset.pricePerFullShare
+    // const balance = this.props.asset.vaultBalance*this.props.asset.pricePerFullShare
+    const balance = this.props.asset.vaultBalance
     let amount = balance*percent/100
     amount = Math.floor(amount*10000)/10000;
 
@@ -686,7 +695,8 @@ class Asset extends Component {
       return
     }
 
-    const balance = this.props.asset.vaultBalance*this.props.asset.pricePerFullShare
+    // const balance = this.props.asset.earnBalance*this.props.asset.pricePerFullShare
+    const balance = this.props.asset.earnBalance
     let amount = balance*percent/100
     amount = Math.floor(amount*10000)/10000;
 

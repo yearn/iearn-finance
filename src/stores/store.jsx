@@ -46,7 +46,8 @@ import {
   DASHBOARD_SNAPSHOT_RETURNED,
   USD_PRICE_RETURNED,
   GET_STATISTICS,
-  STATISTICS_RETURNED, TOGGLE_DRAWER, DRAWER_RETURNED
+  STATISTICS_RETURNED, TOGGLE_DRAWER, DRAWER_RETURNED,
+  WITHDRAW_BOTH
 } from '../constants';
 import Web3 from 'web3';
 
@@ -353,6 +354,9 @@ class Store {
           case TOGGLE_DRAWER:
             this.toggleDrawer(payload)
             break
+          case WITHDRAW_BOTH:
+            this.withdrawBoth(payload)
+            break;
           default: {
           }
         }
@@ -2485,7 +2489,8 @@ class Store {
     async.map(assets, (asset, callback) => {
       async.parallel([
         (callbackInner) => { this._getERC20Balance(web3, asset, account, callbackInner) },
-        (callbackInner) => { this._getVaultBalance(web3, asset, account, callbackInner) },
+        // (callbackInner) => { this._getVaultBalance(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getBalances(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getStrategy(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getStatsAPY(vaultStatistics, asset, callbackInner) },
         (callbackInner) => { this._getVaultHoldings(web3, asset, account, callbackInner) },
@@ -2499,7 +2504,8 @@ class Store {
         }
 
         asset.balance = data[0]
-        asset.vaultBalance = data[1]
+        asset.vaultBalance = data[1].vaultBalance
+        asset.earnBalance = data[1].earnBalance
         asset.strategy = data[2].strategy
         asset.strategyHoldings = data[2].holdings
         asset.strategyName = data[2].name
@@ -2740,6 +2746,25 @@ class Store {
     var  balance = await vaultContract.methods.balanceOf(account.address).call({ from: account.address });
     balance = parseFloat(balance)/10**asset.decimals
     callback(null, parseFloat(balance))
+  }
+
+  _getBalances = async (web3, asset, account, callback) => {
+    if(asset.vaultContractAddress === null) {
+      return callback(null, 0)
+    }
+
+    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+    let earnBalance = await vaultContract.methods.earnBalanceOf(account.address).call({ from: account.address });
+    console.log(earnBalance);
+    earnBalance = parseFloat(earnBalance)/10**asset.decimals
+
+    let vaultBalance = await vaultContract.methods.vaultBalanceOf(account.address).call({ from: account.address });
+    vaultBalance = parseFloat(vaultBalance)/10**asset.decimals
+
+    callback(null, {
+      earnBalance: parseFloat(earnBalance),
+      vaultBalance: parseFloat(vaultBalance),
+    })
   }
 
   _getVaultPricePerShare = async (web3, asset, account, callback) => {
@@ -2995,7 +3020,6 @@ class Store {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
 
-
     if(asset.yVaultCheckAddress) {
       this._checkApprovalForProxy(asset, account, amount, asset.yVaultCheckAddress, (err) => {
         if(err) {
@@ -3061,8 +3085,8 @@ class Store {
     if (asset.decimals !== 18) {
       amountSend = Math.round(amount*10**asset.decimals);
     }
-
-    let functionCall = vaultContract.methods.withdraw(amountSend)
+    console.log(amountSend);
+    let functionCall = vaultContract.methods.withdrawVault(amountSend)
     if(asset.erc20address === 'Ethereum') {
       functionCall = vaultContract.methods.withdrawETH(amountSend)
     }
@@ -3572,6 +3596,95 @@ class Store {
     this.setStore({ openDrawer: open })
     return emitter.emit(DRAWER_RETURNED)
   };
+
+  withdrawBoth = (payload) => {
+    let { earnAmount, vaultAmount, asset } = payload.content;
+
+    if (Number(earnAmount) > 0) {
+      this.withdrawYfUDST({
+        content: {
+          amount: earnAmount,
+          asset,
+          methods: 'withdrawEarn'
+        }
+      })
+    }
+    
+    if (Number(vaultAmount)) {
+      this.withdrawYfUDST({
+        content: {
+          amount: vaultAmount,
+          asset,
+          methods: 'withdrawVault'
+        }
+      })
+    }
+  };
+
+  withdrawYfUDST = (payload) => {
+    const account = store.getStore('account')
+    const { asset, amount, methods } = payload.content
+
+    if(asset.yVaultCheckAddress) {
+      this._checkApprovalForProxy(asset, account, amount, asset.yVaultCheckAddress, (err) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        this._callWithdrawVaultProxy(asset, account, amount, (err, withdrawResult) => {
+          if(err) {
+            return emitter.emit(ERROR, err);
+          }
+
+          return emitter.emit(WITHDRAW_VAULT_RETURNED, withdrawResult)
+        })
+      })
+    } else {
+      this._callWithdraw(asset, account, amount, methods, (err, withdrawResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+        return emitter.emit(WITHDRAW_VAULT_RETURNED, withdrawResult)
+      })
+    }
+  }
+
+  _callWithdraw = async (asset, account, amount, methods, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+
+    var amountSend = web3.utils.toWei(amount, "ether")
+    if (asset.decimals !== 18) {
+      amountSend = Math.round(amount*10**asset.decimals);
+    }
+    console.log(amountSend);
+    let functionCall = vaultContract.methods[methods](amountSend)
+    if(asset.erc20address === 'Ethereum') {
+      functionCall = vaultContract.methods.withdrawETH(amountSend)
+    }
+
+    functionCall.send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    .on('transactionHash', function(hash){
+      console.log(hash)
+      callback(null, hash)
+    })
+    .on('confirmation', function(confirmationNumber, receipt){
+      console.log(confirmationNumber, receipt);
+    })
+    .on('receipt', function(receipt){
+      console.log(receipt);
+    })
+    .on('error', function(error) {
+      console.log(error);
+      if (!error.toString().includes("-32601")) {
+        if(error.message) {
+          return callback(error.message)
+        }
+        callback(error)
+      }
+    })
+  }
 }
 
 var store = new Store();
