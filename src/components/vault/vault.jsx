@@ -11,13 +11,14 @@ import {
   FormControlLabel,
   Checkbox,
   Tooltip,
-  MenuItem
+  MenuItem,
+  Grid
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
 import InfoIcon from '@material-ui/icons/Info';
 import { withNamespaces } from 'react-i18next';
-import { colors } from '../../theme'
+import { colors, drawerWidth } from '../../theme'
 
 import Snackbar from '../snackbar'
 import Asset from './asset'
@@ -27,17 +28,18 @@ import HighchartsReact from 'highcharts-react-official';
 
 import {
   ERROR,
-  GET_VAULT_BALANCES_FULL,
-  VAULT_BALANCES_FULL_RETURNED,
   DEPOSIT_VAULT_RETURNED,
   WITHDRAW_VAULT_RETURNED,
   DEPOSIT_ALL_VAULT_RETURNED,
   WITHDRAW_ALL_VAULT_RETURNED,
   CONNECTION_CONNECTED,
-  CONNECTION_DISCONNECTED
+  CONNECTION_DISCONNECTED,
+  GET_STRATEGY_BALANCES_FULL,
+  STRATEGY_BALANCES_FULL_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
+import UnlockModal from "../unlock/unlockModal";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
@@ -47,22 +49,23 @@ const styles = theme => ({
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    maxWidth: '1200px',
     width: '100%',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'flex-end'
   },
-  investedContainerLoggedOut: {
+  contentContainer: {
+    minWidth: '100%',
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: '100%',
-    marginTop: '40px',
+    position: 'relative',
     [theme.breakpoints.up('md')]: {
-      minWidth: '900px',
+      minWidth: 'calc(100% - '+ drawerWidth + 'px)',
     }
+  },
+  investedContainerLoggedOut: {
   },
   investedContainer: {
     display: 'flex',
@@ -71,13 +74,15 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     minWidth: '100%',
-    marginTop: '40px',
+    marginTop: '20px',
     marginBottom: '40px',
     [theme.breakpoints.up('md')]: {
       minWidth: '900px',
     },
     [theme.breakpoints.down('sm')]: {
-      marginTop: '100px',
+      minWidth: '90%',
+      margin: 'auto',
+      marginTop: '40px',
     }
   },
   balancesContainer: {
@@ -150,11 +155,7 @@ const styles = theme => ({
     }
   },
   headingEarning: {
-    display: 'none',
-    width: '300px',
-    [theme.breakpoints.up('sm')]: {
-      display: 'block'
-    }
+    display: 'block',
   },
   buttonText: {
     fontWeight: '700',
@@ -180,9 +181,9 @@ const styles = theme => ({
     cursor: 'pointer',
     marginRight: '20px',
     [theme.breakpoints.up('sm')]: {
-      height: '40px',
-      width: '40px',
-      marginRight: '24px',
+      height: '32px',
+      width: '32px',
+      marginRight: '12px',
     }
   },
   addressContainer: {
@@ -292,6 +293,162 @@ const styles = theme => ({
   removePadding: {
     padding: '0px',
     maxWidth: '900px'
+  },
+  welcomeText: {
+    fontWeight: 'bold',
+    fontSize: '2rem',
+    lineHeight: '38px',
+    color: '#444444',
+    textAlign: 'center'
+  },
+  warningMessage: {
+    fontSize: '1rem',
+    lineHeight: '19px',
+    textAlign: 'center',
+    color: '#18A0FB',
+    position: 'absolute',
+    bottom: '10%',
+    left: '0',
+    right: '0',
+    margin: 'auto',
+    [theme.breakpoints.down('sm')]: {
+      bottom: '5%',
+      width: '90%',
+    }
+  },
+  buttonGroup: {
+    background: '#18A0FB',
+    borderRadius: '48px',
+    color: '#ffffff',
+    display: 'flex',
+    alignItems: 'stretch',
+    justifyContent: 'center',
+    width: '80%',
+    margin: 'auto',
+    cursor: 'pointer',
+  },
+  buttonIconContainer: {
+    width: '60px',
+    background: '#50B9FF',
+    borderRadius: '48px 0px 0px 48px',
+    textAlign: 'center',
+    padding: '0.5rem 1.5rem',
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  connectButtonIcon: {
+    width: '60%',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+    }
+  },
+  buttonTextContainer: {
+    padding: '1rem 2rem',
+    textAlign: 'center'
+  },
+  buttonContainer: {
+    textAlign: 'center',
+    marginTop: '5rem',
+    [theme.breakpoints.down('sm')]: {
+      marginTop: '3rem'
+    }
+  },
+  descriptionContainer: {
+    border: '1px solid #DDDDDD',
+    marginTop: '8rem',
+    borderRadius: '10px',
+    padding: '1.5rem 3.5rem',
+    textAlign: 'center',
+    [theme.breakpoints.down('sm')]: {
+      width: '90%',
+      margin: 'auto',
+      marginTop: '4rem',
+    }
+  },
+  shieldContainer: {
+    background: 'rgba(24,160,251, 0.1)',
+    borderRadius: '10px',
+    width: '36px',
+    margin: 'auto',
+    padding: '0.6rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  subtitle: {
+    fontSize: '1.1rem',
+    color: '#4444444',
+    lineHeight: '22px',
+    marginTop: '1rem'
+  },
+  securityDesc: {
+    color: '#777777',
+    fontSize: '.9rem',
+    lineHeight: '18px',
+    marginTop: '0.8rem'
+  },
+  titleDesc: {
+    textAlign: 'center',
+    [theme.breakpoints.down('sm')]: {
+      padding: '1rem 2rem'
+    }
+  },
+  strategyContainer: {
+    border: '1px solid #d9d9d9',
+    borderRadius: '10px',
+    padding: '1rem',
+    [theme.breakpoints.down('sm')]: {
+      width: '95%',
+      margin: 'auto'
+    }
+  },
+  riskLabel: {
+    background: '#72C6AE',
+    borderRadius: '5px',
+    color: '#ffffff',
+    padding: '5px 10px',
+    textAlign: 'center',
+    width: '5rem',
+    marginLeft: 'auto'
+  },
+  assetName: {
+    color: '#222222',
+    fontSize: '1rem'
+  },
+  assetLabel: {
+    color: '#888888',
+    fontSize: '1rem',
+    fontWeight: 600
+  },
+  assetValue: {
+    color: '#222222',
+    fontSize: '1rem',
+    fontWeight: 600
+  },
+  gridItemColumn: {
+    display: 'flex',
+    alignItems: 'stretch',
+    [theme.breakpoints.down('sm')]: {
+      marginBottom: '5px'
+    }
+  },
+  roundIconClass: {
+    background: 'rgba(24, 160, 251, 0.1)', 
+    color: '#A7c0d6',
+    borderRadius: '50%'
+  },
+  showDesktop: {
+    display: 'block',
+    [theme.breakpoints.down('sm')]: {
+      display: 'none'
+    }
+  },
+  showMobile: {
+    display: 'none',
+    [theme.breakpoints.down('sm')]: {
+      display: 'block'
+    }
   }
 });
 
@@ -315,11 +472,12 @@ class Vault extends Component {
       hideZero: localStorage.getItem('yearn.finance-hideZero') === '1' ? true : false,
       basedOn: basedOn ? parseInt(basedOn > 3 ? 3 : basedOn) : 1,
       loading: true,
-      expanded: 'USDT'
+      expanded: 'USDT',
+      modalOpen: false,
     }
 
     if(account && account.address) {
-      dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+      dispatcher.dispatch({ type: GET_STRATEGY_BALANCES_FULL, content: {} })
     }
   }
   componentWillMount() {
@@ -328,7 +486,7 @@ class Vault extends Component {
     emitter.on(DEPOSIT_ALL_VAULT_RETURNED, this.showHash);
     emitter.on(WITHDRAW_ALL_VAULT_RETURNED, this.showHash);
     emitter.on(ERROR, this.errorReturned);
-    emitter.on(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    emitter.on(STRATEGY_BALANCES_FULL_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
   }
@@ -341,7 +499,7 @@ class Vault extends Component {
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
-    emitter.removeListener(VAULT_BALANCES_FULL_RETURNED, this.balancesReturned);
+    emitter.removeListener(STRATEGY_BALANCES_FULL_RETURNED, this.balancesReturned);
   };
 
   balancesReturned = (balances) => {
@@ -362,7 +520,7 @@ class Vault extends Component {
     })
 
 
-    dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+    dispatcher.dispatch({ type: GET_STRATEGY_BALANCES_FULL, content: {} })
 
     const that = this
     setTimeout(() => {
@@ -406,30 +564,59 @@ class Vault extends Component {
       loading,
       account,
       snackbarMessage,
+      modalOpen,
     } = this.state
 
     if(!account || !account.address) {
       return (
         <div className={ classes.root }>
-          <div className={ classes.investedContainerLoggedOut }>
-          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
-            <div className={ classes.introCenter }>
-              <Typography variant='h3'>Connect your wallet to continue</Typography>
+          <div className={classes.contentContainer}>
+            <div className={ classes.investedContainerLoggedOut }>
+              <Typography variant={'h2'} className={classes.welcomeText}>Welcome to DAOventures</Typography>
+              <Typography className={classes.titleDesc} variant={'body1'}>Connect an Ethereum wallet to manage and invest your DeFi portfolio</Typography>
+              <div className={classes.buttonContainer}>
+                <Grid container className={classes.buttonGroup} onClick={this.addressClicked}>
+                  <Grid item sm={3} xs={3} className={classes.buttonIconContainer}>
+                    <img 
+                        alt=""
+                        src={require('../../assets/metamask.svg')}
+                        className={classes.connectButtonIcon}
+                      />
+                  </Grid>
+                  <Grid item sm={9} xs={9} className={classes.buttonTextContainer}>
+                    <Typography variant='h4'>Connect to Metamask wallet</Typography>
+                  </Grid>
+                </Grid>
+              </div>
+              <div className={classes.descriptionContainer}>
+                <div className={classes.shieldContainer}>
+                  <img 
+                    alt=""
+                    src={require('../../assets/shield.svg')}
+                  />
+                </div>
+                <Typography variant='h3' className={classes.subtitle}>Non-custodial & Secure</Typography>
+                <Typography variant='body2' className={classes.securityDesc}>We do not own your private keys and cannot access your funds.</Typography>
+              </div>
             </div>
+            <Typography variant='body1' className={classes.warningMessage}>*Crypto is volatile, DeFi is new and risky. Please use it at your own risk.</Typography>
           </div>
           { snackbarMessage && this.renderSnackbar() }
+          { modalOpen && this.renderModal() }
         </div>
       )
     }
 
     return (
       <div className={ classes.root }>
-        <div className={ classes.investedContainer }>
-          {/* <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
-          { this.renderFilters() }
-          { this.renderBasedOn() } */}
-          { this.renderChart() }
-          { this.renderAssetBlocks() }
+        <div className={classes.contentContainer}>
+          <div className={ classes.investedContainer }>
+            {/* <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
+            { this.renderFilters() }
+            { this.renderBasedOn() } */}
+            {/* { this.renderChart() } */}
+            { this.renderAssetBlocks() }
+          </div>
         </div>
         { loading && <Loader /> }
         { snackbarMessage && this.renderSnackbar() }
@@ -500,66 +687,88 @@ class Vault extends Component {
       } else {
         return true
       }
-    }).map((asset) => {
+    }).map((asset, index) => {
       return (
-        <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1bh-content"
-            id="panel1bh-header"
-          >
-            <div className={ classes.assetSummary }>
-              <div className={classes.headingName}>
-                <div className={ classes.assetIcon }>
-                  <img
-                    alt=""
-                    src={ require('../../assets/'+asset.symbol+'-logo.png') }
-                    height={ width > 600 ? '40px' : '30px'}
-                    style={asset.disabled?{filter:'grayscale(100%)'}:{}}
-                  />
-                </div>
-                <div>
-                  <Typography variant={ 'h3' } noWrap>{ asset.name }</Typography>
-                  <Typography variant={ 'h5' } className={ classes.grey }>{ asset.description }</Typography>
-                </div>
+        <div className={classes.strategyContainer}>
+          <Grid container>
+            <Grid item sm={6} xs={6} style={{display: 'flex', alignItems: 'center'}}>
+              <Typography variant='h4'>Strategy {index+1}: {asset.strategyName}</Typography>
+            </Grid>
+            <Grid item sm={6} xs={6}>
+              {this.renderRiskLabel()}
+            </Grid>
+          </Grid>
+          <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon className={classes.roundIconClass} />}
+              aria-controls="panel1bh-content"
+              id="panel1bh-header"
+            >
+              <div className={ classes.assetSummary }>
+                <Grid container>
+                  <Grid item sm={2} xs={6} className={classes.gridItemColumn}>
+                    <div className={classes.assetIcon}>
+                      <img
+                          alt=""
+                          src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                          height={ '32px' }
+                          style={asset.disabled?{filter:'grayscale(100%)'}:{}}
+                        />
+                    </div>
+                    <Typography variant={ 'body1' } noWrap className={classes.assetName}>{ asset.name }</Typography>
+                  </Grid>
+                  <Grid item sm={3} xs={6} className={classes.gridItemColumn}>
+                    <Typography variant={ 'body1' } className={ classes.assetLabel }>{ asset.description }</Typography>
+                  </Grid>
+                  <Grid item sm={3} xs={6} className={classes.gridItemColumn}>
+                  {
+                    (!['LINK'].includes(asset.id) && asset.vaultBalance > 0) &&
+                    <div>
+                      <div className={classes.showDesktop}>
+                        <Typography variant={ 'h5' } className={ classes.assetLabel }>Yearly Growth: <span style={{color: '#222222'}}>{ (this._getAPY(asset)/1).toFixed(2) }% on { (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(2) : '0.00') } {asset.symbol}</span></Typography>
+                      </div>  
+                      <div className={classes.showMobile}>
+                        <Typography variant={ 'h5' } className={ classes.assetLabel }>Yearly Growth: </Typography>
+                        <Typography variant={ 'h3' } noWrap className={classes.assetValue}>{ (this._getAPY(asset)/1).toFixed(2) }% on { (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(2) : '0.00') } {asset.symbol}</Typography>
+                      </div>
+                    </div>   
+                  }
+                  {
+                    (!['LINK'].includes(asset.id) && asset.vaultBalance === 0) &&
+                      <div>
+                        <div className={classes.showDesktop}>
+                        <Typography variant={ 'h5' } className={ classes.assetLabel }>Yearly Growth: <span style={{color: '#222222'}}>
+                            { (this._getAPY(asset)/1).toFixed(2) }%
+                          </span>
+                        </Typography>
+                        </div>  
+                        <div className={classes.showMobile}>
+                          <Typography variant={ 'h5' } className={ classes.assetLabel }>Yearly Growth: </Typography>
+                          <Typography variant={ 'h3' } noWrap className={classes.assetValue}>{ (this._getAPY(asset)/1).toFixed(2) }%</Typography>
+                        </div>
+                      </div>   
+                  }
+                  </Grid>
+                  <Grid item sm={4} xs={6} className={classes.gridItemColumn}>
+                    <div className={classes.showDesktop}>
+                      <Typography variant={ 'h5' } className={ classes.assetLabel }>Available to deposit: <span style={{color: '#222222'}}>
+                          { (asset.balance ? (asset.balance).toFixed(2) : '0.00')+' '+asset.symbol }
+                        </span>
+                      </Typography>
+                    </div>
+                    <div className={classes.showMobile}>
+                      <Typography variant={ 'h5' } className={ classes.assetLabel }>Available to deposit: </Typography>
+                      <Typography variant={ 'h3' } noWrap className={classes.assetValue}>{ (asset.balance ? (asset.balance).toFixed(2) : '0.00')+' '+asset.symbol }</Typography>
+                    </div>
+                  </Grid>
+                </Grid>
               </div>
-              {
-                (!['LINK'].includes(asset.id) && asset.vaultBalance > 0) &&
-                <div className={classes.headingEarning}>
-                  <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
-                  <div className={ classes.flexy }>
-                    <Typography variant={ 'h3' } noWrap>{ (this._getAPY(asset)/1).toFixed(2) }% </Typography>
-                    <Typography variant={ 'h5' } className={ classes.on }> on </Typography>
-                    <Typography variant={ 'h3' } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(2) : '0.00') } {asset.symbol}</Typography>
-                  </div>
-                </div>
-              }
-              {
-                (!['LINK'].includes(asset.id) && asset.vaultBalance === 0) &&
-                <div className={classes.headingEarning}>
-                  <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
-                  <div className={ classes.flexy }>
-                    <Typography variant={ 'h3' } noWrap>{ (this._getAPY(asset)/1).toFixed(2) }% </Typography>
-                  </div>
-                </div>
-              }
-              {
-                ['LINK'].includes(asset.id) &&
-                <div className={classes.headingEarning}>
-                  <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
-                  <Typography variant={ 'h3' } noWrap>Not Available</Typography>
-                </div>
-              }
-              <div className={classes.heading}>
-                <Typography variant={ 'h5' } className={ classes.grey }>Available to deposit:</Typography>
-                <Typography variant={ 'h3' } noWrap>{ (asset.balance ? (asset.balance).toFixed(2) : '0.00')+' '+asset.symbol }</Typography>
-              </div>
-            </div>
-          </AccordionSummary>
-          <AccordionDetails className={ classes.removePadding }>
-            <Asset asset={ asset } startLoading={ this.startLoading } basedOn={ basedOn } />
-          </AccordionDetails>
-        </Accordion>
+            </AccordionSummary>
+            <AccordionDetails className={ classes.removePadding }>
+              <Asset asset={ asset } startLoading={ this.startLoading } basedOn={ basedOn } />
+            </AccordionDetails>
+          </Accordion>
+        </div>
       )
     })
   }
@@ -611,6 +820,15 @@ class Vault extends Component {
     )
   }
 
+  renderRiskLabel = () => {
+    const { classes } = this.props;
+    return (
+      <div className={classes.riskLabel}>
+        <Typography variant='caption'>Risk: Low</Typography>
+      </div>
+    );
+  }
+
   handleChecked = (event) => {
     this.setState({ hideZero: event.target.checked })
     localStorage.setItem('yearn.finance-hideZero', (event.target.checked ? '1' : '0' ))
@@ -634,7 +852,8 @@ class Vault extends Component {
 
   _getAPY = (asset) => {
     const { basedOn } = this.state
-
+    console.log('asset', asset);
+    console.log('basedOn', basedOn);
     if(asset && asset.stats) {
       switch (basedOn) {
         case 1:
@@ -711,7 +930,21 @@ class Vault extends Component {
     localStorage.setItem('yearn.finance-dashboard-basedon', event.target.value)
 
     this.setState({ loading: true })
-    dispatcher.dispatch({ type: GET_VAULT_BALANCES_FULL, content: {} })
+    dispatcher.dispatch({ type: GET_STRATEGY_BALANCES_FULL, content: {} })
+  }
+
+  addressClicked = () => {
+    this.setState({ modalOpen: true })
+  }
+
+  closeModal = () => {
+    this.setState({ modalOpen: false })
+  }
+
+  renderModal = () => {
+    return (
+      <UnlockModal closeModal={ this.closeModal } modalOpen={ this.state.modalOpen } />
+    )
   }
 }
 

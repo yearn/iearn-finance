@@ -30,21 +30,21 @@ const styles = theme => ({
     [theme.breakpoints.down('sm')]: {
       marginBottom: '40px'
     },
-    zIndex: theme.zIndex.drawer + 1,
+    zIndex: theme.zIndex.drawer - 1,
     position: 'fixed'
   },
   headerV2: {
     background: colors.white,
-    border: '1px solid '+colors.darkGray,
+    border: '1px solid #d9d9d9',
     borderTop: 'none',
     width: '100%',
     display: 'flex',
-    padding: '24px 32px',
+    padding: '15px 32px',
     alignItems: 'center',
     justifyContent: 'center',
     [theme.breakpoints.down('sm')]: {
       justifyContent: 'space-between',
-      padding: '16px 24px'
+      padding: '15px'
     }
   },
   icon: {
@@ -89,35 +89,25 @@ const styles = theme => ({
   },
   walletAddress: {
     padding: '12px',
-    border: '2px solid rgb(174, 174, 174)',
-    borderRadius: '10px',
+    borderRadius: '41px',
     display: 'flex',
     alignItems: 'center',
     cursor: 'pointer',
+    background: 'rgba(24,160,251,0.1)',
     '&:hover': {
-      border: "2px solid "+colors.borderBlue,
       background: 'rgba(47, 128, 237, 0.1)'
     },
-    [theme.breakpoints.down('sm')]: {
-      display: 'flex',
-      position: 'absolute',
-      transform: 'translate(0, 200%)',
-      border: "1px solid "+colors.borderBlue,
-      background: colors.white
-    }
+    // [theme.breakpoints.down('sm')]: {
+    //   display: 'flex',
+    //   position: 'absolute',
+    //   transform: 'translate(0, 200%)',
+    //   border: "1px solid "+colors.borderBlue,
+    //   background: colors.white
+    // }
   },
   walletTitle: {
     flex: 1,
     color: colors.darkGray
-  },
-  connectedDot: {
-    background: colors.compoundGreen,
-    opacity: '1',
-    borderRadius: '10px',
-    width: '10px',
-    height: '10px',
-    marginRight: '3px',
-    marginLeft:'6px'
   },
   name: {
     paddingLeft: '24px',
@@ -126,9 +116,16 @@ const styles = theme => ({
     }
   },
   menuButton: {
-    marginLeft: -5,
-    marginRight: 20,
+    marginLeft: -16,
+    marginRight: 3,
   },
+  addressAlias: {
+    color: '#222222',
+    fontSize: '14px',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '12px',
+    }
+  }
 });
 
 class Header extends Component {
@@ -208,19 +205,25 @@ class Header extends Component {
     }
     const addressAlias = addressEnsName || address
 
+    if (!hideNav && address == null) {
+      return null;
+    }
+
     return (
       <div className={ classes.root }>
         <div className={ classes.headerV2 }>
           {hideNav && this.renderToggleButton()}
-          <div className={ classes.icon }>
-            <img
-              alt=""
-              src={ require('../../assets/DAOventures-logo.png') }
-              height={ '40px' }
-              onClick={ () => { this.nav('') } }
-            />
-            {/* <Typography variant={ 'h3'} className={ classes.name } onClick={ () => { this.nav('') } }>DAOVentures</Typography> */}
-          </div>
+          {hideNav && 
+            <div className={ classes.icon }>
+              <img
+                alt=""
+                src={ require('../../assets/DAOventures-logo.png') }
+                height={ '25px' }
+                onClick={ () => { this.nav('') } }
+              />
+            </div>
+          }
+          
           <div className={ classes.links }>
             {/* { this.renderLink('dashboard') } */}
             {/* { this.renderLink('vaults') } */}
@@ -231,15 +234,14 @@ class Header extends Component {
           </div>
           <div className={ classes.account }>
             { address &&
-              <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap onClick={this.addressClicked} >
+              <div className={ classes.walletAddress }>
+                <img 
+                  alt="" 
+                  src={require('../../assets/profile.svg')} />
+                <Typography variant={ 'h4'} className={classes.addressAlias} style={{marginLeft: '10px'}} noWrap onClick={this.addressClicked} >
                 { addressAlias }
-                <div className={ classes.connectedDot }></div>
               </Typography>
-            }
-            { !address &&
-              <Typography variant={ 'h4'} className={ classes.walletAddress } noWrap onClick={this.addressClicked} >
-                Connect to Metamask wallet
-              </Typography>
+              </div>
             }
           </div>
         </div>

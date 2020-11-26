@@ -4,9 +4,10 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
   TextField,
-  MenuItem
+  MenuItem,
+  Grid
 } from '@material-ui/core';
-import { colors } from '../../theme'
+import { colors, drawerWidth } from '../../theme'
 
 import Loader from '../loader'
 import InfoIcon from '@material-ui/icons/Info';
@@ -20,6 +21,9 @@ import {
 } from '../../constants'
 
 import Store from "../../stores";
+import UnlockModal from "../unlock/unlockModal";
+import Highcharts from 'highcharts';
+import HighchartsReact from "highcharts-react-official";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
@@ -29,21 +33,20 @@ const styles = theme => ({
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    maxWidth: '1200px',
     width: '100%',
-    justifyContent: 'flex-start',
-    alignItems: 'center'
+    justifyContent: 'center',
+    alignItems: 'flex-end'
   },
-  investedContainerLoggedOut: {
+  contentContainer: {
+    minWidth: '100%',
     display: 'flex',
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: '100%',
-    marginTop: '40px',
+    position: 'relative',
     [theme.breakpoints.up('md')]: {
-      minWidth: '900px',
+      minWidth: 'calc(100% - '+ drawerWidth + 'px)',
     }
   },
   investedContainer: {
@@ -53,9 +56,15 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     minWidth: '100%',
-    marginTop: '40px',
     [theme.breakpoints.up('md')]: {
       minWidth: '900px',
+      padding: '3rem'
+    },
+    [theme.breakpoints.down('sm')]: {
+      minWidth: '90%',
+      margin: 'auto',
+      marginTop: '40px',
+      width: '95vw'
     }
   },
   disaclaimer: {
@@ -72,12 +81,16 @@ const styles = theme => ({
   },
   vaultContainer: {
     padding: '28px 30px',
-    borderRadius: '50px',
-    border: '1px solid '+colors.borderBlue,
+    borderRadius: '10px',
+    border: '1px solid #d9d9d9',
     background: colors.white,
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
+    marginTop: '2rem',
+    [theme.breakpoints.down('sm')]: {
+      padding: '10px'
+    }
   },
   earnContainer: {
     marginTop: '40px',
@@ -97,16 +110,20 @@ const styles = theme => ({
     height: '40px'
   },
   titleBalance: {
-    padding: '28px 30px',
-    borderRadius: '50px',
-    border: '1px solid '+colors.borderBlue,
+    padding: '28px 30px !important',
+    borderRadius: '10px',
+    border: '1px solid #d9d9d9',
     background: colors.white,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    maxWidth: '49%',
+    [theme.breakpoints.down('sm')]: {
+      padding: '17px 20px !important',
+    }
   },
   prettyAlign: {
     display: 'flex',
@@ -138,7 +155,7 @@ const styles = theme => ({
     marginRight: '12px',
   },
   heading: {
-    display: 'none',
+    display: 'block',
     [theme.breakpoints.up('md')]: {
       display: 'flex',
       flexDirection: 'column',
@@ -161,15 +178,14 @@ const styles = theme => ({
   },
   vault: {
     borderBottom: '1px solid rgba(25, 101, 233, 0.2)',
-    padding: '12px',
+    padding: '12px 0px',
     '&:last-child': {
       borderBottom: 'none'
     }
   },
   sectionHeading: {
-    color: colors.darkGray,
-    width: '100%',
-    marginLeft: '54px'
+    color: '#222222',
+    fontSize: '1.2rem'
   },
   inline: {
     display: 'flex',
@@ -184,9 +200,150 @@ const styles = theme => ({
   },
   basedOnContainer: {
     display: 'flex',
-    width: '100%',
     justifyContent: 'flex-end',
     alignItems: 'center'
+  },
+  welcomeText: {
+    fontWeight: 'bold',
+    fontSize: '2rem',
+    lineHeight: '38px',
+    color: '#444444',
+    textAlign: 'center'
+  },
+  warningMessage: {
+    fontSize: '1rem',
+    lineHeight: '19px',
+    textAlign: 'center',
+    color: '#18A0FB',
+    position: 'absolute',
+    bottom: '10%',
+    left: '0',
+    right: '0',
+    margin: 'auto',
+    [theme.breakpoints.down('sm')]: {
+      bottom: '5%',
+      width: '90%',
+    }
+  },
+  buttonGroup: {
+    background: '#18A0FB',
+    borderRadius: '48px',
+    color: '#ffffff',
+    display: 'flex',
+    alignItems: 'stretch',
+    justifyContent: 'center',
+    width: '80%',
+    margin: 'auto',
+    cursor: 'pointer',
+  },
+  buttonIconContainer: {
+    width: '60px',
+    background: '#50B9FF',
+    borderRadius: '48px 0px 0px 48px',
+    textAlign: 'center',
+    padding: '0.5rem 1.5rem',
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  connectButtonIcon: {
+    width: '60%',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+    }
+  },
+  buttonTextContainer: {
+    padding: '1rem 2rem',
+    textAlign: 'center'
+  },
+  buttonContainer: {
+    textAlign: 'center',
+    marginTop: '5rem',
+    [theme.breakpoints.down('sm')]: {
+      marginTop: '3rem'
+    }
+  },
+  descriptionContainer: {
+    border: '1px solid #DDDDDD',
+    marginTop: '8rem',
+    borderRadius: '10px',
+    padding: '1.5rem 3.5rem',
+    textAlign: 'center',
+    [theme.breakpoints.down('sm')]: {
+      width: '90%',
+      margin: 'auto',
+      marginTop: '4rem',
+    }
+  },
+  shieldContainer: {
+    background: 'rgba(24,160,251, 0.1)',
+    borderRadius: '10px',
+    width: '36px',
+    margin: 'auto',
+    padding: '0.6rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  subtitle: {
+    fontSize: '1.1rem',
+    color: '#4444444',
+    lineHeight: '22px',
+    marginTop: '1rem'
+  },
+  securityDesc: {
+    color: '#777777',
+    fontSize: '.9rem',
+    lineHeight: '18px',
+    marginTop: '0.8rem'
+  },
+  chartContainer: {
+    border: '1px solid #D9D9D9',
+    borderRadius: '10px',
+    padding: '10px',
+    background: '#ffffff',
+    marginBottom: '2rem',
+    width: '100%'
+  },
+  amountValue: {
+    color: '#222222',
+    fontSize: '30px',
+    marginTop: '5px',
+    wordBreak: 'break-all',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '16px'
+    }
+  },
+  inlineBlock: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    [theme.breakpoints.down('sm')]: {
+      display: 'block'
+    }
+  },
+  netWorth: {
+    color: '#8888888',
+    fontSize: '0.8rem',
+    textAlign: 'right',
+    fontWeight: 'bold'
+  },
+  assetName: {
+    color: '#222222',
+    fontSize: '1.1rem'
+  },
+  dataValue: {
+    fontSize: '1rem',
+    color: '#158920',
+    background: '#DAF3E4',
+    borderRadius: '5px',
+    padding: '10px'
+  },
+  labelSize: {
+    fontSize: '13px',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '10px'
+    }
   }
 });
 
@@ -205,9 +362,10 @@ class Dashboard extends Component {
       dashboard: dashboard,
       account: account,
       loading: true,
-      growth: growth ? parseInt(growth) : 1, // 0=daily 1=weekly 2=yearly
+      growth: growth ? parseInt(growth) : 0, // 0=daily 1=weekly 2=yearly
       currency: currency ? currency : 'USD', // USD / ETH,
-      basedOn: basedOn ? parseInt(basedOn > 3 ? 3 : basedOn) : 1 // 1=apyThreeDaySample  2=apyOneWeekSample  3= apyInceptionSample  4=apyInceptionSample (old)
+      basedOn: basedOn ? parseInt(basedOn > 3 ? 3 : basedOn) : 1, // 1=apyThreeDaySample  2=apyOneWeekSample  3= apyInceptionSample  4=apyInceptionSample (old)
+      modalOpen: false
     }
 
     if(account && account.address) {
@@ -258,95 +416,111 @@ class Dashboard extends Component {
       growth,
       currency,
       account,
+      modalOpen,
     } = this.state
 
     if(!account || !account.address) {
       return (
         <div className={ classes.root }>
-          <div className={ classes.investedContainerLoggedOut }>
-          <Typography variant={'h5'} className={ classes.disaclaimer }>This project is in beta. Use at your own risk.</Typography>
-            <div className={ classes.introCenter }>
-              <Typography variant='h3'>Connect your wallet to continue</Typography>
+          <div className={classes.contentContainer}>
+            <div>
+              <Typography variant={'h2'} className={classes.welcomeText}>Welcome to DAOventures</Typography>
+              <Typography className={classes.titleDesc} variant={'body1'}>Connect an Ethereum wallet to manage and invest your DeFi portfolio</Typography>
+              <div className={classes.buttonContainer}>
+                <Grid container className={classes.buttonGroup} onClick={this.addressClicked}>
+                  <Grid item sm={3} xs={3} className={classes.buttonIconContainer}>
+                    <img 
+                        alt=""
+                        src={require('../../assets/metamask.svg')}
+                        className={classes.connectButtonIcon}
+                      />
+                  </Grid>
+                  <Grid item sm={9} xs={9} className={classes.buttonTextContainer}>
+                    <Typography variant='h4'>Connect to Metamask wallet</Typography>
+                  </Grid>
+                </Grid>
+              </div>
+              <div className={classes.descriptionContainer}>
+                <div className={classes.shieldContainer}>
+                  <img 
+                    alt=""
+                    src={require('../../assets/shield.svg')}
+                  />
+                </div>
+                <Typography variant='h3' className={classes.subtitle}>Non-custodial & Secure</Typography>
+                <Typography variant='body2' className={classes.securityDesc}>We do not own your private keys and cannot access your funds.</Typography>
+              </div>
             </div>
+            <Typography variant='body1' className={classes.warningMessage}>*Crypto is volatile, DeFi is new and risky. Please use it at your own risk.</Typography>
           </div>
+          { modalOpen && this.renderModal() }
         </div>
       )
     }
 
     return (
       <div className={ classes.root }>
-        <div className={ classes.investedContainer}>
-          <div className={ classes.portfolioContainer }>
-            <div className={ classes.titleBalance } onClick={ this.balanceClicked }>
-              { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_balance_usd.toFixed(2)).toLocaleString() }</Typography> }
-              { currency === 'ETH' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_balance_eth.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
-                </div>
+        <div className={classes.contentContainer}>
+          <div className={ classes.investedContainer}>
+            {this.renderChart()}
+            <Grid container spacing={1} className={ classes.portfolioContainer }>
+              <Grid item sm={6} xs={6} className={ classes.titleBalance }>
+                <Typography variant={ 'h4' } className={[classes.gray, classes.labelSize ]}>Portfolio Balance</Typography>
+                <Typography variant={ 'h2' } className={classes.amountValue}>$ { parseFloat(dashboard.portfolio_balance_usd.toFixed(2)).toLocaleString() }</Typography>
+              </Grid>
+              { growth === 0 &&
+                <Grid item sm={6} xs={6} className={ classes.titleBalance } onClick={ this.growthClicked }>
+                  <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign} ${classes.labelSize}` }>
+                    Daily Growth
+                  </Typography>
+                  <Typography variant={ 'h2' } className={classes.amountValue}>$ { parseFloat(dashboard.portfolio_growth_usd_daily.toFixed(2)).toLocaleString() }</Typography>
+                </Grid>
               }
-              <Typography variant={ 'h4' } className={ classes.gray }>Portfolio Balance</Typography>
-            </div>
-            <div className={ classes.between }>
-            </div>
-            { growth === 0 &&
-              <div className={ classes.titleBalance } onClick={ this.growthClicked }>
-                { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_daily.toFixed(2)).toLocaleString() }</Typography> }
-                { currency === 'ETH' &&
-                  <div className={ classes.inline }>
-                    <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_growth_eth_daily.toFixed(2)).toLocaleString() }</Typography >
-                    <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
-                  </div>
-                }
-                <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
-                  Daily Growth
-                </Typography>
-              </div>
-            }
 
-            { growth === 1 &&
-              <div className={ classes.titleBalance } onClick={ this.growthClicked }>
-                { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_weekly.toFixed(2)).toLocaleString() }</Typography> }
-                { currency === 'ETH' &&
-                  <div className={ classes.inline }>
-                    <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_growth_eth_weekly.toFixed(2)).toLocaleString() }</Typography >
-                    <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
-                  </div>
-                }
-                <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
-                  Weekly Growth
-                </Typography>
-              </div>
-            }
+              { growth === 1 &&
+                <Grid item sm={6} xs={6} className={ classes.titleBalance } onClick={ this.growthClicked }>
+                  <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign} ${classes.labelSize}` }>
+                    Weekly Growth
+                  </Typography>
+                  <Typography variant={ 'h2' } className={classes.amountValue}>$ { parseFloat(dashboard.portfolio_growth_usd_weekly.toFixed(2)).toLocaleString() }</Typography>
+                </Grid>
+              }
 
-            { growth === 2 &&
-              <div className={ classes.titleBalance } onClick={ this.growthClicked }>
-                { currency === 'USD' && <Typography variant={ 'h2' }>$ { parseFloat(dashboard.portfolio_growth_usd_yearly.toFixed(2)).toLocaleString() }</Typography> }
-                { currency === 'ETH' &&
-                  <div className={ classes.inline }>
-                    <Typography variant={ 'h2' } noWrap>{ parseFloat(dashboard.portfolio_growth_eth_yearly.toFixed(2)).toLocaleString() }</Typography >
-                    <Typography className={ classes.symbol } variant={ 'h3' }>ETH</Typography>
+              { growth === 2 &&
+                <Grid item sm={6} xs={6} className={ classes.titleBalance } onClick={ this.growthClicked }>
+                  <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign} ${classes.labelSize}` }>
+                    Yearly Growth
+                  </Typography>
+                  <Typography variant={ 'h2' } className={classes.amountValue}>$ { parseFloat(dashboard.portfolio_growth_usd_yearly.toFixed(2)).toLocaleString() }</Typography>
+                </Grid>
+              }
+            </Grid>
+            { (true) &&
+              <div className={ classes.vaultContainer }>
+                <div className={classes.inlineBlock}>
+                  <div>
+                    <Typography variant={ 'h3' } className={ classes.sectionHeading }>Yearn Farmer Overview</Typography>
                   </div>
-                }
-                <Typography variant={ 'h4' } className={ `${classes.gray} ${classes.prettyAlign}` }>
-                  Yearly Growth
-                </Typography>
+                  { this.renderBasedOn() }
+                </div>
+                <Typography variant={ 'caption' } className={ classes.netWorth }>NET WORTH</Typography>
+
+                { this.renderVaults() }
               </div>
             }
+            {/* { (dashboard.vaults && dashboard.vaults.length > 0) &&
+              <div className={ classes.vaultContainer }>
+                <Typography variant={ 'h3' } className={ classes.sectionHeading }>Vaults Overview</Typography>
+                { this.renderVaults() }
+              </div>
+            }
+            { (dashboard.assets && dashboard.assets.length > 0) &&
+              <div className={ classes.earnContainer }>
+                <Typography variant={ 'h3' } className={ classes.sectionHeading }>Earn Overview</Typography>
+                { this.renderEarn() }
+              </div>
+            } */}
           </div>
-          { this.renderBasedOn() }
-          { (dashboard.vaults && dashboard.vaults.length > 0) &&
-            <div className={ classes.vaultContainer }>
-              <Typography variant={ 'h3' } className={ classes.sectionHeading }>Vaults Overview</Typography>
-              { this.renderVaults() }
-            </div>
-          }
-          { (dashboard.assets && dashboard.assets.length > 0) &&
-            <div className={ classes.earnContainer }>
-              <Typography variant={ 'h3' } className={ classes.sectionHeading }>Earn Overview</Typography>
-              { this.renderEarn() }
-            </div>
-          }
         </div>
         { loading && <Loader /> }
       </div>
@@ -375,8 +549,7 @@ class Dashboard extends Component {
 
     return (
       <div className={ classes.basedOnContainer }>
-        <InfoIcon className={ classes.infoIcon } />
-        <Typography>Growth is based on the vault's performance { basedOn === 3 ? 'since' : 'for the past' }</Typography>
+        <Typography style={{fontSize: '0.8rem', color: '#777777'}}>Growth is based on the vault's performance { basedOn === 3 ? 'since' : 'for the past' }</Typography>
         <TextField
           id={ 'basedOn' }
           name={ 'basedOn' }
@@ -393,7 +566,7 @@ class Dashboard extends Component {
           options.map((option) => {
             return (
               <MenuItem key={ option.value } value={ option.value }>
-                <Typography variant='h4'>{ option.description }</Typography>
+                <Typography variant='body1' style={{fontSize: '0.8rem', fontWeight: 'bold', color: '#222'}}>{ option.description }</Typography>
               </MenuItem>
             )
           })
@@ -434,13 +607,6 @@ class Dashboard extends Component {
     localStorage.setItem('yearn.finance-dashboard-growth', newGrowth.toString())
   }
 
-  balanceClicked = () => {
-    const { currency } = this.state
-    this.setState({ currency: (currency === 'USD' ? 'ETH' : 'USD') })
-
-    localStorage.setItem('yearn.finance-dashboard-currency', (currency === 'USD' ? 'ETH' : 'USD'))
-  }
-
   renderVaults = () => {
     const { growth, currency } = this.state
     const { vaults } = this.state.dashboard
@@ -462,13 +628,12 @@ class Dashboard extends Component {
               />
             </div>
             <div>
-              <Typography variant={ 'h3' } noWrap>{ asset.name }</Typography>
+              <Typography variant={ 'h5' } noWrap className={classes.assetName}>{ asset.name }</Typography>
               <Typography variant={ 'h5' } noWrap className={ classes.gray }>{ asset.description }</Typography>
             </div>
           </div>
-          { growth === 0 &&
+          {/* { growth === 0 &&
             <div className={classes.heading}>
-              <Typography variant={ 'h5' } className={ classes.gray }>Daily Growth</Typography>
               { currency === 'USD' &&
                 <div className={ classes.inline }>
                   <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_daily_usd.toFixed(2)).toLocaleString() }</Typography >
@@ -488,7 +653,6 @@ class Dashboard extends Component {
           }
           { growth === 1 &&
             <div className={classes.heading}>
-              <Typography variant={ 'h5' } className={ classes.gray }>Weekly Growth</Typography>
               { currency === 'USD' &&
                 <div className={ classes.inline }>
                   <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_weekly_usd.toFixed(2)).toLocaleString() }</Typography >
@@ -508,7 +672,6 @@ class Dashboard extends Component {
           }
           { growth === 2 &&
             <div className={classes.heading}>
-              <Typography variant={ 'h5' } className={ classes.gray }>Yearly Growth</Typography>
               { currency === 'USD' &&
                 <div className={ classes.inline }>
                   <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_yearly_usd.toFixed(2)).toLocaleString() }</Typography >
@@ -525,16 +688,9 @@ class Dashboard extends Component {
                 </div>
               }
             </div>
-          }
+          } */}
           <div className={classes.heading}>
-            <Typography variant={ 'h5' } className={ classes.gray }>Net worth</Typography>
-            { currency === 'USD' && <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.usdBalance ? (asset.usdBalance).toFixed(2) : '0.00').toLocaleString() }</Typography > }
-            { currency === 'ETH' &&
-              <div className={ classes.inline }>
-                <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.ethBalance ? (asset.ethBalance).toFixed(2) : '0.00').toLocaleString() }</Typography >
-                <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
-              </div>
-            }
+            <Typography variant={ 'h3' } noWrap className={classes.dataValue}>$ { parseFloat(asset.usdBalance ? (asset.usdBalance).toFixed(2) : '0.00').toLocaleString() }</Typography>
           </div>
         </div>
       </div>)
@@ -566,7 +722,7 @@ class Dashboard extends Component {
               <Typography variant={ 'h5' } noWrap className={ classes.gray }>{ asset.description }</Typography>
             </div>
           </div>
-          { growth === 0 &&
+          {/* { growth === 0 &&
             <div className={classes.heading}>
               <Typography variant={ 'h5' } className={ classes.gray }>Daily Growth</Typography>
               { currency === 'USD' &&
@@ -625,9 +781,9 @@ class Dashboard extends Component {
                 </div>
               }
             </div>
-          }
+          } */}
           <div className={classes.heading}>
-            <Typography variant={ 'h5' } className={ classes.gray }>Net worth</Typography>
+            {/* <Typography variant={ 'h5' } className={ classes.gray }>Net worth</Typography> */}
             { currency === 'USD' && <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.usdBalance ? (asset.usdBalance).toFixed(2) : '0.00').toLocaleString() }</Typography > }
             { currency === 'ETH' &&
               <div className={ classes.inline }>
@@ -660,6 +816,52 @@ class Dashboard extends Component {
     } else {
       return '0.00'
     }
+  }
+
+  renderChart = () => {
+    const { classes } = this.props;
+
+    const options = {
+      chart: {
+        width: 800
+      },
+      title: {
+        text: 'Historical Earn & Vault Performance'
+      },
+      series: [
+        {
+          name: 'Earn',
+          data: [1, 2, 1, 4, 3, 6]
+        },
+        {
+          name: 'Vault',
+          data: [3, 1, 3, 4, 3, 8]
+        }
+      ],
+      credits: {
+        enabled: false
+      }
+    };
+
+    return (
+      <div className={classes.chartContainer}>
+        <HighchartsReact highcharts={Highcharts} options={options} />
+      </div>
+    );
+  }
+
+  addressClicked = () => {
+    this.setState({ modalOpen: true })
+  }
+
+  closeModal = () => {
+    this.setState({ modalOpen: false })
+  }
+
+  renderModal = () => {
+    return (
+      <UnlockModal closeModal={ this.closeModal } modalOpen={ this.state.modalOpen } />
+    )
   }
 
 }

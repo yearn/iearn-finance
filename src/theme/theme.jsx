@@ -51,6 +51,8 @@ const breakpoints = createBreakpoints({
   }
 })
 
+export const drawerWidth = 240;
+
 const iswapTheme =  {
   typography: {
     fontFamily: [
@@ -182,11 +184,11 @@ const iswapTheme =  {
         },
         color: colors.text,
         padding: '14px',
-        borderRadius: '50px'
+        borderRadius: '10px'
       },
       root: {
         // border: "none !important",
-        borderRadius: '50px'
+        borderRadius: '10px'
       },
       notchedOutline: {
         // border: "none !important"
@@ -223,8 +225,8 @@ const iswapTheme =  {
     },
     MuiAccordion: {
       root: {
-        border: '1px solid '+colors.borderBlue,
-        borderRadius: '50px',
+        border: '1px solid #d9d9d9',
+        borderRadius: '10px',
         margin: '8px 0px',
         '&:before': { //underline color when textfield is inactive
           backgroundColor: 'none',
@@ -236,7 +238,7 @@ const iswapTheme =  {
       root: {
         padding: '12px 24px',
         '@media (min-width: 960px)': {
-          padding: '30px 42px',
+          padding: '16px 25px',
         }
       },
       content: {
@@ -301,7 +303,7 @@ const iswapTheme =  {
         MozOsxFontSmoothing: "grayscale",
         lineHeight: 1.2
       }
-    }
+    },
   },
   palette: {
     primary: {
@@ -315,7 +317,7 @@ const iswapTheme =  {
       secondary: colors.text
     }
   },
-  breakpoints: breakpoints
+  breakpoints: breakpoints,
 };
 
 export default iswapTheme;

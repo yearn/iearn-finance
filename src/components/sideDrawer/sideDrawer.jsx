@@ -1,20 +1,15 @@
 import React, { Component } from 'react'
 import { withStyles } from '@material-ui/core/styles';
 import { withRouter } from "react-router-dom";
-import { Drawer, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import { Drawer, Grid, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import ShoppingBasketIcon from '@material-ui/icons/ShoppingBasket';
-
-import MainContainer from '../mainContainer';
 import Store from "../../stores";
 import { DRAWER_RETURNED, TOGGLE_DRAWER } from '../../constants/constants';
+import { drawerWidth } from "../../theme/theme";
 
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
-
-const drawerWidth = 240;
 
 const styles = theme => ({
   drawer: {
@@ -23,6 +18,11 @@ const styles = theme => ({
   },
   drawerPaper: {
     width: drawerWidth,
+    padding: '26px',
+    boxShadow: '0px 4px 30px rgba(204, 204, 204, 0.25)',
+  },
+  drawerLeft: {
+    borderRight: 0
   },
   toolbar: {
     minHeight: '96px',
@@ -31,7 +31,18 @@ const styles = theme => ({
     }
   },
   selected: {
-    backgroundColor: '#efefef'
+    color: '#18A0FB',
+  },
+  icon: {
+    width: '100%'
+  },
+  paddingGitter: {
+    paddingLeft: '16px',
+    paddingRight: '16px'
+  },
+  footerMenu: {
+    position: 'absolute',
+    bottom: '5%'
   }
 })
 
@@ -102,20 +113,34 @@ class SideDrawer extends Component {
         variant="permanent"
         classes={{
           paper: classes.drawerPaper,
+          paperAnchorLeft: classes.drawerLeft,
         }}
       >
-        <MainContainer />
+        <div className={ classes.icon }>
+          <img
+            alt=""
+            src={ require('../../assets/DAOventures-logo.png') }
+            height={ '30px' }
+            onClick={ () => { this.nav('') } }
+          />
+        </div>
         <List>
-          <ListItem button key={'Dashboard'} className={ (this.linkSelected('/dashboard'))?classes.selected:'' } onClick={ () => { this.nav('dashboard') } }>
-            <ListItemIcon><DashboardIcon /></ListItemIcon>
-            <ListItemText primary={'Dashboard'} />
+          <ListItem button key={'Invest'} className={ (this.linkSelected('/invest'))? classes.selected:'' } onClick={ () => { this.nav('invest') } }>
+            <ListItemIcon>
+              {this.renderIcon('line-chart', '/invest')}
+            </ListItemIcon>
+            <ListItemText primary={'Invest'} />
           </ListItem>
 
-          <ListItem button key={'Portfolio'} className={ (this.linkSelected('/portfolio'))?classes.selected:'' } onClick={ () => { this.nav('portfolio') } }>
-            <ListItemIcon><ShoppingBasketIcon /></ListItemIcon>
-            <ListItemText primary={'Portfolio'} />
+          <ListItem button key={'Portfolios'} className={ (this.linkSelected('/portfolio'))?classes.selected:'' } onClick={ () => { this.nav('portfolio') } }>
+            <ListItemIcon>
+              {this.renderIcon('pie-chart', '/portfolio')}
+            </ListItemIcon>
+            <ListItemText primary={'Portfolios'} />
           </ListItem>
         </List>
+
+        {this.renderFooterMenu()}
       </Drawer>
     );
   }
@@ -134,20 +159,83 @@ class SideDrawer extends Component {
         open={this.state.openDrawer} 
         onClose={this.dispatchToggle}
       >
-        <MainContainer />
         <List>
-          <ListItem button key={'Dashboard'} className={ (this.linkSelected('/dashboard'))?classes.selected:'' } onClick={ () => { this.nav('dashboard') } }>
-            <ListItemIcon><DashboardIcon /></ListItemIcon>
-            <ListItemText primary={'Dashboard'} />
+          <ListItem button key={'Invest'} className={ (this.linkSelected('/invest'))? classes.selected:'' } onClick={ () => { this.nav('invest') } }>
+            <ListItemIcon>
+              {this.renderIcon('line-chart', '/invest')}
+            </ListItemIcon>
+            <ListItemText primary={'Invest'} />
           </ListItem>
 
-          <ListItem button key={'Portfolio'} className={ (this.linkSelected('/portfolio'))?classes.selected:'' } onClick={ () => { this.nav('portfolio') } }>
-            <ListItemIcon><ShoppingBasketIcon /></ListItemIcon>
-            <ListItemText primary={'Portfolio'} />
+          <ListItem button key={'Portfolios'} className={ (this.linkSelected('/portfolio'))?classes.selected:'' } onClick={ () => { this.nav('portfolio') } }>
+            <ListItemIcon>
+              {this.renderIcon('pie-chart', '/portfolio')}
+            </ListItemIcon>
+            <ListItemText primary={'Portfolios'} />
           </ListItem>
         </List>
+
+        {this.renderFooterMenu()}
       </Drawer>
     );
+  }
+
+  renderFooterMenu = () => {
+    const { classes } = this.props;
+
+    return (
+      <div className={classes.footerMenu}>
+          <List>
+            <ListItem button key={'FAQ'} className={ (this.linkSelected('/faq'))? classes.selected:'' } onClick={ () => { this.nav('faq') } }>
+              <ListItemText primary={'FAQ'} />
+            </ListItem>
+
+            <ListItem button key={'About Us'} className={ (this.linkSelected('/about-us'))?classes.selected:'' } onClick={ () => { this.nav('about-us') } }>
+              <ListItemText primary={'About Us'} />
+            </ListItem>
+          </List>
+
+          <Grid container spacing={2} className={classes.paddingGitter}>
+            <Grid item>
+              <img alt="" src={require('../../assets/reddit.svg')} />
+            </Grid>
+            <Grid item>
+              <img alt="" src={require('../../assets/twitter.svg')} />
+            </Grid>
+            <Grid item>
+              <img alt="" src={require('../../assets/facebook.svg')} />
+            </Grid>
+          </Grid>
+
+          <Grid container spacing={2} className={classes.paddingGitter}>
+            <Grid item>
+              <img alt="" src={require('../../assets/slack.svg')} />
+            </Grid>
+            <Grid item>
+              <img alt="" src={require('../../assets/linkedin.svg')} />
+            </Grid>
+            <Grid item>
+              <img alt="" src={require('../../assets/email.svg')} />
+            </Grid>
+          </Grid>
+        </div>
+    )
+  }
+
+  renderIcon = (name, url) => {
+    if (this.linkSelected(url)) {
+      return (
+        <img 
+          alt=""
+          src={ require(`../../assets/${name}_blue.svg`) } /> 
+      );
+    } else {
+      return (
+        <img 
+          alt=""
+          src={ require(`../../assets/${name}.svg`) } /> 
+      );
+    }
   }
 
   linkSelected = (link) => {

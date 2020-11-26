@@ -107,13 +107,13 @@ class App extends Component {
                 <MainContainer />
                 <Dashboard />
               </Route>
-              {/* <Route path="/earn">
+              <Route path="/earn">
                 <Header />
                 <SideDrawer />
                 <MainContainer />
                 <InvestSimple />
-              </Route> */}
-              <Route path="/dashboard">
+              </Route>
+              <Route path="/invest">
                 <Header />
                 <SideDrawer />
                 <MainContainer />
@@ -121,7 +121,7 @@ class App extends Component {
               </Route>
               <Route path="/">
                 {/* <Home /> */}
-                <Redirect to="/dashboard" />
+                <Redirect to="/invest" />
               </Route>
             </Switch>
             {/* <Footer /> */}

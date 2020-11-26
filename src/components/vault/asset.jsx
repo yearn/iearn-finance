@@ -22,6 +22,8 @@ import {
 import { colors } from '../../theme'
 
 import Store from "../../stores";
+import HighchartsReact from "highcharts-react-official";
+import Highcharts from 'highcharts';
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
@@ -32,11 +34,12 @@ const styles = theme => ({
   },
   actionInput: {
     padding: '0px 0px 12px 0px',
-    fontSize: '0.5rem'
+    fontSize: '0.5rem',
+    marginTop: '1rem'
   },
   balances: {
     width: '100%',
-    textAlign: 'right',
+    textAlign: 'center',
     paddingRight: '20px',
     cursor: 'pointer'
   },
@@ -50,38 +53,71 @@ const styles = theme => ({
     display: 'flex',
     flex: '1',
     padding: '24px',
-    flexDirection: 'column'
-    // [theme.breakpoints.down('sm')]: {
-    //   flexDirection: 'column'
-    // }
+    flexDirection: 'column',
+    [theme.breakpoints.down('sm')]: {
+      padding: '24px 12px',
+    }
   },
   ratioContainer: {
     paddingBottom: '12px',
     display: 'flex',
     flex: '1',
-    padding: '24px'
+    padding: '24px 0'
   },
   withdrawContainer: {
     paddingBottom: '12px',
     display: 'flex',
     flex: '1',
-    width: '100%'
+    width: '100%',
+    [theme.breakpoints.down('sm')]: {
+      display: 'block'
+    }
   },
   title: {
     paddingRight: '24px'
   },
   actionButton: {
-    height: '47px'
+    height: '47px',
+    margin: 'auto',
+    borderRadius: '5px',
+    background: '#18a0fb',
+    color: '#ffffff',
+    width: '49%'
+  },
+  withdrawButton: {
+    height: '47px',
+    margin: 'auto',
+    borderRadius: '5px',
+    background: '#cccccc',
+    color: '#222222',
+    width: '49%'
+  },
+  leftLabelContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  rightLabelContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end'
   },
   tradeContainer: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: '80%',
+    margin: 'auto',
+    marginBottom: '1.5rem',
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+    }
   },
   sepperator: {
     borderBottom: '1px solid #E1E1E1',
-    margin: '24px',
+    margin: '24px -24px',
     // [theme.breakpoints.up('sm')]: {
     //   width: '40px',
     //   borderBottom: 'none',
@@ -96,10 +132,22 @@ const styles = theme => ({
     flexWrap: 'wrap',
   },
   scale: {
-    minWidth: '10px'
+    width: '24%',
+    color: '#777777',
+  },
+  scaleActive: {
+    minWidth: '25%',
+    color: '#222222',
+    background: 'rgba(24, 160, 251, 0.2)',
+    borderRadius: '5px'
   },
   buttonText: {
     fontWeight: '700',
+    color: '#ffffff'
+  },
+  withdrawButtonText: {
+    color: '#222222',
+    fontWeight: '700'
   },
   headingContainer: {
     width: '100%',
@@ -121,7 +169,7 @@ const styles = theme => ({
   },
   buttons: {
     display: 'flex',
-    width: '100%'
+    width: '100%',
   },
   disabledContainer: {
     width: '100%',
@@ -130,13 +178,13 @@ const styles = theme => ({
   },
   assetSummary: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'stretch',
     flex: 1,
-    padding: '12px 24px',
-    background: '#dedede',
     width: '100%',
     marginBottom: '24px',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    borderTop: '1px solid #d9d9d9',
+    borderBottom: '1px solid #d9d9d9'
   },
   headingEarning: {
     flex: 1,
@@ -152,15 +200,13 @@ const styles = theme => ({
   flexy: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    marginTop: '0.5rem',
+    marginBottom: '1rem'
   },
   fullWidth: {
     minWidth: '100%',
     margin: '18px 0px',
-    borderBottom: '1px solid '+colors.borderBlue
-  },
-  assetSummarySectionheader: {
-    width: '83px'
   },
   rail: {
     height: 8
@@ -177,7 +223,10 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'center',
     margin: 'auto',
-    marginBottom: 16
+    marginBottom: 16,
+    [theme.breakpoints.down('sm')]: {
+      width: '90%'
+    }
   },
   projected: {
     display: 'flex',
@@ -188,8 +237,30 @@ const styles = theme => ({
   withdrawalText: {
     marginTop: 20,
     marginBottom: 10
+  },
+  assetDetails: {
+    padding: '1rem'
+  },
+  subtitle: {
+    fontSize: '1.2rem',
+    color: '#222222'
   }
 });
+
+const marks = [
+  {
+    value: 0,
+    label: '100'
+  },
+  {
+    value: 50,
+    label: '50'
+  },
+  {
+    value: 100,
+    label: '100'
+  }
+];
 
 class Asset extends Component {
 
@@ -205,7 +276,10 @@ class Asset extends Component {
       account: store.getStore('account'),
       ratio: 50,
       earnRatio: 50,
-      vaultRatio: 50
+      vaultRatio: 50,
+      percent: 0,
+      earnPercent: 0,
+      vaultPercent: 0
     }
   }
 
@@ -248,82 +322,95 @@ class Asset extends Component {
       loading,
       ratio,
       earnRatio,
-      vaultRatio
+      vaultRatio,
+      percent,
+      earnPercent,
+      vaultPercent
     } = this.state
 
     return (
       <div className={ classes.vaultContainer }>
-        <div className={ classes.assetSummary }>
-          <div className={ classes.assetSummarySectionheader }>
-            <Typography variant={ 'h4' } color='primary' noWrap>Strategy:</Typography>
-          </div>
-          <div className={classes.headingStrategy}>
-            <div>
-              <Typography variant={ 'h5' } className={ classes.grey }>Currently Active:</Typography>
-              <Typography variant={ 'h4' } noWrap>{ asset.strategyName }</Typography>
-            </div>
-          </div>
-          <div className={classes.headingEarning}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/1).toFixed(2) }% </Typography>
-            </div>
-          </div>
-          <div className={classes.headingEarning}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Monthly Growth:</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/12).toFixed(2) }% </Typography>
-            </div>
-          </div>
-          <div className={classes.headingEarning}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Weekly Growth:</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/52).toFixed(2) }% </Typography>
-            </div>
-          </div>
-          <div className={ classes.fullWidth }></div>
-          <div className={ classes.assetSummarySectionheader }>
-            <Typography variant={ 'h4' } color='primary' noWrap>Statistics:</Typography>
-          </div>
-          <div className={classes.headingEarning}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Total Earnings:</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.earnings/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
-            </div>
-          </div>
-          <div className={classes.headingEarning}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Deposits:</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalDeposits/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
-            </div>
-          </div>
-          <div className={classes.headingEarning}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Withdrawals:</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalWithdrawals/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
-            </div>
-          </div>
-          <div className={classes.headingEarning}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Transferred In:</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalTransferredIn/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
-            </div>
-          </div>
-          <div className={classes.headingEarning}>
-            <Typography variant={ 'h5' } className={ classes.grey }>Transferred Out:</Typography>
-            <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalTransferredOut/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
-            </div>
-          </div>
-        </div>
+        <Grid container className={ classes.assetSummary }>
+          <Grid item sm={6} xs={12} style={{borderRight: '1px solid #d9d9d9'}}>
+            {this.renderChart()}
+          </Grid>
+          <Grid item sm={6} xs={12} className={classes.assetDetails}>
+            <Typography variant={ 'h4' } className={classes.subtitle} noWrap>STRATEGY</Typography>
+
+            <Grid container style={{marginTop: '1rem'}}>
+            <Grid item sm={4} xs={6}>
+                <Typography variant={ 'h5' } className={ classes.grey }>Currently Active:</Typography>
+                <div className={ classes.flexy }>
+                  <Typography variant={ 'h4' } noWrap>Yearn Vault</Typography>
+                </div>  
+              </Grid>
+              <Grid item sm={4} xs={6}>
+                <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
+                <div className={ classes.flexy }>
+                  <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/1).toFixed(2) }% </Typography>
+                </div>  
+              </Grid>
+              <Grid item sm={4} xs={6}>
+                <Typography variant={ 'h5' } className={ classes.grey }>Monthly Growth:</Typography>
+                <div className={ classes.flexy }>
+                  <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/12).toFixed(2) }% </Typography>
+                </div>
+              </Grid>
+              <Grid item sm={4} xs={6}>
+                <Typography variant={ 'h5' } className={ classes.grey }>Weekly Growth:</Typography>
+                <div className={ classes.flexy }>
+                  <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/52).toFixed(2) }% </Typography>
+                </div>
+              </Grid>
+            </Grid>
+            <div className={ classes.fullWidth }></div>
+            <Typography variant={ 'h4' } className={classes.subtitle} noWrap>STATISTICS</Typography>
+
+            <Grid container style={{marginTop: '1rem'}}>
+              <Grid item sm={4} xs={6}>
+                <Typography variant={ 'h5' } className={ classes.grey }>Total Earnings:</Typography>
+                <div className={ classes.flexy }>
+                  <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.earnings/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
+                </div>
+              </Grid>
+              <Grid item sm={4} xs={6}>
+                <Typography variant={ 'h5' } className={ classes.grey }>Deposits:</Typography>
+                <div className={ classes.flexy }>
+                  <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalDeposits/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
+                </div>
+              </Grid>
+              <Grid item sm={4} xs={6}>
+                <Typography variant={ 'h5' } className={ classes.grey }>Withdrawals:</Typography>
+                <div className={ classes.flexy }>
+                  <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalWithdrawals/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
+                </div>
+              </Grid>
+              <Grid item sm={4} xs={6}>
+                <Typography variant={ 'h5' } className={ classes.grey }>Transferred In:</Typography>
+                <div className={ classes.flexy }>
+                  <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalTransferredIn/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
+                </div>
+              </Grid>
+              <Grid item sm={4} xs={6}>
+                <Typography variant={ 'h5' } className={ classes.grey }>Transferred Out:</Typography>
+                <div className={ classes.flexy }>
+                  <Typography variant={ 'h4' } noWrap>{ asset.addressStatistics ? (asset.addressStatistics.totalTransferredOut/10**asset.decimals).toFixed(2) : '0.00' } {asset.symbol}</Typography>
+                </div>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
         <Grid container className={classes.slider}>
-          <Grid item xs={9}>
+          <Grid item xs={12}>
             <div className={ classes.ratioContainer }>
-              <div className={ classes.tradeContainer }>
-                <Typography variant='h4' color='primary' noWrap>{ 'Earn: '+ earnRatio + '%' }</Typography>
+              <div className={ classes.leftLabelContainer }>
+                <Typography variant='h4' style={{color: '#044b7b'}} noWrap>{ 'yEarn: '+ earnRatio + '%' }</Typography>
               </div>
-              <div className={ classes.tradeContainer }>
-                <Typography variant='h4' color='secondary' noWrap>{ 'Vault: '+ vaultRatio + '%' }</Typography>
+              <div>
+                <Typography variant='h4' noWrap>{ 'APY '+ earnRatio + '%' }</Typography>
+              </div>
+              <div className={ classes.rightLabelContainer }>
+                <Typography variant='h4' style={{color: '#2962ef'}} noWrap>{ 'yVault: '+ vaultRatio + '%' }</Typography>
               </div>
             </div>
             <Slider 
@@ -335,12 +422,14 @@ class Asset extends Component {
                 thumb: classes.thumb
               }}
               onChange={this.handleSliderChange}
+              getAriaValueText={this.sliderValueText}
+              marks={marks}
               aria-labelledby="continuous-slider" />
           </Grid>
-          <Grid item xs={3} className={classes.projected}>
+          {/* <Grid item xs={3} className={classes.projected}>
             <Typography variant={'caption'} style={{ marginTop: 5 }}>Project APY %</Typography>
             <Typography variant={'h3'} style={{ marginTop: 5 }}>6.7</Typography>
-          </Grid>
+          </Grid> */}
         </Grid>
         <div className={ classes.actionsContainer }>
           <div className={ classes.tradeContainer }>
@@ -348,7 +437,7 @@ class Asset extends Component {
                 <Typography variant='h4' onClick={ () => { this.setAmount(100) } } className={ classes.value } noWrap>{ 'Your wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.tokenSymbol ? asset.tokenSymbol : asset.symbol }</Typography>
             </div>
             <TextField
-              fullWidth
+              style={{width: '95%'}}
               className={ classes.actionInput }
               id='amount'
               value={ amount }
@@ -361,34 +450,30 @@ class Asset extends Component {
             />
             <div className={ classes.scaleContainer }>
               <Button
-                className={ classes.scale }
+                className={ percent === 25 ? classes.scaleActive : classes.scale }
                 variant='text'
                 disabled={ loading }
-                color="primary"
                 onClick={ () => { this.setAmount(25) } }>
                 <Typography variant={'h5'}>25%</Typography>
               </Button>
               <Button
-                className={ classes.scale }
+                className={ percent === 50 ? classes.scaleActive : classes.scale }
                 variant='text'
                 disabled={ loading }
-                color="primary"
                 onClick={ () => { this.setAmount(50) } }>
                 <Typography variant={'h5'}>50%</Typography>
               </Button>
               <Button
-                className={ classes.scale }
+                className={ percent === 75 ? classes.scaleActive : classes.scale }
                 variant='text'
                 disabled={ loading }
-                color="primary"
                 onClick={ () => { this.setAmount(75) } }>
                 <Typography variant={'h5'}>75%</Typography>
               </Button>
               <Button
-                className={ classes.scale }
+                className={ percent === 100 ? classes.scaleActive : classes.scale }
                 variant='text'
                 disabled={ loading }
-                color="primary"
                 onClick={ () => { this.setAmount(100) } }>
                 <Typography variant={'h5'}>100%</Typography>
               </Button>
@@ -397,11 +482,8 @@ class Asset extends Component {
               { asset.deposit === true &&
                 <Button
                   className={ classes.actionButton }
-                  variant="outlined"
-                  color="primary"
                   disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
                   onClick={ this.onDeposit }
-                  fullWidth
                   >
                   <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit</Typography>
                 </Button>
@@ -409,11 +491,8 @@ class Asset extends Component {
               { asset.depositAll === true &&
                 <Button
                   className={ classes.actionButton }
-                  variant="outlined"
-                  color="primary"
                   disabled={ loading || asset.balance <= 0 || asset.depositDisabled === true }
                   onClick={ this.onDepositAll }
-                  fullWidth
                   >
                   <Typography className={ classes.buttonText } variant={ 'h5'} color={asset.disabled?'':'secondary'}>Deposit All</Typography>
                 </Button>
@@ -432,10 +511,10 @@ class Asset extends Component {
             </div>
             <div className={ classes.withdrawContainer }>
               <div className={ classes.tradeContainer }>
-                <Typography variant='h5' color='primary' className={ classes.withdrawalText }>Earn</Typography>
+                <Typography variant='h5' style={{color: '#044b7b'}} className={ classes.withdrawalText }>Earn</Typography>
                 <Typography variant='h4' onClick={ () => { this.setRedeemEarnAmount(100) } }  className={ classes.value } noWrap>{ (asset.earnBalance ? (Math.floor(asset.earnBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.earnBalance ? (Math.floor(asset.earnBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography>
                 <TextField
-                  fullWidth
+                  style={{width: '95%'}}
                   className={ classes.actionInput }
                   id='redeemEarnAmount'
                   value={ redeemEarnAmount }
@@ -448,7 +527,7 @@ class Asset extends Component {
                 />
                 <div className={ classes.scaleContainer }>
                   <Button
-                    className={ classes.scale }
+                    className={ earnPercent === 25 ? classes.scaleActive : classes.scale }
                     variant='text'
                     disabled={ loading }
                     color="primary"
@@ -456,7 +535,7 @@ class Asset extends Component {
                     <Typography variant={'h5'}>25%</Typography>
                   </Button>
                   <Button
-                    className={ classes.scale }
+                    className={ earnPercent === 50 ? classes.scaleActive : classes.scale }
                     variant='text'
                     disabled={ loading }
                     color="primary"
@@ -464,7 +543,7 @@ class Asset extends Component {
                     <Typography variant={'h5'}>50%</Typography>
                   </Button>
                   <Button
-                    className={ classes.scale }
+                    className={ earnPercent === 75 ? classes.scaleActive : classes.scale }
                     variant='text'
                     disabled={ loading }
                     color="primary"
@@ -472,7 +551,7 @@ class Asset extends Component {
                     <Typography variant={'h5'}>75%</Typography>
                   </Button>
                   <Button
-                    className={ classes.scale }
+                    className={ earnPercent === 100 ? classes.scaleActive : classes.scale }
                     variant='text'
                     disabled={ loading }
                     color="primary"
@@ -482,7 +561,7 @@ class Asset extends Component {
                 </div>
               </div>
               <div className={ classes.tradeContainer }>
-                <Typography variant='h5' color='secondary' className={ classes.withdrawalText }>Vault</Typography>
+                <Typography variant='h5' style={{color: '#2962ef'}} className={ classes.withdrawalText }>Vault</Typography>
                 <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.vaultBalance ? (Math.floor(asset.vaultBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography>
                 <TextField
                   fullWidth
@@ -498,7 +577,7 @@ class Asset extends Component {
                   />
                 <div className={ classes.scaleContainer }>
                   <Button
-                    className={ classes.scale }
+                    className={ vaultPercent === 25 ? classes.scaleActive : classes.scale }
                     variant='text'
                     disabled={ loading }
                     color="primary"
@@ -506,7 +585,7 @@ class Asset extends Component {
                     <Typography variant={'h5'}>25%</Typography>
                   </Button>
                   <Button
-                    className={ classes.scale }
+                    className={ vaultPercent === 50 ? classes.scaleActive : classes.scale }
                     variant='text'
                     disabled={ loading }
                     color="primary"
@@ -514,7 +593,7 @@ class Asset extends Component {
                     <Typography variant={'h5'}>50%</Typography>
                   </Button>
                   <Button
-                    className={ classes.scale }
+                    className={ vaultPercent === 75 ? classes.scaleActive : classes.scale }
                     variant='text'
                     disabled={ loading }
                     color="primary"
@@ -522,7 +601,7 @@ class Asset extends Component {
                     <Typography variant={'h5'}>75%</Typography>
                   </Button>
                   <Button
-                    className={ classes.scale }
+                    className={ vaultPercent === 100 ? classes.scaleActive : classes.scale }
                     variant='text'
                     disabled={ loading }
                     color="primary"
@@ -535,26 +614,22 @@ class Asset extends Component {
             <div className={ classes.buttons }>
               { asset.withdraw === true &&
                 <Button
-                  className={ classes.actionButton }
-                  variant="outlined"
-                  color="primary"
+                  className={ classes.withdrawButton }
                   disabled={ loading || asset.vaultBalance <= 0 }
                   onClick={ this.onWithdraw }
                   fullWidth
                   >
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Withdraw</Typography>
+                  <Typography className={ classes.withdrawButtonText } variant={ 'h5'}>Withdraw</Typography>
                 </Button>
               }
               { asset.withdrawAll === true &&
                 <Button
-                  className={ classes.actionButton }
-                  variant="outlined"
-                  color="primary"
+                  className={ classes.withdrawButton }
                   disabled={ loading || asset.vaultBalance <= 0 }
                   onClick={ this.onWithdrawAll }
                   fullWidth
                   >
-                  <Typography className={ classes.buttonText } variant={ 'h5'} color='secondary'>Withdraw All</Typography>
+                  <Typography className={ classes.withdrawButtonText } variant={ 'h5'}>Withdraw All</Typography>
                 </Button>
               }
             </div>
@@ -563,6 +638,36 @@ class Asset extends Component {
       </div>
     )
   };
+
+  renderChart = () => {
+    const options = {
+      chart: {
+        width: 800
+      },
+      title: {
+        text: 'Historical Earn & Vault Performance'
+      },
+      series: [
+        {
+          name: 'Earn',
+          data: [1, 2, 1, 4, 3, 6]
+        },
+        {
+          name: 'Vault',
+          data: [3, 1, 3, 4, 3, 8]
+        }
+      ],
+      credits: {
+        enabled: false
+      }
+    };
+
+    return (
+      <div>
+        <HighchartsReact highcharts={Highcharts} options={options} />
+      </div>
+    );
+  }
 
   _getAPY = (asset) => {
     const { basedOn } = this.props
@@ -605,6 +710,11 @@ class Asset extends Component {
     if (event.which === 13) {
       this.onInvest();
     }
+  }
+
+  sliderValueText = (value) => {
+    console.log(value)
+    return value;
   }
 
   onDeposit = () => {
@@ -674,7 +784,7 @@ class Asset extends Component {
     let amount = balance*percent/100
     amount = Math.floor(amount*10000)/10000;
 
-    this.setState({ amount: amount.toFixed(4) })
+    this.setState({ amount: amount.toFixed(4), percent })
   }
 
   setRedeemAmount = (percent) => {
@@ -687,7 +797,7 @@ class Asset extends Component {
     let amount = balance*percent/100
     amount = Math.floor(amount*10000)/10000;
 
-    this.setState({ redeemAmount: amount.toFixed(4) })
+    this.setState({ redeemAmount: amount.toFixed(4), vaultPercent: percent })
   }
 
   setRedeemEarnAmount = (percent) => {
@@ -700,7 +810,7 @@ class Asset extends Component {
     let amount = balance*percent/100
     amount = Math.floor(amount*10000)/10000;
 
-    this.setState({ redeemEarnAmount: amount.toFixed(4) })
+    this.setState({ redeemEarnAmount: amount.toFixed(4), earnPercent: percent })
   }
 }
 
