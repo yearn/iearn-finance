@@ -56,7 +56,23 @@ import {
   CLAIM_EXPERIMENTAL_VAULT,
   CLAIM_EXPERIMENTAL_VAULT_RETURNED,
   ZAP_EXPERIMENTAL_VAULT,
-  ZAP_EXPERIMENTAL_VAULT_RETURNED
+  ZAP_EXPERIMENTAL_VAULT_RETURNED,
+  CONFIGURE_LENDING,
+  CONFIGURE_LENDING_RETURNED,
+  GET_LENDING_BALANCES,
+  LENDING_BALANCES_RETURNED,
+  LENDING_SUPPLY,
+  LENDING_SUPPLY_RETURNED,
+  LENDING_WITHDRAW,
+  LENDING_WITHDRAW_RETURNED,
+  LENDING_BORROW,
+  LENDING_BORROW_RETURNED,
+  LENDING_REPAY,
+  LENDING_REPAY_RETURNED,
+  LENDING_ENABLE_COLLATERAL,
+  LENDING_ENABLE_COLLATERAL_RETURNED,
+  LENDING_DISABLE_COLLATERAL,
+  LENDING_DISABLE_COLLATERAL_RETURNED
 } from '../constants';
 import Web3 from 'web3';
 
@@ -86,15 +102,18 @@ const emitter = new Emitter();
 class Store {
   constructor() {
 
+    const defaultValues = this._getDefaultValues()
+
     this.store = {
       statistics: [],
       universalGasPrice: '70',
       ethPrice: 0,
-      dashboard: this._getDefaultValues().dashboard,
-      aprs: this._getDefaultValues().aprs,
-      assets: this._getDefaultValues().assets,
-      vaultAssets: this._getDefaultValues().vaultAssets,
-      experimentalVaultAssets: this._getDefaultValues().experimentalVaultAssets,
+      dashboard: defaultValues.dashboard,
+      aprs: defaultValues.aprs,
+      assets: defaultValues.assets,
+      vaultAssets: defaultValues.vaultAssets,
+      experimentalVaultAssets: defaultValues.experimentalVaultAssets,
+      lendingAssets: defaultValues.lendingAssets,
       usdPrices: null,
       account: {},
       web3: null,
@@ -375,6 +394,30 @@ class Store {
           case ZAP_EXPERIMENTAL_VAULT:
             this.zapExperimentalVault(payload)
             break;
+          case CONFIGURE_LENDING:
+            this.configureLending(payload)
+            break;
+          case GET_LENDING_BALANCES:
+            this.getLendingBalances(payload)
+            break;
+          case LENDING_SUPPLY:
+            this.lendingSupply(payload)
+            break;
+          case LENDING_WITHDRAW:
+            this.lendingWithdraw(payload)
+            break;
+          case LENDING_BORROW:
+            this.lendingBorrow(payload)
+            break;
+          case LENDING_REPAY:
+            this.lendingRepay(payload)
+            break;
+          case LENDING_ENABLE_COLLATERAL:
+            this.lendingEnableCollateral(payload)
+            break;
+          case LENDING_DISABLE_COLLATERAL:
+            this.lendingDisableCollateral(payload)
+            break;
           default: {
           }
         }
@@ -399,12 +442,16 @@ class Store {
       aprs: defaultvalues.aprs,
       assets: defaultvalues.assets,
       vaultAssets: defaultvalues.vaultAssets,
-      experimentalVaultAssets: defaultvalues.experimentalVaultAssets
+      experimentalVaultAssets: defaultvalues.experimentalVaultAssets,
+      lendingAssets: defaultvalues.lendingAssets
     })
   }
 
   _getDefaultValues = () => {
     return {
+      lendingAssets: [
+
+      ],
       assets: [
         {
           id: 'DAIv3',
@@ -3987,6 +4034,372 @@ class Store {
         }
       })
   }
+
+  configureLending = async (payload) => {
+    const account = store.getStore('account')
+
+    const web3 = await this._getWeb3Provider()
+    if(!web3) {
+      return null
+    }
+
+    const allMarkets = await this._getAllMarkets(web3)
+    const assetsIn = await this._getAssetsIn(web3, account)
+
+    const removedDeadMarket = allMarkets.filter((market) => {
+      return market.toLowerCase() !== '0xBdf447B39D152d6A234B4c02772B8ab5D1783F72'.toLowerCase()
+    })
+
+    async.map(removedDeadMarket, async (market, callback) => {
+
+      try {
+        let marketContract = new web3.eth.Contract(config.cErc20DelegatorABI, market)
+
+        const vaultDecimals = await marketContract.methods.decimals().call()
+        const vaultSymbol = await marketContract.methods.symbol().call()
+        const exchangeRate = await marketContract.methods.exchangeRateStored().call()
+
+        if(vaultSymbol === 'crETH') {
+          marketContract = new web3.eth.Contract(config.cEtherABI, market)
+        }
+
+        let supplyBalance = await marketContract.methods.balanceOf(account.address).call()
+        let borrowBalance = await marketContract.methods.borrowBalanceStored(account.address).call()
+
+        let erc20address = ''
+        let symbol = ''
+        let balance = 0
+        let decimals = 0
+
+        if(vaultSymbol !== 'crETH') {
+          erc20address = await marketContract.methods.underlying().call()
+
+          const erc20Contract = new web3.eth.Contract(config.erc20ABI, erc20address)
+          symbol = await erc20Contract.methods.symbol().call()
+          if(symbol === 'yyDAI+yUSDC+yUSDT+yTUSD') {
+            symbol = 'yUSD'
+          }
+          if(symbol === 'yDAI+yUSDC+yUSDT+yTUSD') {
+            symbol = 'yCRV'
+          }
+          balance = await erc20Contract.methods.balanceOf(account.address).call()
+          decimals = await erc20Contract.methods.decimals().call()
+          balance = balance/10**decimals
+        } else {
+          erc20address = 'Ethereum'
+          symbol = 'ETH'
+          balance = await web3.eth.getBalance(account.address)
+          decimals = 18
+          balance = balance/10**decimals
+        }
+
+        const exchangeRateReal = exchangeRate/10**28
+
+        supplyBalance = supplyBalance*exchangeRateReal/10**vaultDecimals
+        borrowBalance = borrowBalance*exchangeRateReal/10**vaultDecimals
+
+        const borrowRatePerBlock = await marketContract.methods.borrowRatePerBlock().call()
+        const supplyRatePerBlock = await marketContract.methods.supplyRatePerBlock().call()
+
+        const totalReserves = await marketContract.methods.totalReserves().call()
+        const totalSupply = await marketContract.methods.totalSupply().call()
+        const totalBorrows = await marketContract.methods.totalBorrows().call()
+
+        const blocksPeryear = 6500 * 365
+
+        const borrowRatePerYear = (borrowRatePerBlock) * blocksPeryear / 1e16
+        const supplyRatePerYear = (supplyRatePerBlock) * blocksPeryear / 1e16
+
+        const lendingAsset = {
+          address: market,
+          erc20address: erc20address,
+          vaultSymbol: vaultSymbol,
+          symbol: symbol,
+          vaultDecimals: vaultDecimals,
+          decimals: decimals,
+          collateralEnabled: assetsIn.includes(market),
+          liquidity: 0,
+          balance: balance,
+          supplyBalance: supplyBalance,
+          supplyAPY: supplyRatePerYear,
+          borrowBalance: borrowBalance,
+          borrowAPY: borrowRatePerYear,
+          exchangeRate: exchangeRate,
+        }
+
+        if(callback) {
+          callback(null, lendingAsset)
+        } else {
+          return lendingAsset
+        }
+      } catch(ex) {
+        console.log(ex)
+        console.log(market)
+
+        if(callback) {
+          callback(ex)
+        } else {
+          throw ex
+        }
+      }
+    }, (err, allMarketsData) => {
+      if(err) {
+        return emitter.emit(ERROR, err)
+      }
+
+      store.setStore({ lendingAssets: allMarketsData })
+
+      emitter.emit(CONFIGURE_LENDING_RETURNED)
+    })
+  }
+
+  _getAllMarkets = async (web3) => {
+    const comptrollerContract = new web3.eth.Contract(config.comptrollerContractABI, config.comptrollerContractAddress)
+
+    const allMarkets = await comptrollerContract.methods.getAllMarkets().call()
+
+    return allMarkets
+  }
+
+  _getAssetsIn = async (web3, account) => {
+    const comptrollerContract = new web3.eth.Contract(config.comptrollerContractABI, config.comptrollerContractAddress)
+
+    const assetsIn = await comptrollerContract.methods.getAssetsIn(account.address).call()
+
+    return assetsIn
+  }
+
+  lendingSupply = async (payload) => {
+    const account = store.getStore('account')
+    const { asset, amount } = payload.content
+
+    this._checkApproval(asset, account, amount, asset.address, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callLendMint(asset, account, amount, (err, res) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(LENDING_SUPPLY_RETURNED, res)
+      })
+    })
+  }
+
+  _callLendMint = async (asset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let lendContract = null
+
+    var amountToSend = web3.utils.toWei(amount, "ether")
+    if (asset.decimals !== 18) {
+      amountToSend = amount*10**asset.decimals;
+    }
+
+    if(asset.erc20address === 'Ethereum') {
+      lendContract = new web3.eth.Contract(config.cEtherABI, asset.address)
+
+      lendContract.methods.mint().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+        .on('transactionHash', function(hash){
+          console.log(hash)
+          callback(null, hash)
+        })
+        .on('confirmation', function(confirmationNumber, receipt){
+          console.log(confirmationNumber, receipt);
+        })
+        .on('receipt', function(receipt){
+          console.log(receipt);
+        })
+        .on('error', function(error) {
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
+          }
+        })
+        .catch((error) => {
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
+          }
+        })
+    } else {
+      lendContract = new web3.eth.Contract(config.cErc20DelegatorABI, asset.address)
+
+      lendContract.methods.mint(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+        .on('transactionHash', function(hash){
+          console.log(hash)
+          callback(null, hash)
+        })
+        .on('confirmation', function(confirmationNumber, receipt){
+          console.log(confirmationNumber, receipt);
+        })
+        .on('receipt', function(receipt){
+          console.log(receipt);
+        })
+        .on('error', function(error) {
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
+          }
+        })
+        .catch((error) => {
+          if (!error.toString().includes("-32601")) {
+            if(error.message) {
+              return callback(error.message)
+            }
+            callback(error)
+          }
+        })
+    }
+  }
+
+  lendingWithdraw = (payload) => {
+    const account = store.getStore('account')
+    const { asset, amount } = payload.content
+
+    this._callLendRedeem(asset, account, amount, (err, res) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+      return emitter.emit(LENDING_WITHDRAW_RETURNED, res)
+    })
+  }
+
+  _callLendRedeem = async (asset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let lendContract = new web3.eth.Contract(config.cErc20DelegatorABI, asset.address)
+
+    var amountSend = web3.utils.toWei(amount, "ether")
+    if (asset.decimals !== 18) {
+      amountSend = Math.round(amount*10**asset.decimals);
+    }
+
+    lendContract.methods.redeem(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    .on('transactionHash', function(hash){
+      console.log(hash)
+      callback(null, hash)
+    })
+    .on('confirmation', function(confirmationNumber, receipt){
+      console.log(confirmationNumber, receipt);
+    })
+    .on('receipt', function(receipt){
+      console.log(receipt);
+    })
+    .on('error', function(error) {
+      console.log(error);
+      if (!error.toString().includes("-32601")) {
+        if(error.message) {
+          return callback(error.message)
+        }
+        callback(error)
+      }
+    })
+  }
+
+  lendingEnableCollateral = async (payload) => {
+    const account = store.getStore('account')
+    const { asset, amount } = payload.content
+
+    this._callEnterMarkets(asset, account, amount, (err, res) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(LENDING_ENABLE_COLLATERAL_RETURNED, res)
+    })
+  }
+
+  _callEnterMarkets = async (asset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const comptrollerContract = new web3.eth.Contract(config.comptrollerContractABI, config.comptrollerContractAddress)
+
+    comptrollerContract.methods.enterMarkets([asset.address]).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+  lendingDisableCollateral = async (payload) => {
+    const account = store.getStore('account')
+    const { asset, amount } = payload.content
+
+    this._callExitMarkets(asset, account, amount, (err, res) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      return emitter.emit(LENDING_DISABLE_COLLATERAL_RETURNED, res)
+    })
+  }
+
+  _callExitMarkets = async (asset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    const comptrollerContract = new web3.eth.Contract(config.comptrollerContractABI, config.comptrollerContractAddress)
+
+    comptrollerContract.methods.exitMarket(asset.address).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
+
 }
 
 var store = new Store();
