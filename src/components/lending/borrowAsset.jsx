@@ -404,7 +404,19 @@ class BorrowAsset extends Component {
     try {
       logo = require('../../assets/'+symbol+'-logo.png')
     } catch(ex) {
-      logo = require('../../assets/unknown-logo.png')
+      try {
+        logo = require('../../assets/'+symbol+'-logo.jpg')
+      } catch(ex) {
+        try {
+          logo = require('../../assets/'+symbol+'-logo.jpeg')
+        } catch(ex) {
+          try {
+            logo = require('../../assets/'+symbol+'-logo.svg')
+          } catch(ex) {
+            logo = require('../../assets/unknown-logo.png')
+          }
+        }
+      }
     }
 
     return logo
