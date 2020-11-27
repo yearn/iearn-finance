@@ -307,12 +307,11 @@ const styles = theme => ({
     textAlign: 'center',
     color: '#18A0FB',
     position: 'absolute',
-    bottom: '10%',
+    bottom: '5%',
     left: '0',
     right: '0',
     margin: 'auto',
     [theme.breakpoints.down('sm')]: {
-      bottom: '5%',
       width: '90%',
     }
   },
