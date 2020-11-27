@@ -10,8 +10,6 @@ import {
   AccordionDetails
 } from '@material-ui/core';
 
-import WarningIcon from '@material-ui/icons/Warning';
-
 import {
   ERROR,
   LENDING_BORROW,
@@ -25,7 +23,6 @@ import { colors } from '../../theme'
 import Store from "../../stores";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
-const store = Store.store
 
 const styles = theme => ({
   value: {
@@ -147,6 +144,9 @@ const styles = theme => ({
     alignItems: 'center',
     flexWrap: 'wrap',
   },
+  emptyScale: {
+    height: '36px'
+  },
   scale: {
     minWidth: '10px',
     padding: '10px'
@@ -159,6 +159,9 @@ const styles = theme => ({
   assetSummarySectionheader: {
     width: '150px'
   },
+  flexy: {
+    padding: '6px 0px'
+  }
 });
 
 
@@ -248,7 +251,7 @@ class BorrowAsset extends Component {
   }
 
   _renderActions = () => {
-    const { classes, asset } = this.props;
+    const { classes, asset, limit, limitUsed } = this.props;
     const {
       borrowAmount,
       borrowAmountError,
@@ -256,6 +259,16 @@ class BorrowAsset extends Component {
       repayAmountError,
       loading
     } = this.state
+
+    let theLimitUsed = 0
+
+    if(borrowAmount && borrowAmount !== '') {
+      theLimitUsed = (limitUsed+(borrowAmount*asset.price))*100/limit
+    } else if(repayAmount && repayAmount !== '') {
+      theLimitUsed = (limitUsed-(repayAmount*asset.price))*100/limit
+    } else {
+      theLimitUsed = (limitUsed)*100/limit
+    }
 
     return (
       <div className={ classes.assetActions }>
@@ -266,13 +279,13 @@ class BorrowAsset extends Component {
           <div className={ classes.infoField }>
             <Typography variant={ 'h5' } className={ classes.grey }>Borrow limit:</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>${ 0.00 }</Typography>
+              <Typography variant={ 'h3' } noWrap>$ { limit ? limit.toFixed(2) : '0.00' }</Typography>
             </div>
           </div>
           <div className={ classes.infoField }>
             <Typography variant={ 'h5' } className={ classes.grey }>Borrow limit used:</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ 0.00 }%</Typography>
+              <Typography variant={ 'h3' } noWrap>{ theLimitUsed.toFixed(2) }%</Typography>
             </div>
           </div>
         </div>
@@ -280,7 +293,7 @@ class BorrowAsset extends Component {
         <div className={ classes.actionsContainer }>
           <div className={ classes.tradeContainer }>
             <div className={ classes.balances }>
-              <Typography variant='h4' onClick={ () => { this.setBorrowAmount(100) } } className={ classes.value } noWrap>{ 'Wallet: '+ (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol }</Typography>
+              <Typography variant='h4' className={ classes.value } noWrap>~</Typography>
             </div>
             <TextField
               fullWidth
@@ -295,56 +308,28 @@ class BorrowAsset extends Component {
               onKeyDown={ this.inputKeyDown }
             />
             <div className={ classes.scaleContainer }>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setBorrowAmount(25) } }>
-                <Typography variant={'h5'}>25%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setBorrowAmount(50) } }>
-                <Typography variant={'h5'}>50%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setBorrowAmount(75) } }>
-                <Typography variant={'h5'}>75%</Typography>
-              </Button>
-              <Button
-                className={ classes.scale }
-                variant='text'
-                disabled={ loading }
-                color="primary"
-                onClick={ () => { this.setBorrowAmount(100) } }>
-                <Typography variant={'h5'}>100%</Typography>
-              </Button>
+              <div className={ classes.emptyScale }></div>
             </div>
             <div className={ classes.buttons }>
               <Button
                 className={ classes.actionButton }
                 variant="contained"
                 color="primary"
-                disabled={ loading }
+                disabled={ loading || theLimitUsed > 100 || !borrowAmount || borrowAmount < 0  }
                 onClick={ this.onBorrow }
                 fullWidth
                 >
-                <Typography className={ classes.buttonText } variant={ 'h5'}>Borrow</Typography>
+                <Typography className={ classes.buttonText } variant={ 'h5'}>
+                  { theLimitUsed > 100 && 'Insufficient collateral' }
+                  { theLimitUsed <= 100 && 'Borrow' }
+                </Typography>
               </Button>
             </div>
           </div>
           <div className={ classes.sepperator }></div>
           <div className={classes.tradeContainer}>
             <div className={ classes.balances }>
-              <Typography variant='h4' onClick={ () => { this.setRepayAmount(100) } }  className={ classes.value } noWrap>{ 'Protocol: ' + (asset.supplyBalance ? (Math.floor(asset.supplyBalance*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol }</Typography>
+              <Typography variant='h4' onClick={ () => { this.setRepayAmount(100) } }  className={ classes.value } noWrap>{ 'Wallet: ' + (asset.balance ? (Math.floor(asset.balance*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol }</Typography>
             </div>
             <TextField
               fullWidth
@@ -397,11 +382,15 @@ class BorrowAsset extends Component {
                 className={ classes.actionButton }
                 variant="contained"
                 color="primary"
-                disabled={ loading }
+                disabled={ loading || asset.borrowBalance === 0 || !repayAmount || parseFloat(repayAmount) > asset.balance }
                 onClick={ this.onRepay }
                 fullWidth
                 >
-                <Typography className={ classes.buttonText } variant={ 'h5'} >Repay</Typography>
+                <Typography className={ classes.buttonText } variant={ 'h5'} >
+                  { asset.borrowBalance === 0 && 'No Balance to Repay' }
+                  { asset.borrowBalance > 0 && parseFloat(repayAmount) > asset.balance && 'Insufficient Balance' }
+                  { asset.borrowBalance > 0 && (!repayAmount || parseFloat(repayAmount) <= asset.balance) && 'Repay' }
+                </Typography>
               </Button>
             </div>
           </div>
@@ -466,19 +455,6 @@ class BorrowAsset extends Component {
     dispatcher.dispatch({ type: LENDING_REPAY, content: { amount: repayAmount, asset: asset } })
   }
 
-  setBorrowAmount = (percent) => {
-    if(this.state.loading) {
-      return
-    }
-
-    const { asset } = this.props
-
-    const balance = asset.balance
-    let amount = balance*percent/100
-
-    this.setState({ borrowAmount: amount.toFixed(asset.decimals) })
-  }
-
   setRepayAmount = (percent) => {
     if(this.state.loading) {
       return
@@ -486,7 +462,7 @@ class BorrowAsset extends Component {
 
     const { asset } = this.props
 
-    const balance = asset.supplyBalance
+    const balance = asset.borrowBalance
     let amount = balance*percent/100
 
     this.setState({ repayAmount: amount.toFixed(asset.decimals) })

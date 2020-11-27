@@ -2,13 +2,8 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withStyles } from '@material-ui/core/styles';
 import {
-  Grid,
   Typography,
-  TextField,
-  InputAdornment,
-  FormControlLabel,
-  Tooltip,
-  MenuItem
+  Slider
 } from '@material-ui/core';
 import { colors } from '../../theme'
 
@@ -28,6 +23,8 @@ import {
   LENDING_BORROW_RETURNED,
   LENDING_REPAY_RETURNED,
   LENDING_ENABLE_COLLATERAL_RETURNED,
+  LENDING_DISABLE_COLLATERAL_RETURNED,
+  LENDING_BALANCES_RETURNED
 } from '../../constants'
 
 import Store from "../../stores";
@@ -50,7 +47,7 @@ const styles = theme => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     width: '100%',
-    maxWidth: '1400px',
+    maxWidth: '1600px',
     marginTop: '40px',
   },
   loggedOut: {
@@ -102,7 +99,8 @@ const styles = theme => ({
     borderRadius: '50px',
     background: colors.white,
     minHeight: '1000px',
-    margin: '12px'
+    margin: '12px',
+    minWidth: '600px'
   },
   title: {
     color: colors.white,
@@ -111,6 +109,7 @@ const styles = theme => ({
     padding: '38px 24px',
     borderTopRightRadius: '50px',
     borderTopLeftRadius: '50px',
+    position: 'relative'
   },
   headers: {
     padding: '0px 12px'
@@ -119,7 +118,7 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     flex: 1,
-    padding: '24px 0px',
+    padding: '40px 0px 24px 0px',
     width: '100%',
     flexWrap: 'wrap',
   },
@@ -139,6 +138,29 @@ const styles = theme => ({
   },
   assetName: {
     paddingLeft: '52px'
+  },
+  limitContainer: {
+    width: '300px',
+    background: colors.white,
+    position: 'absolute',
+    bottom: '0px',
+    left: '50%',
+    transform: 'translate(-50%, 50%)',
+    padding: '12px',
+    borderRadius: '50px',
+    border: '1px solid '+colors.borderBlue,
+    display: 'flex',
+    color: colors.text,
+    alignItems: 'center'
+  },
+  limit: {
+    flex: 1,
+    padding: '0px 18px',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  limitHeading: {
+    paddingRight: '12px'
   }
 });
 
@@ -151,6 +173,10 @@ class Lending extends Component {
 
     this.state = {
       assets: store.getStore('lendingAssets'),
+      lendingSupply: store.getStore('lendingSupply'),
+      lendingCollateral: store.getStore('lendingCollateral'),
+      lendingBorrow: store.getStore('lendingBorrow'),
+      lendingBorrowLimit: store.getStore('lendingBorrowLimit'),
       usdPrices: store.getStore('usdPrices'),
       account: account,
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null,
@@ -166,6 +192,7 @@ class Lending extends Component {
   componentWillMount() {
     emitter.on(ERROR, this.errorReturned);
     emitter.on(CONFIGURE_LENDING_RETURNED, this.configureLendingReturned);
+    emitter.on(LENDING_BALANCES_RETURNED, this.configureLendingReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.on(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.on(LENDING_WITHDRAW_RETURNED, this.showHash);
@@ -173,6 +200,7 @@ class Lending extends Component {
     emitter.on(LENDING_BORROW_RETURNED, this.showHash);
     emitter.on(LENDING_REPAY_RETURNED, this.showHash);
     emitter.on(LENDING_ENABLE_COLLATERAL_RETURNED, this.showHash);
+    emitter.on(LENDING_DISABLE_COLLATERAL_RETURNED, this.showHash);
   }
 
   componentWillUnmount() {
@@ -180,16 +208,22 @@ class Lending extends Component {
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
     emitter.removeListener(CONFIGURE_LENDING_RETURNED, this.configureLendingReturned);
+    emitter.removeListener(LENDING_BALANCES_RETURNED, this.configureLendingReturned);
     emitter.removeListener(LENDING_WITHDRAW_RETURNED, this.showHash);
     emitter.removeListener(LENDING_SUPPLY_RETURNED, this.showHash);
     emitter.removeListener(LENDING_BORROW_RETURNED, this.showHash);
     emitter.removeListener(LENDING_REPAY_RETURNED, this.showHash);
     emitter.removeListener(LENDING_ENABLE_COLLATERAL_RETURNED, this.showHash);
+    emitter.removeListener(LENDING_DISABLE_COLLATERAL_RETURNED, this.showHash);
   };
 
   configureLendingReturned = (balances) => {
     this.setState({
-      assets: store.getStore('lendingAssets') ,
+      assets: store.getStore('lendingAssets'),
+      lendingSupply: store.getStore('lendingSupply'),
+      lendingCollateral: store.getStore('lendingCollateral'),
+      lendingBorrow: store.getStore('lendingBorrow'),
+      lendingBorrowLimit: store.getStore('lendingBorrowLimit'),
       loading: false
     })
   };
@@ -247,6 +281,10 @@ class Lending extends Component {
       loading,
       account,
       snackbarMessage,
+      lendingSupply,
+      lendingCollateral,
+      lendingBorrow,
+      lendingBorrowLimit
     } = this.state
 
     if(!account || !account.address) {
@@ -271,7 +309,7 @@ class Lending extends Component {
             <div className={ classes.supplyContainer }>
               <div className={ classes.title } >
                 <Typography variant='h3'>Supply Balance</Typography>
-                <Typography variant='h1'>$0.00</Typography>
+                <Typography variant='h1'>${ lendingSupply ? lendingSupply.toFixed(2) : '0.00' }</Typography>
               </div>
               { this.renderSupplyHeaders() }
               { this.renderSupplyAssets() }
@@ -279,7 +317,38 @@ class Lending extends Component {
             <div className={ classes.supplyContainer }>
               <div className={ classes.title } >
                 <Typography variant='h3'>Borrow Balance</Typography>
-                <Typography variant='h1'>$0.00</Typography>
+                <Typography variant='h1'>${ lendingBorrow ? lendingBorrow.toFixed(2) : '0.00' }</Typography>
+                <div className={ classes.limitContainer }>
+                  <Typography variant='h4' className={ classes.limitHeading }>Limit</Typography>
+                  <div className={ classes.limit}>
+                    <Slider
+                      className={ classes.slider }
+                      disabled={ true }
+                      marks={[
+                        {
+                          value: 0,
+                          label: '0%',
+                        },
+                        {
+                          value: 25,
+                        },
+                        {
+                          value: 50,
+                          label: '50%',
+                        },
+                        {
+                          value: 75,
+                        },
+                        {
+                          value: 100,
+                          label: '100%',
+                        },
+                      ]}
+                      defaultValue={0}
+                      value={ lendingBorrow*100/lendingBorrowLimit }
+                    />
+                  </div>
+                </div>
               </div>
               { this.renderBorrowHeaders() }
               { this.renderBorrowAssets() }
@@ -310,7 +379,7 @@ class Lending extends Component {
       <div className={ classes.headers }>
         <div className={ classes.assetSummary }>
           <div className={ classes.headingName }>
-            <Typography variant={ 'h4' } className={ classes.assetName } noWrap>Asset</Typography>
+            <Typography variant={ 'h4' } className={ classes.assetName }>Asset</Typography>
           </div>
           <div className={classes.headingAPY }>
             <Typography variant={ 'h4' } noWrap align='right'>APY</Typography>
@@ -332,7 +401,7 @@ class Lending extends Component {
       <div className={ classes.headers }>
         <div className={ classes.assetSummary }>
           <div className={ classes.headingName }>
-            <Typography variant={ 'h4' } className={ classes.assetName } noWrap>Asset</Typography>
+            <Typography variant={ 'h4' } className={ classes.assetName }>Asset</Typography>
           </div>
           <div className={classes.headingAPY }>
             <Typography variant={ 'h4' } noWrap align='right'>APY</Typography>
@@ -348,22 +417,58 @@ class Lending extends Component {
     )
   }
 
-  renderSupplyAssets = () => {
-    const { assets } = this.state
+  sortSupply = (a, b) => {
+    if(a.supplyBalance > b.supplyBalance) {
+      return -1
+    } else if (a.supplyBalance < b.supplyBalance) {
+      return 1
+    } else if (a.balance > b.balance) {
+      return -1
+    } else if (a.balance < b.balance) {
+      return 1
+    } else {
+      return 0
+    }
+  }
 
-    return assets.map((asset) => {
+  sortBorrow = (a, b) => {
+    if(a.borrowBalance > b.borrowBalance) {
+      return -1
+    } else if (a.borrowBalance < b.borrowBalance) {
+      return 1
+    } else if (a.balance > b.balance) {
+      return -1
+    } else if (a.balance < b.balance) {
+      return 1
+    } else {
+      return 0
+    }
+  }
+
+  renderSupplyAssets = () => {
+    const {
+      assets,
+      lendingBorrowLimit,
+      lendingBorrow
+    } = this.state
+
+    return assets.sort(this.sortSupply).map((asset) => {
       return (
-        <SupplyAsset asset={ asset } startLoading={ this.startLoading } />
+        <SupplyAsset key={ 'supply_'+asset.address } asset={ asset } startLoading={ this.startLoading } limit={ lendingBorrowLimit } limitUsed={ lendingBorrow } />
       )
     })
   }
 
   renderBorrowAssets = () => {
-    const { assets } = this.state
+    const {
+      assets,
+      lendingBorrowLimit,
+      lendingBorrow
+    } = this.state
 
-    return assets.map((asset) => {
+    return assets.sort(this.sortBorrow).map((asset) => {
       return (
-        <BorrowAsset asset={ asset } startLoading={ this.startLoading } />
+        <BorrowAsset key={ 'borrow_'+asset.address } asset={ asset } startLoading={ this.startLoading } limit={ lendingBorrowLimit } limitUsed={ lendingBorrow } />
       )
     })
   }

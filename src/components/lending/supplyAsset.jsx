@@ -28,7 +28,6 @@ import { colors } from '../../theme'
 import Store from "../../stores";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
-const store = Store.store
 
 const styles = theme => ({
   value: {
@@ -164,7 +163,7 @@ const styles = theme => ({
     width: '150px'
   },
   flexy: {
-    padding: '10px 0px'
+    padding: '6px 0px'
   }
 });
 
@@ -285,7 +284,7 @@ class SupplyAsset extends Component {
   };
 
   _renderActions = () => {
-    const { classes, asset } = this.props;
+    const { classes, asset, limit, limitUsed } = this.props;
     const {
       supplyAmount,
       supplyAmountError,
@@ -293,6 +292,14 @@ class SupplyAsset extends Component {
       withdrawAmountError,
       loading,
     } = this.state
+
+    let theLimitUsed = (limitUsed)*100/limit
+
+    if(asset.collateralEnabled) {
+      if(supplyAmount && supplyAmount !== '') {
+        theLimitUsed = (limitUsed-(supplyAmount*asset.price))*100/limit
+      }
+    }
 
     return (
       <div className={ classes.assetActions }>
@@ -303,13 +310,13 @@ class SupplyAsset extends Component {
           <div className={ classes.infoField }>
             <Typography variant={ 'h5' } className={ classes.grey }>Borrow limit:</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>${ 0.00 }</Typography>
+              <Typography variant={ 'h3' } noWrap>$ { limit ? limit.toFixed(2) : '0.00' }</Typography>
             </div>
           </div>
           <div className={ classes.infoField }>
             <Typography variant={ 'h5' } className={ classes.grey }>Borrow limit used:</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ 0.00 }%</Typography>
+              <Typography variant={ 'h3' } noWrap>{ theLimitUsed.toFixed(2) }%</Typography>
             </div>
           </div>
           <div>
@@ -379,11 +386,15 @@ class SupplyAsset extends Component {
                 className={ classes.actionButton }
                 variant="contained"
                 color="primary"
-                disabled={ loading }
+                disabled={ loading || !supplyAmount || parseFloat(supplyAmount) >= asset.balance }
                 onClick={ this.onSupply }
                 fullWidth
                 >
-                <Typography className={ classes.buttonText } variant={ 'h5'}>Supply</Typography>
+                <Typography className={ classes.buttonText } variant={ 'h5'}>
+                  { asset.balance === 0 && 'No Balance to Supply' }
+                  { asset.balance > 0 && supplyAmount && parseFloat(supplyAmount) > asset.balance && 'Insufficient Balance' }
+                  { asset.balance > 0 && (!supplyAmount || parseFloat(supplyAmount) <= asset.balance) && 'Supply' }
+                </Typography>
               </Button>
             </div>
           </div>
@@ -443,11 +454,15 @@ class SupplyAsset extends Component {
                 className={ classes.actionButton }
                 variant="contained"
                 color="primary"
-                disabled={ loading }
+                disabled={ loading || asset.supplyBalance === 0 || !withdrawAmount || parseFloat(withdrawAmount) > asset.supplyBalance }
                 onClick={ this.onWithdraw }
                 fullWidth
                 >
-                <Typography className={ classes.buttonText } variant={ 'h5'} >Withdraw</Typography>
+                <Typography className={ classes.buttonText } variant={ 'h5'} >
+                  { asset.supplyBalance === 0 && 'No Balance to Withdraw' }
+                  { asset.supplyBalance > 0 && parseFloat(withdrawAmount) > asset.supplyBalance && 'Insufficient Balance' }
+                  { asset.supplyBalance > 0 && (!withdrawAmount || parseFloat(withdrawAmount) <= asset.supplyBalance) && 'Withdraw' }
+                </Typography>
               </Button>
             </div>
           </div>

@@ -301,6 +301,11 @@ const iswapTheme =  {
         MozOsxFontSmoothing: "grayscale",
         lineHeight: 1.2
       }
+    },
+    MuiSlider: {
+      root: {
+        color: colors.blue + ' !important'
+      }
     }
   },
   palette: {

@@ -607,7 +607,7 @@ class Experimental extends Component {
     return(
       <div className={ classes.disaclaimer } style={{ marginTop: '25px', maxWidth: '500px' }}>
         <Grid container spacing={1}>
-          <Grid item><TimelineIcon fontsize="small" /></Grid>
+          <Grid item><TimelineIcon fontSize="small" /></Grid>
           <Grid item xs>
             <Typography variant="h4" style={{ display: 'inline', fontWeight: 'bold' }}>
             Strategy Rewards
