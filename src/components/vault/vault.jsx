@@ -553,13 +553,13 @@ class Vault extends Component {
                   <Tooltip title={
                       <React.Fragment>
                         <Typography variant={'h5'} className={ classes.fees }>
-                          This vault is currently inactive and is not taking deposits. 
+                          This vault is currently inactive and is not taking deposits.
                         </Typography>
                       </React.Fragment>
                     } arrow>
                   <Grid container spacing={1} direction="row" alignItems="center">
 
-                    
+
                       <Grid item>
                           <HelpIcon fontSize="small" className={ classes.grey } style={{ marginBottom: '-5px' }} />
                       </Grid>
@@ -727,11 +727,11 @@ class Vault extends Component {
 
     const { classes } = this.props
 
-    return( 
+    return(
           <div className={ classes.disaclaimer } style={{ marginTop: '25px', maxWidth: '500px' }}>
 
             <Grid container spacing={1}>
-              <Grid item><TimelineIcon fontsize="small" /></Grid>
+              <Grid item><TimelineIcon fontSize="small" /></Grid>
               <Grid item xs>
                 <Typography variant="h4" style={{ display: 'inline', fontWeight: 'bold' }}>
                 Strategy Rewards

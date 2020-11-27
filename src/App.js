@@ -22,6 +22,7 @@ import Header from './components/header';
 import Vaults from './components/vault';
 import Dashboard from './components/dashboard';
 import Experimental from './components/experimental';
+import Lending from './components/lending';
 
 import { injected } from "./stores/connectors";
 
@@ -117,6 +118,10 @@ class App extends Component {
               <Route path='/experimental'>
                 <Header />
                 <Experimental />
+              </Route>
+              <Route path='/lending'>
+                <Header />
+                <Lending />
               </Route>
               <Route path="/">
                 <Home />

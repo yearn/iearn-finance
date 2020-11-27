@@ -32,6 +32,8 @@ export const colors = {
   compoundGreen: '#00d395',
   tomato: '#e56b73',
   purple: '#935dff',
+  creamPurple: '#594bad',
+  creamBlue: '#69e2dc',
 
   text: "#212529",
   lightBlue: "#2F80ED",
@@ -300,6 +302,11 @@ const iswapTheme =  {
         WebkitFontSmoothing: "antialiased",
         MozOsxFontSmoothing: "grayscale",
         lineHeight: 1.2
+      }
+    },
+    MuiSlider: {
+      root: {
+        color: colors.blue + ' !important'
       }
     }
   },

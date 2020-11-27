@@ -181,6 +181,33 @@ const styles = theme => ({
       display: 'none'
     }
   },
+  lending: {
+    backgroundColor: colors.white,
+    '&:hover': {
+      backgroundColor: colors.creamPurple,
+      '& .title': {
+        color: colors.creamBlue,
+      },
+      '& .icon': {
+        color: colors.creamBlue
+      },
+      '& .description': {
+        display: 'block',
+        color: colors.creamBlue,
+        padding: '48px',
+        textAlign: 'center'
+      }
+    },
+    '& .title': {
+      color: colors.creamBlue,
+    },
+    '& .icon': {
+      color: colors.creamBlue
+    },
+    '& .description': {
+      display: 'none'
+    }
+  },
   title: {
     padding: '24px',
     paddingBottom: '0px',
@@ -237,6 +264,11 @@ class Home extends Component {
           <WarningIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Experimental") }</Typography>
           <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Home for experimental vaults." }</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.lending}` } onClick={ () => { this.nav('lending') } }>
+          <img alt='' src={ require('../../assets/cream-logo.png') } width='100px' height='100px' className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Lending") }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Lending, provided by cream." }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('stats') } }>
           <BarChartIcon className={ `${classes.icon} icon` } />
