@@ -174,7 +174,6 @@ class Lending extends Component {
     this.state = {
       assets: store.getStore('lendingAssets'),
       lendingSupply: store.getStore('lendingSupply'),
-      lendingCollateral: store.getStore('lendingCollateral'),
       lendingBorrow: store.getStore('lendingBorrow'),
       lendingBorrowLimit: store.getStore('lendingBorrowLimit'),
       usdPrices: store.getStore('usdPrices'),
@@ -221,7 +220,6 @@ class Lending extends Component {
     this.setState({
       assets: store.getStore('lendingAssets'),
       lendingSupply: store.getStore('lendingSupply'),
-      lendingCollateral: store.getStore('lendingCollateral'),
       lendingBorrow: store.getStore('lendingBorrow'),
       lendingBorrowLimit: store.getStore('lendingBorrowLimit'),
       loading: false
@@ -282,7 +280,6 @@ class Lending extends Component {
       account,
       snackbarMessage,
       lendingSupply,
-      lendingCollateral,
       lendingBorrow,
       lendingBorrowLimit
     } = this.state

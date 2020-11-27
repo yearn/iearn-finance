@@ -266,7 +266,7 @@ class Home extends Component {
           <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Home for experimental vaults." }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.lending}` } onClick={ () => { this.nav('lending') } }>
-          <img src={ require('../../assets/cream-logo.png') } width='100px' height='100px' className={ `${classes.icon} icon` } />
+          <img alt='' src={ require('../../assets/cream-logo.png') } width='100px' height='100px' className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Lending") }</Typography>
           <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Lending, provided by cream." }</Typography>
         </Card>
