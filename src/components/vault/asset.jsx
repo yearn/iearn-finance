@@ -747,14 +747,14 @@ class Asset extends Component {
     const { asset, startLoading  } = this.props
     let redeemAmount = this.state.redeemAmount
     redeemAmount = (Math.floor(redeemAmount*10000)/10000).toFixed(4);
-    if(!redeemAmount || isNaN(redeemAmount) || redeemAmount < 0 || redeemAmount > asset.vaultBalance) {
+    if(!redeemAmount || isNaN(redeemAmount) || redeemAmount < 0) {
       this.setState({ redeemAmountError: true })
       return false
     }
 
     let redeemEarnAmount = this.state.redeemEarnAmount
     redeemEarnAmount = (Math.floor(redeemEarnAmount*10000)/10000).toFixed(4);
-    if(!redeemEarnAmount || isNaN(redeemEarnAmount) || redeemEarnAmount < 0 || redeemEarnAmount > asset.earnBalance) {
+    if(!redeemEarnAmount || isNaN(redeemEarnAmount) || redeemEarnAmount < 0) {
       this.setState({ redeemAmountError: true })
       return false
     }
