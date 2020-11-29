@@ -49,7 +49,9 @@ import {
   STATISTICS_RETURNED, TOGGLE_DRAWER, DRAWER_RETURNED,
   WITHDRAW_BOTH,
   GET_STRATEGY_BALANCES_FULL,
-  STRATEGY_BALANCES_FULL_RETURNED
+  STRATEGY_BALANCES_FULL_RETURNED,
+  GET_HISTORICAL_PRICE,
+  GET_HISTORICAL_PRICE_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 
@@ -341,6 +343,9 @@ class Store {
           case GET_STRATEGY_BALANCES_FULL:
             this.getStrategyBalancesFull(payload);
             break;
+          case GET_HISTORICAL_PRICE:
+            this.getHistoricalPrice(payload);
+          // eslint-disable-next-line no-fallthrough
           default: {
           }
         }
@@ -3258,9 +3263,19 @@ class Store {
       const url = config.statsProvider+'vaults/apy'
       const statisticsString = await rp(url);
       const statistics = JSON.parse(statisticsString)
-
-      console.log('statistics', statistics);
       return statistics
+    } catch(e) {
+      console.log(e)
+      return store.getStore('universalGasPrice')
+    }
+  }
+
+  _getHistoricalPrice = async (contract, interval) => {
+    try {
+      const url = `${config.statsProvider}+vaults/price/${contract}/${interval}`
+      const resultString = await rp(url);
+      const result = JSON.parse(resultString)
+      return result
     } catch(e) {
       console.log(e)
       return store.getStore('universalGasPrice')
@@ -3481,6 +3496,10 @@ class Store {
       store.setStore({ vaultAssets: assets })
       return emitter.emit(STRATEGY_BALANCES_FULL_RETURNED, assets)
     })
+  }
+
+  getHistoricalPrice = async () => {
+
   }
 }
 
