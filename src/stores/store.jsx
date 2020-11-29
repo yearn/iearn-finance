@@ -4654,7 +4654,7 @@ class Store {
 
         const borrowRatePerYear = (borrowRatePerBlock) * blocksPeryear / 1e16
         const supplyRatePerYear = (supplyRatePerBlock) * blocksPeryear / 1e16
-        const dollarPerAsset = ethPerAsset*priceJSON/10**asset.decimals
+        const dollarPerAsset = ethPerAsset*priceJSON/1e18
 
         const lendingAsset = {
           address: asset.address,
@@ -4815,7 +4815,7 @@ class Store {
 
         const borrowRatePerYear = (borrowRatePerBlock) * blocksPeryear / 1e16
         const supplyRatePerYear = (supplyRatePerBlock) * blocksPeryear / 1e16
-        const dollarPerAsset = ethPerAsset*priceJSON/10**decimals
+        const dollarPerAsset = ethPerAsset*priceJSON/1e18
 
         const lendingAsset = {
           address: market,
