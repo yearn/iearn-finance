@@ -297,7 +297,10 @@ class SupplyAsset extends Component {
 
     if(asset.collateralEnabled) {
       if(supplyAmount && supplyAmount !== '') {
-        theLimitUsed = (limitUsed-(supplyAmount*asset.price))*100/limit
+        theLimitUsed = limitUsed*100/(limit+(supplyAmount*asset.price*0.75))
+      }
+      if(withdrawAmount && withdrawAmount !== '') {
+        theLimitUsed = limitUsed*100/(limit-(withdrawAmount*asset.price*0.75))
       }
     }
 
@@ -345,7 +348,6 @@ class SupplyAsset extends Component {
               disabled={ loading }
               placeholder="0.00"
               variant="outlined"
-              onKeyDown={ this.inputKeyDown }
             />
             <div className={ classes.scaleContainer }>
               <Button
@@ -498,12 +500,6 @@ class SupplyAsset extends Component {
     let val = []
     val[event.target.id] = event.target.value
     this.setState(val)
-  }
-
-  inputKeyDown = (event) => {
-    if (event.which === 13) {
-      this.onInvest();
-    }
   }
 
   onSupply = () => {

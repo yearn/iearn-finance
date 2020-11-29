@@ -305,7 +305,6 @@ class BorrowAsset extends Component {
               disabled={ loading }
               placeholder="0.00"
               variant="outlined"
-              onKeyDown={ this.inputKeyDown }
             />
             <div className={ classes.scaleContainer }>
               <div className={ classes.emptyScale }></div>
@@ -426,12 +425,6 @@ class BorrowAsset extends Component {
     let val = []
     val[event.target.id] = event.target.value
     this.setState(val)
-  }
-
-  inputKeyDown = (event) => {
-    if (event.which === 13) {
-      this.onInvest();
-    }
   }
 
   onBorrow = () => {
