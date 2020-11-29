@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+
 export const ERROR = 'ERROR'
 export const RESET_PROFILE = 'RESET_PROFILE'
 
@@ -134,3 +136,9 @@ export const LENDING_ENABLE_COLLATERAL_RETURNED = 'LENDING_ENABLE_COLLATERAL_RET
 
 export const LENDING_DISABLE_COLLATERAL = 'LENDING_DISABLE_COLLATERAL'
 export const LENDING_DISABLE_COLLATERAL_RETURNED = 'LENDING_DISABLE_COLLATERAL_RETURNED'
+
+// #GENERAL
+export const MAX_UINT256 = new BigNumber(2)
+  .pow(256)
+  .minus(1)
+  .toFixed(0);

@@ -269,6 +269,9 @@ class BorrowAsset extends Component {
     } else {
       theLimitUsed = (limitUsed)*100/limit
     }
+    if (isNaN(theLimitUsed)) {
+      theLimitUsed = 0
+    }
 
     return (
       <div className={ classes.assetActions }>
