@@ -5,7 +5,8 @@ import {
   Typography,
   TextField,
   MenuItem,
-  Grid
+  Grid,
+  Button
 } from '@material-ui/core';
 import { colors, drawerWidth } from '../../theme'
 
@@ -19,6 +20,8 @@ import {
   GET_DASHBOARD_SNAPSHOT,
   DASHBOARD_SNAPSHOT_RETURNED,
 } from '../../constants'
+import * as moment from 'moment';
+import _ from 'lodash';
 
 import Store from "../../stores";
 import UnlockModal from "../unlock/unlockModal";
@@ -343,7 +346,24 @@ const styles = theme => ({
     [theme.breakpoints.down('sm')]: {
       fontSize: '10px'
     }
-  }
+  },
+  periodContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '0px 0px 12px 0px',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  period: {
+    width: '33%',
+    color: '#777777',
+  },
+  periodActive: {
+    minWidth: '33%',
+    color: '#222222',
+    background: 'rgba(24, 160, 251, 0.2)',
+    borderRadius: '5px'
+  },
 });
 
 class Dashboard extends Component {
@@ -363,12 +383,13 @@ class Dashboard extends Component {
       loading: true,
       growth: growth ? parseInt(growth) : 0, // 0=daily 1=weekly 2=yearly
       currency: currency ? currency : 'USD', // USD / ETH,
-      basedOn: basedOn ? parseInt(basedOn > 3 ? 3 : basedOn) : 1, // 1=apyThreeDaySample  2=apyOneWeekSample  3= apyInceptionSample  4=apyInceptionSample (old)
-      modalOpen: false
+      basedOn: basedOn ? parseInt(basedOn > 3 ? 3 : basedOn) : 1, // 1=apyOneWeekSample  2= apyInceptionSample  3=apyInceptionSample (old)
+      modalOpen: false,
+      period: '1d'
     }
 
     if(account && account.address) {
-      dispatcher.dispatch({ type: GET_DASHBOARD_SNAPSHOT, content: {} })
+      dispatcher.dispatch({ type: GET_DASHBOARD_SNAPSHOT, content: { interval: this.state.period } })
     }
   }
 
@@ -394,9 +415,10 @@ class Dashboard extends Component {
   }
 
   connectionConnected = () => {
+    const { period } = this.state;
     const account = store.getStore('account')
     this.setState({ loading: true, account: account })
-    dispatcher.dispatch({ type: GET_DASHBOARD_SNAPSHOT, content: {} })
+    dispatcher.dispatch({ type: GET_DASHBOARD_SNAPSHOT, content: { interval: period } })
   };
 
   connectionDisconnected = () => {
@@ -461,10 +483,10 @@ class Dashboard extends Component {
       <div className={ classes.root }>
         <div className={classes.contentContainer}>
           <div className={ classes.investedContainer}>
-            {this.renderChart()}
+            {this.renderChart(dashboard)}
             <Grid container spacing={1} className={ classes.portfolioContainer }>
               <Grid item sm={6} xs={6} className={ classes.titleBalance }>
-                <Typography variant={ 'h4' } className={[classes.gray, classes.labelSize ]}>Portfolio Balance</Typography>
+                <Typography variant={ 'h4' } className={`${classes.gray} ${classes.labelSize}`}>Portfolio Balance</Typography>
                 <Typography variant={ 'h2' } className={classes.amountValue}>$ { parseFloat(dashboard.portfolio_balance_usd.toFixed(2)).toLocaleString() }</Typography>
               </Grid>
               { growth === 0 &&
@@ -507,18 +529,6 @@ class Dashboard extends Component {
                 { this.renderVaults() }
               </div>
             }
-            {/* { (dashboard.vaults && dashboard.vaults.length > 0) &&
-              <div className={ classes.vaultContainer }>
-                <Typography variant={ 'h3' } className={ classes.sectionHeading }>Vaults Overview</Typography>
-                { this.renderVaults() }
-              </div>
-            }
-            { (dashboard.assets && dashboard.assets.length > 0) &&
-              <div className={ classes.earnContainer }>
-                <Typography variant={ 'h3' } className={ classes.sectionHeading }>Earn Overview</Typography>
-                { this.renderEarn() }
-              </div>
-            } */}
           </div>
         </div>
         { loading && <Loader /> }
@@ -577,13 +587,14 @@ class Dashboard extends Component {
 
   onSelectChange = (event) => {
     let val = []
+    const { period } = this.state;
     val[event.target.name] = event.target.value
     this.setState(val)
 
     localStorage.setItem('yearn.finance-dashboard-basedon', event.target.value)
 
     this.setState({ loading: true })
-    dispatcher.dispatch({ type: GET_DASHBOARD_SNAPSHOT, content: {} })
+    dispatcher.dispatch({ type: GET_DASHBOARD_SNAPSHOT, content: { interval: period } })
   }
 
   growthClicked = () => {
@@ -631,165 +642,8 @@ class Dashboard extends Component {
               <Typography variant={ 'h5' } noWrap className={ classes.gray }>{ asset.description }</Typography>
             </div>
           </div>
-          {/* { growth === 0 &&
-            <div className={classes.heading}>
-              { currency === 'USD' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_daily_usd.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/365).toFixed(2) }%</Typography>
-                </div>
-              }
-              { currency === 'ETH' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.vaultGrowth_daily_eth.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/365).toFixed(2) }%</Typography>
-                </div>
-              }
-            </div>
-          }
-          { growth === 1 &&
-            <div className={classes.heading}>
-              { currency === 'USD' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_weekly_usd.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/52).toFixed(2) }%</Typography>
-                </div>
-              }
-              { currency === 'ETH' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.vaultGrowth_weekly_eth.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/52).toFixed(2) }%</Typography>
-                </div>
-              }
-            </div>
-          }
-          { growth === 2 &&
-            <div className={classes.heading}>
-              { currency === 'USD' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.vaultGrowth_yearly_usd.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/1).toFixed(2) }%</Typography>
-                </div>
-              }
-              { currency === 'ETH' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.vaultGrowth_yearly_eth.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (this._getAPY(asset)/1).toFixed(2) }%</Typography>
-                </div>
-              }
-            </div>
-          } */}
           <div className={classes.heading}>
             <Typography variant={ 'h3' } noWrap className={classes.dataValue}>$ { parseFloat(asset.usdBalance ? (asset.usdBalance).toFixed(2) : '0.00').toLocaleString() }</Typography>
-          </div>
-        </div>
-      </div>)
-    })
-  }
-
-  renderEarn = () => {
-    const { growth, currency } = this.state
-    const { assets } = this.state.dashboard
-    const { classes } = this.props
-
-    if(!assets || assets.length === 0) {
-      return null
-    }
-
-    return assets.map((asset) => {
-      return (<div className={ classes.vault } key={asset.id}>
-        <div className={ classes.assetSummary }>
-          <div className={classes.headingName}>
-            <div className={ classes.assetIcon }>
-              <img
-                alt=""
-                src={ require('../../assets/'+asset.symbol+'-logo.png') }
-                height={ '30px'}
-              />
-            </div>
-            <div>
-              <Typography variant={ 'h3' } noWrap>{ asset.name }</Typography>
-              <Typography variant={ 'h5' } noWrap className={ classes.gray }>{ asset.description }</Typography>
-            </div>
-          </div>
-          {/* { growth === 0 &&
-            <div className={classes.heading}>
-              <Typography variant={ 'h5' } className={ classes.gray }>Daily Growth</Typography>
-              { currency === 'USD' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.earnGrowth_daily_usd.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100/365).toFixed(2) : '0.00') }%</Typography>
-                </div>
-              }
-              { currency === 'ETH' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.earnGrowth_daily_eth.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100/365).toFixed(2) : '0.00') }%</Typography>
-                </div>
-              }
-            </div>
-          }
-          { growth === 1 &&
-            <div className={classes.heading}>
-              <Typography variant={ 'h5' } className={ classes.gray }>Weekly Growth</Typography>
-              { currency === 'USD' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.earnGrowth_weekly_usd.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100/52).toFixed(2) : '0.00') }%</Typography>
-                </div>
-              }
-              { currency === 'ETH' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.earnGrowth_weekly_eth.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100/52).toFixed(2) : '0.00') }%</Typography>
-                </div>
-              }
-            </div>
-          }
-          { growth === 2 &&
-            <div className={classes.heading}>
-              <Typography variant={ 'h5' } className={ classes.gray }>Yearly Growth</Typography>
-              { currency === 'USD' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.earnGrowth_yearly_usd.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100).toFixed(2) : '0.00') }%</Typography>
-                </div>
-              }
-              { currency === 'ETH' &&
-                <div className={ classes.inline }>
-                  <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.earnGrowth_yearly_eth.toFixed(2)).toLocaleString() }</Typography >
-                  <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
-                  <Typography className={ classes.symbolAt } variant={ 'h4' }> @ </Typography>
-                  <Typography className={ classes.symbol } variant={ 'h4' }> { (asset.maxApr ? (asset.maxApr*100).toFixed(2) : '0.00') }%</Typography>
-                </div>
-              }
-            </div>
-          } */}
-          <div className={classes.heading}>
-            {/* <Typography variant={ 'h5' } className={ classes.gray }>Net worth</Typography> */}
-            { currency === 'USD' && <Typography variant={ 'h3' } noWrap>$ { parseFloat(asset.usdBalance ? (asset.usdBalance).toFixed(2) : '0.00').toLocaleString() }</Typography > }
-            { currency === 'ETH' &&
-              <div className={ classes.inline }>
-                <Typography variant={ 'h3' } noWrap>{ parseFloat(asset.ethBalance ? (asset.ethBalance).toFixed(2) : '0.00').toLocaleString() }</Typography >
-                <Typography className={ classes.symbol } variant={ 'h4' }>ETH</Typography>
-              </div>
-            }
           </div>
         </div>
       </div>)
@@ -817,26 +671,85 @@ class Dashboard extends Component {
     }
   }
 
-  renderChart = () => {
+  renderChart = (dashboard) => {
     const { classes } = this.props;
+    const { period } = this.state;
+    let dataSet = [];
+
+    if (dashboard.totalPerformance) {
+      dashboard.totalPerformance.map(balance => {
+        balance[1] = parseFloat(balance[1].toFixed(4))
+        return balance;
+      });
+
+     let startTime = dashboard.totalPerformance[0][0];
+     var temp;
+      switch (period) {
+        case '1d':
+          temp = _.groupBy(dashboard.totalPerformance, (d) => {
+            return Math.floor((d[0]-startTime)/(1000*60*60*24))
+          });
+          Object.keys(temp).forEach(l => {
+            dataSet.push([temp[l][temp[l].length - 1][0], temp[l][temp[l].length - 1][1]]);
+          })
+          break;
+        case '7d':
+          temp = _.groupBy(dashboard.totalPerformance, (d) => {
+            return Math.floor((d[0]-startTime)/(1000*60*60*24*7))
+          });
+          Object.keys(temp).forEach(l => {
+            dataSet.push([temp[l][temp[l].length - 1][0], temp[l][temp[l].length - 1][1]]);
+          })
+          break;
+        case '30d':
+          temp = _.groupBy(dashboard.totalPerformance, (d) => {
+            return Math.floor((d[0]-startTime)/(1000*60*60*24*30))
+          });
+          Object.keys(temp).forEach(l => {
+            dataSet.push([temp[l][temp[l].length - 1][0], temp[l][temp[l].length - 1][1]]);
+          })
+          break;
+        default: 
+      }
+    }
 
     const options = {
       chart: {
-        width: 800
+        width: 800,
+        type: 'area'
       },
       title: {
-        text: 'Historical Earn & Vault Performance'
+        text: ''
       },
       series: [
         {
-          name: 'Earn',
-          data: [1, 2, 1, 4, 3, 6]
+          name: '',
+          data: dataSet
         },
-        {
-          name: 'Vault',
-          data: [3, 1, 3, 4, 3, 8]
-        }
       ],
+      tooltip: {
+        formatter: function() {
+          return moment.unix(this.x/1000).format('DD-MM-YYYY') 
+            + '<br/>' +
+            '<span style="color:' + this.point.color +'">\u25CF</span> ' + 
+            '<b>' + this.y + '</b>';
+        }
+      },
+      xAxis: {
+        labels: {
+          formatter: function() {
+            return moment.unix(this.value/1000).format('DD-MM-YYYY');
+          }
+        }
+      },
+      yAxis: {
+        title: {
+          text: ''
+        }
+      },
+      legend: {
+        enabled: false
+      },
       credits: {
         enabled: false
       }
@@ -844,9 +757,43 @@ class Dashboard extends Component {
 
     return (
       <div className={classes.chartContainer}>
+        <Grid container style={{display: 'flex', alignItems: 'center'}}>
+          <Grid item sm={9} xs={9}>
+            <Typography variant='body1'>Portfolio Performance</Typography>
+          </Grid>
+          <Grid item sm={3} xs={3} className={classes.periodContainer}>
+            <Button
+              className={ period === '1d' ? classes.periodActive : classes.period }
+              variant='text'
+              color="primary"
+              onClick={ () => { this.setChartPeriod('1d') } }>
+              <Typography variant={'h5'}>1D</Typography>
+            </Button>
+            <Button
+              className={ period === '7d' ? classes.periodActive : classes.period }
+              variant='text'
+              color="primary"
+              onClick={ () => { this.setChartPeriod('7d') } }>
+              <Typography variant={'h5'}>1W</Typography>
+            </Button>
+            <Button
+              className={ period === '30d' ? classes.periodActive : classes.period }
+              variant='text'
+              color="primary"
+              onClick={ () => { this.setChartPeriod('30d') } }>
+              <Typography variant={'h5'}>1M</Typography>
+            </Button>
+          </Grid>
+        </Grid>
         <HighchartsReact highcharts={Highcharts} options={options} />
       </div>
     );
+  }
+
+  setChartPeriod = (period) => {
+    this.setState({
+      period
+    })
   }
 
   addressClicked = () => {

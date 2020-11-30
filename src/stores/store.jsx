@@ -34,14 +34,14 @@ import {
   GET_BEST_PRICE_RETURNED,
   GET_VAULT_BALANCES,
   VAULT_BALANCES_RETURNED,
-  DEPOSIT_VAULT,
-  DEPOSIT_VAULT_RETURNED,
-  DEPOSIT_ALL_VAULT,
-  DEPOSIT_ALL_VAULT_RETURNED,
+  DEPOSIT_CONTRACT,
+  DEPOSIT_CONTRACT_RETURNED,
+  DEPOSIT_ALL_CONTRACT,
+  DEPOSIT_ALL_CONTRACT_RETURNED,
   WITHDRAW_VAULT,
   WITHDRAW_VAULT_RETURNED,
-  WITHDRAW_ALL_VAULT,
-  WITHDRAW_ALL_VAULT_RETURNED,
+  WITHDRAW_BOTH_VAULT,
+  WITHDRAW_BOTH_VAULT_RETURNED,
   GET_DASHBOARD_SNAPSHOT,
   DASHBOARD_SNAPSHOT_RETURNED,
   USD_PRICE_RETURNED,
@@ -50,8 +50,6 @@ import {
   WITHDRAW_BOTH,
   GET_STRATEGY_BALANCES_FULL,
   STRATEGY_BALANCES_FULL_RETURNED,
-  GET_HISTORICAL_PRICE,
-  GET_HISTORICAL_PRICE_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
 
@@ -316,17 +314,17 @@ class Store {
           case GET_VAULT_BALANCES_FULL:
             this.getVaultBalancesFull(payload);
             break;
-          case DEPOSIT_VAULT:
-            this.depositVault(payload)
+          case DEPOSIT_CONTRACT:
+            this.depositContract(payload)
             break;
-          case DEPOSIT_ALL_VAULT:
-            this.depositAllVault(payload)
+          case DEPOSIT_ALL_CONTRACT:
+            this.depositAllContract(payload)
             break;
           case WITHDRAW_VAULT:
             this.withdrawVault(payload)
             break;
-          case WITHDRAW_ALL_VAULT:
-            this.withdrawAllVault(payload)
+          case WITHDRAW_BOTH_VAULT:
+            this.withdrawBothAll(payload)
             break;
           case GET_DASHBOARD_SNAPSHOT:
             this.getDashboardSnapshot(payload)
@@ -343,8 +341,6 @@ class Store {
           case GET_STRATEGY_BALANCES_FULL:
             this.getStrategyBalancesFull(payload);
             break;
-          case GET_HISTORICAL_PRICE:
-            this.getHistoricalPrice(payload);
           // eslint-disable-next-line no-fallthrough
           default: {
           }
@@ -813,8 +809,8 @@ class Store {
           symbol: 'USDT',
           description: 'Tether USD',
           vaultSymbol: 'dUSDT',
-          erc20address: '0x2922d23EB6B635f72BBca45bE092cfE4FcA50b9A',
-          vaultContractAddress: '0x4f6C84ed8bE874431e727881bF2D48C9BCB0228D',
+          erc20address: '0xafA24C3B1cdaD53b937c3D9582697779B3671E92',
+          vaultContractAddress: '0x9680CF4CfED6Cf04eF0Eeb513c2399c192D0c0B0',
           vaultContractABI: config.vaultContractNewABI,
           balance: 0,
           vaultBalance: 0,
@@ -826,7 +822,8 @@ class Store {
           lastMeasurement: 10651402,
           measurement: 1e18,
           price_id: 'tether',
-          strategyName: 'Yearn Farmer v1'
+          strategyName: 'Yearn Farmer v1',
+          strategy: 'Yearn Vault',
         },
       ],
       aprs: [{
@@ -1583,38 +1580,43 @@ class Store {
     if(asset.iEarnContract === null) {
       return callback(null, 0)
     }
-    if (asset.symbol === 'CRV') {
-      let aprContract = new web3.eth.Contract(config.crvContractABI, config.crvAddress)
-      const call = 'crvapr'
-      const aprs = await aprContract.methods[call]().call();
-      return callback(null, web3.utils.fromWei(parseFloat(aprs).toFixed(0), 'ether'))
-    }
 
-    let aprContract = new web3.eth.Contract(config.aggregatedContractABI, config.aggregatedContractAddress)
-
-    var call = 'getAPROptions';//+asset.symbol
-    var address = asset.erc20address
-    var aprs = 0;
-    if (asset.erc20address === 'Ethereum') {
-      call = 'getETH';
-      aprs = await aprContract.methods[call]().call();
-    } else {
-      aprs = await aprContract.methods[call](address).call();
-    }
-
-
-    const keys = Object.keys(aprs)
-    const workKeys = keys.filter((key) => {
-      return isNaN(key)
-    })
-    const maxApr = Math.max.apply(Math, workKeys.map(function(o) {
-      if(o === 'uniapr' || o === 'unicapr' || o === "iapr") {
-        return aprs[o]-100000000000000000000
+    try {
+      if (asset.symbol === 'CRV') {
+        let aprContract = new web3.eth.Contract(config.crvContractABI, config.crvAddress)
+        const call = 'crvapr'
+        const aprs = await aprContract.methods[call]().call();
+        return callback(null, web3.utils.fromWei(parseFloat(aprs).toFixed(0), 'ether'))
       }
-      return aprs[o];
-    }))
-
-    callback(null, web3.utils.fromWei(maxApr.toFixed(0), 'ether'))
+  
+      let aprContract = new web3.eth.Contract(config.aggregatedContractABI, config.aggregatedContractAddress)
+  
+      var call = 'getAPROptions';//+asset.symbol
+      var address = asset.erc20address
+      var aprs = 0;
+      if (asset.erc20address === 'Ethereum') {
+        call = 'getETH';
+        aprs = await aprContract.methods[call]().call();
+      } else {
+        aprs = await aprContract.methods[call](address).call();
+      }
+  
+  
+      const keys = Object.keys(aprs)
+      const workKeys = keys.filter((key) => {
+        return isNaN(key)
+      })
+      const maxApr = Math.max.apply(Math, workKeys.map(function(o) {
+        if(o === 'uniapr' || o === 'unicapr' || o === "iapr") {
+          return aprs[o]-100000000000000000000
+        }
+        return aprs[o];
+      }))
+  
+      callback(null, web3.utils.fromWei(maxApr.toFixed(0), 'ether'))
+    } catch (ex) {
+      return callback(null, 0);
+    }
   }
 
   getAPR = (payload) => {
@@ -2208,7 +2210,7 @@ class Store {
     })
   }
 
-  getVaultBalancesFull = async () => {
+  getVaultBalancesFull = async (interval) => {
     const account = store.getStore('account')
     const assets = store.getStore('vaultAssets')
 
@@ -2239,6 +2241,8 @@ class Store {
         (callbackInner) => { this._getVaultAPY(web3, asset, account, callbackInner) },
         (callbackInner) => { this._getAddressStats(addressStatistics, asset, callbackInner) },
         (callbackInner) => { this._getAddressTransactions(addressTXHitory, asset, callbackInner) },
+        (callbackInner) => { this._getMaxAPR(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getHistoricalPrice(asset.vaultContractAddress, interval, callbackInner) },
       ], (err, data) => {
         if(err) {
           return callback(err)
@@ -2255,6 +2259,8 @@ class Store {
         asset.apy = data[5].apy
         asset.addressStatistics = data[6]
         asset.addressTransactions = data[7]
+        asset.earnApr = data[8]
+        asset.historicalPrice = data[9]
 
         callback(null, asset)
       })
@@ -2271,12 +2277,15 @@ class Store {
 
   _getAssetUSDPrices = async (web3, asset, account, usdPrices, callback) => {
     try {
-      const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-      const earnPool = await vaultContract.methods.earnPool().call({ from: account.address })
-      const vaultPool = await vaultContract.methods.vaultPool().call({ from: account.address })
-      const totalSupply = await vaultContract.methods.totalSupply().call({ from: account.address })
-      const pricePerFullShare = (earnPool + vaultPool) * 1e18 / totalSupply;
-      // const pricePerFullShare = await vaultContract.methods.getPricePerFullShare().call({ from: account.address })
+      const contract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
+      const earnContract = new web3.eth.Contract(config.yFarmerEarnABI, config.yFarmerEarnContract);
+      const vaultContract = new web3.eth.Contract(config.yFarmerVaultABI, config.yFarmerVaultContract);
+      const earnBalance = await earnContract.methods.balanceOf(asset.vaultContractAddress).call({ from: account.address })
+      const vaultBalance = await vaultContract.methods.balanceOf(asset.vaultContractAddress).call({ from: account.address })
+      const earnPricePerFullShare = await earnContract.methods.getPricePerFullShare().call({ from: account.address })
+      const vaultPricePerFullShare = await vaultContract.methods.getPricePerFullShare().call({ from: account.address })
+      const totalSupply = await contract.methods.totalSupply().call({ from: account.address })
+      const pricePerFullShare = (earnBalance * earnPricePerFullShare + vaultBalance * vaultPricePerFullShare) / totalSupply;
 
       const usdPrice = usdPrices[asset.price_id]
 
@@ -2371,7 +2380,7 @@ class Store {
       }
 
       const vault = addressStatistics.filter((stats) => {
-        return stats.vaultAddress.toLowerCase() === asset.vaultContractAddress.toLowerCase()
+        return stats.contractAddress.toLowerCase() === asset.vaultContractAddress.toLowerCase()
       })
 
       if(vault.length === 0) {
@@ -2493,7 +2502,6 @@ class Store {
 
     let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
     let earnBalance = await vaultContract.methods.earnBalanceOf(account.address).call({ from: account.address });
-    console.log(earnBalance);
     earnBalance = parseFloat(earnBalance)/10**asset.decimals
 
     let vaultBalance = await vaultContract.methods.vaultBalanceOf(account.address).call({ from: account.address });
@@ -2521,21 +2529,21 @@ class Store {
     }
   }
 
-  depositVault = (payload) => {
+  depositContract = (payload) => {
     const account = store.getStore('account')
-    const { asset, amount } = payload.content
+    const { asset, earnAmount, vaultAmount } = payload.content
 
-    this._checkApproval(asset, account, amount, asset.vaultContractAddress, (err) => {
+    this._checkApproval(asset, account, earnAmount + vaultAmount, asset.vaultContractAddress, (err) => {
       if(err) {
         return emitter.emit(ERROR, err);
       }
 
-      this._callDepositVault(asset, account, amount, (err, depositResult) => {
+      this._callDepositContract(asset, account, earnAmount, vaultAmount, (err, depositResult) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
 
-        return emitter.emit(DEPOSIT_VAULT_RETURNED, depositResult)
+        return emitter.emit(DEPOSIT_CONTRACT_RETURNED, depositResult)
       })
     })
   }
@@ -2602,130 +2610,24 @@ class Store {
     }
   }
 
-  _callDepositVault = async (asset, account, amount, callback) => {
+  _callDepositContract = async (asset, account, earnAmount, vaultAmount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
 
-    var amountToSend = web3.utils.toWei(amount, "ether")
+    console.log('earnAmount', earnAmount);
+    console.log('vaultAmount', vaultAmount);
+    var earnAmountToSend = web3.utils.toWei(earnAmount, "ether")
     if (asset.decimals !== 18) {
-      amountToSend = amount*10**asset.decimals;
+      earnAmountToSend = earnAmount*10**asset.decimals;
     }
 
-    if(asset.erc20address === 'Ethereum') {
-      vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-        .on('transactionHash', function(hash){
-          console.log(hash)
-          callback(null, hash)
-        })
-        .on('confirmation', function(confirmationNumber, receipt){
-          console.log(confirmationNumber, receipt);
-        })
-        .on('receipt', function(receipt){
-          console.log(receipt);
-        })
-        .on('error', function(error) {
-          if (!error.toString().includes("-32601")) {
-            if(error.message) {
-              return callback(error.message)
-            }
-            callback(error)
-          }
-        })
-        .catch((error) => {
-          if (!error.toString().includes("-32601")) {
-            if(error.message) {
-              return callback(error.message)
-            }
-            callback(error)
-          }
-        })
-    } else {
-      var amountWei = amountToSend / 2;
-      console.log(amountWei);
-      vaultContract.methods.deposit(amountWei, amountWei).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-        .on('transactionHash', function(hash){
-          console.log(hash)
-          callback(null, hash)
-        })
-        .on('confirmation', function(confirmationNumber, receipt){
-          console.log(confirmationNumber, receipt);
-        })
-        .on('receipt', function(receipt){
-          console.log(receipt);
-        })
-        .on('error', function(error) {
-          if (!error.toString().includes("-32601")) {
-            if(error.message) {
-              return callback(error.message)
-            }
-            callback(error)
-          }
-        })
-        .catch((error) => {
-          if (!error.toString().includes("-32601")) {
-            if(error.message) {
-              return callback(error.message)
-            }
-            callback(error)
-          }
-        })
+    var vaultAmountToSend = web3.utils.toWei(vaultAmount, "ether")
+    if (asset.decimals !== 18) {
+      vaultAmountToSend = vaultAmount*10**asset.decimals;
     }
-    //   vaultContract.methods.deposit(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-    //     .on('transactionHash', function(hash){
-    //       console.log(hash)
-    //       callback(null, hash)
-    //     })
-    //     .on('confirmation', function(confirmationNumber, receipt){
-    //       console.log(confirmationNumber, receipt);
-    //     })
-    //     .on('receipt', function(receipt){
-    //       console.log(receipt);
-    //     })
-    //     .on('error', function(error) {
-    //       if (!error.toString().includes("-32601")) {
-    //         if(error.message) {
-    //           return callback(error.message)
-    //         }
-    //         callback(error)
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       if (!error.toString().includes("-32601")) {
-    //         if(error.message) {
-    //           return callback(error.message)
-    //         }
-    //         callback(error)
-    //       }
-    //     })
-    // }
-  }
 
-  depositAllVault = (payload) => {
-    const account = store.getStore('account')
-    const { asset } = payload.content
-
-    this._checkApproval(asset, account, asset.balance, asset.vaultContractAddress, (err) => {
-      if(err) {
-        return emitter.emit(ERROR, err);
-      }
-
-      this._callDepositAllVault(asset, account, (err, depositResult) => {
-        if(err) {
-          return emitter.emit(ERROR, err);
-        }
-
-        return emitter.emit(DEPOSIT_ALL_VAULT_RETURNED, depositResult)
-      })
-    })
-  }
-
-  _callDepositAllVault = async (asset, account, callback) => {
-    const web3 = new Web3(store.getStore('web3context').library.provider);
-
-    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-
-    vaultContract.methods.depositAll().send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    vaultContract.methods.deposit(earnAmountToSend, vaultAmountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
@@ -2752,6 +2654,25 @@ class Store {
           callback(error)
         }
       })
+  }
+
+  depositAllContract = (payload) => {
+    const account = store.getStore('account')
+    const { asset, earnAmount, vaultAmount } = payload.content
+
+    this._checkApproval(asset, account, asset.balance, asset.vaultContractAddress, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callDepositContract(asset, account, earnAmount, vaultAmount, (err, depositResult) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(DEPOSIT_ALL_CONTRACT_RETURNED, depositResult)
+      })
+    })
   }
 
   withdrawVault = (payload) => {
@@ -2866,7 +2787,7 @@ class Store {
             return emitter.emit(ERROR, err);
           }
 
-          return emitter.emit(WITHDRAW_ALL_VAULT_RETURNED, withdrawResult)
+          return emitter.emit(WITHDRAW_BOTH_VAULT_RETURNED, withdrawResult)
         })
       })
     } else {
@@ -2874,7 +2795,7 @@ class Store {
         if(err) {
           return emitter.emit(ERROR, err);
         }
-        return emitter.emit(WITHDRAW_ALL_VAULT_RETURNED, withdrawResult)
+        return emitter.emit(WITHDRAW_BOTH_VAULT_RETURNED, withdrawResult)
       })
     }
   }
@@ -2949,13 +2870,15 @@ class Store {
 
       const block = await web3.eth.getBlockNumber();
       const contract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
-      const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
-      const earnPool = await vaultContract.methods.earnPool().call({ from: account.address })
-      const vaultPool = await vaultContract.methods.vaultPool().call({ from: account.address })
-      const totalSupply = await vaultContract.methods.totalSupply().call({ from: account.address })
-      const pricePerFullShare = (earnPool + vaultPool) * 1e18 / totalSupply;
-      // let pricePerFullShare = await contract.methods.getPricePerFullShare().call();
-
+      const earnContract = new web3.eth.Contract(config.yFarmerEarnABI, config.yFarmerEarnContract);
+      const vaultContract = new web3.eth.Contract(config.yFarmerVaultABI, config.yFarmerVaultContract);
+      const earnBalance = await earnContract.methods.balanceOf(asset.vaultContractAddress).call({ from: account.address })
+      const vaultBalance = await vaultContract.methods.balanceOf(asset.vaultContractAddress).call({ from: account.address })
+      const earnPricePerFullShare = await earnContract.methods.getPricePerFullShare().call({ from: account.address })
+      const vaultPricePerFullShare = await vaultContract.methods.getPricePerFullShare().call({ from: account.address })
+      const totalSupply = await contract.methods.totalSupply().call({ from: account.address })
+      const pricePerFullShare = (earnBalance * earnPricePerFullShare + vaultBalance * vaultPricePerFullShare) / totalSupply;
+  
       let balance = pricePerFullShare - asset.measurement;
       balance = balance / 1e18;
       let diff = block - asset.lastMeasurement;
@@ -3004,30 +2927,34 @@ class Store {
   }
 
   getDashboardSnapshot = (payload) => {
+    const { interval } = payload.content;
     emitter.on(VAULT_BALANCES_FULL_RETURNED, this._calculateDashboard)
-    emitter.on(BALANCES_LIGHT_RETURNED, this._calculateDashboard)
+    // emitter.on(BALANCES_LIGHT_RETURNED, this._calculateDashboard)
     emitter.on(USD_PRICE_RETURNED, this._calculateDashboard)
     emitter.on(STATISTICS_RETURNED, this._calculateDashboard)
 
-    this.getVaultBalancesFull()
-    this.getBalancesLight()
+    this.getVaultBalancesFull(interval)
+    // this.getBalancesLight()
     this.getUSDPrices()
     this.getStatistics()
   }
 
   _calculateDashboard = () => {
     const vaults = store.getStore('vaultAssets')
-    const assets = store.getStore('assets')
     const prices = store.getStore('usdPrices')
     const statistics = store.getStore('statistics')
 
-    if(vaults && vaults.length > 0 && assets && assets.length > 0 && prices !== null && statistics && statistics.length > 0) {
+    console.log('vaults', vaults);
+    if(vaults && vaults.length > 0 && prices !== null && statistics && statistics.length > 0) {
       let basedOn = localStorage.getItem('yearn.finance-dashboard-basedon')
 
       if(!basedOn) {
         basedOn = '1'
       }
-
+      // console.log('vaults', vaults);
+      // console.log('assets', assets);
+      // console.log('prices', prices);
+      // console.log('statistics', statistics);
       // FILTER USED VAULTS AND CALCULATE VAULT ASSET BALANCES
       const vaultsInUse = vaults.filter((vault) => {
         if(vault.id === 'ETH') {
@@ -3048,13 +2975,13 @@ class Store {
         } else {
           switch (basedOn) {
             case '1':
-              apy = vaultStats[0].apyOneWeekSample
+              apy = (vaultStats[0].apyOneWeekSample + vault.earnApr) / 2
               break;
             case '2':
-              apy = vaultStats[0].apyOneMonthSample
+              apy = (vaultStats[0].apyOneMonthSample + vault.earnApr) / 2
               break;
             case '3':
-              apy = vaultStats[0].apyInceptionSample
+              apy = (vaultStats[0].apyInceptionSample + vault.earnApr) / 2
               break;
             default:
               apy = vault.apy
@@ -3063,15 +2990,31 @@ class Store {
 
         const price = prices[vault.price_id]
         vault.prices = price
-        vault.usdBalance = vault.vaultBalance * vault.pricePerFullShare * vault.prices.usd
-        vault.vaultGrowth_daily_usd = vault.vaultBalance * vault.pricePerFullShare * (apy/36500) * vault.prices.usd
-        vault.vaultGrowth_weekly_usd = vault.vaultBalance * vault.pricePerFullShare * (apy/5200) * vault.prices.usd
-        vault.vaultGrowth_yearly_usd = vault.vaultBalance * vault.pricePerFullShare * apy/100 * vault.prices.usd
+        vault.tokenBalance = vault.vaultBalance + vault.earnBalance
+        vault.usdBalance = vault.tokenBalance * vault.pricePerFullShare * vault.prices.usd
+        vault.vaultGrowth_daily_usd = vault.tokenBalance * vault.pricePerFullShare * (apy/36500) * vault.prices.usd
+        vault.vaultGrowth_weekly_usd = vault.tokenBalance * vault.pricePerFullShare * (apy/5200) * vault.prices.usd
+        vault.vaultGrowth_yearly_usd = vault.tokenBalance * vault.pricePerFullShare * apy/100 * vault.prices.usd
 
-        vault.ethBalance = vault.vaultBalance * vault.pricePerFullShare * vault.prices.eth
-        vault.vaultGrowth_daily_eth = vault.vaultBalance * vault.pricePerFullShare * (apy/36500) * vault.prices.eth
-        vault.vaultGrowth_weekly_eth = vault.vaultBalance * vault.pricePerFullShare * (apy/5200) * vault.prices.eth
-        vault.vaultGrowth_yearly_eth = vault.vaultBalance * vault.pricePerFullShare * apy/100 * vault.prices.eth
+        vault.ethBalance = vault.tokenBalance * vault.pricePerFullShare * vault.prices.eth
+        vault.vaultGrowth_daily_eth = vault.tokenBalance * vault.pricePerFullShare * (apy/36500) * vault.prices.eth
+        vault.vaultGrowth_weekly_eth = vault.tokenBalance * vault.pricePerFullShare * (apy/5200) * vault.prices.eth
+        vault.vaultGrowth_yearly_eth = vault.tokenBalance * vault.pricePerFullShare * apy/100 * vault.prices.eth
+
+        if (vault.historicalPrice) {
+          vault.portfolioBalance = [];
+          const sortByTimestamp = (a, b) => {
+            if (a.timestamp > b.timestamp) return 1;
+            if (a.timestamp < b.timestamp) return -1;
+            return 0;
+          }
+
+          vault.historicalPrice
+          .sort(sortByTimestamp)
+          .forEach(price => {
+            vault.portfolioBalance.push([price.timestamp, parseFloat(price.earnPrice)/10**18 * vault.earnBalance + parseFloat(price.vaultPrice)/10**18 * vault.vaultBalance])
+          })
+        }
 
         return vault
       })
@@ -3087,6 +3030,18 @@ class Store {
         accumulator.vaultGrowth_daily_eth = accumulator.vaultGrowth_daily_eth + vault.vaultGrowth_daily_eth
         accumulator.vaultGrowth_weekly_eth = accumulator.vaultGrowth_weekly_eth + vault.vaultGrowth_weekly_eth
         accumulator.vaultGrowth_yearly_eth = accumulator.vaultGrowth_yearly_eth + vault.vaultGrowth_yearly_eth
+
+        if (!accumulator.totalPortfolioBalance || accumulator.totalPortfolioBalance.length === 0) {
+          accumulator.totalPortfolioBalance = vault.portfolioBalance;
+        } else {
+          vault.portfolioBalance.forEach(balance => {
+            accumulator.totalPortfolioBalance.forEach(totalBalance => {
+              if (balance[0] === totalBalance[0]) {
+                totalBalance[1] += balance[1];
+              }
+            })
+          })
+        }        
         return accumulator
       }, {
         vaultBalance_usd: 0,
@@ -3108,83 +3063,25 @@ class Store {
       const vaultGrowthWeeklyPerc_eth = vaultBalances.vaultGrowth_weekly_eth * 100 / vaultBalances.vaultBalance_eth
       const vaultGrowthYearlyPerc_eth = vaultBalances.vaultGrowth_yearly_eth * 100 / vaultBalances.vaultBalance_eth
 
-
-      // FILTER USED EARN AND CALCULATE EARN ASSET BALANCES
-      const assetsInUse = assets.filter((asset) => {
-        return asset.investedBalance > 0.0001
-      }).map((asset) => {
-        const price = prices[asset.price_id]
-        if(price == null) {
-          console.log(asset.price_id)
-        }
-        asset.prices = price
-        asset.usdBalance = asset.investedBalance * asset.price * asset.prices.usd
-        asset.earnGrowth_daily_usd = asset.investedBalance * asset.price * (asset.maxApr/36500) * asset.prices.usd
-        asset.earnGrowth_weekly_usd = asset.investedBalance * asset.price * (asset.maxApr/5200) * asset.prices.usd
-        asset.earnGrowth_yearly_usd = asset.investedBalance * asset.price * asset.maxApr/100 * asset.prices.usd
-
-        asset.ethBalance = asset.investedBalance * asset.price * asset.prices.eth
-        asset.earnGrowth_daily_eth = asset.investedBalance * asset.price * (asset.maxApr/36500) * asset.prices.eth
-        asset.earnGrowth_weekly_eth = asset.investedBalance * asset.price * (asset.maxApr/5200) * asset.prices.eth
-        asset.earnGrowth_yearly_eth = asset.investedBalance * asset.price * asset.maxApr/100 * asset.prices.eth
-        return asset
-      })
-
-
-      // CALCULATE EARN BALANCES AND DAILY GROWTH
-      const earnBalances = assetsInUse.reduce((accumulator, asset) => {
-        accumulator.earnBalance_usd = accumulator.earnBalance_usd + asset.usdBalance
-        accumulator.earnGrowth_daily_usd = accumulator.earnGrowth_daily_usd + asset.earnGrowth_daily_usd
-        accumulator.earnGrowth_weekly_usd = accumulator.earnGrowth_weekly_usd + asset.earnGrowth_weekly_usd
-        accumulator.earnGrowth_yearly_usd = accumulator.earnGrowth_yearly_usd + asset.earnGrowth_yearly_usd
-
-        accumulator.earnBalance_eth = accumulator.earnBalance_eth + asset.ethBalance
-        accumulator.earnGrowth_daily_eth = accumulator.earnGrowth_daily_eth + asset.earnGrowth_daily_eth
-        accumulator.earnGrowth_weekly_eth = accumulator.earnGrowth_weekly_eth + asset.earnGrowth_weekly_eth
-        accumulator.earnGrowth_yearly_eth = accumulator.earnGrowth_yearly_eth + asset.earnGrowth_yearly_eth
-        return accumulator
-      }, {
-        earnBalance_usd: 0,
-        earnGrowth_daily_usd: 0,
-        earnGrowth_weekly_usd: 0,
-        earnGrowth_yearly_usd: 0,
-        earnBalance_eth: 0,
-        earnGrowth_daily_eth: 0,
-        earnGrowth_weekly_eth: 0,
-        earnGrowth_yearly_eth: 0
-      })
-
-      // CALCULATE EARN GROWth PERCENTAGES
-      const earnGrowthDailyPerc_usd = earnBalances.earnGrowth_daily_usd * 100 / earnBalances.earnBalance_usd
-      const earnGrowthWeeklyPerc_usd = earnBalances.earnGrowth_weekly_usd * 100 / earnBalances.earnBalance_usd
-      const earnGrowthYearlyPerc_usd = earnBalances.earnGrowth_yearly_usd * 100 / earnBalances.earnBalance_usd
-
-      const earnGrowthDailyPerc_eth = earnBalances.earnGrowth_daily_eth * 100 / earnBalances.earnBalance_eth
-      const earnGrowthWeeklyPerc_eth = earnBalances.earnGrowth_weekly_eth * 100 / earnBalances.earnBalance_eth
-      const earnGrowthYearlyPerc_eth = earnBalances.earnGrowth_yearly_eth * 100 / earnBalances.earnBalance_eth
-
-
-
-
       // CALCULATE PORTFOLIO (earn + vault) BALANCES
-      const portfolioBalance_usd = vaultBalances.vaultBalance_usd + earnBalances.earnBalance_usd
-      const portfolioGrowthDaily_usd = vaultBalances.vaultGrowth_daily_usd + earnBalances.earnGrowth_daily_usd
-      const portfolioGrowthWeekly_usd = vaultBalances.vaultGrowth_weekly_usd + earnBalances.earnGrowth_weekly_usd
-      const portfolioGrowthYearly_usd = vaultBalances.vaultGrowth_yearly_usd + earnBalances.earnGrowth_yearly_usd
-      const portfolioGrowthDailyPerc_usd = (vaultBalances.vaultGrowth_daily_usd + earnBalances.earnGrowth_daily_usd) * 100 / (vaultBalances.vaultBalance_usd + earnBalances.earnBalance_usd)
-      const portfolioGrowthWeeklyPerc_usd = (vaultBalances.vaultGrowth_weekly_usd + earnBalances.earnGrowth_weekly_usd) * 100 / (vaultBalances.vaultBalance_usd + earnBalances.earnBalance_usd)
-      const portfolioGrowthYearlyPerc_usd = (vaultBalances.vaultGrowth_yearly_usd + earnBalances.earnGrowth_yearly_usd) * 100 / (vaultBalances.vaultBalance_usd + earnBalances.earnBalance_usd)
+      const portfolioBalance_usd = vaultBalances.vaultBalance_usd
+      const portfolioGrowthDaily_usd = vaultBalances.vaultGrowth_daily_usd
+      const portfolioGrowthWeekly_usd = vaultBalances.vaultGrowth_weekly_usd
+      const portfolioGrowthYearly_usd = vaultBalances.vaultGrowth_yearly_usd
+      const portfolioGrowthDailyPerc_usd = (vaultBalances.vaultGrowth_daily_usd) * 100 / vaultBalances.vaultBalance_usd
+      const portfolioGrowthWeeklyPerc_usd = (vaultBalances.vaultGrowth_weekly_usd) * 100 / vaultBalances.vaultBalance_usd
+      const portfolioGrowthYearlyPerc_usd = (vaultBalances.vaultGrowth_yearly_usd) * 100 / vaultBalances.vaultBalance_usd
 
 
-      const portfolioBalance_eth = vaultBalances.vaultBalance_eth + earnBalances.earnBalance_eth
-      const portfolioGrowthDaily_eth = vaultBalances.vaultGrowth_daily_eth + earnBalances.earnGrowth_daily_eth
-      const portfolioGrowthWeekly_eth = vaultBalances.vaultGrowth_weekly_eth + earnBalances.earnGrowth_weekly_eth
-      const portfolioGrowthYearly_eth = vaultBalances.vaultGrowth_yearly_eth + earnBalances.earnGrowth_yearly_eth
-      const portfolioGrowthDailyPerc_eth = (vaultBalances.vaultGrowth_daily_eth + earnBalances.earnGrowth_daily_eth) * 100 / (vaultBalances.vaultBalance_eth + earnBalances.earnBalance_eth)
-      const portfolioGrowthWeeklyPerc_eth = (vaultBalances.vaultGrowth_weekly_eth + earnBalances.earnGrowth_weekly_eth) * 100 / (vaultBalances.vaultBalance_eth + earnBalances.earnBalance_eth)
-      const portfolioGrowthYearlyPerc_eth = (vaultBalances.vaultGrowth_yearly_eth + earnBalances.earnGrowth_yearly_eth) * 100 / (vaultBalances.vaultBalance_eth + earnBalances.earnBalance_eth)
+      const portfolioBalance_eth = vaultBalances.vaultBalance_eth
+      const portfolioGrowthDaily_eth = vaultBalances.vaultGrowth_daily_eth
+      const portfolioGrowthWeekly_eth = vaultBalances.vaultGrowth_weekly_eth
+      const portfolioGrowthYearly_eth = vaultBalances.vaultGrowth_yearly_eth
+      const portfolioGrowthDailyPerc_eth = (vaultBalances.vaultGrowth_daily_eth) * 100 / vaultBalances.vaultBalance_eth
+      const portfolioGrowthWeeklyPerc_eth = (vaultBalances.vaultGrowth_weekly_eth) * 100 / vaultBalances.vaultBalance_eth
+      const portfolioGrowthYearlyPerc_eth = (vaultBalances.vaultGrowth_yearly_eth) * 100 / vaultBalances.vaultBalance_eth
 
-
+      console.log('vaultBalances', vaultBalances);
       let dashboard = {
         vault_balance_usd: vaultBalances.vaultBalance_usd,
         vault_growth_usd_daily: vaultBalances.vaultGrowth_daily_usd,
@@ -3201,23 +3098,6 @@ class Store {
         vault_growth_eth_daily_perc: vaultGrowthDailyPerc_eth,
         vault_growth_eth_weekly_perc: vaultGrowthWeeklyPerc_eth,
         vault_growth_eth_yearly_perc: vaultGrowthYearlyPerc_eth,
-
-
-        earn_balance_usd: earnBalances.earnBalance_usd,
-        earn_growth_usd_daily: earnBalances.earnGrowth_daily_usd,
-        earn_growth_usd_weekly: earnBalances.earnGrowth_weekly_usd,
-        earn_growth_usd_yearly: earnBalances.earnGrowth_yearly_usd,
-        earn_growth_usd_daily_perc: earnGrowthDailyPerc_usd,
-        earn_growth_usd_weekly_perc: earnGrowthWeeklyPerc_usd,
-        earn_growth_usd_yearly_perc: earnGrowthYearlyPerc_usd,
-
-        earn_balance_eth: earnBalances.earnBalance_eth,
-        earn_growth_eth_daily: earnBalances.earnGrowth_daily_eth,
-        earn_growth_eth_weekly: earnBalances.earnGrowth_weekly_eth,
-        earn_growth_eth_yearly: earnBalances.earnGrowth_yearly_eth,
-        earn_growth_eth_daily_perc: earnGrowthDailyPerc_eth,
-        earn_growth_eth_weekly_perc: earnGrowthWeeklyPerc_eth,
-        earn_growth_eth_yearly_perc: earnGrowthYearlyPerc_eth,
 
         portfolio_balance_usd: portfolioBalance_usd,
         portfolio_growth_usd_daily: portfolioGrowthDaily_usd,
@@ -3236,8 +3116,8 @@ class Store {
         portfolio_growth_eth_yearly_perc: portfolioGrowthYearlyPerc_eth,
 
         vaults: vaultsInUse,
-        assets: assetsInUse,
-        statistics: statistics
+        statistics: statistics,
+        totalPerformance: vaultBalances.totalPortfolioBalance
       }
 
       store.setStore({ dashboard: dashboard })
@@ -3263,22 +3143,34 @@ class Store {
       const url = config.statsProvider+'vaults/apy'
       const statisticsString = await rp(url);
       const statistics = JSON.parse(statisticsString)
-      return statistics
+      return statistics.body;
     } catch(e) {
       console.log(e)
       return store.getStore('universalGasPrice')
     }
   }
 
-  _getHistoricalPrice = async (contract, interval) => {
+  _getHistoricalPrice = async (contract, interval, callback) => {
     try {
-      const url = `${config.statsProvider}+vaults/price/${contract}/${interval}`
+      const url = `${config.statsProvider}vaults/price/${contract}/${interval}`
       const resultString = await rp(url);
       const result = JSON.parse(resultString)
-      return result
+      callback(null, result.body)
     } catch(e) {
       console.log(e)
-      return store.getStore('universalGasPrice')
+      callback(null, [])
+    }
+  }
+
+  _getHistoricalAPY = async (contract, interval, callback) => {
+    try {
+      const url = `${config.statsProvider}vaults/historical-apy/${contract}/${interval}`
+      const resultString = await rp(url);
+      const result = JSON.parse(resultString)
+      callback(null, result.body)
+    } catch(e) {
+      console.log(e)
+      callback(null, [])
     }
   }
 
@@ -3288,7 +3180,7 @@ class Store {
       const statisticsString = await rp(url);
       const statistics = JSON.parse(statisticsString)
 
-      return statistics
+      return statistics.body;
     } catch(e) {
       console.log(e)
       return store.getStore('universalGasPrice')
@@ -3301,7 +3193,7 @@ class Store {
       const statisticsString = await rp(url);
       const statistics = JSON.parse(statisticsString)
 
-      return statistics
+      return statistics.body
     } catch(e) {
       console.log(e)
       return store.getStore('universalGasPrice')
@@ -3344,6 +3236,30 @@ class Store {
     const { open } = payload.content
     this.setStore({ openDrawer: open })
     return emitter.emit(DRAWER_RETURNED)
+  };
+
+  withdrawBothAll = (payload) => {
+    let { asset } = payload.content;
+
+    if (asset.earnBalance > 0) {
+      this.withdrawYfUDST({
+        content: {
+          amount: asset.earnBalance.toString(),
+          asset,
+          methods: 'withdrawEarn'
+        }
+      })
+    }
+    
+    if (asset.vaultBalance) {
+      this.withdrawYfUDST({
+        content: {
+          amount: asset.vaultBalance.toString(),
+          asset,
+          methods: 'withdrawVault'
+        }
+      })
+    }
   };
 
   withdrawBoth = (payload) => {
@@ -3435,9 +3351,11 @@ class Store {
     })
   }
 
-  getStrategyBalancesFull = async () => {
+  getStrategyBalancesFull = async (payload) => {
     const account = store.getStore('account')
     const assets = store.getStore('vaultAssets')
+
+    const { interval } = payload.content;
 
     if(!account || !account.address) {
       return false
@@ -3467,6 +3385,7 @@ class Store {
         (callbackInner) => { this._getAddressStats(addressStatistics, asset, callbackInner) },
         (callbackInner) => { this._getAddressTransactions(addressTXHitory, asset, callbackInner) },
         (callbackInner) => { this._getMaxAPR(web3, asset, account, callbackInner) },
+        (callbackInner) => { this._getHistoricalAPY(asset.vaultContractAddress, interval, callbackInner) },
       ], (err, data) => {
         if(err) {
           return callback(err)
@@ -3484,6 +3403,7 @@ class Store {
         asset.addressStatistics = data[6]
         asset.addressTransactions = data[7]
         asset.earnApr = data[8]
+        asset.historicalAPY = data[9]
 
         callback(null, asset)
       })
@@ -3496,10 +3416,6 @@ class Store {
       store.setStore({ vaultAssets: assets })
       return emitter.emit(STRATEGY_BALANCES_FULL_RETURNED, assets)
     })
-  }
-
-  getHistoricalPrice = async () => {
-
   }
 }
 

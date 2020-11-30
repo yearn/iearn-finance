@@ -28,14 +28,14 @@ import HighchartsReact from 'highcharts-react-official';
 
 import {
   ERROR,
-  DEPOSIT_VAULT_RETURNED,
+  DEPOSIT_CONTRACT_RETURNED,
   WITHDRAW_VAULT_RETURNED,
-  DEPOSIT_ALL_VAULT_RETURNED,
-  WITHDRAW_ALL_VAULT_RETURNED,
+  DEPOSIT_ALL_CONTRACT_RETURNED,
+  WITHDRAW_BOTH_VAULT_RETURNED,
   CONNECTION_CONNECTED,
   CONNECTION_DISCONNECTED,
   GET_STRATEGY_BALANCES_FULL,
-  STRATEGY_BALANCES_FULL_RETURNED
+  STRATEGY_BALANCES_FULL_RETURNED,
 } from '../../constants'
 
 import Store from "../../stores";
@@ -427,9 +427,10 @@ const styles = theme => ({
   },
   gridItemColumn: {
     display: 'flex',
-    alignItems: 'stretch',
+    alignItems: 'center',
     [theme.breakpoints.down('sm')]: {
-      marginBottom: '5px'
+      marginBottom: '5px',
+      alignItems: 'stretch',
     }
   },
   roundIconClass: {
@@ -476,14 +477,14 @@ class Vault extends Component {
     }
 
     if(account && account.address) {
-      dispatcher.dispatch({ type: GET_STRATEGY_BALANCES_FULL, content: {} })
+      dispatcher.dispatch({ type: GET_STRATEGY_BALANCES_FULL, content: { interval: '30d' } })
     }
   }
   componentWillMount() {
-    emitter.on(DEPOSIT_VAULT_RETURNED, this.showHash);
+    emitter.on(DEPOSIT_CONTRACT_RETURNED, this.showHash);
     emitter.on(WITHDRAW_VAULT_RETURNED, this.showHash);
-    emitter.on(DEPOSIT_ALL_VAULT_RETURNED, this.showHash);
-    emitter.on(WITHDRAW_ALL_VAULT_RETURNED, this.showHash);
+    emitter.on(DEPOSIT_ALL_CONTRACT_RETURNED, this.showHash);
+    emitter.on(WITHDRAW_BOTH_VAULT_RETURNED, this.showHash);
     emitter.on(ERROR, this.errorReturned);
     emitter.on(STRATEGY_BALANCES_FULL_RETURNED, this.balancesReturned);
     emitter.on(CONNECTION_CONNECTED, this.connectionConnected);
@@ -491,10 +492,10 @@ class Vault extends Component {
   }
 
   componentWillUnmount() {
-    emitter.removeListener(DEPOSIT_VAULT_RETURNED, this.showHash);
+    emitter.removeListener(DEPOSIT_CONTRACT_RETURNED, this.showHash);
     emitter.removeListener(WITHDRAW_VAULT_RETURNED, this.showHash);
-    emitter.removeListener(DEPOSIT_ALL_VAULT_RETURNED, this.showHash);
-    emitter.removeListener(WITHDRAW_ALL_VAULT_RETURNED, this.showHash);
+    emitter.removeListener(DEPOSIT_ALL_CONTRACT_RETURNED, this.showHash);
+    emitter.removeListener(WITHDRAW_BOTH_VAULT_RETURNED, this.showHash);
     emitter.removeListener(ERROR, this.errorReturned);
     emitter.removeListener(CONNECTION_CONNECTED, this.connectionConnected);
     emitter.removeListener(CONNECTION_DISCONNECTED, this.connectionDisconnected);
@@ -508,6 +509,13 @@ class Vault extends Component {
     })
   };
 
+  historicalPriceReturned = (historicalPrices) => {
+    console.log(historicalPrices)
+    this.setState({
+      historicalPrice: historicalPrices
+    })
+  }
+
   connectionConnected = () => {
     const { t } = this.props
     const account = store.getStore('account')
@@ -519,7 +527,7 @@ class Vault extends Component {
     })
 
 
-    dispatcher.dispatch({ type: GET_STRATEGY_BALANCES_FULL, content: {} })
+    dispatcher.dispatch({ type: GET_STRATEGY_BALANCES_FULL, content: { interval: '30d' } })
 
     const that = this
     setTimeout(() => {
@@ -688,7 +696,7 @@ class Vault extends Component {
       }
     }).map((asset, index) => {
       return (
-        <div className={classes.strategyContainer}>
+        <div key={index} className={classes.strategyContainer}>
           <Grid container>
             <Grid item sm={6} xs={6} style={{display: 'flex', alignItems: 'center'}}>
               <Typography variant='h4'>Strategy {index+1}: {asset.strategyName}</Typography>
@@ -697,7 +705,7 @@ class Vault extends Component {
               {this.renderRiskLabel()}
             </Grid>
           </Grid>
-          <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id) } }>
+          <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id, asset) } }>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon className={classes.roundIconClass} />}
               aria-controls="panel1bh-content"
@@ -716,7 +724,7 @@ class Vault extends Component {
                     </div>
                     <Typography variant={ 'body1' } noWrap className={classes.assetName}>{ asset.name }</Typography>
                   </Grid>
-                  <Grid item sm={3} xs={6} className={classes.gridItemColumn}>
+                  <Grid item sm={2} xs={6} className={classes.gridItemColumn}>
                     <Typography variant={ 'body1' } className={ classes.assetLabel }>{ asset.description }</Typography>
                   </Grid>
                   <Grid item sm={3} xs={6} className={classes.gridItemColumn}>
@@ -724,11 +732,11 @@ class Vault extends Component {
                     (!['LINK'].includes(asset.id) && asset.vaultBalance > 0) &&
                     <div>
                       <div className={classes.showDesktop}>
-                        <Typography variant={ 'h5' } className={ classes.assetLabel }>Yearly Growth: <span style={{color: '#222222'}}>{ (this._getAPY(asset)/1).toFixed(2) }% on { (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(2) : '0.00') } {asset.symbol}</span></Typography>
+                        <Typography variant={ 'h5' } className={ classes.assetLabel }>Yearly Growth: <span style={{color: '#222222'}}>{ (this._getAPY(asset)/1).toFixed(2) }%</span></Typography>
                       </div>  
                       <div className={classes.showMobile}>
                         <Typography variant={ 'h5' } className={ classes.assetLabel }>Yearly Growth: </Typography>
-                        <Typography variant={ 'h3' } noWrap className={classes.assetValue}>{ (this._getAPY(asset)/1).toFixed(2) }% on { (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(2) : '0.00') } {asset.symbol}</Typography>
+                        <Typography variant={ 'h3' } noWrap className={classes.assetValue}>{ (this._getAPY(asset)/1).toFixed(2) }%</Typography>
                       </div>
                     </div>   
                   }
@@ -748,7 +756,7 @@ class Vault extends Component {
                       </div>   
                   }
                   </Grid>
-                  <Grid item sm={4} xs={6} className={classes.gridItemColumn}>
+                  <Grid item sm={5} xs={6} className={classes.gridItemColumn}>
                     <div className={classes.showDesktop}>
                       <Typography variant={ 'h5' } className={ classes.assetLabel }>Available to deposit: <span style={{color: '#222222'}}>
                           { (asset.balance ? (asset.balance).toFixed(2) : '0.00')+' '+asset.symbol }
@@ -833,7 +841,7 @@ class Vault extends Component {
     localStorage.setItem('yearn.finance-hideZero', (event.target.checked ? '1' : '0' ))
   }
 
-  handleChange = (id) => {
+  handleChange = (id, asset) => {
     this.setState({ expanded: this.state.expanded === id ? null : id })
   }
 
@@ -852,20 +860,20 @@ class Vault extends Component {
   _getAPY = (asset) => {
     const { basedOn } = this.state
     console.log('asset', asset);
-    console.log('basedOn', basedOn);
+    // To calculate APY (Vault + Earn divide by 2 : Estimated)
     if(asset && asset.stats) {
       switch (basedOn) {
         case 1:
-          return asset.stats.apyOneWeekSample
+          return (asset.stats.apyOneWeekSample + asset.earnApr) / 2
         case 2:
-          return asset.stats.apyOneMonthSample
+          return (asset.stats.apyOneMonthSample + asset.earnApr) / 2
         case 3:
-          return asset.stats.apyInceptionSample
+          return (asset.stats.apyInceptionSample + asset.earnApr) / 2
         default:
-          return asset.apy
+          return (asset.apy + asset.earnApr) / 2
       }
     } else if (asset.apy) {
-      return asset.apy
+      return (asset.apy + asset.earnApr) / 2
     } else {
       return '0.00'
     }
@@ -929,7 +937,7 @@ class Vault extends Component {
     localStorage.setItem('yearn.finance-dashboard-basedon', event.target.value)
 
     this.setState({ loading: true })
-    dispatcher.dispatch({ type: GET_STRATEGY_BALANCES_FULL, content: {} })
+    dispatcher.dispatch({ type: GET_STRATEGY_BALANCES_FULL, content: { interval: '30d' } })
   }
 
   addressClicked = () => {

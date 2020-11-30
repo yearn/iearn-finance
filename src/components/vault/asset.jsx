@@ -9,18 +9,18 @@ import {
 
 import {
   ERROR,
-  DEPOSIT_VAULT,
-  DEPOSIT_VAULT_RETURNED,
+  DEPOSIT_CONTRACT,
+  DEPOSIT_CONTRACT_RETURNED,
   WITHDRAW_BOTH,
   WITHDRAW_VAULT_RETURNED,
-  DEPOSIT_ALL_VAULT,
-  DEPOSIT_ALL_VAULT_RETURNED,
-  WITHDRAW_ALL_VAULT,
-  WITHDRAW_ALL_VAULT_RETURNED
+  DEPOSIT_ALL_CONTRACT,
+  DEPOSIT_ALL_CONTRACT_RETURNED,
+  WITHDRAW_BOTH_VAULT,
+  WITHDRAW_BOTH_VAULT_RETURNED
 } from '../../constants'
 
 import { colors } from '../../theme'
-
+import * as moment from 'moment';
 import Store from "../../stores";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from 'highcharts';
@@ -82,7 +82,10 @@ const styles = theme => ({
     borderRadius: '5px',
     background: '#18a0fb',
     color: '#ffffff',
-    width: '49%'
+    width: '49%',
+    '&:hover': {
+      background: '#00c2ff'
+    }
   },
   withdrawButton: {
     height: '47px',
@@ -279,23 +282,23 @@ class Asset extends Component {
       vaultRatio: 50,
       percent: 0,
       earnPercent: 0,
-      vaultPercent: 0
+      vaultPercent: 0,
     }
   }
 
   componentWillMount() {
-    emitter.on(DEPOSIT_VAULT_RETURNED, this.depositReturned);
+    emitter.on(DEPOSIT_CONTRACT_RETURNED, this.depositReturned);
     emitter.on(WITHDRAW_VAULT_RETURNED, this.withdrawReturned);
-    emitter.on(DEPOSIT_ALL_VAULT_RETURNED, this.depositReturned);
-    emitter.on(WITHDRAW_ALL_VAULT_RETURNED, this.withdrawReturned);
+    emitter.on(DEPOSIT_ALL_CONTRACT_RETURNED, this.depositReturned);
+    emitter.on(WITHDRAW_BOTH_VAULT_RETURNED, this.withdrawReturned);
     emitter.on(ERROR, this.errorReturned);
   }
 
   componentWillUnmount() {
-    emitter.removeListener(DEPOSIT_VAULT_RETURNED, this.depositReturned);
+    emitter.removeListener(DEPOSIT_CONTRACT_RETURNED, this.depositReturned);
     emitter.removeListener(WITHDRAW_VAULT_RETURNED, this.withdrawReturned);
-    emitter.removeListener(DEPOSIT_ALL_VAULT_RETURNED, this.depositReturned);
-    emitter.removeListener(WITHDRAW_ALL_VAULT_RETURNED, this.withdrawReturned);
+    emitter.removeListener(DEPOSIT_ALL_CONTRACT_RETURNED, this.depositReturned);
+    emitter.removeListener(WITHDRAW_BOTH_VAULT_RETURNED, this.withdrawReturned);
     emitter.removeListener(ERROR, this.errorReturned);
   };
 
@@ -325,14 +328,14 @@ class Asset extends Component {
       vaultRatio,
       percent,
       earnPercent,
-      vaultPercent
+      vaultPercent,
     } = this.state
 
     return (
       <div className={ classes.vaultContainer }>
         <Grid container className={ classes.assetSummary }>
           <Grid item sm={6} xs={12} style={{borderRight: '1px solid #d9d9d9'}}>
-            {this.renderChart()}
+            {this.renderChart(asset)}
           </Grid>
           <Grid item sm={6} xs={12} className={classes.assetDetails}>
             <Typography variant={ 'h4' } className={classes.subtitle} noWrap>STRATEGY</Typography>
@@ -341,7 +344,7 @@ class Asset extends Component {
             <Grid item sm={4} xs={6}>
                 <Typography variant={ 'h5' } className={ classes.grey }>Currently Active:</Typography>
                 <div className={ classes.flexy }>
-                  <Typography variant={ 'h4' } noWrap>Yearn Vault</Typography>
+                  <Typography variant={ 'h4' } noWrap>{asset.strategy}</Typography>
                 </div>  
               </Grid>
               <Grid item sm={4} xs={6}>
@@ -407,7 +410,7 @@ class Asset extends Component {
                 <Typography variant='h4' style={{color: '#044b7b'}} noWrap>{ 'yEarn: '+ earnRatio + '%' }</Typography>
               </div>
               <div>
-                <Typography variant='h4' noWrap>{ 'APY '+ earnRatio + '%' }</Typography>
+                <Typography variant='h4' noWrap>{ 'APY '+ this._getEstimatedAPY(asset) + '%' }</Typography>
               </div>
               <div className={ classes.rightLabelContainer }>
                 <Typography variant='h4' style={{color: '#2962ef'}} noWrap>{ 'yVault: '+ vaultRatio + '%' }</Typography>
@@ -639,24 +642,56 @@ class Asset extends Component {
     )
   };
 
-  renderChart = () => {
+  renderChart = (asset) => {
+    var earnAPY = [];
+    var vaultAPY = [];
+    var labels = [];
+
+    const sortByTimestamp = (a, b) => {
+      if (a.timestamp > b.timestamp) return 1;
+      if (a.timestamp < b.timestamp) return -1;
+      return 0;
+    }
+
+    if (asset.historicalAPY) {
+      asset.historicalAPY
+      .sort(sortByTimestamp)
+      .forEach(apy => {
+        var dateFormat = moment.unix(apy.timestamp/1000).format('DD-MM-YYYY');
+        labels.push(dateFormat);
+        earnAPY.push([dateFormat, parseFloat(parseFloat(apy.aprs).toFixed(4))]);
+        vaultAPY.push([dateFormat, parseFloat(apy.apyOneWeekSample.toFixed(4))]);
+      })
+    }
     const options = {
-      chart: {
-        width: 800
-      },
       title: {
         text: 'Historical Earn & Vault Performance'
+      },
+      xAxis: {
+        categories: labels
       },
       series: [
         {
           name: 'Earn',
-          data: [1, 2, 1, 4, 3, 6]
+          data: earnAPY
         },
         {
           name: 'Vault',
-          data: [3, 1, 3, 4, 3, 8]
+          data: vaultAPY
         }
       ],
+      responsive: {
+        rules: [{
+          condition: {
+            maxWidth: 450,
+            chartOptions: {
+              chart: {
+                width: 300
+              }
+            }
+          }
+        }]
+      },
       credits: {
         enabled: false
       }
@@ -671,25 +706,35 @@ class Asset extends Component {
 
   _getAPY = (asset) => {
     const { basedOn } = this.props
-
     if(asset && asset.stats) {
       switch (basedOn) {
+        // case 1:
+        //   return (asset.stats.apyThreeDaySample + asset.earnApr) / 2
         case 1:
-          return asset.stats.apyThreeDaySample
+          return (asset.stats.apyOneWeekSample + asset.earnApr) / 2
         case 2:
-          return asset.stats.apyOneWeekSample
+          return (asset.stats.apyOneMonthSample + asset.earnApr) / 2
         case 3:
-          return asset.stats.apyOneMonthSample
-        case 4:
-          return asset.stats.apyInceptionSample
+          return (asset.stats.apyInceptionSample + asset.earnApr) / 2
         default:
-          return asset.apy
+          return (asset.apy + asset.earnApr) / 2
       }
     } else if (asset.apy) {
-      return asset.apy
+      return (asset.apy + asset.earnApr) / 2
     } else {
       return '0.00'
     }
+  }
+
+  _getEstimatedAPY = (asset) => {
+    const {
+      earnRatio,
+      vaultRatio
+    } = this.state;
+
+    const earnAPY = asset.earnApr ? asset.earnApr : 0;
+    const vaultAPY = asset && asset.stats ? asset.stats.apyOneWeekSample : 0
+    return ((earnAPY * earnRatio / 100) + (vaultAPY * vaultRatio / 100)).toFixed(2)
   }
 
   handleSliderChange = (event, newValue) => {
@@ -713,14 +758,13 @@ class Asset extends Component {
   }
 
   sliderValueText = (value) => {
-    console.log(value)
     return value;
   }
 
   onDeposit = () => {
     this.setState({ amountError: false })
 
-    const { amount } = this.state
+    const { amount, earnRatio, vaultRatio } = this.state
     const { asset, startLoading } = this.props
 
     if(!amount || isNaN(amount) || amount <= 0 || amount > asset.balance) {
@@ -730,15 +774,24 @@ class Asset extends Component {
 
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: DEPOSIT_VAULT, content: { amount: amount, asset: asset } })
+    dispatcher.dispatch({ type: DEPOSIT_CONTRACT, content: { 
+      earnAmount: (amount * earnRatio / 100).toString(), 
+      vaultAmount: (amount * vaultRatio/ 100).toString(), 
+      asset 
+    } })
   }
 
   onDepositAll = () => {
     const { asset, startLoading } = this.props
+    const { earnRatio, vaultRatio } = this.state
 
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: DEPOSIT_ALL_VAULT, content: { asset: asset } })
+    dispatcher.dispatch({ type: DEPOSIT_ALL_CONTRACT, content: { 
+      asset,
+      earnAmount: (asset.balance * earnRatio / 100).toString(), 
+      vaultAmount: (asset.balance * vaultRatio/ 100).toString(), 
+    } })
   }
 
   onWithdraw = () => {
@@ -746,18 +799,18 @@ class Asset extends Component {
 
     const { asset, startLoading  } = this.props
     let redeemAmount = this.state.redeemAmount.toString()
-    // redeemAmount = (Math.floor(redeemAmount*10000)/10000).toFixed(4);
-    // if(!redeemAmount || isNaN(redeemAmount) || redeemAmount < 0) {
-    //   this.setState({ redeemAmountError: true })
-    //   return false
-    // }
+    redeemAmount = (Math.floor(redeemAmount*10000)/10000).toFixed(4);
+    if(!redeemAmount || isNaN(redeemAmount) || redeemAmount < 0) {
+      this.setState({ redeemAmountError: true })
+      return false
+    }
 
     let redeemEarnAmount = this.state.redeemEarnAmount.toString()
-    // redeemEarnAmount = (Math.floor(redeemEarnAmount*10000)/10000).toFixed(4);
-    // if(!redeemEarnAmount || isNaN(redeemEarnAmount) || redeemEarnAmount < 0) {
-    //   this.setState({ redeemAmountError: true })
-    //   return false
-    // }
+    redeemEarnAmount = (Math.floor(redeemEarnAmount*10000)/10000).toFixed(4);
+    if(!redeemEarnAmount || isNaN(redeemEarnAmount) || redeemEarnAmount < 0) {
+      this.setState({ redeemAmountError: true })
+      return false
+    }
 
     this.setState({ loading: true })
     startLoading()
@@ -770,7 +823,7 @@ class Asset extends Component {
 
     this.setState({ loading: true })
     startLoading()
-    dispatcher.dispatch({ type: WITHDRAW_ALL_VAULT, content: { asset: asset } })
+    dispatcher.dispatch({ type: WITHDRAW_BOTH_VAULT, content: { asset: asset } })
   }
 
   setAmount = (percent) => {
