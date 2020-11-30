@@ -3,7 +3,7 @@ const config = {
     "https://eth-mainnet.alchemyapi.io/v2/k2--UT_xVVXMOvAyoxJYqtKhlmyBbqnX",
   // statsProvider: 'https://api.yearn.tools/',
   // statsProvider: "http://localhost:8080/",
-  statsProvider: "http://34.121.71.229:8080/",
+  statsProvider: "https://test.daoventures.co/api/",
   iEarnContract: "0x9Dde7cdd09dbed542fC422d18d89A589fA9fD4C0",
   erc20ABI: [
     {
