@@ -643,36 +643,6 @@ class Vault extends Component {
     this.setState(val)
   };
 
-  renderChart = () => {
-    const options = {
-      chart: {
-        width: 800
-      },
-      title: {
-        text: 'Historical Earn & Vault Performance'
-      },
-      series: [
-        {
-          name: 'Earn',
-          data: [1, 2, 1, 4, 3, 6]
-        },
-        {
-          name: 'Vault',
-          data: [3, 1, 3, 4, 3, 8]
-        }
-      ],
-      credits: {
-        enabled: false
-      }
-    };
-
-    return (
-      <div>
-        <HighchartsReact highcharts={Highcharts} options={options} />
-      </div>
-    );
-  }
-
   renderAssetBlocks = () => {
     const { assets, expanded, search, hideZero, basedOn } = this.state
     const { classes } = this.props
@@ -864,11 +834,11 @@ class Vault extends Component {
     if(asset && asset.stats) {
       switch (basedOn) {
         case 1:
-          return (asset.stats.apyOneWeekSample + asset.earnApr) / 2
+          return (asset.stats.apyOneWeekSample + parseFloat(asset.earnApr)) / 2
         case 2:
-          return (asset.stats.apyOneMonthSample + asset.earnApr) / 2
+          return (asset.stats.apyOneMonthSample + parseFloat(asset.earnApr)) / 2
         case 3:
-          return (asset.stats.apyInceptionSample + asset.earnApr) / 2
+          return (asset.stats.apyInceptionSample + parseFloat(asset.earnApr)) / 2
         default:
           return (asset.apy + asset.earnApr) / 2
       }

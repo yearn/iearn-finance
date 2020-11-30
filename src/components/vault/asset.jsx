@@ -711,11 +711,11 @@ class Asset extends Component {
         // case 1:
         //   return (asset.stats.apyThreeDaySample + asset.earnApr) / 2
         case 1:
-          return (asset.stats.apyOneWeekSample + asset.earnApr) / 2
+          return (asset.stats.apyOneWeekSample + parseFloat(asset.earnApr)) / 2
         case 2:
-          return (asset.stats.apyOneMonthSample + asset.earnApr) / 2
+          return (asset.stats.apyOneMonthSample + parseFloat(asset.earnApr)) / 2
         case 3:
-          return (asset.stats.apyInceptionSample + asset.earnApr) / 2
+          return (asset.stats.apyInceptionSample + parseFloat(asset.earnApr)) / 2
         default:
           return (asset.apy + asset.earnApr) / 2
       }
