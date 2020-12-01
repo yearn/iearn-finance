@@ -72,7 +72,8 @@ import {
   LENDING_ENABLE_COLLATERAL,
   LENDING_ENABLE_COLLATERAL_RETURNED,
   LENDING_DISABLE_COLLATERAL,
-  LENDING_DISABLE_COLLATERAL_RETURNED
+  LENDING_DISABLE_COLLATERAL_RETURNED,
+  MAX_UINT256
 } from '../constants';
 import Web3 from 'web3';
 
@@ -2038,10 +2039,7 @@ class Store {
         ethAllowance = (allowance*10**asset.decimals).toFixed(0);
       }
 
-      var amountToSend = web3.utils.toWei('999999999', "ether")
-      if (asset.decimals !== 18) {
-        amountToSend = (999999999*10**asset.decimals).toFixed(0);
-      }
+      const amountToSend = MAX_UINT256;
 
       if(parseFloat(ethAllowance) < parseFloat(amount)) {
         /*

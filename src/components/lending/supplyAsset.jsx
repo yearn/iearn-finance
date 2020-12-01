@@ -293,13 +293,13 @@ class SupplyAsset extends Component {
       loading,
     } = this.state
 
-    let theLimitUsed = (limitUsed)*100/limit
+    let theLimitUsed = (limitUsed)*100/limit || 0
 
     if(asset.collateralEnabled) {
-      if(supplyAmount && supplyAmount !== '') {
+      if(supplyAmount && supplyAmount !== '' && limit !== 0) {
         theLimitUsed = limitUsed*100/(limit+(supplyAmount*asset.price*0.75))
       }
-      if(withdrawAmount && withdrawAmount !== '') {
+      if(withdrawAmount && withdrawAmount !== '' && limit !== 0) {
         theLimitUsed = limitUsed*100/(limit-(withdrawAmount*asset.price*0.75))
       }
     }
