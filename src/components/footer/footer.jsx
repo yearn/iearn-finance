@@ -140,10 +140,6 @@ class Footer extends Component {
             <HowToVoteIcon height='15px' className={ classes.icon } />
             <Typography variant={ 'h4'} >ygov.finance</Typography>
           </div>
-          <div  className={ classes.link } onClick={()=> window.open("https://yinsure.finance", "_blank")} >
-            <SecurityIcon height='15px' className={ classes.icon } />
-            <Typography variant={ 'h4'} >yinsure.finance</Typography>
-          </div>
           <div  className={ classes.link } onClick={()=> window.open("https://yborrow.finance", "_blank")} >
             <MonetizationOnIcon height='15px' className={ classes.icon } />
             <Typography variant={ 'h4'} >yborrow.finance</Typography>
