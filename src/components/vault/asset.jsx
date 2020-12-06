@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   Typography,
   TextField,
-  Button, Slider, Grid
+  Button, Slider, Grid, Tooltip
 } from '@material-ui/core';
 
 import {
@@ -24,6 +24,7 @@ import * as moment from 'moment';
 import Store from "../../stores";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from 'highcharts';
+import InfoIcon from '@material-ui/icons/Info';
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
 const store = Store.store
@@ -265,6 +266,16 @@ const marks = [
   }
 ];
 
+const HtmlTooltip = withStyles((theme) => ({
+  tooltip: {
+    backgroundColor: '#f5f5f9',
+    color: 'rgba(0, 0, 0, 0.87)',
+    maxWidth: 220,
+    fontSize: theme.typography.pxToRem(12),
+    border: '1px solid #dadde9',
+  },
+}))(Tooltip);
+
 class Asset extends Component {
 
   constructor() {
@@ -283,6 +294,9 @@ class Asset extends Component {
       percent: 0,
       earnPercent: 0,
       vaultPercent: 0,
+      hideNav: false,
+      openEarnInfo: false,
+      openVaultInfo: false
     }
   }
 
@@ -294,13 +308,25 @@ class Asset extends Component {
     emitter.on(ERROR, this.errorReturned);
   }
 
+  componentDidMount() {
+    window.addEventListener("resize", this.resize.bind(this));
+  }
+
   componentWillUnmount() {
     emitter.removeListener(DEPOSIT_CONTRACT_RETURNED, this.depositReturned);
     emitter.removeListener(WITHDRAW_VAULT_RETURNED, this.withdrawReturned);
     emitter.removeListener(DEPOSIT_ALL_CONTRACT_RETURNED, this.depositReturned);
     emitter.removeListener(WITHDRAW_BOTH_VAULT_RETURNED, this.withdrawReturned);
     emitter.removeListener(ERROR, this.errorReturned);
+    window.removeEventListener("resize", this.resize.bind(this));
   };
+
+  resize() {
+    let currentHideNav = (window.innerWidth <= 760);
+    if (currentHideNav !== this.state.hideNav) {
+        this.setState({hideNav: currentHideNav});
+    }
+  }
 
   depositReturned = () => {
     this.setState({ loading: false, amount: '' })
@@ -329,6 +355,8 @@ class Asset extends Component {
       percent,
       earnPercent,
       vaultPercent,
+      openEarnInfo,
+      openVaultInfo
     } = this.state
 
     return (
@@ -407,13 +435,59 @@ class Asset extends Component {
           <Grid item xs={12}>
             <div className={ classes.ratioContainer }>
               <div className={ classes.leftLabelContainer }>
-                <Typography variant='h4' style={{color: '#044b7b'}} noWrap>{ 'yEarn: '+ earnRatio + '%' }</Typography>
+                <Typography variant='h4' style={{color: '#044b7b'}}>
+                  <HtmlTooltip 
+                    placement={'top'}
+                    title={
+                      <React.Fragment>
+                        <Typography>See <a href="https://daoventures.gitbook.io/daoventures/" target="_blank">FAQ: Product</a> for more information</Typography>
+                      </React.Fragment>
+                    } 
+                    open={openEarnInfo}
+                    onClose={this.handleTooltipEarnClose}
+                    PopperProps={{
+                      disablePortal: true,
+                      style: {
+                        pointerEvents: 'auto'
+                      }
+                    }}
+                    disableFocusListener
+                    disableHoverListener
+                    disableTouchListener>
+                    <InfoIcon style={{verticalAlign: 'text-top', cursor: 'pointer'}} onClick={() => this.handleTooltipEarnClose()} /> 
+                  </HtmlTooltip>
+                  &nbsp;
+                  { 'yEarn: '+ earnRatio + '%' }
+                </Typography>
               </div>
               <div>
                 <Typography variant='h4' noWrap>{ 'APY '+ this._getEstimatedAPY(asset) + '%' }</Typography>
               </div>
               <div className={ classes.rightLabelContainer }>
-                <Typography variant='h4' style={{color: '#2962ef'}} noWrap>{ 'yVault: '+ vaultRatio + '%' }</Typography>
+                <Typography variant='h4' style={{color: '#2962ef'}}>
+                  <HtmlTooltip 
+                    placement={'top'}
+                    title={
+                      <React.Fragment>
+                        <Typography>See <a href="https://daoventures.gitbook.io/daoventures/" target="_blank">FAQ: Product</a> for more information</Typography>
+                      </React.Fragment>
+                    } 
+                    open={openVaultInfo}
+                    onClose={this.handleTooltipVaultClose}
+                    PopperProps={{
+                      disablePortal: true,
+                      style: {
+                        pointerEvents: 'auto'
+                      }
+                    }}
+                    disableFocusListener
+                    disableHoverListener
+                    disableTouchListener>
+                      <InfoIcon style={{verticalAlign: 'text-top', cursor: 'pointer'}} onClick={() => this.handleTooltipVaultClose()} /> 
+                  </HtmlTooltip>
+                  &nbsp;
+                  { 'yVault: '+ vaultRatio + '%' }
+                </Typography>
               </div>
             </div>
             <Slider 
@@ -647,6 +721,8 @@ class Asset extends Component {
     var vaultAPY = [];
     var labels = [];
 
+    const { hideNav } = this.state;
+
     const sortByTimestamp = (a, b) => {
       if (a.timestamp > b.timestamp) return 1;
       if (a.timestamp < b.timestamp) return -1;
@@ -654,16 +730,40 @@ class Asset extends Component {
     }
 
     if (asset.historicalAPY) {
-      asset.historicalAPY
+      // this gives an object with dates as keys
+      const groups = asset.historicalAPY
       .sort(sortByTimestamp)
-      .forEach(apy => {
-        var dateFormat = moment.unix(apy.timestamp/1000).format('DD-MM-YYYY');
-        labels.push(dateFormat);
-        earnAPY.push([dateFormat, parseFloat(parseFloat(apy.aprs).toFixed(4))]);
-        vaultAPY.push([dateFormat, parseFloat(apy.apyOneWeekSample.toFixed(4))]);
-      })
+      .reduce((groups, apy) => {
+        const date = moment.unix(apy.timestamp/1000).format('DD-MM-YYYY');
+        if (!groups[date]) {
+          groups[date] = [];
+        }
+        groups[date].push(apy);
+        return groups;
+      }, {});
+      
+      try {
+        Object.keys(groups)
+        .forEach((date) => {
+          // first attempt
+          labels.push(date);
+          earnAPY.push([date, parseFloat((parseFloat(groups[date][0].aprs) * 100).toFixed(4))]);
+          vaultAPY.push([date, parseFloat(groups[date][0].apyInceptionSample.toFixed(4))]);
+
+          // second attempt
+          var halfCount = Number(groups[date].length / 2)
+          if (halfCount !== 1) {
+            labels.push(date);
+            earnAPY.push([date, parseFloat((parseFloat(groups[date][halfCount].aprs) * 100).toFixed(4))]);
+            vaultAPY.push([date, parseFloat(groups[date][halfCount].apyInceptionSample.toFixed(4))]);
+          }        
+        })
+      } catch (ex) {}
     }
     const options = {
+      chart: {
+        width: hideNav ? 300 : 420
+      },
       title: {
         text: 'Historical Earn & Vault Performance'
       },
@@ -699,7 +799,7 @@ class Asset extends Component {
 
     return (
       <div>
-        <HighchartsReact highcharts={Highcharts} options={options} />
+        <HighchartsReact highcharts={Highcharts} options={options} style={{ margin: 'auto' }} />
       </div>
     );
   }
@@ -711,16 +811,16 @@ class Asset extends Component {
         // case 1:
         //   return (asset.stats.apyThreeDaySample + asset.earnApr) / 2
         case 1:
-          return (asset.stats.apyOneWeekSample + parseFloat(asset.earnApr)) / 2
+          return (asset.stats.apyOneWeekSample + parseFloat(asset.earnApr) * 100) / 2
         case 2:
-          return (asset.stats.apyOneMonthSample + parseFloat(asset.earnApr)) / 2
+          return (asset.stats.apyOneMonthSample + parseFloat(asset.earnApr) * 100) / 2
         case 3:
-          return (asset.stats.apyInceptionSample + parseFloat(asset.earnApr)) / 2
+          return (asset.stats.apyInceptionSample + parseFloat(asset.earnApr) * 100) / 2
         default:
           return (asset.apy + asset.earnApr) / 2
       }
     } else if (asset.apy) {
-      return (asset.apy + asset.earnApr) / 2
+      return (asset.apy + parseFloat(asset.earnApr) * 100) / 2
     } else {
       return '0.00'
     }
@@ -864,6 +964,18 @@ class Asset extends Component {
     amount = Math.floor(amount*10000)/10000;
 
     this.setState({ redeemEarnAmount: amount.toFixed(4), earnPercent: percent })
+  }
+
+  handleTooltipEarnClose = () => {
+    this.setState({
+      openEarnInfo: !this.state.openEarnInfo
+    })
+  }
+
+  handleTooltipVaultClose = () => {
+    this.setState({
+      openVaultInfo: !this.state.openVaultInfo
+    })
   }
 }
 

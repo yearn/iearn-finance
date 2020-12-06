@@ -23,8 +23,6 @@ import { colors, drawerWidth } from '../../theme'
 import Snackbar from '../snackbar'
 import Asset from './asset'
 import Loader from '../loader'
-import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
 
 import {
   ERROR,
@@ -472,7 +470,7 @@ class Vault extends Component {
       hideZero: localStorage.getItem('yearn.finance-hideZero') === '1' ? true : false,
       basedOn: basedOn ? parseInt(basedOn > 3 ? 3 : basedOn) : 1,
       loading: true,
-      expanded: 'USDT',
+      expanded: '',
       modalOpen: false,
     }
 
@@ -480,6 +478,7 @@ class Vault extends Component {
       dispatcher.dispatch({ type: GET_STRATEGY_BALANCES_FULL, content: { interval: '30d' } })
     }
   }
+
   componentWillMount() {
     emitter.on(DEPOSIT_CONTRACT_RETURNED, this.showHash);
     emitter.on(WITHDRAW_VAULT_RETURNED, this.showHash);
@@ -834,16 +833,16 @@ class Vault extends Component {
     if(asset && asset.stats) {
       switch (basedOn) {
         case 1:
-          return (asset.stats.apyOneWeekSample + parseFloat(asset.earnApr)) / 2
+          return (asset.stats.apyOneWeekSample + parseFloat(asset.earnApr) * 100) / 2
         case 2:
-          return (asset.stats.apyOneMonthSample + parseFloat(asset.earnApr)) / 2
+          return (asset.stats.apyOneMonthSample + parseFloat(asset.earnApr) * 100) / 2
         case 3:
-          return (asset.stats.apyInceptionSample + parseFloat(asset.earnApr)) / 2
+          return (asset.stats.apyInceptionSample + parseFloat(asset.earnApr) * 100) / 2
         default:
           return (asset.apy + asset.earnApr) / 2
       }
     } else if (asset.apy) {
-      return (asset.apy + asset.earnApr) / 2
+      return (asset.apy + parseFloat(asset.earnApr) * 100) / 2
     } else {
       return '0.00'
     }

@@ -520,11 +520,11 @@ class Dashboard extends Component {
               <div className={ classes.vaultContainer }>
                 <div className={classes.inlineBlock}>
                   <div>
-                    <Typography variant={ 'h3' } className={ classes.sectionHeading }>Yearn Farmer Overview</Typography>
+                    <Typography variant={ 'h3' } className={ classes.sectionHeading }>My Portfolio</Typography>
                   </div>
                   { this.renderBasedOn() }
                 </div>
-                <Typography variant={ 'caption' } className={ classes.netWorth }>NET WORTH</Typography>
+                <Typography variant={ 'caption' } className={ classes.netWorth }>NET BALANCE</Typography>
 
                 { this.renderVaults() }
               </div>
@@ -552,7 +552,7 @@ class Dashboard extends Component {
       },
       {
         value: 3,
-        description: 'inception'
+        description: '1 year'
       }
     ]
 

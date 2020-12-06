@@ -86,11 +86,11 @@ class SideDrawer extends Component {
     dispatcher.dispatch({ type: TOGGLE_DRAWER, content: { open: false } })
   }
 
-  nav = (screen) => {
-    if(screen === 'cover') {
-      window.open("https://yinsure.finance", "_blank")
-      return
-    }
+  nav = (url) => {
+    window.open(url, '_blank')
+  }
+
+  navInApp(screen) {
     this.props.history.push('/'+screen)
   }
 
@@ -121,18 +121,19 @@ class SideDrawer extends Component {
             alt=""
             src={ require('../../assets/DAOventures-logo.png') }
             height={ '30px' }
-            onClick={ () => { this.nav('') } }
+            style={{ cursor: 'pointer' }}
+            onClick={ () => { this.nav('https://daoventures.co/') } }
           />
         </div>
         <List>
-          <ListItem button key={'Invest'} className={ (this.linkSelected('/invest'))? classes.selected:'' } onClick={ () => { this.nav('invest') } }>
+          <ListItem button key={'Invest'} className={ (this.linkSelected('/invest'))? classes.selected:'' } onClick={ () => { this.navInApp('invest') } }>
             <ListItemIcon>
               {this.renderIcon('line-chart', '/invest')}
             </ListItemIcon>
             <ListItemText primary={'Invest'} />
           </ListItem>
 
-          <ListItem button key={'Portfolios'} className={ (this.linkSelected('/portfolio'))?classes.selected:'' } onClick={ () => { this.nav('portfolio') } }>
+          <ListItem button key={'Portfolios'} className={ (this.linkSelected('/portfolio'))?classes.selected:'' } onClick={ () => { this.navInApp('portfolio') } }>
             <ListItemIcon>
               {this.renderIcon('pie-chart', '/portfolio')}
             </ListItemIcon>
@@ -160,14 +161,14 @@ class SideDrawer extends Component {
         onClose={this.dispatchToggle}
       >
         <List>
-          <ListItem button key={'Invest'} className={ (this.linkSelected('/invest'))? classes.selected:'' } onClick={ () => { this.nav('invest') } }>
+          <ListItem button key={'Invest'} className={ (this.linkSelected('/invest'))? classes.selected:'' } onClick={ () => { this.navInApp('invest') } }>
             <ListItemIcon>
               {this.renderIcon('line-chart', '/invest')}
             </ListItemIcon>
             <ListItemText primary={'Invest'} />
           </ListItem>
 
-          <ListItem button key={'Portfolios'} className={ (this.linkSelected('/portfolio'))?classes.selected:'' } onClick={ () => { this.nav('portfolio') } }>
+          <ListItem button key={'Portfolios'} className={ (this.linkSelected('/portfolio'))?classes.selected:'' } onClick={ () => { this.navInApp('portfolio') } }>
             <ListItemIcon>
               {this.renderIcon('pie-chart', '/portfolio')}
             </ListItemIcon>
@@ -186,36 +187,36 @@ class SideDrawer extends Component {
     return (
       <div className={classes.footerMenu}>
           <List>
-            <ListItem button key={'FAQ'} className={ (this.linkSelected('/faq'))? classes.selected:'' } onClick={ () => { this.nav('faq') } }>
+            <ListItem button key={'FAQ'} className={ (this.linkSelected('/faq'))? classes.selected:'' } onClick={ () => { this.nav('https://daoventures.gitbook.io/daoventures/frequently-asked-question') } }>
               <ListItemText primary={'FAQ'} />
             </ListItem>
 
-            <ListItem button key={'About Us'} className={ (this.linkSelected('/about-us'))?classes.selected:'' } onClick={ () => { this.nav('about-us') } }>
+            <ListItem button key={'About Us'} className={ (this.linkSelected('/about-us'))?classes.selected:'' } onClick={ () => { this.nav('https://daoventures.co/about.html') } }>
               <ListItemText primary={'About Us'} />
             </ListItem>
           </List>
 
           <Grid container spacing={2} className={classes.paddingGitter}>
             <Grid item>
-              <img alt="" src={require('../../assets/reddit.svg')} />
+              <img alt="" src={require('../../assets/reddit.svg')} style={{ cursor: 'pointer' }} onClick={ () => { this.nav('https://www.reddit.com/r/DAOVentures/') } } />
             </Grid>
             <Grid item>
-              <img alt="" src={require('../../assets/twitter.svg')} />
+              <img alt="" src={require('../../assets/twitter.svg')} style={{ cursor: 'pointer' }} onClick={ () => { this.nav('https://twitter.com/VenturesDao') } } />
             </Grid>
             <Grid item>
-              <img alt="" src={require('../../assets/facebook.svg')} />
+              <img alt="" src={require('../../assets/facebook.svg')} style={{ cursor: 'pointer' }} onClick={ () => { this.nav('https://www.facebook.com/DAOventuresCo/') } } />
             </Grid>
           </Grid>
 
           <Grid container spacing={2} className={classes.paddingGitter}>
             <Grid item>
-              <img alt="" src={require('../../assets/slack.svg')} />
+              <img alt="" src={require('../../assets/slack.svg')} style={{ cursor: 'pointer' }} onClick={ () => { this.nav('https://join.slack.com/t/daoventures/shared_invite/zt-k4hmm44g-p5ME~5I~fm0pkfY2U8AUIw') } } />
             </Grid>
             <Grid item>
-              <img alt="" src={require('../../assets/linkedin.svg')} />
+              <img alt="" src={require('../../assets/linkedin.svg')} style={{ cursor: 'pointer' }} onClick={ () => { this.nav('https://www.linkedin.com/company/daoventuresco/') } } />
             </Grid>
             <Grid item>
-              <img alt="" src={require('../../assets/email.svg')} />
+              <img alt="" src={require('../../assets/email.svg')} style={{ cursor: 'pointer' }} onClick={ () => { this.nav('mailto:support@daoventures.co') } } />
             </Grid>
           </Grid>
         </div>
