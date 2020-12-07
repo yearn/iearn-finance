@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { withStyles } from '@material-ui/core/styles';
 import {
-  Typography
+  Typography,
+  Menu
 } from '@material-ui/core';
 import { withRouter } from "react-router-dom";
 import { colors } from '../../theme'
@@ -58,6 +59,7 @@ const styles = theme => ({
     padding: '12px 0px',
     margin: '0px 12px',
     cursor: 'pointer',
+    width: 'fit-content',
     '&:hover': {
       paddingBottom: '9px',
       borderBottom: "3px solid "+colors.borderBlue,
@@ -72,6 +74,7 @@ const styles = theme => ({
     cursor: 'pointer',
     paddingBottom: '9px',
     borderBottom: "3px solid "+colors.borderBlue,
+    width: 'fit-content'
   },
   account: {
     display: 'flex',
@@ -129,7 +132,8 @@ class Header extends Component {
 
     this.state = {
       account: store.getStore('account'),
-      modalOpen: false
+      modalOpen: false,
+      anchorEl: null
     }
   }
 
@@ -199,12 +203,9 @@ class Header extends Component {
           </div>
           <div className={ classes.links }>
             { this.renderLink('dashboard') }
-            { this.renderLink('vaults') }
-            { this.renderLink('earn') }
-            { this.renderLink('zap') }
-            { this.renderLink('experimental') }
-            { this.renderLink('stats') }
+            { this.renderMenuLinks({ label: 'yield', screens: ['vaults', 'earn', 'zap', 'experimental', 'stats'] }) }
             { this.renderLink('lending') }
+            { this.renderLink('cover') }
           </div>
           <div className={ classes.account }>
             { address &&
@@ -225,6 +226,42 @@ class Header extends Component {
     )
   }
 
+  handleClick = (event) => {
+    this.setState({ anchorEl: event.currentTarget });
+  }
+
+  handleClose = () => {
+    this.setState({ anchorEl: null })
+  }
+
+  renderMenuLinks = (menu) => {
+    const {
+      classes
+    } = this.props;
+
+    const currentScreen = window.location.pathname.substring(1)
+    const menuSelected = menu.screens.includes(currentScreen)
+
+    return (
+      <React.Fragment>
+        <div className={ menuSelected ? classes.linkActive : classes.link } onClick={ this.handleClick }>
+          <Typography variant={'h4'} className={ `title` }>{ menu.label }</Typography>
+        </div>
+        <Menu
+          id="simple-menu"
+          anchorEl={ this.state.anchorEl }
+          keepMounted
+          open={ Boolean(this.state.anchorEl) }
+          onClose={ this.handleClose }
+        >
+          { menu.screens.map((screen) => {
+            return this.renderLink(screen)
+          }) }
+        </Menu>
+      </React.Fragment>
+    )
+  }
+
   renderLink = (screen) => {
     const {
       classes
@@ -242,6 +279,7 @@ class Header extends Component {
     //   window.open("https://yinsure.finance", "_blank")
     //   return
     // }
+    this.handleClose()
     this.props.history.push('/'+screen)
   }
 
