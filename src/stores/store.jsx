@@ -73,9 +73,16 @@ import {
   LENDING_ENABLE_COLLATERAL_RETURNED,
   LENDING_DISABLE_COLLATERAL,
   LENDING_DISABLE_COLLATERAL_RETURNED,
-  MAX_UINT256
+  MAX_UINT256,
+  CONFIGURE_COVER,
+  CONFIGURE_COVER_RETURNED,
+  GET_COVER_BALANCES,
+  COVER_BALANCES_RETURNED,
+  COVER_PURCHASE,
+  COVER_PURCHASE_RETURNED,
 } from '../constants';
 import Web3 from 'web3';
+import BigNumber from 'bignumber.js'
 
 import {
   injected,
@@ -115,6 +122,9 @@ class Store {
       vaultAssets: defaultValues.vaultAssets,
       experimentalVaultAssets: defaultValues.experimentalVaultAssets,
       lendingAssets: defaultValues.lendingAssets,
+      coverProtocols: defaultValues.coverProtocols,
+      coverCollateral: [],
+      coverAassets: [],
       lendingSupply: 0,
       lendingBorrow: 0,
       lendingCollateral: 0,
@@ -423,6 +433,15 @@ class Store {
           case LENDING_DISABLE_COLLATERAL:
             this.lendingDisableCollateral(payload)
             break;
+          case CONFIGURE_COVER:
+            this.configureCover(payload)
+            break;
+          case GET_COVER_BALANCES:
+            this.getCoverBalances(payload)
+            break;
+          case COVER_PURCHASE:
+            this.purchaseCover(payload)
+            break;
           default: {
           }
         }
@@ -448,12 +467,16 @@ class Store {
       assets: defaultvalues.assets,
       vaultAssets: defaultvalues.vaultAssets,
       experimentalVaultAssets: defaultvalues.experimentalVaultAssets,
-      lendingAssets: defaultvalues.lendingAssets
+      lendingAssets: defaultvalues.lendingAssets,
+      coverProtocols: defaultvalues.coverProtocols
     })
   }
 
   _getDefaultValues = () => {
     return {
+      coverProtocols: [
+
+      ],
       lendingAssets: [{
       	"address": "0xD06527D5e56A3495252A528C4987003b712860eE",
       	"erc20address": "Ethereum",
@@ -5283,6 +5306,309 @@ class Store {
     }
   }
 
+  configureCover = async (payload) => {
+
+    try {
+      const url = config.coverAPI
+      const protocolsString = await rp(url);
+      const protocolsJSON = JSON.parse(protocolsString)
+
+      const poolDataArr = Object.entries(protocolsJSON.poolData)
+      const shieldMiningPoolData = protocolsJSON.shieldMiningData.poolData
+
+      const claimAssets = protocolsJSON.protocols.map((protocol) => {
+        const name = protocol.protocolName
+        const expires = protocol.expirationTimestamps
+        const claimAddress = protocol.coverObjects[protocol.claimNonce].tokens.claimAddress
+        const noClaimAddress = protocol.coverObjects[protocol.claimNonce].tokens.noClaimAddress
+        let collateralAddress = protocol.coverObjects[protocol.claimNonce].collateralAddress
+
+        // this hack is because they use dai as collateral even though their api/ui say yDAI...reasons
+        if(collateralAddress === '0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01') {
+          collateralAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'
+        }
+
+        let claimPoolData = poolDataArr.filter((data) => {
+          if(data[1].poolId.tokens[0].address.toLowerCase() === claimAddress.toLowerCase() && data[1].poolId.tokens[1].address.toLowerCase() === collateralAddress.toLowerCase()) {
+            return true
+          }
+          if(data[1].poolId.tokens[1].address.toLowerCase() === claimAddress.toLowerCase() && data[1].poolId.tokens[0].address.toLowerCase() === collateralAddress.toLowerCase()) {
+            return true
+          }
+
+          return false
+        }).map((data) => {
+          return {
+            price: data[1].price,
+            symbol: data[1].symbol,
+            swapFee: data[1].poolId.swapFee,
+            liquidity: data[1].poolId.liquidity
+          }
+        })
+
+        if(claimPoolData.length > 0) {
+          claimPoolData = claimPoolData.sort((a, b) => {
+            return b.liquidity !== null ? parseFloat(b.liquidity) - parseFloat(a.liquidity) : -9999999999
+          })[0]
+        } else {
+          claimPoolData = {
+            price: 0,
+            symbol: 'N/A',
+            swapFee: 0,
+            liquidity: 0
+          }
+        }
+
+        let noClaimPoolData = poolDataArr.filter((data) => {
+          if(data[1].poolId.tokens[0].address.toLowerCase() === noClaimAddress.toLowerCase() && data[1].poolId.tokens[1].address.toLowerCase() === collateralAddress.toLowerCase()) {
+            return true
+          }
+          if(data[1].poolId.tokens[1].address.toLowerCase() === noClaimAddress.toLowerCase() && data[1].poolId.tokens[0].address.toLowerCase() === collateralAddress.toLowerCase()) {
+            return true
+          }
+
+          return false
+        }).map((data) => {
+          return {
+            price: data[1].price,
+            symbol: data[1].symbol,
+            swapFee: data[1].poolId.swapFee,
+            liquidity: data[1].poolId.liquidity
+          }
+        })
+
+        if(noClaimPoolData.length > 0) {
+          noClaimPoolData = noClaimPoolData.sort((a, b) => {
+            return b.liquidity !== null ? parseFloat(b.liquidity) - parseFloat(a.liquidity) : -9999999999
+          })[0]
+        } else {
+          noClaimPoolData = {
+            price: 0,
+            symbol: 'N/A',
+            swapFee: 0,
+            liquidity: 0
+          }
+        }
+
+        let noClaimShieldData = shieldMiningPoolData.filter((data) => {
+          return data.tokensList.map((a) => { return a.toLowerCase() }).includes(noClaimAddress.toLowerCase()) && data.tokensList.map((a) => { return a.toLowerCase() }).includes(collateralAddress.toLowerCase())
+        })
+
+        if(noClaimShieldData.length > 0) {
+          noClaimShieldData = noClaimShieldData.sort((a, b) => {
+            return parseFloat(b.liquidity) - parseFloat(a.liquidity)
+          })[0]
+        } else {
+          noClaimShieldData = {
+            id: null
+          }
+        }
+
+        let claimShieldData = shieldMiningPoolData.filter((data) => {
+          return data.tokensList.map((a) => { return a.toLowerCase() }).includes(claimAddress.toLowerCase()) && data.tokensList.map((a) => { return a.toLowerCase() }).includes(collateralAddress.toLowerCase())
+        })
+
+        if(claimShieldData.length > 0) {
+          claimShieldData = claimShieldData.sort((a, b) => {
+            return parseFloat(b.liquidity) - parseFloat(a.liquidity)
+          })[0]
+        } else {
+          claimShieldData = {
+            id: null
+          }
+        }
+
+        claimPoolData.address = claimShieldData.id
+        noClaimPoolData.address = noClaimShieldData.id
+
+        return {
+          name,
+          expires,
+          claimAddress,
+          noClaimAddress,
+          collateralAddress,
+          claimPoolData: claimPoolData,
+          noClaimPoolData: noClaimPoolData,
+        }
+      })
+
+      store.setStore({ coverProtocols: claimAssets })
+
+      emitter.emit(CONFIGURE_COVER_RETURNED, claimAssets)
+    } catch(e) {
+      console.log(e)
+      emitter.emit(ERROR, e)
+    }
+  }
+
+  getCoverBalances = async (payload) => {
+    const account = store.getStore('account')
+
+    const coverProtocols = store.getStore('coverProtocols')
+
+    if(!account || !account.address) {
+      return false
+    }
+
+    const web3 = await this._getWeb3Provider();
+    if(!web3) {
+      return null
+    }
+
+    if(!coverProtocols) {
+      return null
+    }
+
+    // get unique collaterals
+    const collateralAssets = coverProtocols.map((protocol) => {
+      return protocol.collateralAddress
+    }).reduce((unique, item) => {
+      return unique.includes(item) ? unique : [...unique, item]
+    }, [])
+
+    // get unique tokens (claim vs noclaim)
+    const claimAssets = coverProtocols.map((protocol) => {
+      return [protocol.claimAddress, protocol.noClaimAddress]
+    }).flat().reduce((unique, item) => {
+      return unique.includes(item) ? unique : [...unique, item]
+    }, [])
+
+    // get balance and decimals
+    const collateral = await this._getClaimAssetInfo(web3, account, collateralAssets)
+    const assets = await this._getClaimAssetInfo(web3, account, claimAssets)
+
+    let populatedCoverProtocols = coverProtocols.map((protocol) => {
+      let claimAsset = assets.filter((asset) => {
+        return asset.address === protocol.claimAddress
+      })
+
+      let noClaimAsset = assets.filter((asset) => {
+        return asset.address === protocol.noClaimAddress
+      })
+
+      protocol.claimAsset = claimAsset[0]
+      protocol.noClaimAsset = noClaimAsset[0]
+
+      return protocol
+    })
+
+    console.log(populatedCoverProtocols)
+
+    store.setStore({
+      coverCollateral: collateral,
+      coverAassets: assets,
+      coverProtocols: populatedCoverProtocols
+    })
+
+    return emitter.emit(COVER_BALANCES_RETURNED)
+  }
+
+  _getClaimAssetInfo = async (web3, account, assets) => {
+    const promises = assets.map((asset) => {
+      return new Promise((resolve, reject) => {
+        const assetInfo = this._getInfo(web3, account, asset)
+        resolve(assetInfo)
+      });
+    })
+
+    const result = await Promise.all(promises);
+
+    return result
+  }
+
+  _getInfo = async (web3, account, asset) => {
+    const erc20Contract = new web3.eth.Contract(config.erc20ABI, asset)
+
+    try {
+      const decimals = await erc20Contract.methods.decimals().call()
+      const symbol = await erc20Contract.methods.symbol().call()
+      let balance = await erc20Contract.methods.balanceOf(account.address).call()
+
+      balance = parseFloat(balance)/10**decimals
+
+      return {
+        address: asset,
+        symbol: symbol,
+        balance: balance,
+        decimals: decimals
+      }
+    } catch(ex) {
+      console.log(ex)
+      return {
+        balance: 0,
+        decimals: 0
+      }
+    }
+  }
+
+  purchaseCover = (payload) => {
+    const account = store.getStore('account')
+    const { asset, collateral, amount, pool } = payload.content
+
+    const sendAsset = {
+      erc20address: collateral.address,
+      decimals: collateral.decimals,
+      id: collateral.symbol
+    }
+
+    this._checkApproval(sendAsset, account, amount, pool.address, (err) => {
+      if(err) {
+        return emitter.emit(ERROR, err);
+      }
+
+      this._callSwapExactAmountIn(asset, collateral, amount, account, pool, (err, res) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+
+        return emitter.emit(COVER_PURCHASE_RETURNED, res)
+      })
+    })
+  }
+
+  _callSwapExactAmountIn = async (asset, collateral, amount, account, pool, callback) => {
+    const web3 = await this._getWeb3Provider();
+
+    let balancerContract = new web3.eth.Contract(config.balancerProxyABI, pool.address)
+
+    let amountToSend = web3.utils.toWei(amount, "ether")
+    if (collateral.decimals !== 18) {
+      const decimals = new BigNumber(10)
+        .pow(collateral.decimals)
+
+      amountToSend = new BigNumber(amount)
+        .times(decimals)
+        .toFixed(0);
+    }
+
+    balancerContract.methods.swapExactAmountIn(collateral.address, amountToSend, asset.address, '1', MAX_UINT256).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
 }
 
 var store = new Store();
