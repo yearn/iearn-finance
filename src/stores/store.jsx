@@ -455,11 +455,11 @@ class Store {
   _getDefaultValues = () => {
     return {
       lendingAssets: [{
-      	"address": "0xD06527D5e56A3495252A528C4987003b712860eE",
-      	"erc20address": "Ethereum",
-      	"vaultSymbol": "crETH",
-      	"symbol": "ETH",
-      	"vaultDecimals": "8",
+      	"address": "0x41c84c0e2EE0b740Cf0d31F63f3B6F627DC6b393",
+      	"erc20address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      	"vaultSymbol": "cyWETH",
+      	"symbol": "WETH",
+      	"vaultDecimals": 8,
       	"decimals": 18,
       	"collateralEnabled": false,
       	"liquidity": 0,
@@ -471,14 +471,15 @@ class Store {
       	"exchangeRate": "0",
       	"price": 0,
       	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
+      	"borrowBalanceDolar": 0,
+        "collateralPercent": 85
       }, {
-      	"address": "0x44fbeBd2F576670a6C33f6Fc0B00aA8c5753b322",
-      	"erc20address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-      	"vaultSymbol": "crUSDC",
-      	"symbol": "USDC",
-      	"vaultDecimals": "8",
-      	"decimals": "6",
+      	"address": "0x8e595470Ed749b85C6F7669de83EAe304C2ec68F",
+      	"erc20address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+      	"vaultSymbol": "cyDAI",
+      	"symbol": "DAI",
+      	"vaultDecimals": 8,
+      	"decimals": 18,
       	"collateralEnabled": false,
       	"liquidity": 0,
       	"balance": 0,
@@ -489,14 +490,15 @@ class Store {
       	"exchangeRate": "0",
       	"price": 0,
       	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
+      	"borrowBalanceDolar": 0,
+        "collateralPercent": 90
       }, {
-      	"address": "0xCbaE0A83f4f9926997c8339545fb8eE32eDc6b76",
-      	"erc20address": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
-      	"vaultSymbol": "crYFI",
-      	"symbol": "YFI",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
+      	"address": "0x7589C9E17BCFcE1Ccaa1f921196FDa177F0207Fc",
+      	"erc20address": "0x9cA85572E6A3EbF24dEDd195623F188735A5179f",
+      	"vaultSymbol": "cyY3CRV",
+      	"symbol": "y3Crv",
+      	"vaultDecimals": 8,
+      	"decimals": 18,
       	"collateralEnabled": false,
       	"liquidity": 0,
       	"balance": 0,
@@ -507,511 +509,8 @@ class Store {
       	"exchangeRate": "0",
       	"price": 0,
       	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0xcE4Fe9b4b8Ff61949DCfeB7e03bc9FAca59D2Eb3",
-      	"erc20address": "0xba100000625a3754423978a60c9317c58a424e3D",
-      	"vaultSymbol": "crBAL",
-      	"symbol": "BAL",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x19D1666f543D42ef17F66E376944A22aEa1a8E46",
-      	"erc20address": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
-      	"vaultSymbol": "crCOMP",
-      	"symbol": "COMP",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x9baF8a5236d44AC410c0186Fe39178d5AAD0Bb87",
-      	"erc20address": "0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8",
-      	"vaultSymbol": "crYCRV",
-      	"symbol": "yCRV",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x797AAB1ce7c01eB727ab980762bA88e7133d2157",
-      	"erc20address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-      	"vaultSymbol": "crUSDT",
-      	"symbol": "USDT",
-      	"vaultDecimals": "8",
-      	"decimals": "6",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x892B14321a4FCba80669aE30Bd0cd99a7ECF6aC0",
-      	"erc20address": "0x2ba592F78dB6436527729929AAf6c908497cB200",
-      	"vaultSymbol": "crCREAM",
-      	"symbol": "CREAM",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x697256CAA3cCaFD62BB6d3Aa1C7C5671786A5fD9",
-      	"erc20address": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
-      	"vaultSymbol": "crLINK",
-      	"symbol": "LINK",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x8B86e0598616a8d4F1fdAE8b59E55FB5Bc33D0d6",
-      	"erc20address": "0x80fB784B7eD66730e8b1DBd9820aFD29931aab03",
-      	"vaultSymbol": "crLEND",
-      	"symbol": "LEND",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0xc7Fd8Dcee4697ceef5a2fd4608a7BD6A94C77480",
-      	"erc20address": "0xD533a949740bb3306d119CC777fa900bA034cd52",
-      	"vaultSymbol": "crCRV",
-      	"symbol": "CRV",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x17107f40d70f4470d20CB3f138a052cAE8EbD4bE",
-      	"erc20address": "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
-      	"vaultSymbol": "crRENBTC",
-      	"symbol": "renBTC",
-      	"vaultDecimals": "8",
-      	"decimals": "8",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x1FF8CDB51219a8838b52E9cAc09b71e591BC998e",
-      	"erc20address": "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
-      	"vaultSymbol": "crBUSD",
-      	"symbol": "BUSD",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x3623387773010d9214B10C551d6e7fc375D31F58",
-      	"erc20address": "0xa3BeD4E1c75D00fa6f4E5E6922DB7261B5E9AcD2",
-      	"vaultSymbol": "crMTA",
-      	"symbol": "MTA",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x4EE15f44c6F0d8d1136c83EfD2e8E4AC768954c6",
-      	"erc20address": "0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c",
-      	"vaultSymbol": "crYYCRV",
-      	"symbol": "yUSD",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x338286C0BC081891A4Bda39C7667ae150bf5D206",
-      	"erc20address": "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
-      	"vaultSymbol": "crSUSHI",
-      	"symbol": "SUSHI",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x10FDBD1e48eE2fD9336a482D746138AE19e649Db",
-      	"erc20address": "0x50D1c9771902476076eCFc8B2A83Ad6b9355a4c9",
-      	"vaultSymbol": "crFTT",
-      	"symbol": "FTX Token",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x01da76DEa59703578040012357b81ffE62015C2d",
-      	"erc20address": "0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7",
-      	"vaultSymbol": "crYETH",
-      	"symbol": "yWETH",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": true,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0xef58b2d5A1b8D3cDE67b8aB054dC5C831E9Bc025",
-      	"erc20address": "0x476c5E26a75bd202a9683ffD34359C0CC15be0fF",
-      	"vaultSymbol": "crSRM",
-      	"symbol": "SRM",
-      	"vaultDecimals": "8",
-      	"decimals": "6",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0xe89a6D0509faF730BD707bf868d9A2A744a363C7",
-      	"erc20address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-      	"vaultSymbol": "crUNI",
-      	"symbol": "UNI",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0xeFF039C3c1D668f408d09dD7B63008622a77532C",
-      	"erc20address": "0x0d438F3b5175Bebc262bF23753C1E53d03432bDE",
-      	"vaultSymbol": "crWNXM",
-      	"symbol": "wNXM",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x22B243B96495C547598D9042B6f94B01C22B2e9E",
-      	"erc20address": "0x87eDfFDe3E14c7a66c9b9724747a1C5696b742e6",
-      	"vaultSymbol": "crSWAG",
-      	"symbol": "SWAG",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x8b3FF1ed4F36C2c2be675AFb13CC3AA5d73685a5",
-      	"erc20address": "0xaaAEBE6Fe48E54f431b0C390CfaF0b017d09D42d",
-      	"vaultSymbol": "crCEL",
-      	"symbol": "CEL",
-      	"vaultDecimals": "8",
-      	"decimals": "4",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x2A537Fa9FFaea8C1A41D3C2B68a9cb791529366D",
-      	"erc20address": "0x1494CA1F11D487c2bBe4543E90080AeBa4BA3C2b",
-      	"vaultSymbol": "crDPI",
-      	"symbol": "DPI",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x7ea9C63E216D5565c3940A2B3d150e59C2907Db3",
-      	"erc20address": "0x9BE89D2a4cd102D8Fecc6BF9dA793be995C22541",
-      	"vaultSymbol": "crBBTC",
-      	"symbol": "BBTC",
-      	"vaultDecimals": "8",
-      	"decimals": "8",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x3225E3C669B39C7c8B3e204a8614bB218c5e31BC",
-      	"erc20address": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
-      	"vaultSymbol": "crAAVE",
-      	"symbol": "AAVE",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0xf55BbE0255f7f4E70f63837Ff72A577fbDDbE924",
-      	"erc20address": "0x0391D2021f89DC339F60Fff84546EA23E337750f",
-      	"vaultSymbol": "crBOND",
-      	"symbol": "BOND",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x903560b1CcE601794C584F58898dA8a8b789Fc5d",
-      	"erc20address": "0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44",
-      	"vaultSymbol": "crKP3R",
-      	"symbol": "KP3R",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0x054B7ed3F45714d3091e82aAd64A1588dC4096Ed",
-      	"erc20address": "0x0316EB71485b0Ab14103307bf65a021042c6d380",
-      	"vaultSymbol": "crHBTC",
-      	"symbol": "HBTC",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0xd5103AfcD0B3fA865997Ef2984C66742c51b2a8b",
-      	"erc20address": "0x9AFb950948c2370975fb91a441F36FDC02737cD4",
-      	"vaultSymbol": "crHFIL",
-      	"symbol": "HFIL",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
-      }, {
-      	"address": "0xfd609a03B393F1A1cFcAcEdaBf068CAD09a924E2",
-      	"erc20address": "0xcBc1065255cBc3aB41a6868c22d1f1C573AB89fd",
-      	"vaultSymbol": "crCRETH2",
-      	"symbol": "CRETH2",
-      	"vaultDecimals": "8",
-      	"decimals": "18",
-      	"collateralEnabled": false,
-      	"liquidity": 0,
-      	"balance": 0,
-      	"supplyBalance": 0,
-      	"supplyAPY": 0,
-      	"borrowBalance": 0,
-      	"borrowAPY": 0,
-      	"exchangeRate": "0",
-      	"price": 0,
-      	"supplyBalanceDolar": 0,
-      	"borrowBalanceDolar": 0
+      	"borrowBalanceDolar": 0,
+        "collateralPercent": 90
       }],
       assets: [
         {
@@ -4643,7 +4142,7 @@ class Store {
         let borrowBalance = await marketContract.methods.borrowBalanceStored(account.address).call()
         const borrowRatePerBlock = await marketContract.methods.borrowRatePerBlock().call()
         const supplyRatePerBlock = await marketContract.methods.supplyRatePerBlock().call()
-        const ethPerAsset = await creamPriceOracleContract.methods.getUnderlyingPrice(asset.address).call()
+        const ethPerAsset = await creamPriceOracleContract.methods.getUnderlyingPrice(asset.address).call() //no longer eth per asset it's now dollars per asset
 
         const exchangeRateReal = exchangeRate/10**28
 
@@ -4652,7 +4151,7 @@ class Store {
 
         const borrowRatePerYear = (borrowRatePerBlock) * blocksPeryear / 1e16
         const supplyRatePerYear = (supplyRatePerBlock) * blocksPeryear / 1e16
-        const dollarPerAsset = ethPerAsset*priceJSON/10**asset.decimals
+        const dollarPerAsset = ethPerAsset/10**asset.decimals
 
         const lendingAsset = {
           address: asset.address,
@@ -4671,7 +4170,8 @@ class Store {
           exchangeRate: exchangeRate,
           price: dollarPerAsset,
           supplyBalanceDolar: supplyBalance*dollarPerAsset,
-          borrowBalanceDolar: borrowBalance*dollarPerAsset
+          borrowBalanceDolar: borrowBalance*dollarPerAsset,
+          collateralPercent: this._getCollateralPercent(asset.vaultSymbol)
         }
 
         if(callback) {
@@ -4698,15 +4198,14 @@ class Store {
         return val + market.supplyBalanceDolar
       }, 0)
 
-      const lendingCollateral = allMarketsData.reduce((val, market) => {
-        return val + (market.collateralEnabled ? market.supplyBalanceDolar : 0)
+      const lendingBorrowLimit = allMarketsData.reduce((val, market) => {
+        return val + (market.collateralEnabled ? market.supplyBalanceDolar*market.collateralPercent/100 : 0)
       }, 0)
 
       store.setStore({
         lendingAssets: allMarketsData,
         lendingSupply: lendingSupply,
-        lendingCollateral: lendingCollateral,
-        lendingBorrowLimit: lendingCollateral*0.75,
+        lendingBorrowLimit: lendingBorrowLimit,
         lendingBorrow: allMarketsData.reduce((val, market) => {
           return val + market.borrowBalanceDolar
         }, 0),
@@ -4804,7 +4303,7 @@ class Store {
         let borrowBalance = await marketContract.methods.borrowBalanceStored(account.address).call()
         const borrowRatePerBlock = await marketContract.methods.borrowRatePerBlock().call()
         const supplyRatePerBlock = await marketContract.methods.supplyRatePerBlock().call()
-        const ethPerAsset = await creamPriceOracleContract.methods.getUnderlyingPrice(market).call()
+        const ethPerAsset = await creamPriceOracleContract.methods.getUnderlyingPrice(market).call() //no longer eth per asset it's now dollars per asset
 
         const exchangeRateReal = exchangeRate/10**28
 
@@ -4813,7 +4312,7 @@ class Store {
 
         const borrowRatePerYear = (borrowRatePerBlock) * blocksPeryear / 1e16
         const supplyRatePerYear = (supplyRatePerBlock) * blocksPeryear / 1e16
-        const dollarPerAsset = ethPerAsset*priceJSON/10**decimals
+        const dollarPerAsset = ethPerAsset/10**decimals
 
         const lendingAsset = {
           address: market,
@@ -4832,7 +4331,8 @@ class Store {
           exchangeRate: exchangeRate,
           price: dollarPerAsset,
           supplyBalanceDolar: supplyBalance*dollarPerAsset,
-          borrowBalanceDolar: borrowBalance*dollarPerAsset
+          borrowBalanceDolar: borrowBalance*dollarPerAsset,
+          collateralPercent: this._getCollateralPercent(vaultSymbol)
         }
 
         if(callback) {
@@ -4859,15 +4359,14 @@ class Store {
         return val + market.supplyBalanceDolar
       }, 0)
 
-      const lendingCollateral = allMarketsData.reduce((val, market) => {
-        return val + (market.collateralEnabled ? market.supplyBalanceDolar : 0)
+      const lendingBorrowLimit = allMarketsData.reduce((val, market) => {
+        return val + (market.collateralEnabled ? (market.supplyBalanceDolar*market.collateralPercent/100) : 0)
       }, 0)
 
       store.setStore({
         lendingAssets: allMarketsData,
         lendingSupply: lendingSupply,
-        lendingCollateral: lendingCollateral,
-        lendingBorrowLimit: lendingCollateral*0.75,
+        lendingBorrowLimit: lendingBorrowLimit,
         lendingBorrow: allMarketsData.reduce((val, market) => {
           return val + market.borrowBalanceDolar
         }, 0),
@@ -4875,6 +4374,18 @@ class Store {
 
       emitter.emit(CONFIGURE_LENDING_RETURNED)
     })
+  }
+
+  _getCollateralPercent = (vaultSymbol) => {
+    switch (vaultSymbol) {
+      case 'cyWETH':
+        return 85
+      case 'cyDAI':
+      case 'cyY3CRV':
+        return 90
+      default:
+        return 0
+    }
   }
 
   _getAllMarkets = async (web3) => {
@@ -4932,7 +4443,7 @@ class Store {
         })
         .on('confirmation', function(confirmationNumber, receipt){
           console.log(confirmationNumber, receipt);
-          if(confirmationNumber === 2) {
+          if(confirmationNumber === 1) {
             dispatcher.dispatch({ type: GET_LENDING_BALANCES })
           }
         })
@@ -4965,7 +4476,7 @@ class Store {
         })
         .on('confirmation', function(confirmationNumber, receipt){
           console.log(confirmationNumber, receipt);
-          if(confirmationNumber === 2) {
+          if(confirmationNumber === 1) {
             dispatcher.dispatch({ type: GET_LENDING_BALANCES })
           }
         })
@@ -5020,7 +4531,7 @@ class Store {
     })
     .on('confirmation', function(confirmationNumber, receipt){
       console.log(confirmationNumber, receipt);
-      if(confirmationNumber === 2) {
+      if(confirmationNumber === 1) {
         dispatcher.dispatch({ type: GET_LENDING_BALANCES })
       }
     })
@@ -5063,7 +4574,7 @@ class Store {
       })
       .on('confirmation', function(confirmationNumber, receipt){
         console.log(confirmationNumber, receipt);
-        if(confirmationNumber === 2) {
+        if(confirmationNumber === 1) {
           dispatcher.dispatch({ type: GET_LENDING_BALANCES })
         }
       })
@@ -5113,7 +4624,7 @@ class Store {
       })
       .on('confirmation', function(confirmationNumber, receipt){
         console.log(confirmationNumber, receipt);
-        if(confirmationNumber === 2) {
+        if(confirmationNumber === 1) {
           dispatcher.dispatch({ type: GET_LENDING_BALANCES })
         }
       })
@@ -5167,7 +4678,7 @@ class Store {
     })
     .on('confirmation', function(confirmationNumber, receipt){
       console.log(confirmationNumber, receipt);
-      if(confirmationNumber === 2) {
+      if(confirmationNumber === 1) {
         dispatcher.dispatch({ type: GET_LENDING_BALANCES })
       }
     })
@@ -5224,7 +4735,7 @@ class Store {
         })
         .on('confirmation', function(confirmationNumber, receipt){
           console.log(confirmationNumber, receipt);
-          if(confirmationNumber === 2) {
+          if(confirmationNumber === 1) {
             dispatcher.dispatch({ type: GET_LENDING_BALANCES })
           }
         })
@@ -5257,7 +4768,7 @@ class Store {
         })
         .on('confirmation', function(confirmationNumber, receipt){
           console.log(confirmationNumber, receipt);
-          if(confirmationNumber === 2) {
+          if(confirmationNumber === 1) {
             dispatcher.dispatch({ type: GET_LENDING_BALANCES })
           }
         })

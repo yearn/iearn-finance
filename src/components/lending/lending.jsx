@@ -98,9 +98,10 @@ const styles = theme => ({
     paddingBottom: '50px',
     borderRadius: '50px',
     background: colors.white,
-    minHeight: '1000px',
+    minHeight: '400px',
     margin: '12px',
-    minWidth: '600px'
+    minWidth: '600px',
+    height: 'fit-content'
   },
   title: {
     color: colors.white,
