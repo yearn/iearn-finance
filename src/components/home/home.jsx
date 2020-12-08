@@ -12,6 +12,7 @@ import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PieChartIcon from '@material-ui/icons/PieChart';
 import WarningIcon from '@material-ui/icons/Warning';
+import SecurityIcon from '@material-ui/icons/Security';
 
 const styles = theme => ({
   root: {
@@ -208,6 +209,33 @@ const styles = theme => ({
       display: 'none'
     }
   },
+  cover: {
+    backgroundColor: colors.white,
+    '&:hover': {
+      backgroundColor: colors.coverPurple,
+      '& .title': {
+        color: colors.white,
+      },
+      '& .icon': {
+        color: colors.white
+      },
+      '& .description': {
+        display: 'block',
+        color: colors.white,
+        padding: '48px',
+        textAlign: 'center'
+      }
+    },
+    '& .title': {
+      color: colors.coverPurple,
+    },
+    '& .icon': {
+      color: colors.coverPurple
+    },
+    '& .description': {
+      display: 'none'
+    }
+  },
   title: {
     padding: '24px',
     paddingBottom: '0px',
@@ -269,6 +297,11 @@ class Home extends Component {
           <img alt='' src={ require('../../assets/cream-logo.png') } width='100px' height='100px' className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Lending") }</Typography>
           <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Lending, provided by cream." }</Typography>
+        </Card>
+        <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { this.nav('cover') } }>
+          <SecurityIcon className={ `${classes.icon} icon` } />
+          <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Cover") }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Cover provided by Cover Protocol." }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('stats') } }>
           <BarChartIcon className={ `${classes.icon} icon` } />
