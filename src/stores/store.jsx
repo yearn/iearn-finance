@@ -4858,18 +4858,21 @@ class Store {
         const expires = protocol.expirationTimestamps
         const claimAddress = protocol.coverObjects[protocol.claimNonce].tokens.claimAddress
         const noClaimAddress = protocol.coverObjects[protocol.claimNonce].tokens.noClaimAddress
-        let collateralAddress = protocol.coverObjects[protocol.claimNonce].collateralAddress
-
-        // this hack is because they use dai as collateral even though their api/ui say yDAI...reasons
+        const collateralAddress = protocol.coverObjects[protocol.claimNonce].collateralAddress
+        let collateralName;
+        // currently supported collateral types are DAI and yDAI, however, purchasing coverage always uses DAI through Balancer
+        const daiAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'
         if(collateralAddress === '0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01') {
-          collateralAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'
+          collateralName = "yDAI";
+        } else if (collateralAddress === '0x6B175474E89094C44Da98b954EedeAC495271d0F') {
+          collateralName = "DAI";
         }
 
         let claimPoolData = poolDataArr.filter((data) => {
-          if(data[1].poolId.tokens[0].address.toLowerCase() === claimAddress.toLowerCase() && data[1].poolId.tokens[1].address.toLowerCase() === collateralAddress.toLowerCase()) {
+          if(data[1].poolId.tokens[0].address.toLowerCase() === claimAddress.toLowerCase() && data[1].poolId.tokens[1].address.toLowerCase() === daiAddress.toLowerCase()) {
             return true
           }
-          if(data[1].poolId.tokens[1].address.toLowerCase() === claimAddress.toLowerCase() && data[1].poolId.tokens[0].address.toLowerCase() === collateralAddress.toLowerCase()) {
+          if(data[1].poolId.tokens[1].address.toLowerCase() === claimAddress.toLowerCase() && data[1].poolId.tokens[0].address.toLowerCase() === daiAddress.toLowerCase()) {
             return true
           }
 
@@ -4878,11 +4881,15 @@ class Store {
           return {
             price: data[1].price,
             symbol: data[1].symbol,
-            swapFee: data[1].poolId.swapFee,
-            liquidity: data[1].poolId.liquidity
+            swapFee: parseFloat(data[1].poolId.swapFee),
+            liquidity: data[1].poolId.liquidity,
+            daiInPool: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
+            covTokenBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === claimAddress.toLowerCase()).balance),
+            covTokenWeight: 
+              parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === claimAddress.toLowerCase()).denormWeight) / 
+              parseFloat(data[1].poolId.totalWeight)
           }
         })
-
         if(claimPoolData.length > 0) {
           claimPoolData = claimPoolData.sort((a, b) => {
             return b.liquidity !== null ? parseFloat(b.liquidity) - parseFloat(a.liquidity) : -9999999999
@@ -4895,12 +4902,11 @@ class Store {
             liquidity: 0
           }
         }
-
         let noClaimPoolData = poolDataArr.filter((data) => {
-          if(data[1].poolId.tokens[0].address.toLowerCase() === noClaimAddress.toLowerCase() && data[1].poolId.tokens[1].address.toLowerCase() === collateralAddress.toLowerCase()) {
+          if(data[1].poolId.tokens[0].address.toLowerCase() === noClaimAddress.toLowerCase() && data[1].poolId.tokens[1].address.toLowerCase() === daiAddress.toLowerCase()) {
             return true
           }
-          if(data[1].poolId.tokens[1].address.toLowerCase() === noClaimAddress.toLowerCase() && data[1].poolId.tokens[0].address.toLowerCase() === collateralAddress.toLowerCase()) {
+          if(data[1].poolId.tokens[1].address.toLowerCase() === noClaimAddress.toLowerCase() && data[1].poolId.tokens[0].address.toLowerCase() === daiAddress.toLowerCase()) {
             return true
           }
 
@@ -4909,8 +4915,13 @@ class Store {
           return {
             price: data[1].price,
             symbol: data[1].symbol,
-            swapFee: data[1].poolId.swapFee,
-            liquidity: data[1].poolId.liquidity
+            swapFee: parseFloat(data[1].poolId.swapFee),
+            liquidity: data[1].poolId.liquidity,
+            daiInPool: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
+            covTokenBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === noClaimAddress.toLowerCase()).balance),
+            covTokenWeight: 
+              parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === noClaimAddress.toLowerCase()).denormWeight) / 
+              parseFloat(data[1].poolId.totalWeight)
           }
         })
 
@@ -4928,7 +4939,7 @@ class Store {
         }
 
         let noClaimShieldData = shieldMiningPoolData.filter((data) => {
-          return data.tokensList.map((a) => { return a.toLowerCase() }).includes(noClaimAddress.toLowerCase()) && data.tokensList.map((a) => { return a.toLowerCase() }).includes(collateralAddress.toLowerCase())
+          return data.tokensList.map((a) => { return a.toLowerCase() }).includes(noClaimAddress.toLowerCase()) && data.tokensList.map((a) => { return a.toLowerCase() }).includes(daiAddress.toLowerCase())
         })
 
         if(noClaimShieldData.length > 0) {
@@ -4942,7 +4953,7 @@ class Store {
         }
 
         let claimShieldData = shieldMiningPoolData.filter((data) => {
-          return data.tokensList.map((a) => { return a.toLowerCase() }).includes(claimAddress.toLowerCase()) && data.tokensList.map((a) => { return a.toLowerCase() }).includes(collateralAddress.toLowerCase())
+          return data.tokensList.map((a) => { return a.toLowerCase() }).includes(claimAddress.toLowerCase()) && data.tokensList.map((a) => { return a.toLowerCase() }).includes(daiAddress.toLowerCase())
         })
 
         if(claimShieldData.length > 0) {
@@ -4963,7 +4974,9 @@ class Store {
           expires,
           claimAddress,
           noClaimAddress,
+          purchaseCurrency: daiAddress,
           collateralAddress,
+          collateralName,
           claimPoolData: claimPoolData,
           noClaimPoolData: noClaimPoolData,
         }
