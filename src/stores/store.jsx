@@ -4137,7 +4137,6 @@ class Store {
     }
     const assets = store.getStore('lendingAssets')
     const assetsIn = await this._getAssetsIn(web3, account)
-    const priceJSON = await this._getETHUSDPrices()
     const blocksPeryear = 2102400
 
     async.map(assets, async (asset, callback) => {
@@ -4248,7 +4247,6 @@ class Store {
 
     const allMarkets = await this._getAllMarkets(web3)
     const assetsIn = await this._getAssetsIn(web3, account)
-    const priceJSON = await this._getETHUSDPrices()
     const blocksPeryear = 2102400
 
     const removedDeadMarket = allMarkets.filter((market) => {
