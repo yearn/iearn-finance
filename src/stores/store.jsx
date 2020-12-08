@@ -124,7 +124,7 @@ class Store {
       lendingAssets: defaultValues.lendingAssets,
       coverProtocols: defaultValues.coverProtocols,
       coverCollateral: [],
-      coverAassets: [],
+      coverAssets: [],
       lendingSupply: 0,
       lendingBorrow: 0,
       lendingCollateral: 0,
@@ -4867,18 +4867,20 @@ class Store {
         } else if (collateralAddress === '0x6B175474E89094C44Da98b954EedeAC495271d0F') {
           collateralName = "DAI";
         }
-
         let claimPoolData = poolDataArr.filter((data) => {
-          if(data[1].poolId.tokens[0].address.toLowerCase() === claimAddress.toLowerCase() && data[1].poolId.tokens[1].address.toLowerCase() === daiAddress.toLowerCase()) {
+          const token0Address = data[1].poolId.tokens[0].address.toLowerCase();
+          const token1Address = data[1].poolId.tokens[1].address.toLowerCase();
+          if(token0Address === claimAddress.toLowerCase() && token1Address.toLowerCase() === daiAddress.toLowerCase()) {
             return true
           }
-          if(data[1].poolId.tokens[1].address.toLowerCase() === claimAddress.toLowerCase() && data[1].poolId.tokens[0].address.toLowerCase() === daiAddress.toLowerCase()) {
+          if(token1Address === claimAddress.toLowerCase() && token0Address === daiAddress.toLowerCase()) {
             return true
           }
 
           return false
         }).map((data) => {
           return {
+            address: data[1].poolId.id,
             price: data[1].price,
             symbol: data[1].symbol,
             swapFee: parseFloat(data[1].poolId.swapFee),
@@ -4913,6 +4915,7 @@ class Store {
           return false
         }).map((data) => {
           return {
+            address: data[1].poolId.id,
             price: data[1].price,
             symbol: data[1].symbol,
             swapFee: parseFloat(data[1].poolId.swapFee),
@@ -4966,8 +4969,12 @@ class Store {
           }
         }
 
-        claimPoolData.address = claimShieldData.id
-        noClaimPoolData.address = noClaimShieldData.id
+        if (claimShieldData.id) {
+          claimPoolData.address = claimShieldData.id;
+        }
+        if (noClaimShieldData.id) {
+          noClaimPoolData.address = noClaimShieldData.id;
+        }
 
         return {
           name,
@@ -4981,7 +4988,6 @@ class Store {
           noClaimPoolData: noClaimPoolData,
         }
       })
-
       store.setStore({ coverProtocols: claimAssets })
 
       emitter.emit(CONFIGURE_COVER_RETURNED, claimAssets)
@@ -5042,11 +5048,9 @@ class Store {
       return protocol
     })
 
-    console.log(populatedCoverProtocols)
-
     store.setStore({
       coverCollateral: collateral,
-      coverAassets: assets,
+      coverAssets: assets,
       coverProtocols: populatedCoverProtocols
     })
 
