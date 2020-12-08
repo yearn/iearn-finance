@@ -71,7 +71,8 @@ const styles = theme => ({
   },
   assetSelectIcon: {
     marginRight: '24px',
-    width: '30px'
+    width: '30px',
+    display: 'flex'
   },
   claimOptionContainer: {
     display: 'flex',
@@ -193,6 +194,9 @@ const styles = theme => ({
   },
   assetSelectMenu: {
     padding: '12px 24px'
+  },
+  padLeft: {
+    marginLeft: '5px'
   }
 });
 
@@ -388,7 +392,7 @@ class NewCover extends Component {
           renderValue: (option) => {
             return (
               <React.Fragment>
-                <div className={ classes.assetSelectIcon }>
+                <div className={ `${classes.assetSelectIcon} ${classes.padLeft}` }>
                   <img
                     alt=""
                     src={ this.getLogoForProtocol({ name: option }, true) }
