@@ -4883,7 +4883,7 @@ class Store {
             symbol: data[1].symbol,
             swapFee: parseFloat(data[1].poolId.swapFee),
             liquidity: data[1].poolId.liquidity,
-            daiBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
+            daiInPool: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
             covTokenBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === claimAddress.toLowerCase()).balance),
             covTokenWeight: 
               parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === claimAddress.toLowerCase()).denormWeight) / 
@@ -4917,7 +4917,7 @@ class Store {
             symbol: data[1].symbol,
             swapFee: parseFloat(data[1].poolId.swapFee),
             liquidity: data[1].poolId.liquidity,
-            daiBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
+            daiInPool: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
             covTokenBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === noClaimAddress.toLowerCase()).balance),
             covTokenWeight: 
               parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === noClaimAddress.toLowerCase()).denormWeight) / 

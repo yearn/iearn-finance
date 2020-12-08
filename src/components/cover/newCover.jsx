@@ -536,7 +536,8 @@ class NewCover extends Component {
     const slippage = (1 - feePercent) / (2 * daiInPool * covTokenWeight);
     const totalSlippage = amountToSell * slippage;
     const endPrice = basePrice * (1 + totalSlippage);
-    return amountToSell / endPrice;
+    // better to underestimate than overestimate
+    return (amountToSell / endPrice) * 0.98;
   }
 
   renderClaim = () => {
@@ -566,10 +567,10 @@ class NewCover extends Component {
     }
     const logo =  this.getLogoForProtocol(selectedProtocol, false)
     const tokensReceived = this.calculateTokensReceived(
-      assetAmount, 
+      parseFloat(assetAmount), 
       selectedProtocol.claimPoolData.swapFee, 
       selectedProtocol.claimPoolData.covTokenWeight, 
-      selectedProtocol.claimPoolData.daiBalance, 
+      selectedProtocol.claimPoolData.daiInPool, 
       selectedProtocol.claimPoolData.price
       );
 
@@ -584,7 +585,7 @@ class NewCover extends Component {
           </div>
           <div className={ classes.priceContainer }>
             <Typography variant='h1' align='center' >{ selectedProtocol.claimPoolData.price ? tokensReceived.toFixed(0) : '0' }</Typography>
-            <Typography variant='h4' align='center' className={ classes.priceDescription }>Tokens Received</Typography>
+            <Typography variant='h4' align='center' className={ classes.priceDescription }>Tokens Received (est.)</Typography>
           </div>
         </div>
         <div className={ classes.pricesContainer }>
@@ -630,10 +631,10 @@ class NewCover extends Component {
 
     const logo =  this.getLogoForProtocol(selectedProtocol, false)
     const tokensReceived = this.calculateTokensReceived(
-      assetAmount, 
+      parseFloat(assetAmount), 
       selectedProtocol.noClaimPoolData.swapFee, 
       selectedProtocol.noClaimPoolData.covTokenWeight, 
-      selectedProtocol.noClaimPoolData.daiBalance, 
+      selectedProtocol.noClaimPoolData.daiInPool, 
       selectedProtocol.noClaimPoolData.price
       );
     
@@ -648,7 +649,7 @@ class NewCover extends Component {
           </div>
           <div className={ classes.priceContainer }>
             <Typography variant='h1' align='center' >{ selectedProtocol.noClaimPoolData.price ? tokensReceived.toFixed(0) : '0' }</Typography>
-            <Typography variant='h4' align='center' className={ classes.priceDescription }>Tokens Received</Typography>
+            <Typography variant='h4' align='center' className={ classes.priceDescription }>Tokens Received (est.)</Typography>
           </div>
         </div>
         <div className={ classes.pricesContainer }>
