@@ -207,10 +207,10 @@ class NewCover extends Component {
       account: account,
       coverProtocols: store.getStore('coverProtocols'),
       coverCollateral: store.getStore('coverCollateral'),
-      coverAassets: store.getStore('coverAassets'),
+      coverAssets: store.getStore('coverAssets'),
       loading: true,
       protocol: 'YEARN',
-      assetAmount: '100',
+      assetAmount: '1',
       assetAmountError: false,
       claimOption: null,
       snackbarType: null,
@@ -268,7 +268,7 @@ class NewCover extends Component {
   coverBalancesReturned = () => {
     this.setState({
       coverCollateral: store.getStore('coverCollateral'),
-      coverAassets: store.getStore('coverAassets'),
+      coverAssets: store.getStore('coverAssets'),
       loading: false
     })
   }
@@ -580,11 +580,11 @@ class NewCover extends Component {
         <Typography variant='h2' color='primary' align='center' className={ classes.tokenTypeHeader }>Claim Tokens</Typography>
         <div className={ classes.pricesContainer }>
           <div className={ classes.priceContainer }>
-            <Typography variant='h1' align='center' >${ selectedProtocol.claimPoolData.price ? (assetAmount ? assetAmount / tokensReceived : selectedProtocol.claimPoolData.price).toFixed(2) : 'Unknown' }</Typography>
+            <Typography variant='h1' align='center' >${ selectedProtocol.claimPoolData.price ? (assetAmount && assetAmount !== '0' ? assetAmount / tokensReceived : selectedProtocol.claimPoolData.price).toFixed(2) : 'Unknown' }</Typography>
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Token Price</Typography>
           </div>
           <div className={ classes.priceContainer }>
-            <Typography variant='h1' align='center' >{ selectedProtocol.claimPoolData.price ? tokensReceived.toFixed(0) : '0' }</Typography>
+            <Typography variant='h1' align='center' >{ selectedProtocol.claimPoolData.price ? (tokensReceived ? tokensReceived.toFixed(1) : '0') : '0' }</Typography>
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Tokens Received (est.)</Typography>
           </div>
         </div>
@@ -644,11 +644,11 @@ class NewCover extends Component {
         <Typography variant='h2' color='primary' align='center' className={ classes.tokenTypeHeader }>No Claim Tokens</Typography>
         <div className={ classes.pricesContainer }>
           <div className={ classes.priceContainer }>
-            <Typography variant='h1' align='center' >${ selectedProtocol.noClaimPoolData.price ? (assetAmount ? assetAmount / tokensReceived : selectedProtocol.noClaimPoolData.price).toFixed(2) : 'Unknown' }</Typography>
+            <Typography variant='h1' align='center' >${ selectedProtocol.noClaimPoolData.price ? (assetAmount && assetAmount !== '0' ? assetAmount / tokensReceived : selectedProtocol.noClaimPoolData.price).toFixed(2) : 'Unknown' }</Typography>
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Token Price</Typography>
           </div>
           <div className={ classes.priceContainer }>
-            <Typography variant='h1' align='center' >{ selectedProtocol.noClaimPoolData.price ? tokensReceived.toFixed(0) : '0' }</Typography>
+            <Typography variant='h1' align='center' >{ selectedProtocol.noClaimPoolData.price ? (tokensReceived ? tokensReceived.toFixed(1) : '0') : '0' }</Typography>
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Tokens Received (est.)</Typography>
           </div>
         </div>
