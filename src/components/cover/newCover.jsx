@@ -351,7 +351,7 @@ class NewCover extends Component {
               </Grid>
             </Grid>
             <Typography variant="body1">
-              * To find out more about how claims are assessed, <a href="https://docs.coverprotocol.com/product/claims-guidelines" rel="noopener noreferrer" target="_blank">go to Coverprotocol's guidelines</a>
+              * To find out more about how claims are assessed, <a href="https://docs.coverprotocol.com/product/claims-guidelines" rel="noopener noreferrer" target="_blank">go to Cover Protocol's guidelines</a>
             </Typography>
           </div>
         </div>
@@ -517,7 +517,7 @@ class NewCover extends Component {
       <div className={ classes.valContainer }>
         <div className={ classes.flexy }>
           <div className={ classes.label }>
-            <Typography variant='h4'>How much collateral would you like to provide</Typography>
+            <Typography variant='h4'>How much would you like to spend</Typography>
           </div>
           <div className={ classes.balances }>
             <Typography variant='h4' onClick={ () => { this.balanceClicked(selectedAsset) } }>Balance { selectedAsset.balance ? selectedAsset.balance.toFixed(4) : '0.0000' }</Typography>
