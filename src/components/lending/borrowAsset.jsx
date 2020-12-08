@@ -9,6 +9,7 @@ import {
   AccordionSummary,
   AccordionDetails
 } from '@material-ui/core';
+import BigNumber from 'bignumber.js'
 
 import {
   ERROR,
@@ -229,13 +230,16 @@ class BorrowAsset extends Component {
               <Typography variant={ 'h4' } className={ classes.assetName } noWrap>{ asset.symbol }</Typography>
             </div>
             <div className={classes.headingAPY }>
-              <Typography variant={ 'h4' } noWrap align='right'>{ asset.borrowAPY ? asset.borrowAPY.toFixed(2) : '0.00' }%</Typography>
+              <Typography variant={ 'h4' } noWrap align='right'>{ asset.borrowAPY ? BigNumber(asset.borrowAPY).toFixed(2, BigNumber.ROUND_DOWN) : '0.00' }%</Typography>
             </div>
             <div className={classes.heading}>
-              <Typography variant={ 'h4' } noWrap align='right'>{ asset.balance ? asset.balance.toFixed(2) : '0.00' } { asset.symbol }</Typography>
+              <Typography variant={ 'h4' } noWrap align='right'>{ asset.balance ? BigNumber(asset.balance).toFixed(2, BigNumber.ROUND_DOWN) : '0.00' } { asset.symbol }</Typography>
             </div>
             <div className={classes.heading}>
-              <Typography variant={ 'h4' } noWrap align='right'>{ asset.borrowBalance ? asset.borrowBalance.toFixed(2) : '0.00' } { asset.symbol }</Typography>
+              <Typography variant={ 'h4' } noWrap align='right'>{ asset.borrowBalance ? BigNumber(asset.borrowBalance).toFixed(2, BigNumber.ROUND_DOWN) : '0.00' } { asset.symbol }</Typography>
+            </div>
+            <div className={classes.heading}>
+              <Typography variant={ 'h4' } noWrap align='right'>{ asset.liquidity ? BigNumber(asset.liquidity).toFixed(2, BigNumber.ROUND_DOWN) : '0.00' } { asset.symbol }</Typography>
             </div>
           </div>
         </AccordionSummary>
@@ -308,7 +312,6 @@ class BorrowAsset extends Component {
               disabled={ loading }
               placeholder="0.00"
               variant="outlined"
-              onKeyDown={ this.inputKeyDown }
             />
             <div className={ classes.scaleContainer }>
               <div className={ classes.emptyScale }></div>
@@ -385,14 +388,15 @@ class BorrowAsset extends Component {
                 className={ classes.actionButton }
                 variant="contained"
                 color="primary"
-                disabled={ loading || asset.borrowBalance === 0 || !repayAmount || parseFloat(repayAmount) > asset.balance }
+                disabled={ loading || asset.borrowBalance === 0 || !repayAmount || BigNumber(repayAmount).gt(BigNumber(asset.balance)) || BigNumber(repayAmount).gt(BigNumber(asset.borrowBalance)) }
                 onClick={ this.onRepay }
                 fullWidth
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'} >
                   { asset.borrowBalance === 0 && 'No Balance to Repay' }
-                  { asset.borrowBalance > 0 && parseFloat(repayAmount) > asset.balance && 'Insufficient Balance' }
-                  { asset.borrowBalance > 0 && (!repayAmount || parseFloat(repayAmount) <= asset.balance) && 'Repay' }
+                  { asset.borrowBalance > 0 && BigNumber(repayAmount).gt(BigNumber(asset.balance)) && 'Insufficient Balance' }
+                  { asset.borrowBalance > 0 && BigNumber(repayAmount).gt(BigNumber(asset.borrowBalance)) && 'Insufficient Borrowed' }
+                  { asset.borrowBalance > 0 && (!repayAmount || (BigNumber(repayAmount).lte(BigNumber(asset.balance)) && BigNumber(repayAmount).lte(BigNumber(asset.borrowBalance)))) && 'Repay' }
                 </Typography>
               </Button>
             </div>
@@ -429,12 +433,6 @@ class BorrowAsset extends Component {
     let val = []
     val[event.target.id] = event.target.value
     this.setState(val)
-  }
-
-  inputKeyDown = (event) => {
-    if (event.which === 13) {
-      this.onInvest();
-    }
   }
 
   onBorrow = () => {

@@ -4146,15 +4146,18 @@ class Store {
 
         let balance = 0
 
+        const bnDecimals = new BigNumber(10)
+          .pow(asset.decimals)
+
         if(asset.vaultSymbol !== 'crETH') {
           const erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
           balance = await erc20Contract.methods.balanceOf(account.address).call()
-          balance = balance/10**asset.decimals
+          balance = new BigNumber(balance).div(bnDecimals).toFixed(asset.decimals, BigNumber.ROUND_DOWN)
 
           marketContract = new web3.eth.Contract(config.cErc20DelegatorABI, asset.address)
         } else {
           balance = await web3.eth.getBalance(account.address)
-          balance = balance/10**asset.decimals
+          balance = new BigNumber(balance).div(bnDecimals).toFixed(asset.decimals, BigNumber.ROUND_DOWN)
 
           marketContract = new web3.eth.Contract(config.cEtherABI, asset.address)
         }
@@ -4302,6 +4305,9 @@ class Store {
           }
         }
 
+        const bnDecimals = new BigNumber(10)
+          .pow(decimals)
+
         let balance = 0
 
         if(vaultSymbol !== 'crETH') {
@@ -4310,10 +4316,10 @@ class Store {
           }
 
           balance = await erc20Contract.methods.balanceOf(account.address).call()
-          balance = balance/10**decimals
+          balance = new BigNumber(balance).div(bnDecimals).toFixed(decimals, BigNumber.ROUND_DOWN)
         } else {
           balance = await web3.eth.getBalance(account.address)
-          balance = balance/10**decimals
+          balance = new BigNumber(balance).div(bnDecimals).toFixed(decimals, BigNumber.ROUND_DOWN)
 
           marketContract = new web3.eth.Contract(config.cEtherABI, market)
         }
@@ -4322,6 +4328,7 @@ class Store {
         const exchangeRate = await marketContract.methods.exchangeRateStored().call()
         let supplyBalance = await marketContract.methods.balanceOf(account.address).call()
         let borrowBalance = await marketContract.methods.borrowBalanceStored(account.address).call()
+        let cash = await marketContract.methods.getCash().call()
         const borrowRatePerBlock = await marketContract.methods.borrowRatePerBlock().call()
         const supplyRatePerBlock = await marketContract.methods.supplyRatePerBlock().call()
         const ethPerAsset = await creamPriceOracleContract.methods.getUnderlyingPrice(market).call() //no longer eth per asset it's now dollars per asset
@@ -4330,6 +4337,7 @@ class Store {
 
         supplyBalance = supplyBalance*exchangeRateReal/10**vaultDecimals
         borrowBalance = borrowBalance/10**decimals
+        cash = cash/10**decimals
 
         const borrowRatePerYear = (borrowRatePerBlock) * blocksPeryear / 1e16
         const supplyRatePerYear = (supplyRatePerBlock) * blocksPeryear / 1e16
@@ -4343,7 +4351,7 @@ class Store {
           vaultDecimals: vaultDecimals,
           decimals: decimals,
           collateralEnabled: assetsIn.includes(market),
-          liquidity: 0,
+          liquidity: cash,
           balance: balance,
           supplyBalance: supplyBalance,
           supplyAPY: supplyRatePerYear,
@@ -4451,7 +4459,12 @@ class Store {
 
     var amountToSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals !== 18) {
-      amountToSend = (amount*10**asset.decimals).toFixed(0)
+      const decimals = new BigNumber(10)
+        .pow(asset.decimals)
+
+      amountToSend = new BigNumber(amount)
+        .times(decimals)
+        .toFixed(0);
     }
 
     if(asset.erc20address === 'Ethereum') {
@@ -4540,12 +4553,17 @@ class Store {
 
     let lendContract = new web3.eth.Contract(config.cErc20DelegatorABI, asset.address)
 
-    var amountSend = web3.utils.toWei(amount, "ether")
+    var amountToSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals !== 18) {
-      amountSend = (amount*10**asset.decimals).toFixed(0)
+      const decimals = new BigNumber(10)
+        .pow(asset.decimals)
+
+      amountToSend = new BigNumber(amount)
+        .times(decimals)
+        .toFixed(0);
     }
 
-    lendContract.methods.redeemUnderlying(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    lendContract.methods.redeemUnderlying(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
       console.log(hash)
       callback(null, hash)
@@ -4687,12 +4705,17 @@ class Store {
 
     let lendContract = new web3.eth.Contract(config.cErc20DelegatorABI, asset.address)
 
-    var amountSend = web3.utils.toWei(amount, "ether")
+    var amountToSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals !== 18) {
-      amountSend = (amount*10**asset.decimals).toFixed(0);
+      const decimals = new BigNumber(10)
+        .pow(asset.decimals)
+
+      amountToSend = new BigNumber(amount)
+        .times(decimals)
+        .toFixed(0);
     }
 
-    lendContract.methods.borrow(amountSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    lendContract.methods.borrow(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
     .on('transactionHash', function(hash){
       console.log(hash)
       callback(null, hash)
@@ -4743,7 +4766,12 @@ class Store {
 
     var amountToSend = web3.utils.toWei(amount, "ether")
     if (asset.decimals !== 18) {
-      amountToSend = (amount*10**asset.decimals).toFixed(0)
+      const decimals = new BigNumber(10)
+        .pow(asset.decimals)
+
+      amountToSend = new BigNumber(amount)
+        .times(decimals)
+        .toFixed(0);
     }
 
     if(asset.erc20address === 'Ethereum') {
