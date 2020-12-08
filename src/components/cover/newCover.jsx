@@ -391,7 +391,7 @@ class NewCover extends Component {
                 <div className={ classes.assetSelectIcon }>
                   <img
                     alt=""
-                    src={ this.getLogoForProtocol({ name: option }) }
+                    src={ this.getLogoForProtocol({ name: option }, true) }
                     height="30px"
                   />
                 </div>
@@ -413,14 +413,13 @@ class NewCover extends Component {
 
   renderProtocolOption = (option) => {
     const { classes } = this.props
-
     return (
       <MenuItem key={ option.name } value={ option.name } className={ classes.assetSelectMenu }>
         <div className={ classes.assetSelectName}>
           <div className={ classes.assetSelectIcon }>
             <img
               alt=""
-              src={ this.getLogoForProtocol(option) }
+              src={ this.getLogoForProtocol(option, true) }
               height="30px"
             />
           </div>
@@ -440,38 +439,11 @@ class NewCover extends Component {
     )
   }
 
-  getLogoForProtocol = (protocol) => {
-    switch (protocol.name) {
-      case 'CURVE':
-        return require('../../assets/cover/curve_logo.png')
-      case 'AAVE':
-        return require('../../assets/cover/aave_logo.png')
-      case 'BALANCER':
-        return require('../../assets/cover/balancer_logo.png')
-      case 'SUSHISWAP':
-        return require('../../assets/cover/sushiswap_logo.png')
-      case 'YEARN':
-        return require('../../assets/cover/yearn_logo.png')
-      case 'PICKLE':
-        return require('../../assets/cover/pickle_logo.png')
-      case 'BARNBRIDGE':
-        return require('../../assets/cover/barnbridge_logo.png')
-      case 'HARVEST':
-        return require('../../assets/cover/harvest_logo.png')
-      case 'REN':
-        return require('../../assets/cover/ren_logo.png')
-      case 'CREAM':
-        return require('../../assets/cover/cream_logo.png')
-      case 'BASIS':
-        return require('../../assets/cover/basis_logo.png')
-      case 'BADGERDAO':
-        return require('../../assets/cover/badger_logo.png')
-      case 'MUSHROOMS':
-        return require('../../assets/cover/mushrooms_logo.png')
-      case 'BORINGDAO':
-        return require('../../assets/cover/boringdao_logo.png')
-      default:
-        return require('../../assets/unknown-logo.png')
+  getLogoForProtocol = (protocol, isIcon) => {
+    try {
+      return require(`../../assets/cover/${protocol.name.toLowerCase()}_${isIcon ? "icon" : "logo"}.png`)
+    } catch {
+      return require('../../assets/unknown-logo.png')
     }
   }
 
@@ -586,7 +558,7 @@ class NewCover extends Component {
       selectedProtocol = selectedProtocol[0]
     }
 
-    const logo =  this.getLogoForProtocol(selectedProtocol)
+    const logo =  this.getLogoForProtocol(selectedProtocol, false)
 
     return (
       <div className={ `${claimOption==='Claim Tokens'?classes.claimOptionSelected:classes.claimOption}` } onClick={ () => { this.selectClaimOption('Claim Tokens') } }>
@@ -643,7 +615,7 @@ class NewCover extends Component {
       selectedProtocol = selectedProtocol[0]
     }
 
-    const logo =  this.getLogoForProtocol(selectedProtocol)
+    const logo =  this.getLogoForProtocol(selectedProtocol, false)
 
     return (
       <div className={ `${claimOption==='No Claim Tokens'?classes.claimOptionSelected:classes.claimOption}` } onClick={ () => { this.selectClaimOption('No Claim Tokens') } }>
@@ -669,7 +641,7 @@ class NewCover extends Component {
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Liquidity</Typography>
           </div>
         </div>
-        <Typography variant='body2' className={ classes.claimDescription } align='center'>No claim tokens will pay out $1 for each token you hold in the event that there is no successful attack on the protocol before the expiry date.*</Typography>
+        <Typography variant='body2' className={ classes.claimDescription } align='center'>No claim tokens will pay out $1 for each token you hold in the event that there is no successful attack on the protocol by the expiry date.*</Typography>
       </div>
     )
   }

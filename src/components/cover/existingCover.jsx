@@ -363,37 +363,10 @@ class NewCover extends Component {
   };
 
   getLogoForProtocol = (protocol) => {
-    switch (protocol.name) {
-      case 'CURVE':
-        return require('../../assets/cover/curve_logo.png')
-      case 'AAVE':
-        return require('../../assets/cover/aave_logo.png')
-      case 'BALANCER':
-        return require('../../assets/cover/balancer_logo.png')
-      case 'SUSHISWAP':
-        return require('../../assets/cover/sushiswap_logo.png')
-      case 'YEARN':
-        return require('../../assets/cover/yearn_logo.png')
-      case 'PICKLE':
-        return require('../../assets/cover/pickle_logo.png')
-      case 'BARNBRIDGE':
-        return require('../../assets/cover/barnbridge_logo.png')
-      case 'HARVEST':
-        return require('../../assets/cover/harvest_logo.png')
-      case 'REN':
-        return require('../../assets/cover/ren_logo.png')
-      case 'CREAM':
-        return require('../../assets/cover/cream_logo.png')
-      case 'BASIS':
-        return require('../../assets/cover/basis_logo.png')
-      case 'BADGERDAO':
-        return require('../../assets/cover/badger_logo.png')
-      case 'MUSHROOMS':
-        return require('../../assets/cover/mushrooms_logo.png')
-      case 'BORINGDAO':
-        return require('../../assets/cover/boringdao_logo.png')
-      default:
-        return require('../../assets/unknown-logo.png')
+    try {
+      return require(`../../assets/cover/${protocol.name.toLowerCase()}_icon.png`);
+    } catch {
+      return require('../../assets/unknown-logo.png')
     }
   }
 
