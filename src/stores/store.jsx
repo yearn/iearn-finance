@@ -4881,11 +4881,15 @@ class Store {
           return {
             price: data[1].price,
             symbol: data[1].symbol,
-            swapFee: data[1].poolId.swapFee,
-            liquidity: data[1].poolId.liquidity
+            swapFee: parseFloat(data[1].poolId.swapFee),
+            liquidity: data[1].poolId.liquidity,
+            daiBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
+            covTokenBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === claimAddress.toLowerCase()).balance),
+            covTokenWeight: 
+              parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === claimAddress.toLowerCase()).denormWeight) / 
+              parseFloat(data[1].poolId.totalWeight)
           }
         })
-
         if(claimPoolData.length > 0) {
           claimPoolData = claimPoolData.sort((a, b) => {
             return b.liquidity !== null ? parseFloat(b.liquidity) - parseFloat(a.liquidity) : -9999999999
@@ -4898,7 +4902,6 @@ class Store {
             liquidity: 0
           }
         }
-
         let noClaimPoolData = poolDataArr.filter((data) => {
           if(data[1].poolId.tokens[0].address.toLowerCase() === noClaimAddress.toLowerCase() && data[1].poolId.tokens[1].address.toLowerCase() === daiAddress.toLowerCase()) {
             return true
@@ -4912,8 +4915,13 @@ class Store {
           return {
             price: data[1].price,
             symbol: data[1].symbol,
-            swapFee: data[1].poolId.swapFee,
-            liquidity: data[1].poolId.liquidity
+            swapFee: parseFloat(data[1].poolId.swapFee),
+            liquidity: data[1].poolId.liquidity,
+            daiBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
+            covTokenBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === noClaimAddress.toLowerCase()).balance),
+            covTokenWeight: 
+              parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === noClaimAddress.toLowerCase()).denormWeight) / 
+              parseFloat(data[1].poolId.totalWeight)
           }
         })
 
