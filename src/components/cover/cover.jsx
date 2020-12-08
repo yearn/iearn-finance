@@ -48,7 +48,7 @@ const styles = theme => ({
     width: '100%'
   },
   headerButton: {
-    width: '150px'
+    width: '175px'
   }
 });
 
@@ -83,7 +83,7 @@ class Cover extends Component {
               variant='contained'
               color='primary'
               className={ classes.headerButton }
-            >Buy Cover</Button> }
+            >Buy Coverage</Button> }
             { screen !== 'existingCover' && <div className={ classes.headerButton }></div> }
           </div>
           { screen === 'existingCover' && <ExistingCover /> }

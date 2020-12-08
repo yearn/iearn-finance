@@ -63,7 +63,7 @@ const styles = theme => ({
   },
   actionButton: {
     borderRadius: '6px',
-    width: '90px',
+    width: '130px',
     height: '30px',
     fontSize: '14px'
   },
@@ -299,20 +299,20 @@ class NewCover extends Component {
                 </div>
                 <div className={ classes.assetSelectIconName }>
                   <Typography variant='h4'>{ asset.name }</Typography>
-                  <Typography variant='h5' className={ classes.claimType }>Claim Tokens</Typography>
+                  <Typography variant='h5' className={ classes.claimType }>Claim Token</Typography>
                 </div>
               </TableCell>
               <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
               <TableCell align="right"><Typography variant='h4'>${ asset.claimAsset && asset.claimAsset.balance ? (asset.claimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
               <TableCell align="right">
-                <Tooltip title="Claims are handled on the cover protocols app">
+                <Tooltip title="Claims are handled on Cover Protocol's app">
                   <Button
                     className={ classes.actionButton }
                     variant='contained'
                     color='primary'
                     onClick={ () => { this.onClaim(asset) } }
                   >
-                    Claim
+                    File Claim
                   </Button>
                 </Tooltip>
               </TableCell>
@@ -330,13 +330,13 @@ class NewCover extends Component {
                 </div>
                 <div className={ classes.assetSelectIconName }>
                   <Typography variant='h4'>{ asset.name }</Typography>
-                  <Typography variant='h5' className={ classes.claimType }>No Claim Tokens</Typography>
+                  <Typography variant='h5' className={ classes.claimType }>No Claim Token</Typography>
                 </div>
               </TableCell>
               <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
               <TableCell align="right"><Typography variant='h4'>${ asset.noClaimAsset && asset.noClaimAsset.balance ? (asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
               <TableCell align="right">
-                <Tooltip title="Redemptions are handled on the cover protocols app">
+                <Tooltip title="Redemptions are handled on Cover Protocol's app">
                   <Button
                     className={ classes.actionButton }
                     variant='contained'
@@ -371,11 +371,11 @@ class NewCover extends Component {
   }
 
   onClaim = (asset) => {
-    window.open('https://app.coverprotocol.com/app/claims', '_blank')
+    window.open('https://app.coverprotocol.com/app/claims/new', '_blank')
   }
 
   onRedeem = (asset) => {
-    window.open('https://app.coverprotocol.com/app/redeem', '_blank')
+    window.open('https://app.coverprotocol.com/app/redeem?redeemType=active', '_blank')
   }
 }
 

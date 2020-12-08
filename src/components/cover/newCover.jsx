@@ -319,7 +319,7 @@ class NewCover extends Component {
         <div className={ classes.claimOptionContainer }>
           <div className={ classes.flexy }>
             <div className={ classes.label }>
-              <Typography variant='h4'>Purchase claim or no claim tokens</Typography>
+              <Typography variant='h4'>Purchase Claim or No Claim tokens</Typography>
             </div>
           </div>
           { this.renderClaim() }
@@ -475,7 +475,7 @@ class NewCover extends Component {
       }
 
       selectedAsset = coverCollateral.filter((col) => {
-        return col.address === selectedProtocol.collateralAddress
+        return col.address === selectedProtocol.purchaseCurrency
       })
 
       if(selectedAsset.length > 0) {
@@ -557,7 +557,6 @@ class NewCover extends Component {
     } else {
       selectedProtocol = selectedProtocol[0]
     }
-
     const logo =  this.getLogoForProtocol(selectedProtocol, false)
 
     return (
@@ -570,8 +569,8 @@ class NewCover extends Component {
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Token Price</Typography>
           </div>
           <div className={ classes.priceContainer }>
-            <Typography variant='h1' align='center' >${ selectedProtocol.claimPoolData.price ? (assetAmount/selectedProtocol.claimPoolData.price).toFixed(2) : '0' }</Typography>
-            <Typography variant='h4' align='center' className={ classes.priceDescription }>Receive Tokens</Typography>
+            <Typography variant='h1' align='center' >{ selectedProtocol.claimPoolData.price ? (assetAmount/selectedProtocol.claimPoolData.price).toFixed(2) : '0' }</Typography>
+            <Typography variant='h4' align='center' className={ classes.priceDescription }>Tokens Received</Typography>
           </div>
         </div>
         <div className={ classes.pricesContainer }>
@@ -584,7 +583,7 @@ class NewCover extends Component {
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Liquidity</Typography>
           </div>
         </div>
-        <Typography variant='body2' className={ classes.claimDescription } align='center'>Claim tokens will pay out $1 for each token you hold in the event that there is a successful attack on the protocol before the expiry date.*</Typography>
+        <Typography variant='body2' className={ classes.claimDescription } align='center'>Claim tokens will pay out <b>1 {selectedProtocol.collateralName}</b> for each token you hold in the event that there is a successful attack on the protocol before the expiry date.*</Typography>
       </div>
     )
   }
@@ -627,8 +626,8 @@ class NewCover extends Component {
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Token Price</Typography>
           </div>
           <div className={ classes.priceContainer }>
-            <Typography variant='h1' align='center' >${ selectedProtocol.noClaimPoolData.price ? (assetAmount/selectedProtocol.noClaimPoolData.price).toFixed(2) : '0' }</Typography>
-            <Typography variant='h4' align='center' className={ classes.priceDescription }>Receive Tokens</Typography>
+            <Typography variant='h1' align='center' >{ selectedProtocol.noClaimPoolData.price ? (assetAmount/selectedProtocol.noClaimPoolData.price).toFixed(2) : '0' }</Typography>
+            <Typography variant='h4' align='center' className={ classes.priceDescription }>Tokens Received</Typography>
           </div>
         </div>
         <div className={ classes.pricesContainer }>
@@ -641,7 +640,7 @@ class NewCover extends Component {
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Liquidity</Typography>
           </div>
         </div>
-        <Typography variant='body2' className={ classes.claimDescription } align='center'>No claim tokens will pay out $1 for each token you hold in the event that there is no successful attack on the protocol by the expiry date.*</Typography>
+        <Typography variant='body2' className={ classes.claimDescription } align='center'>No Claim tokens will pay out <b>1 {selectedProtocol.collateralName}</b> for each token you hold if there is no successful attack on the protocol by the expiry date.*</Typography>
       </div>
     )
   }
@@ -694,18 +693,18 @@ class NewCover extends Component {
       pool = selectedProtocol.noClaimPoolData
     }
 
-    let selectedCollateralAsset = coverCollateral.filter((col) => {
-      return col.address === selectedProtocol.collateralAddress
+    let selectedPurchaseAsset = coverCollateral.filter((col) => {
+      return col.address === selectedProtocol.purchaseCurrency
     })
 
-    if(selectedCollateralAsset.length > 0) {
-      selectedCollateralAsset = selectedCollateralAsset[0]
+    if(selectedPurchaseAsset.length > 0) {
+      selectedPurchaseAsset = selectedPurchaseAsset[0]
     } else {
-      selectedCollateralAsset = {}
+      selectedPurchaseAsset = {}
     }
 
     this.setState({ loading: true })
-    dispatcher.dispatch({ type: COVER_PURCHASE, content: { amount: assetAmount, asset: asset, collateral: selectedCollateralAsset, pool: pool } })
+    dispatcher.dispatch({ type: COVER_PURCHASE, content: { amount: assetAmount, asset: asset, collateral: selectedPurchaseAsset, pool: pool } })
   }
 
   balanceClicked = (asset) => {

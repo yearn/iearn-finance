@@ -301,7 +301,7 @@ class Home extends Component {
         <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { this.nav('cover') } }>
           <SecurityIcon className={ `${classes.icon} icon` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Cover") }</Typography>
-          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Cover provided by Cover Protocol." }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Coverage, provided by Cover Protocol." }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('stats') } }>
           <BarChartIcon className={ `${classes.icon} icon` } />
