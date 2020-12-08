@@ -410,6 +410,9 @@ class Lending extends Component {
           <div className={classes.heading}>
             <Typography variant={ 'h4' } noWrap align='right'>Borrowed</Typography>
           </div>
+          <div className={classes.heading}>
+            <Typography variant={ 'h4' } noWrap align='right'>liquidity</Typography>
+          </div>
         </div>
       </div>
     )

@@ -10,6 +10,7 @@ import {
   AccordionDetails,
   Switch
 } from '@material-ui/core';
+import BigNumber from 'bignumber.js'
 
 import {
   ERROR,
@@ -28,6 +29,8 @@ import { colors } from '../../theme'
 import Store from "../../stores";
 const emitter = Store.emitter
 const dispatcher = Store.dispatcher
+
+BigNumber.config({ ROUNDING_MODE: 1 })
 
 const styles = theme => ({
   value: {
@@ -245,13 +248,13 @@ class SupplyAsset extends Component {
               <Typography variant={ 'h4' } className={ classes.assetName } noWrap>{ asset.symbol }</Typography>
             </div>
             <div className={classes.headingAPY }>
-              <Typography variant={ 'h4' } noWrap align='right'>{ asset.supplyAPY ? asset.supplyAPY.toFixed(2) : '0.00' }%</Typography>
+              <Typography variant={ 'h4' } noWrap align='right'>{ asset.supplyAPY ? BigNumber(asset.supplyAPY).toFixed(2, BigNumber.ROUND_DOWN) : '0.00' }%</Typography>
             </div>
             <div className={classes.heading}>
-              <Typography variant={ 'h4' } noWrap align='right'>{ asset.balance ? asset.balance.toFixed(2) : '0.00' } { asset.symbol }</Typography>
+              <Typography variant={ 'h4' } noWrap align='right'>{ asset.balance ? BigNumber(asset.balance).toFixed(2, BigNumber.ROUND_DOWN) : '0.00' } { asset.symbol }</Typography>
             </div>
             <div className={classes.heading}>
-              <Typography variant={ 'h4' } noWrap align='right'>{ asset.supplyBalance ? asset.supplyBalance.toFixed(2) : '0.00' } { asset.symbol }</Typography>
+              <Typography variant={ 'h4' } noWrap align='right'>{ asset.supplyBalance ? BigNumber(asset.supplyBalance).toFixed(2, BigNumber.ROUND_DOWN) : '0.00' } { asset.symbol }</Typography>
             </div>
           </div>
         </AccordionSummary>
@@ -297,7 +300,10 @@ class SupplyAsset extends Component {
 
     if(asset.collateralEnabled) {
       if(supplyAmount && supplyAmount !== '' && limit !== 0) {
-        theLimitUsed = (limitUsed-(supplyAmount*asset.price))*100/limit
+        theLimitUsed = limitUsed*100/(limit+(supplyAmount*asset.price*asset.collateralPercent/100))
+      }
+      if(withdrawAmount && withdrawAmount !== '') {
+        theLimitUsed = limitUsed*100/(limit-(withdrawAmount*asset.price*asset.collateralPercent/100))
       }
     }
 
@@ -345,7 +351,6 @@ class SupplyAsset extends Component {
               disabled={ loading }
               placeholder="0.00"
               variant="outlined"
-              onKeyDown={ this.inputKeyDown }
             />
             <div className={ classes.scaleContainer }>
               <Button
@@ -386,14 +391,14 @@ class SupplyAsset extends Component {
                 className={ classes.actionButton }
                 variant="contained"
                 color="primary"
-                disabled={ loading || !supplyAmount || parseFloat(supplyAmount) >= asset.balance }
+                disabled={ loading || !supplyAmount || BigNumber(supplyAmount).gt(BigNumber(asset.balance)) }
                 onClick={ this.onSupply }
                 fullWidth
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'}>
                   { asset.balance === 0 && 'No Balance to Supply' }
-                  { asset.balance > 0 && supplyAmount && parseFloat(supplyAmount) > asset.balance && 'Insufficient Balance' }
-                  { asset.balance > 0 && (!supplyAmount || parseFloat(supplyAmount) <= asset.balance) && 'Supply' }
+                  { asset.balance > 0 && supplyAmount && BigNumber(supplyAmount).gt(BigNumber(asset.balance)) && 'Insufficient Balance' }
+                  { asset.balance > 0 && (!supplyAmount || BigNumber(supplyAmount).lte(BigNumber(asset.balance))) && 'Supply' }
                 </Typography>
               </Button>
             </div>
@@ -460,8 +465,8 @@ class SupplyAsset extends Component {
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'} >
                   { asset.supplyBalance === 0 && 'No Balance to Withdraw' }
-                  { asset.supplyBalance > 0 && parseFloat(withdrawAmount) > asset.supplyBalance && 'Insufficient Balance' }
-                  { asset.supplyBalance > 0 && (!withdrawAmount || parseFloat(withdrawAmount) <= asset.supplyBalance) && 'Withdraw' }
+                  { asset.supplyBalance > 0 && BigNumber(withdrawAmount).gt(BigNumber(asset.supplyBalance)) && 'Insufficient Balance' }
+                  { asset.supplyBalance > 0 && (!withdrawAmount || BigNumber(withdrawAmount).lte(BigNumber(asset.supplyBalance))) && 'Withdraw' }
                 </Typography>
               </Button>
             </div>
@@ -500,19 +505,13 @@ class SupplyAsset extends Component {
     this.setState(val)
   }
 
-  inputKeyDown = (event) => {
-    if (event.which === 13) {
-      this.onInvest();
-    }
-  }
-
   onSupply = () => {
     this.setState({ supplyAmountError: false })
 
     const { supplyAmount } = this.state
     const { asset, startLoading } = this.props
 
-    if(!supplyAmount || isNaN(supplyAmount) || supplyAmount <= 0 || supplyAmount > asset.balance) {
+    if(!supplyAmount || isNaN(supplyAmount) || supplyAmount <= 0) {
       this.setState({ supplyAmountError: true })
       return false
     }
@@ -531,7 +530,7 @@ class SupplyAsset extends Component {
     const { asset, startLoading  } = this.props
     let withdrawAmount = this.state.withdrawAmount
 
-    if(!withdrawAmount || isNaN(withdrawAmount) || withdrawAmount <= 0 || withdrawAmount > asset.supplyBalance) {
+    if(!withdrawAmount || isNaN(withdrawAmount) || withdrawAmount <= 0) {
       this.setState({ withdrawAmountError: true })
       return false
     }
@@ -550,11 +549,9 @@ class SupplyAsset extends Component {
     }
 
     const { asset } = this.props
+    const amount = BigNumber(asset.balance).times(percent).div(100).toFixed(asset.decimals)
 
-    const balance = asset.balance
-    let amount = balance*percent/100
-
-    this.setState({ supplyAmount: amount.toFixed(asset.decimals) })
+    this.setState({ supplyAmount: amount })
   }
 
   setWithdrawAmount = (percent) => {
@@ -564,10 +561,9 @@ class SupplyAsset extends Component {
 
     const { asset } = this.props
 
-    const balance = asset.supplyBalance
-    let amount = balance*percent/100
+    const amount = BigNumber(asset.supplyBalance).times(percent).div(100).toFixed(asset.decimals)
 
-    this.setState({ withdrawAmount: amount.toFixed(asset.decimals) })
+    this.setState({ withdrawAmount: amount })
   }
 }
 
