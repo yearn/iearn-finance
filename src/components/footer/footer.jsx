@@ -9,7 +9,6 @@ import { colors } from '../../theme'
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import BugReportIcon from '@material-ui/icons/BugReport';
 import HowToVoteIcon from '@material-ui/icons/HowToVote';
-import SecurityIcon from '@material-ui/icons/Security';
 import DescriptionIcon from '@material-ui/icons/Description';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 
