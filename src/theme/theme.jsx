@@ -34,6 +34,7 @@ export const colors = {
   purple: '#935dff',
   creamPurple: '#594bad',
   creamBlue: '#69e2dc',
+  coverPurple: '#5a32c6',
 
   text: "#212529",
   lightBlue: "#2F80ED",
