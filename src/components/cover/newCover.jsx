@@ -310,7 +310,7 @@ class NewCover extends Component {
         <div className={ classes.valContainer }>
           <div className={ classes.flexy }>
             <div className={ classes.label }>
-              <Typography variant='h4'>Select protocol to cover</Typography>
+              <Typography variant='h4'>Select protocol</Typography>
             </div>
           </div>
           { this.renderProtocolSelect() }
