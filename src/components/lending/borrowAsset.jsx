@@ -266,7 +266,9 @@ class BorrowAsset extends Component {
 
     let theLimitUsed = 0
 
-    if(borrowAmount && borrowAmount !== '') {
+    if(limit === 0) {
+      theLimitUsed = 0
+    } else if(borrowAmount && borrowAmount !== '') {
       theLimitUsed = (limitUsed+(borrowAmount*asset.price))*100/limit
     } else if(repayAmount && repayAmount !== '') {
       theLimitUsed = (limitUsed-(repayAmount*asset.price))*100/limit
@@ -276,6 +278,11 @@ class BorrowAsset extends Component {
     if (isNaN(theLimitUsed)) {
       theLimitUsed = 0
     }
+
+
+    console.log(BigNumber(repayAmount))
+    console.log(BigNumber(asset.borrowBalance))
+    console.log(BigNumber(repayAmount).gt(BigNumber(asset.borrowBalance)))
 
     return (
       <div className={ classes.assetActions }>
@@ -321,13 +328,13 @@ class BorrowAsset extends Component {
                 className={ classes.actionButton }
                 variant="contained"
                 color="primary"
-                disabled={ loading || theLimitUsed > 100 || !borrowAmount || borrowAmount < 0  }
+                disabled={ loading || theLimitUsed > 100 || !borrowAmount || borrowAmount < 0 || limit === 0  }
                 onClick={ this.onBorrow }
                 fullWidth
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'}>
-                  { theLimitUsed > 100 && 'Insufficient collateral' }
-                  { theLimitUsed <= 100 && 'Borrow' }
+                  { (theLimitUsed > 100 || limit === 0) && 'Insufficient collateral' }
+                  { (theLimitUsed <= 100 && limit > 0) && 'Borrow' }
                 </Typography>
               </Button>
             </div>
@@ -475,10 +482,9 @@ class BorrowAsset extends Component {
 
     const { asset } = this.props
 
-    const balance = asset.borrowBalance
-    let amount = balance*percent/100
+    const amount = BigNumber(asset.borrowBalance).times(percent).div(100).toFixed(asset.decimals)
 
-    this.setState({ repayAmount: amount.toFixed(asset.decimals) })
+    this.setState({ repayAmount: amount })
   }
 }
 
