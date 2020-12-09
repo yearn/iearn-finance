@@ -95,7 +95,7 @@ const styles = theme => ({
     transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
     '&:hover': {
       filter: 'grayscale(0%)',
-      background: colors.gray,
+      background: colors.lightGray,
       boxShadow: '0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)'
     }
   },
@@ -108,7 +108,7 @@ const styles = theme => ({
     margin: '12px',
     paddingBottom: '24px',
     cursor: 'pointer',
-    background: colors.gray,
+    background: colors.lightGray,
     boxShadow: '0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)',
     transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
   },
@@ -354,7 +354,7 @@ class NewCover extends Component {
               </Grid>
             </Grid>
             <Typography variant="body1">
-              * To find out more about how claims are assessed, <a href="https://docs.coverprotocol.com/product/claims-guidelines" rel="noopener noreferrer" target="_blank">go to Cover Protocol's guidelines</a>
+              * To find out more about how claims are assessed and paid out, go to <a href="https://docs.coverprotocol.com/product/claims-guidelines" rel="noopener noreferrer" target="_blank">Cover Protocol's claim guidelines</a>
             </Typography>
           </div>
         </div>
@@ -606,7 +606,7 @@ class NewCover extends Component {
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Liquidity</Typography>
           </div>
         </div>
-        <Typography variant='body2' className={ classes.claimDescription } align='center'>Claim tokens will pay out <b>1 {selectedProtocol.collateralName}</b> for each token you hold in the event that there is a successful attack on the protocol before the expiry date.*</Typography>
+        <Typography variant='body2' className={ classes.claimDescription } align='center'>Claim tokens will pay out <b>1 {selectedProtocol.collateralName}*</b> for each token you hold in the event that there is a successful attack on the protocol before the expiry date.</Typography>
       </div>
     )
   }
@@ -670,7 +670,7 @@ class NewCover extends Component {
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Liquidity</Typography>
           </div>
         </div>
-        <Typography variant='body2' className={ classes.claimDescription } align='center'>No Claim tokens will pay out <b>1 {selectedProtocol.collateralName}</b> for each token you hold if there is no successful attack on the protocol by the expiry date.*</Typography>
+        <Typography variant='body2' className={ classes.claimDescription } align='center'>No Claim tokens will pay out <b>1 {selectedProtocol.collateralName}*</b> for each token you hold if there is no successful attack on the protocol by the expiry date.</Typography>
       </div>
     )
   }

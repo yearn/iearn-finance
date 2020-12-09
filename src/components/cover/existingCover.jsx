@@ -190,7 +190,7 @@ class NewCover extends Component {
               </Grid>
             </Grid>
             <Typography variant="body1">
-              To find out more about how claims are assessed, <a href="https://docs.coverprotocol.com/product/claims-guidelines" rel="noopener noreferrer" target="_blank">go to Cover Protocol's guidelines</a>
+              To find out more about how claims are assessed and paid out, go to <a href="https://docs.coverprotocol.com/product/claims-guidelines" rel="noopener noreferrer" target="_blank">Cover Protocol's claim guidelines</a>
             </Typography>
           </div>
         </div>
