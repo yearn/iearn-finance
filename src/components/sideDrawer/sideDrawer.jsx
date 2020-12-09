@@ -206,6 +206,9 @@ class SideDrawer extends Component {
             <Grid item>
               <img alt="" src={require('../../assets/facebook.svg')} style={{ cursor: 'pointer' }} onClick={ () => { this.nav('https://www.facebook.com/DAOventuresCo/') } } />
             </Grid>
+            <Grid item>
+              <img alt="" src={require('../../assets/medium.svg')} style={{ cursor: 'pointer' }} onClick={ () => { this.nav('https://daoventuresco.medium.com/ ') } } />
+            </Grid>
           </Grid>
 
           <Grid container spacing={2} className={classes.paddingGitter}>
@@ -217,6 +220,9 @@ class SideDrawer extends Component {
             </Grid>
             <Grid item>
               <img alt="" src={require('../../assets/email.svg')} style={{ cursor: 'pointer' }} onClick={ () => { this.nav('mailto:support@daoventures.co') } } />
+            </Grid>
+            <Grid item>
+              <img alt="" src={require('../../assets/telegram.svg')} style={{ cursor: 'pointer' }} onClick={ () => { this.nav('https://t.me/DAOventures') } } />
             </Grid>
           </Grid>
         </div>
