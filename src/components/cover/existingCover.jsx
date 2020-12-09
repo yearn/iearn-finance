@@ -63,7 +63,7 @@ const styles = theme => ({
   },
   actionButton: {
     borderRadius: '6px',
-    width: '90px',
+    width: '130px',
     height: '30px',
     fontSize: '14px'
   },
@@ -79,6 +79,10 @@ const styles = theme => ({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  maxCellHeight: {
+    height: '60px',
+    padding: '0px'
   }
 });
 
@@ -146,7 +150,7 @@ class NewCover extends Component {
   coverBalancesReturned = () => {
     this.setState({
       coverCollateral: store.getStore('coverCollateral'),
-      coverAassets: store.getStore('coverAassets'),
+      coverAssets: store.getStore('coverAssets'),
       coverProtocols: store.getStore('coverProtocols'),
       loading: false
     })
@@ -186,7 +190,7 @@ class NewCover extends Component {
               </Grid>
             </Grid>
             <Typography variant="body1">
-              To find out more about how claims are assessed, <a href="https://docs.coverprotocol.com/product/claims-guidelines" rel="noopener noreferrer" target="_blank">go to Coverprotocol's guidelines</a>
+              To find out more about how claims are assessed, <a href="https://docs.coverprotocol.com/product/claims-guidelines" rel="noopener noreferrer" target="_blank">go to Cover Protocol's guidelines</a>
             </Typography>
           </div>
         </div>
@@ -217,8 +221,8 @@ class NewCover extends Component {
               <TableRow>
                 <TableCell>Asset</TableCell>
                 <TableCell align="right">Expiry Date</TableCell>
-                <TableCell align="right">Value</TableCell>
-                <TableCell align="right">Action</TableCell>
+                <TableCell align="right">Balance</TableCell>
+                <TableCell align="center">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -264,12 +268,11 @@ class NewCover extends Component {
     if(!coverProtocols || coverProtocols.length === 0) {
       return <TableRow className={ classes.optionRow } key={'No'}>
         <TableCell colSpan={9} align="center">
-          <Typography>You don't have any cover yet</Typography>
+          <Typography>You don't have any cover tokens</Typography>
         </TableCell>
       </TableRow>
     }
-
-    return coverProtocols.filter((asset) => {
+    const filteredRows = coverProtocols.filter((asset) => {
       if(!asset) {
         return false
       }
@@ -283,60 +286,74 @@ class NewCover extends Component {
       }
 
       return false
-    }).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    })
+    
+    return filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
       .map((asset) => {
       return (
         <React.Fragment>
           { asset.claimAsset && asset.claimAsset.balance > 0 &&
-            <TableRow className={ classes.optionRow } key={asset.name} >
-              <TableCell className={ classes.assetName }>
-                <div className={ classes.assetSelectIcon }>
+            <TableRow className={ classes.optionRow } key={`${asset.name}_claim`} >
+              <TableCell>
+                <div className={ classes.assetName }>
                   <img
                     alt=""
+                    className={ classes.assetSelectIcon }
                     src={ this.getLogoForProtocol({ name: asset.name }) }
                     height="30px"
                   />
-                </div>
-                <div className={ classes.assetSelectIconName }>
-                  <Typography variant='h4'>{ asset.name }</Typography>
-                  <Typography variant='h5' className={ classes.claimType }>Claim Tokens</Typography>
+                  <div className={ classes.assetSelectIconName }>
+                    <Typography variant='h4'>{ asset.name }</Typography>
+                    <Typography variant='h5' className={ classes.claimType }>Claim Token</Typography>
+                  </div>
                 </div>
               </TableCell>
               <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
-              <TableCell align="right"><Typography variant='h4'>${ asset.claimAsset && asset.claimAsset.balance ? (asset.claimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
               <TableCell align="right">
-                <Tooltip title="Claims are handled on the cover protocols app">
+                <div>
+                  <Typography variant='h4'>{ asset.claimAsset && asset.claimAsset.balance ? (asset.claimAsset.balance).toFixed(2) : '0' }</Typography>
+                  <Typography variant='h4' className={ classes.claimType }>${ asset.claimPoolData && asset.claimPoolData.price ? (asset.claimPoolData.price * asset.claimAsset.balance).toFixed(2) : '0' }</Typography>
+                </div>
+                </TableCell>
+              <TableCell align="center">
+                <Tooltip title="Claims are handled on Cover Protocol's app">
                   <Button
                     className={ classes.actionButton }
                     variant='contained'
                     color='primary'
                     onClick={ () => { this.onClaim(asset) } }
                   >
-                    Claim
+                    File Claim
                   </Button>
                 </Tooltip>
               </TableCell>
             </TableRow>
           }
           { asset.noClaimAsset && asset.noClaimAsset.balance > 0 &&
-            <TableRow className={ classes.optionRow } key={asset.name} >
-              <TableCell className={ classes.assetName }>
-                <div className={ classes.assetSelectIcon }>
+            <TableRow className={ classes.optionRow } key={`${asset.name}_noclaim`} >
+              <TableCell>
+                <div className={ classes.assetName }>
                   <img
                     alt=""
+                    className={ classes.assetSelectIcon }
                     src={ this.getLogoForProtocol({ name: asset.name }) }
                     height="30px"
                   />
-                </div>
-                <div className={ classes.assetSelectIconName }>
-                  <Typography variant='h4'>{ asset.name }</Typography>
-                  <Typography variant='h5' className={ classes.claimType }>No Claim Tokens</Typography>
+                  <div className={ classes.assetSelectIconName }>
+                    <Typography variant='h4'>{ asset.name }</Typography>
+                    <Typography variant='h5' className={ classes.claimType }>No Claim Token</Typography>
+                  </div>
                 </div>
               </TableCell>
               <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
-              <TableCell align="right"><Typography variant='h4'>${ asset.noClaimAsset && asset.noClaimAsset.balance ? (asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
               <TableCell align="right">
-                <Tooltip title="Redemptions are handled on the cover protocols app">
+                <div>
+                  <Typography variant='h4'>{ asset.noClaimAsset && asset.noClaimAsset.balance ? (asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography>
+                  <Typography variant='h4' className={ classes.claimType }>${ asset.noClaimPoolData && asset.noClaimPoolData.price ? (asset.noClaimPoolData.price * asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography>
+                </div>
+              </TableCell>
+              <TableCell align="center">
+                <Tooltip title="Redemptions are handled on Cover Protocol's app">
                   <Button
                     className={ classes.actionButton }
                     variant='contained'
@@ -363,46 +380,19 @@ class NewCover extends Component {
   };
 
   getLogoForProtocol = (protocol) => {
-    switch (protocol.name) {
-      case 'CURVE':
-        return require('../../assets/cover/curve_logo.png')
-      case 'AAVE':
-        return require('../../assets/cover/aave_logo.png')
-      case 'BALANCER':
-        return require('../../assets/cover/balancer_logo.png')
-      case 'SUSHISWAP':
-        return require('../../assets/cover/sushiswap_logo.png')
-      case 'YEARN':
-        return require('../../assets/cover/yearn_logo.png')
-      case 'PICKLE':
-        return require('../../assets/cover/pickle_logo.png')
-      case 'BARNBRIDGE':
-        return require('../../assets/cover/barnbridge_logo.png')
-      case 'HARVEST':
-        return require('../../assets/cover/harvest_logo.png')
-      case 'REN':
-        return require('../../assets/cover/ren_logo.png')
-      case 'CREAM':
-        return require('../../assets/cover/cream_logo.png')
-      case 'BASIS':
-        return require('../../assets/cover/basis_logo.png')
-      case 'BADGERDAO':
-        return require('../../assets/cover/badger_logo.png')
-      case 'MUSHROOMS':
-        return require('../../assets/cover/mushrooms_logo.png')
-      case 'BORINGDAO':
-        return require('../../assets/cover/boringdao_logo.png')
-      default:
-        return require('../../assets/unknown-logo.png')
+    try {
+      return require(`../../assets/cover/${protocol.name.toLowerCase()}_icon.png`);
+    } catch {
+      return require('../../assets/unknown-logo.png')
     }
   }
 
   onClaim = (asset) => {
-    window.open('https://app.coverprotocol.com/app/claims', '_blank')
+    window.open('https://app.coverprotocol.com/app/claims/new', '_blank')
   }
 
   onRedeem = (asset) => {
-    window.open('https://app.coverprotocol.com/app/redeem', '_blank')
+    window.open('https://app.coverprotocol.com/app/redeem?redeemType=active', '_blank')
   }
 }
 

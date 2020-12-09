@@ -64,14 +64,14 @@ const styles = theme => ({
   balances: {
     textAlign: 'right',
     paddingRight: '20px',
-    cursor: 'pointer'
   },
   actionInput: {
     background: colors.white
   },
   assetSelectIcon: {
     marginRight: '24px',
-    width: '30px'
+    width: '30px',
+    display: 'flex'
   },
   claimOptionContainer: {
     display: 'flex',
@@ -193,6 +193,9 @@ const styles = theme => ({
   },
   assetSelectMenu: {
     padding: '12px 24px'
+  },
+  padLeft: {
+    marginLeft: '5px'
   }
 });
 
@@ -207,7 +210,7 @@ class NewCover extends Component {
       account: account,
       coverProtocols: store.getStore('coverProtocols'),
       coverCollateral: store.getStore('coverCollateral'),
-      coverAassets: store.getStore('coverAassets'),
+      coverAssets: store.getStore('coverAssets'),
       loading: true,
       protocol: 'YEARN',
       assetAmount: '100',
@@ -268,7 +271,7 @@ class NewCover extends Component {
   coverBalancesReturned = () => {
     this.setState({
       coverCollateral: store.getStore('coverCollateral'),
-      coverAassets: store.getStore('coverAassets'),
+      coverAssets: store.getStore('coverAssets'),
       loading: false
     })
   }
@@ -310,7 +313,7 @@ class NewCover extends Component {
         <div className={ classes.valContainer }>
           <div className={ classes.flexy }>
             <div className={ classes.label }>
-              <Typography variant='h4'>Select protocol to cover</Typography>
+              <Typography variant='h4'>Select protocol</Typography>
             </div>
           </div>
           { this.renderProtocolSelect() }
@@ -319,7 +322,7 @@ class NewCover extends Component {
         <div className={ classes.claimOptionContainer }>
           <div className={ classes.flexy }>
             <div className={ classes.label }>
-              <Typography variant='h4'>Purchase claim or no claim tokens</Typography>
+              <Typography variant='h4'>Purchase Claim or No Claim tokens</Typography>
             </div>
           </div>
           { this.renderClaim() }
@@ -330,13 +333,13 @@ class NewCover extends Component {
             className={ classes.actionButton }
             variant="contained"
             color="primary"
-            disabled={ loading || !protocol || !assetAmount || assetAmount === '' }
+            disabled={ loading || !protocol || !assetAmount || assetAmount === '' || assetAmount === '0' || isNaN(parseFloat(assetAmount)) }
             onClick={ this.onPurchase }
             fullWidth
             >
             <Typography className={ classes.buttonText } variant={ 'h5'}>
-              { (!claimOption) && 'Purchase' }
-              { claimOption && 'Purchase '+claimOption }
+              { (!claimOption || isNaN(parseFloat(assetAmount))) && 'Purchase' }
+              { claimOption && !isNaN(parseFloat(assetAmount)) && `Purchase ${parseFloat(assetAmount)} ${claimOption}` }
             </Typography>
           </Button>
         </div>
@@ -351,7 +354,7 @@ class NewCover extends Component {
               </Grid>
             </Grid>
             <Typography variant="body1">
-              * To find out more about how claims are assessed, <a href="https://docs.coverprotocol.com/product/claims-guidelines" rel="noopener noreferrer" target="_blank">go to Coverprotocol's guidelines</a>
+              * To find out more about how claims are assessed, <a href="https://docs.coverprotocol.com/product/claims-guidelines" rel="noopener noreferrer" target="_blank">go to Cover Protocol's guidelines</a>
             </Typography>
           </div>
         </div>
@@ -388,10 +391,10 @@ class NewCover extends Component {
           renderValue: (option) => {
             return (
               <React.Fragment>
-                <div className={ classes.assetSelectIcon }>
+                <div className={ `${classes.assetSelectIcon} ${classes.padLeft}` }>
                   <img
                     alt=""
-                    src={ this.getLogoForProtocol({ name: option }) }
+                    src={ this.getLogoForProtocol({ name: option }, true) }
                     height="30px"
                   />
                 </div>
@@ -413,14 +416,13 @@ class NewCover extends Component {
 
   renderProtocolOption = (option) => {
     const { classes } = this.props
-
     return (
       <MenuItem key={ option.name } value={ option.name } className={ classes.assetSelectMenu }>
         <div className={ classes.assetSelectName}>
           <div className={ classes.assetSelectIcon }>
             <img
               alt=""
-              src={ this.getLogoForProtocol(option) }
+              src={ this.getLogoForProtocol(option, true) }
               height="30px"
             />
           </div>
@@ -440,38 +442,11 @@ class NewCover extends Component {
     )
   }
 
-  getLogoForProtocol = (protocol) => {
-    switch (protocol.name) {
-      case 'CURVE':
-        return require('../../assets/cover/curve_logo.png')
-      case 'AAVE':
-        return require('../../assets/cover/aave_logo.png')
-      case 'BALANCER':
-        return require('../../assets/cover/balancer_logo.png')
-      case 'SUSHISWAP':
-        return require('../../assets/cover/sushiswap_logo.png')
-      case 'YEARN':
-        return require('../../assets/cover/yearn_logo.png')
-      case 'PICKLE':
-        return require('../../assets/cover/pickle_logo.png')
-      case 'BARNBRIDGE':
-        return require('../../assets/cover/barnbridge_logo.png')
-      case 'HARVEST':
-        return require('../../assets/cover/harvest_logo.png')
-      case 'REN':
-        return require('../../assets/cover/ren_logo.png')
-      case 'CREAM':
-        return require('../../assets/cover/cream_logo.png')
-      case 'BASIS':
-        return require('../../assets/cover/basis_logo.png')
-      case 'BADGERDAO':
-        return require('../../assets/cover/badger_logo.png')
-      case 'MUSHROOMS':
-        return require('../../assets/cover/mushrooms_logo.png')
-      case 'BORINGDAO':
-        return require('../../assets/cover/boringdao_logo.png')
-      default:
-        return require('../../assets/unknown-logo.png')
+  getLogoForProtocol = (protocol, isIcon) => {
+    try {
+      return require(`../../assets/cover/${protocol.name.toLowerCase()}_${isIcon ? "icon" : "logo"}.png`)
+    } catch {
+      return require('../../assets/unknown-logo.png')
     }
   }
 
@@ -503,7 +478,7 @@ class NewCover extends Component {
       }
 
       selectedAsset = coverCollateral.filter((col) => {
-        return col.address === selectedProtocol.collateralAddress
+        return col.address === selectedProtocol.purchaseCurrency
       })
 
       if(selectedAsset.length > 0) {
@@ -517,11 +492,11 @@ class NewCover extends Component {
       <div className={ classes.valContainer }>
         <div className={ classes.flexy }>
           <div className={ classes.label }>
-            <Typography variant='h4'>How much collateral would you like to provide</Typography>
+            <Typography variant='h4'>How many tokens would you like to buy</Typography>
           </div>
           <div className={ classes.balances }>
-            <Typography variant='h4' onClick={ () => { this.balanceClicked(selectedAsset) } }>Balance { selectedAsset.balance ? selectedAsset.balance.toFixed(4) : '0.0000' }</Typography>
-          </div>
+            <Typography variant='h4'>DAI Balance { selectedAsset.balance ? selectedAsset.balance.toFixed(4) : '0.0000' }</Typography>
+          </div>        
         </div>
         <TextField
           fullWidth
@@ -534,11 +509,10 @@ class NewCover extends Component {
           variant="outlined"
           InputProps={{
             className: classes.actionInput,
-            endAdornment: <Typography variant='h4'>{ selectedAsset.symbol }</Typography>,
             startAdornment: <div className={ classes.assetContainer }>
               <img
                 alt=""
-                src={ this.getLogo(selectedAsset.symbol) }
+                src={ this.getLogo() }
                 height="30px"
                 className={ classes.assetSelectIcon }
               />
@@ -558,6 +532,20 @@ class NewCover extends Component {
     }
 
     return logo
+  }
+
+  // calculateTokensReceived = (amountToSell, feePercent, covTokenWeight, daiInPool, basePrice) => {
+  //   const slippage = (1 - feePercent) / (2 * daiInPool * covTokenWeight);
+  //   const totalSlippage = amountToSell * slippage;
+  //   const endPrice = basePrice * (1 + totalSlippage);
+  //   // better to underestimate than overestimate
+  //   return (amountToSell / endPrice) * 0.98;
+  // }
+
+  calculateAmountNeeded = (amountWanted, feePercent, covTokenWeight, daiInPool, basePrice) => {
+    const slippagePerUnit = (1 - feePercent) / (2 * daiInPool * covTokenWeight);
+    const totalSlippage = amountWanted * basePrice * slippagePerUnit;
+    return amountWanted > 0 ? ((amountWanted * basePrice) / (1 - totalSlippage) > 0 ? 1.015 * (amountWanted * basePrice) / (1 - totalSlippage) : Infinity) : 0;
   }
 
   renderClaim = () => {
@@ -585,21 +573,27 @@ class NewCover extends Component {
     } else {
       selectedProtocol = selectedProtocol[0]
     }
-
-    const logo =  this.getLogoForProtocol(selectedProtocol)
+    const logo =  this.getLogoForProtocol(selectedProtocol, false)
+    const tokensNeeded = this.calculateAmountNeeded(
+      parseFloat(assetAmount), 
+      selectedProtocol.claimPoolData.swapFee, 
+      selectedProtocol.claimPoolData.covTokenWeight, 
+      selectedProtocol.claimPoolData.daiInPool, 
+      selectedProtocol.claimPoolData.price
+      );
 
     return (
-      <div className={ `${claimOption==='Claim Tokens'?classes.claimOptionSelected:classes.claimOption}` } onClick={ () => { this.selectClaimOption('Claim Tokens') } }>
+      <div className={ `${claimOption==='Claim Tokens'?classes.claimOptionSelected:classes.claimOption}` } onClick={ () => { tokensNeeded !== Infinity && this.selectClaimOption('Claim Tokens') } }>
         <div className={ classes.protocolLogo } style={{ backgroundImage: `url(${logo})` }}></div>
         <Typography variant='h2' color='primary' align='center' className={ classes.tokenTypeHeader }>Claim Tokens</Typography>
         <div className={ classes.pricesContainer }>
           <div className={ classes.priceContainer }>
-            <Typography variant='h1' align='center' >${ selectedProtocol.claimPoolData.price ? selectedProtocol.claimPoolData.price.toFixed(2) : 'Unknown' }</Typography>
+            <Typography variant='h1' align='center' >${ selectedProtocol.claimPoolData.price ? (assetAmount && assetAmount !== '0' ? tokensNeeded / parseFloat(assetAmount) : selectedProtocol.claimPoolData.price).toFixed(2) : 'Unknown' }</Typography>
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Token Price</Typography>
           </div>
           <div className={ classes.priceContainer }>
-            <Typography variant='h1' align='center' >${ selectedProtocol.claimPoolData.price ? (assetAmount/selectedProtocol.claimPoolData.price).toFixed(2) : '0' }</Typography>
-            <Typography variant='h4' align='center' className={ classes.priceDescription }>Receive Tokens</Typography>
+            <Typography variant='h1' align='center' >${ selectedProtocol.claimPoolData.price ? (tokensNeeded ? tokensNeeded.toFixed(2) : '0') : '0' }</Typography>
+            <Typography variant='h4' align='center' className={ classes.priceDescription }>Est. Cost (DAI)</Typography>
           </div>
         </div>
         <div className={ classes.pricesContainer }>
@@ -612,7 +606,7 @@ class NewCover extends Component {
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Liquidity</Typography>
           </div>
         </div>
-        <Typography variant='body2' className={ classes.claimDescription } align='center'>Claim tokens will pay out $1 for each token you hold in the event that there is a successful attack on the protocol before the expiry date.*</Typography>
+        <Typography variant='body2' className={ classes.claimDescription } align='center'>Claim tokens will pay out <b>1 {selectedProtocol.collateralName}</b> for each token you hold in the event that there is a successful attack on the protocol before the expiry date.*</Typography>
       </div>
     )
   }
@@ -643,20 +637,27 @@ class NewCover extends Component {
       selectedProtocol = selectedProtocol[0]
     }
 
-    const logo =  this.getLogoForProtocol(selectedProtocol)
-
+    const logo =  this.getLogoForProtocol(selectedProtocol, false)
+    const tokensNeeded = this.calculateAmountNeeded(
+      parseFloat(assetAmount), 
+      selectedProtocol.noClaimPoolData.swapFee, 
+      selectedProtocol.noClaimPoolData.covTokenWeight, 
+      selectedProtocol.noClaimPoolData.daiInPool, 
+      selectedProtocol.noClaimPoolData.price
+      );
+    
     return (
-      <div className={ `${claimOption==='No Claim Tokens'?classes.claimOptionSelected:classes.claimOption}` } onClick={ () => { this.selectClaimOption('No Claim Tokens') } }>
+      <div className={ `${claimOption==='No Claim Tokens'?classes.claimOptionSelected:classes.claimOption}` } onClick={ () => { tokensNeeded !== Infinity && this.selectClaimOption('No Claim Tokens') } }>
         <div className={ classes.protocolLogo } style={{ backgroundImage: `url(${logo})` }}></div>
         <Typography variant='h2' color='primary' align='center' className={ classes.tokenTypeHeader }>No Claim Tokens</Typography>
         <div className={ classes.pricesContainer }>
           <div className={ classes.priceContainer }>
-            <Typography variant='h1' align='center' >${ selectedProtocol.noClaimPoolData.price ? selectedProtocol.noClaimPoolData.price.toFixed(2) : 'Unknown' }</Typography>
+            <Typography variant='h1' align='center' >${ selectedProtocol.noClaimPoolData.price ? (assetAmount && assetAmount !== '0' ? tokensNeeded / parseFloat(assetAmount) : selectedProtocol.noClaimPoolData.price).toFixed(2) : 'Unknown' }</Typography>
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Token Price</Typography>
           </div>
           <div className={ classes.priceContainer }>
-            <Typography variant='h1' align='center' >${ selectedProtocol.noClaimPoolData.price ? (assetAmount/selectedProtocol.noClaimPoolData.price).toFixed(2) : '0' }</Typography>
-            <Typography variant='h4' align='center' className={ classes.priceDescription }>Receive Tokens</Typography>
+            <Typography variant='h1' align='center' >${ selectedProtocol.noClaimPoolData.price ? (tokensNeeded ? tokensNeeded.toFixed(2) : '0') : '0' }</Typography>
+            <Typography variant='h4' align='center' className={ classes.priceDescription }>Est. Cost (DAI)</Typography>
           </div>
         </div>
         <div className={ classes.pricesContainer }>
@@ -669,7 +670,7 @@ class NewCover extends Component {
             <Typography variant='h4' align='center' className={ classes.priceDescription }>Liquidity</Typography>
           </div>
         </div>
-        <Typography variant='body2' className={ classes.claimDescription } align='center'>No claim tokens will pay out $1 for each token you hold in the event that there is no successful attack on the protocol before the expiry date.*</Typography>
+        <Typography variant='body2' className={ classes.claimDescription } align='center'>No Claim tokens will pay out <b>1 {selectedProtocol.collateralName}</b> for each token you hold if there is no successful attack on the protocol by the expiry date.*</Typography>
       </div>
     )
   }
@@ -711,29 +712,43 @@ class NewCover extends Component {
 
     let asset = null
     let pool = null
+    let purchaseAmount = null
 
     if(!claimOption) {
       return false
     } else if(claimOption === 'Claim Tokens') {
       asset = selectedProtocol.claimAsset
       pool = selectedProtocol.claimPoolData
+      purchaseAmount = this.calculateAmountNeeded(
+        parseFloat(assetAmount), 
+        selectedProtocol.claimPoolData.swapFee, 
+        selectedProtocol.claimPoolData.covTokenWeight, 
+        selectedProtocol.claimPoolData.daiInPool, 
+        selectedProtocol.claimPoolData.price
+        ).toString()
     } else {
       asset = selectedProtocol.noClaimAsset
       pool = selectedProtocol.noClaimPoolData
+      purchaseAmount = this.calculateAmountNeeded(
+        parseFloat(assetAmount), 
+        selectedProtocol.noClaimPoolData.swapFee, 
+        selectedProtocol.noClaimPoolData.covTokenWeight, 
+        selectedProtocol.noClaimPoolData.daiInPool, 
+        selectedProtocol.noClaimPoolData.price
+        ).toString()
     }
 
-    let selectedCollateralAsset = coverCollateral.filter((col) => {
-      return col.address === selectedProtocol.collateralAddress
+    let selectedPurchaseAsset = coverCollateral.filter((col) => {
+      return col.address === selectedProtocol.purchaseCurrency
     })
 
-    if(selectedCollateralAsset.length > 0) {
-      selectedCollateralAsset = selectedCollateralAsset[0]
+    if(selectedPurchaseAsset.length > 0) {
+      selectedPurchaseAsset = selectedPurchaseAsset[0]
     } else {
-      selectedCollateralAsset = {}
+      selectedPurchaseAsset = {}
     }
-
     this.setState({ loading: true })
-    dispatcher.dispatch({ type: COVER_PURCHASE, content: { amount: assetAmount, asset: asset, collateral: selectedCollateralAsset, pool: pool } })
+    dispatcher.dispatch({ type: COVER_PURCHASE, content: { amount: purchaseAmount, amountOut: parseFloat(assetAmount).toString(), asset: asset, collateral: selectedPurchaseAsset, pool: pool } })
   }
 
   balanceClicked = (asset) => {

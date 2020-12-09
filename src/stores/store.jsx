@@ -124,7 +124,7 @@ class Store {
       lendingAssets: defaultValues.lendingAssets,
       coverProtocols: defaultValues.coverProtocols,
       coverCollateral: [],
-      coverAassets: [],
+      coverAssets: [],
       lendingSupply: 0,
       lendingBorrow: 0,
       lendingCollateral: 0,
@@ -4866,31 +4866,40 @@ class Store {
         const expires = protocol.expirationTimestamps
         const claimAddress = protocol.coverObjects[protocol.claimNonce].tokens.claimAddress
         const noClaimAddress = protocol.coverObjects[protocol.claimNonce].tokens.noClaimAddress
-        let collateralAddress = protocol.coverObjects[protocol.claimNonce].collateralAddress
-
-        // this hack is because they use dai as collateral even though their api/ui say yDAI...reasons
+        const collateralAddress = protocol.coverObjects[protocol.claimNonce].collateralAddress
+        let collateralName;
+        // currently supported collateral types are DAI and yDAI, however, purchasing coverage always uses DAI through Balancer
+        const daiAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'
         if(collateralAddress === '0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01') {
-          collateralAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'
+          collateralName = "yDAI";
+        } else if (collateralAddress === '0x6B175474E89094C44Da98b954EedeAC495271d0F') {
+          collateralName = "DAI";
         }
-
         let claimPoolData = poolDataArr.filter((data) => {
-          if(data[1].poolId.tokens[0].address.toLowerCase() === claimAddress.toLowerCase() && data[1].poolId.tokens[1].address.toLowerCase() === collateralAddress.toLowerCase()) {
+          const token0Address = data[1].poolId.tokens[0].address.toLowerCase();
+          const token1Address = data[1].poolId.tokens[1].address.toLowerCase();
+          if(token0Address === claimAddress.toLowerCase() && token1Address === daiAddress.toLowerCase()) {
             return true
           }
-          if(data[1].poolId.tokens[1].address.toLowerCase() === claimAddress.toLowerCase() && data[1].poolId.tokens[0].address.toLowerCase() === collateralAddress.toLowerCase()) {
+          if(token1Address === claimAddress.toLowerCase() && token0Address === daiAddress.toLowerCase()) {
             return true
           }
 
           return false
         }).map((data) => {
           return {
+            address: data[1].poolId.id,
             price: data[1].price,
             symbol: data[1].symbol,
-            swapFee: data[1].poolId.swapFee,
-            liquidity: data[1].poolId.liquidity
+            swapFee: parseFloat(data[1].poolId.swapFee),
+            liquidity: data[1].poolId.liquidity,
+            daiInPool: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
+            covTokenBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === claimAddress.toLowerCase()).balance),
+            covTokenWeight:
+              parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === claimAddress.toLowerCase()).denormWeight) /
+              parseFloat(data[1].poolId.totalWeight)
           }
         })
-
         if(claimPoolData.length > 0) {
           claimPoolData = claimPoolData.sort((a, b) => {
             return b.liquidity !== null ? parseFloat(b.liquidity) - parseFloat(a.liquidity) : -9999999999
@@ -4903,22 +4912,27 @@ class Store {
             liquidity: 0
           }
         }
-
         let noClaimPoolData = poolDataArr.filter((data) => {
-          if(data[1].poolId.tokens[0].address.toLowerCase() === noClaimAddress.toLowerCase() && data[1].poolId.tokens[1].address.toLowerCase() === collateralAddress.toLowerCase()) {
+          if(data[1].poolId.tokens[0].address.toLowerCase() === noClaimAddress.toLowerCase() && data[1].poolId.tokens[1].address.toLowerCase() === daiAddress.toLowerCase()) {
             return true
           }
-          if(data[1].poolId.tokens[1].address.toLowerCase() === noClaimAddress.toLowerCase() && data[1].poolId.tokens[0].address.toLowerCase() === collateralAddress.toLowerCase()) {
+          if(data[1].poolId.tokens[1].address.toLowerCase() === noClaimAddress.toLowerCase() && data[1].poolId.tokens[0].address.toLowerCase() === daiAddress.toLowerCase()) {
             return true
           }
 
           return false
         }).map((data) => {
           return {
+            address: data[1].poolId.id,
             price: data[1].price,
             symbol: data[1].symbol,
-            swapFee: data[1].poolId.swapFee,
-            liquidity: data[1].poolId.liquidity
+            swapFee: parseFloat(data[1].poolId.swapFee),
+            liquidity: data[1].poolId.liquidity,
+            daiInPool: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
+            covTokenBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === noClaimAddress.toLowerCase()).balance),
+            covTokenWeight:
+              parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === noClaimAddress.toLowerCase()).denormWeight) /
+              parseFloat(data[1].poolId.totalWeight)
           }
         })
 
@@ -4936,7 +4950,7 @@ class Store {
         }
 
         let noClaimShieldData = shieldMiningPoolData.filter((data) => {
-          return data.tokensList.map((a) => { return a.toLowerCase() }).includes(noClaimAddress.toLowerCase()) && data.tokensList.map((a) => { return a.toLowerCase() }).includes(collateralAddress.toLowerCase())
+          return data.tokensList.map((a) => { return a.toLowerCase() }).includes(noClaimAddress.toLowerCase()) && data.tokensList.map((a) => { return a.toLowerCase() }).includes(daiAddress.toLowerCase())
         })
 
         if(noClaimShieldData.length > 0) {
@@ -4950,7 +4964,7 @@ class Store {
         }
 
         let claimShieldData = shieldMiningPoolData.filter((data) => {
-          return data.tokensList.map((a) => { return a.toLowerCase() }).includes(claimAddress.toLowerCase()) && data.tokensList.map((a) => { return a.toLowerCase() }).includes(collateralAddress.toLowerCase())
+          return data.tokensList.map((a) => { return a.toLowerCase() }).includes(claimAddress.toLowerCase()) && data.tokensList.map((a) => { return a.toLowerCase() }).includes(daiAddress.toLowerCase())
         })
 
         if(claimShieldData.length > 0) {
@@ -4963,20 +4977,34 @@ class Store {
           }
         }
 
-        claimPoolData.address = claimShieldData.id
-        noClaimPoolData.address = noClaimShieldData.id
+        if (claimShieldData.id) {
+          claimPoolData.address = claimShieldData.id;
+        }
+        if (noClaimShieldData.id) {
+          noClaimPoolData.address = noClaimShieldData.id;
+        }
 
         return {
           name,
           expires,
           claimAddress,
           noClaimAddress,
+          purchaseCurrency: daiAddress,
           collateralAddress,
+          collateralName,
           claimPoolData: claimPoolData,
           noClaimPoolData: noClaimPoolData,
         }
       })
-
+      claimAssets.sort((a, b) => {
+        if (a.expires[0] > b.expires[0]) {
+          return 1;
+        } else if (a.expires[0] < b.expires[0]) {
+          return -1;
+        } else {
+          return a.name > b.name ? 1 : -1;
+        }
+      })
       store.setStore({ coverProtocols: claimAssets })
 
       emitter.emit(CONFIGURE_COVER_RETURNED, claimAssets)
@@ -5037,11 +5065,9 @@ class Store {
       return protocol
     })
 
-    console.log(populatedCoverProtocols)
-
     store.setStore({
       coverCollateral: collateral,
-      coverAassets: assets,
+      coverAssets: assets,
       coverProtocols: populatedCoverProtocols
     })
 
@@ -5088,7 +5114,7 @@ class Store {
 
   purchaseCover = (payload) => {
     const account = store.getStore('account')
-    const { asset, collateral, amount, pool } = payload.content
+    const { asset, collateral, amount, amountOut, pool } = payload.content
 
     const sendAsset = {
       erc20address: collateral.address,
@@ -5101,7 +5127,7 @@ class Store {
         return emitter.emit(ERROR, err);
       }
 
-      this._callSwapExactAmountIn(asset, collateral, amount, account, pool, (err, res) => {
+      this._callSwapExactAmountIn(asset, collateral, amount, amountOut, account, pool, (err, res) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
@@ -5111,12 +5137,13 @@ class Store {
     })
   }
 
-  _callSwapExactAmountIn = async (asset, collateral, amount, account, pool, callback) => {
+  _callSwapExactAmountIn = async (asset, collateral, amount, amountOut, account, pool, callback) => {
     const web3 = await this._getWeb3Provider();
 
     let balancerContract = new web3.eth.Contract(config.balancerProxyABI, pool.address)
 
     let amountToSend = web3.utils.toWei(amount, "ether")
+    let tokenAmountOut = web3.utils.toWei(amountOut, "ether")
     if (collateral.decimals !== 18) {
       const decimals = new BigNumber(10)
         .pow(collateral.decimals)
@@ -5124,9 +5151,12 @@ class Store {
       amountToSend = new BigNumber(amount)
         .times(decimals)
         .toFixed(0);
+      tokenAmountOut = new BigNumber(amountOut)
+        .times(decimals)
+        .toFixed(0);
     }
 
-    balancerContract.methods.swapExactAmountIn(collateral.address, amountToSend, asset.address, '1', MAX_UINT256).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    balancerContract.methods.swapExactAmountOut(collateral.address, amountToSend, asset.address, tokenAmountOut, MAX_UINT256).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
