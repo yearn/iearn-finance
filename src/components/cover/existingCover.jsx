@@ -311,7 +311,7 @@ class NewCover extends Component {
               <TableCell align="right">
                 <div>
                   <Typography variant='h4'>{ asset.claimAsset && asset.claimAsset.balance ? (asset.claimAsset.balance).toFixed(2) : '0' }</Typography>
-                  <Typography variant='h4' style={{color: "rgb(148 148 148)"}}>${ asset.claimPoolData && asset.claimPoolData.price ? (asset.claimPoolData.price * asset.claimAsset.balance).toFixed(2) : '0' }</Typography>
+                  <Typography variant='h4' className={ classes.claimType }>${ asset.claimPoolData && asset.claimPoolData.price ? (asset.claimPoolData.price * asset.claimAsset.balance).toFixed(2) : '0' }</Typography>
                 </div>
                 </TableCell>
               <TableCell align="right">
@@ -347,7 +347,7 @@ class NewCover extends Component {
               <TableCell align="right">
                 <div>
                   <Typography variant='h4'>{ asset.noClaimAsset && asset.noClaimAsset.balance ? (asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography>
-                  <Typography variant='h4' style={{color: "rgb(148 148 148)"}}>${ asset.noClaimPoolData && asset.noClaimPoolData.price ? (asset.noClaimPoolData.price * asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography>
+                  <Typography variant='h4' className={ classes.claimType }>${ asset.noClaimPoolData && asset.noClaimPoolData.price ? (asset.noClaimPoolData.price * asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography>
                 </div>
               </TableCell>
               <TableCell align="right">
