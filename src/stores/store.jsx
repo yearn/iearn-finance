@@ -5106,7 +5106,7 @@ class Store {
 
   purchaseCover = (payload) => {
     const account = store.getStore('account')
-    const { asset, collateral, amount, pool } = payload.content
+    const { asset, collateral, amount, amountOut, pool } = payload.content
 
     const sendAsset = {
       erc20address: collateral.address,
@@ -5119,7 +5119,7 @@ class Store {
         return emitter.emit(ERROR, err);
       }
 
-      this._callSwapExactAmountIn(asset, collateral, amount, account, pool, (err, res) => {
+      this._callSwapExactAmountIn(asset, collateral, amount, amountOut, account, pool, (err, res) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
@@ -5129,12 +5129,13 @@ class Store {
     })
   }
 
-  _callSwapExactAmountIn = async (asset, collateral, amount, account, pool, callback) => {
+  _callSwapExactAmountIn = async (asset, collateral, amount, amountOut, account, pool, callback) => {
     const web3 = await this._getWeb3Provider();
 
     let balancerContract = new web3.eth.Contract(config.balancerProxyABI, pool.address)
 
     let amountToSend = web3.utils.toWei(amount, "ether")
+    let tokenAmountOut = web3.utils.toWei(amountOut, "ether")
     if (collateral.decimals !== 18) {
       const decimals = new BigNumber(10)
         .pow(collateral.decimals)
@@ -5142,9 +5143,12 @@ class Store {
       amountToSend = new BigNumber(amount)
         .times(decimals)
         .toFixed(0);
+      tokenAmountOut = new BigNumber(amountOut)
+        .times(decimals)
+        .toFixed(0);
     }
 
-    balancerContract.methods.swapExactAmountIn(collateral.address, amountToSend, asset.address, '1', MAX_UINT256).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+    balancerContract.methods.swapExactAmountOut(collateral.address, amountToSend, asset.address, tokenAmountOut, MAX_UINT256).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
       .on('transactionHash', function(hash){
         console.log(hash)
         callback(null, hash)
