@@ -79,6 +79,10 @@ const styles = theme => ({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  maxCellHeight: {
+    height: '60px',
+    padding: '0px'
   }
 });
 
@@ -290,7 +294,7 @@ class NewCover extends Component {
         <React.Fragment>
           { asset.claimAsset && asset.claimAsset.balance > 0 &&
             <TableRow className={ classes.optionRow } key={asset.name} >
-              <TableCell className={ classes.assetName }>
+              <TableCell className={ `${classes.assetName} ${classes.maxCellHeight}` }>
                 <div className={ classes.assetSelectIcon }>
                   <img
                     alt=""
@@ -326,7 +330,7 @@ class NewCover extends Component {
           }
           { asset.noClaimAsset && asset.noClaimAsset.balance > 0 &&
             <TableRow className={ classes.optionRow } key={asset.name} >
-              <TableCell className={ classes.assetName }>
+              <TableCell className={ `${classes.assetName} ${classes.maxCellHeight}` }>
                 <div className={ classes.assetSelectIcon }>
                   <img
                     alt=""
