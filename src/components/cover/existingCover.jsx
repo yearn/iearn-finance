@@ -150,7 +150,7 @@ class NewCover extends Component {
   coverBalancesReturned = () => {
     this.setState({
       coverCollateral: store.getStore('coverCollateral'),
-      coverAassets: store.getStore('coverAassets'),
+      coverAssets: store.getStore('coverAssets'),
       coverProtocols: store.getStore('coverProtocols'),
       loading: false
     })
@@ -221,8 +221,8 @@ class NewCover extends Component {
               <TableRow>
                 <TableCell>Asset</TableCell>
                 <TableCell align="right">Expiry Date</TableCell>
-                <TableCell align="right">Value</TableCell>
-                <TableCell align="right">Action</TableCell>
+                <TableCell align="right">Balance</TableCell>
+                <TableCell align="center">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -268,12 +268,11 @@ class NewCover extends Component {
     if(!coverProtocols || coverProtocols.length === 0) {
       return <TableRow className={ classes.optionRow } key={'No'}>
         <TableCell colSpan={9} align="center">
-          <Typography>You don't have any cover yet</Typography>
+          <Typography>You don't have any cover tokens</Typography>
         </TableCell>
       </TableRow>
     }
-
-    return coverProtocols.filter((asset) => {
+    const filteredRows = coverProtocols.filter((asset) => {
       if(!asset) {
         return false
       }
@@ -287,28 +286,36 @@ class NewCover extends Component {
       }
 
       return false
-    }).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    })
+    
+    return filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
       .map((asset) => {
       return (
         <React.Fragment>
           { asset.claimAsset && asset.claimAsset.balance > 0 &&
-            <TableRow className={ classes.optionRow } key={asset.name} >
-              <TableCell className={ `${classes.assetName} ${classes.maxCellHeight}` }>
-                <div className={ classes.assetSelectIcon }>
+            <TableRow className={ classes.optionRow } key={`${asset.name}_claim`} >
+              <TableCell>
+                <div className={ classes.assetName }>
                   <img
                     alt=""
+                    className={ classes.assetSelectIcon }
                     src={ this.getLogoForProtocol({ name: asset.name }) }
                     height="30px"
                   />
-                </div>
-                <div className={ classes.assetSelectIconName }>
-                  <Typography variant='h4'>{ asset.name }</Typography>
-                  <Typography variant='h5' className={ classes.claimType }>Claim Token</Typography>
+                  <div className={ classes.assetSelectIconName }>
+                    <Typography variant='h4'>{ asset.name }</Typography>
+                    <Typography variant='h5' className={ classes.claimType }>Claim Token</Typography>
+                  </div>
                 </div>
               </TableCell>
-              <TableCell align="right" className={classes.maxCellHeight}><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
-              <TableCell align="right" className={classes.maxCellHeight}><Typography variant='h4'>${ asset.claimAsset && asset.claimAsset.balance ? (asset.claimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
-              <TableCell align="right" className={classes.maxCellHeight}>
+              <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
+              <TableCell align="right">
+                <div>
+                  <Typography variant='h4'>{ asset.claimAsset && asset.claimAsset.balance ? (asset.claimAsset.balance).toFixed(2) : '0' }</Typography>
+                  <Typography variant='h4' className={ classes.claimType }>${ asset.claimPoolData && asset.claimPoolData.price ? (asset.claimPoolData.price * asset.claimAsset.balance).toFixed(2) : '0' }</Typography>
+                </div>
+                </TableCell>
+              <TableCell align="center">
                 <Tooltip title="Claims are handled on Cover Protocol's app">
                   <Button
                     className={ classes.actionButton }
@@ -323,23 +330,29 @@ class NewCover extends Component {
             </TableRow>
           }
           { asset.noClaimAsset && asset.noClaimAsset.balance > 0 &&
-            <TableRow className={ classes.optionRow } key={asset.name} >
-              <TableCell className={ `${classes.assetName} ${classes.maxCellHeight}` }>
-                <div className={ classes.assetSelectIcon }>
+            <TableRow className={ classes.optionRow } key={`${asset.name}_noclaim`} >
+              <TableCell>
+                <div className={ classes.assetName }>
                   <img
                     alt=""
+                    className={ classes.assetSelectIcon }
                     src={ this.getLogoForProtocol({ name: asset.name }) }
                     height="30px"
                   />
-                </div>
-                <div className={ classes.assetSelectIconName }>
-                  <Typography variant='h4'>{ asset.name }</Typography>
-                  <Typography variant='h5' className={ classes.claimType }>No Claim Token</Typography>
+                  <div className={ classes.assetSelectIconName }>
+                    <Typography variant='h4'>{ asset.name }</Typography>
+                    <Typography variant='h5' className={ classes.claimType }>No Claim Token</Typography>
+                  </div>
                 </div>
               </TableCell>
-              <TableCell className={classes.maxCellHeight} align="right" ><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
-              <TableCell className={classes.maxCellHeight} align="right"><Typography variant='h4'>${ asset.noClaimAsset && asset.noClaimAsset.balance ? (asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
-              <TableCell className={classes.maxCellHeight} align="right">
+              <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
+              <TableCell align="right">
+                <div>
+                  <Typography variant='h4'>{ asset.noClaimAsset && asset.noClaimAsset.balance ? (asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography>
+                  <Typography variant='h4' className={ classes.claimType }>${ asset.noClaimPoolData && asset.noClaimPoolData.price ? (asset.noClaimPoolData.price * asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography>
+                </div>
+              </TableCell>
+              <TableCell align="center">
                 <Tooltip title="Redemptions are handled on Cover Protocol's app">
                   <Button
                     className={ classes.actionButton }
