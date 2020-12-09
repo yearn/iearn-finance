@@ -63,7 +63,7 @@ const styles = theme => ({
   },
   actionButton: {
     borderRadius: '6px',
-    width: '130px',
+    width: '160px',
     height: '30px',
     fontSize: '14px'
   },
