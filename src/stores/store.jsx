@@ -4870,7 +4870,7 @@ class Store {
         let claimPoolData = poolDataArr.filter((data) => {
           const token0Address = data[1].poolId.tokens[0].address.toLowerCase();
           const token1Address = data[1].poolId.tokens[1].address.toLowerCase();
-          if(token0Address === claimAddress.toLowerCase() && token1Address.toLowerCase() === daiAddress.toLowerCase()) {
+          if(token0Address === claimAddress.toLowerCase() && token1Address === daiAddress.toLowerCase()) {
             return true
           }
           if(token1Address === claimAddress.toLowerCase() && token0Address === daiAddress.toLowerCase()) {
@@ -4986,6 +4986,15 @@ class Store {
           collateralName,
           claimPoolData: claimPoolData,
           noClaimPoolData: noClaimPoolData,
+        }
+      })
+      claimAssets.sort((a, b) => {
+        if (a.expires[0] > b.expires[0]) {
+          return 1;
+        } else if (a.expires[0] < b.expires[0]) {
+          return -1;
+        } else {
+          return a.name > b.name ? 1 : -1;
         }
       })
       store.setStore({ coverProtocols: claimAssets })

@@ -146,7 +146,7 @@ class NewCover extends Component {
   coverBalancesReturned = () => {
     this.setState({
       coverCollateral: store.getStore('coverCollateral'),
-      coverAassets: store.getStore('coverAassets'),
+      coverAssets: store.getStore('coverAssets'),
       coverProtocols: store.getStore('coverProtocols'),
       loading: false
     })
@@ -217,7 +217,7 @@ class NewCover extends Component {
               <TableRow>
                 <TableCell>Asset</TableCell>
                 <TableCell align="right">Expiry Date</TableCell>
-                <TableCell align="right">Value</TableCell>
+                <TableCell align="right">Balance</TableCell>
                 <TableCell align="right">Action</TableCell>
               </TableRow>
             </TableHead>
@@ -230,6 +230,7 @@ class NewCover extends Component {
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
           count={ coverProtocols ? coverProtocols.filter((asset) => {
+            console.log(asset)
             if(!asset) {
               return false
             }
@@ -264,7 +265,7 @@ class NewCover extends Component {
     if(!coverProtocols || coverProtocols.length === 0) {
       return <TableRow className={ classes.optionRow } key={'No'}>
         <TableCell colSpan={9} align="center">
-          <Typography>You don't have any cover yet</Typography>
+          <Typography>You don't have any cover tokens</Typography>
         </TableCell>
       </TableRow>
     }
@@ -303,7 +304,12 @@ class NewCover extends Component {
                 </div>
               </TableCell>
               <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
-              <TableCell align="right"><Typography variant='h4'>${ asset.claimAsset && asset.claimAsset.balance ? (asset.claimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
+              <TableCell align="right">
+                <div>
+                  <Typography variant='h4'>{ asset.claimAsset && asset.claimAsset.balance ? (asset.claimAsset.balance).toFixed(2) : '0' }</Typography>
+                  <Typography variant='h4' style={{color: "rgb(148 148 148)"}}>${ asset.claimPoolData && asset.claimPoolData.price ? (asset.claimPoolData.price * asset.claimAsset.balance).toFixed(2) : '0' }</Typography>
+                </div>
+                </TableCell>
               <TableCell align="right">
                 <Tooltip title="Claims are handled on Cover Protocol's app">
                   <Button
@@ -334,7 +340,12 @@ class NewCover extends Component {
                 </div>
               </TableCell>
               <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
-              <TableCell align="right"><Typography variant='h4'>${ asset.noClaimAsset && asset.noClaimAsset.balance ? (asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
+              <TableCell align="right">
+                <div>
+                  <Typography variant='h4'>{ asset.noClaimAsset && asset.noClaimAsset.balance ? (asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography>
+                  <Typography variant='h4' style={{color: "rgb(148 148 148)"}}>${ asset.noClaimPoolData && asset.noClaimPoolData.price ? (asset.noClaimPoolData.price * asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography>
+                </div>
+              </TableCell>
               <TableCell align="right">
                 <Tooltip title="Redemptions are handled on Cover Protocol's app">
                   <Button
