@@ -214,7 +214,7 @@ class NewCover extends Component {
       coverAssets: store.getStore('coverAssets'),
       loading: true,
       protocol: 'YEARN',
-      assetAmount: '1',
+      assetAmount: '0',
       assetAmountError: false,
       claimOption: null,
       snackbarType: null,

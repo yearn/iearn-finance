@@ -222,7 +222,7 @@ class NewCover extends Component {
                 <TableCell>Asset</TableCell>
                 <TableCell align="right">Expiry Date</TableCell>
                 <TableCell align="right">Balance</TableCell>
-                <TableCell align="right">Action</TableCell>
+                <TableCell align="center">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -234,7 +234,6 @@ class NewCover extends Component {
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
           count={ coverProtocols ? coverProtocols.filter((asset) => {
-            console.log(asset)
             if(!asset) {
               return false
             }
@@ -273,8 +272,7 @@ class NewCover extends Component {
         </TableCell>
       </TableRow>
     }
-
-    return coverProtocols.filter((asset) => {
+    const filteredRows = coverProtocols.filter((asset) => {
       if(!asset) {
         return false
       }
@@ -288,23 +286,26 @@ class NewCover extends Component {
       }
 
       return false
-    }).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    })
+    
+    return filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
       .map((asset) => {
       return (
         <React.Fragment>
           { asset.claimAsset && asset.claimAsset.balance > 0 &&
-            <TableRow className={ classes.optionRow } key={asset.name} >
-              <TableCell className={ `${classes.assetName} ${classes.maxCellHeight}` }>
-                <div className={ classes.assetSelectIcon }>
+            <TableRow className={ classes.optionRow } key={`${asset.name}_claim`} >
+              <TableCell>
+                <div className={ classes.assetName }>
                   <img
                     alt=""
+                    className={ classes.assetSelectIcon }
                     src={ this.getLogoForProtocol({ name: asset.name }) }
                     height="30px"
                   />
-                </div>
-                <div className={ classes.assetSelectIconName }>
-                  <Typography variant='h4'>{ asset.name }</Typography>
-                  <Typography variant='h5' className={ classes.claimType }>Claim Token</Typography>
+                  <div className={ classes.assetSelectIconName }>
+                    <Typography variant='h4'>{ asset.name }</Typography>
+                    <Typography variant='h5' className={ classes.claimType }>Claim Token</Typography>
+                  </div>
                 </div>
               </TableCell>
               <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
@@ -314,7 +315,7 @@ class NewCover extends Component {
                   <Typography variant='h4' className={ classes.claimType }>${ asset.claimPoolData && asset.claimPoolData.price ? (asset.claimPoolData.price * asset.claimAsset.balance).toFixed(2) : '0' }</Typography>
                 </div>
                 </TableCell>
-              <TableCell align="right">
+              <TableCell align="center">
                 <Tooltip title="Claims are handled on Cover Protocol's app">
                   <Button
                     className={ classes.actionButton }
@@ -329,18 +330,19 @@ class NewCover extends Component {
             </TableRow>
           }
           { asset.noClaimAsset && asset.noClaimAsset.balance > 0 &&
-            <TableRow className={ classes.optionRow } key={asset.name} >
-              <TableCell className={ `${classes.assetName} ${classes.maxCellHeight}` }>
-                <div className={ classes.assetSelectIcon }>
+            <TableRow className={ classes.optionRow } key={`${asset.name}_noclaim`} >
+              <TableCell>
+                <div className={ classes.assetName }>
                   <img
                     alt=""
+                    className={ classes.assetSelectIcon }
                     src={ this.getLogoForProtocol({ name: asset.name }) }
                     height="30px"
                   />
-                </div>
-                <div className={ classes.assetSelectIconName }>
-                  <Typography variant='h4'>{ asset.name }</Typography>
-                  <Typography variant='h5' className={ classes.claimType }>No Claim Token</Typography>
+                  <div className={ classes.assetSelectIconName }>
+                    <Typography variant='h4'>{ asset.name }</Typography>
+                    <Typography variant='h5' className={ classes.claimType }>No Claim Token</Typography>
+                  </div>
                 </div>
               </TableCell>
               <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
@@ -350,7 +352,7 @@ class NewCover extends Component {
                   <Typography variant='h4' className={ classes.claimType }>${ asset.noClaimPoolData && asset.noClaimPoolData.price ? (asset.noClaimPoolData.price * asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography>
                 </div>
               </TableCell>
-              <TableCell align="right">
+              <TableCell align="center">
                 <Tooltip title="Redemptions are handled on Cover Protocol's app">
                   <Button
                     className={ classes.actionButton }
