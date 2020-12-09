@@ -79,6 +79,10 @@ const styles = theme => ({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  maxCellHeight: {
+    height: '60px',
+    padding: '0px'
   }
 });
 
@@ -289,7 +293,7 @@ class NewCover extends Component {
         <React.Fragment>
           { asset.claimAsset && asset.claimAsset.balance > 0 &&
             <TableRow className={ classes.optionRow } key={asset.name} >
-              <TableCell className={ classes.assetName }>
+              <TableCell className={ `${classes.assetName} ${classes.maxCellHeight}` }>
                 <div className={ classes.assetSelectIcon }>
                   <img
                     alt=""
@@ -302,9 +306,9 @@ class NewCover extends Component {
                   <Typography variant='h5' className={ classes.claimType }>Claim Token</Typography>
                 </div>
               </TableCell>
-              <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
-              <TableCell align="right"><Typography variant='h4'>${ asset.claimAsset && asset.claimAsset.balance ? (asset.claimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
-              <TableCell align="right">
+              <TableCell align="right" className={classes.maxCellHeight}><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
+              <TableCell align="right" className={classes.maxCellHeight}><Typography variant='h4'>${ asset.claimAsset && asset.claimAsset.balance ? (asset.claimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
+              <TableCell align="right" className={classes.maxCellHeight}>
                 <Tooltip title="Claims are handled on Cover Protocol's app">
                   <Button
                     className={ classes.actionButton }
@@ -320,7 +324,7 @@ class NewCover extends Component {
           }
           { asset.noClaimAsset && asset.noClaimAsset.balance > 0 &&
             <TableRow className={ classes.optionRow } key={asset.name} >
-              <TableCell className={ classes.assetName }>
+              <TableCell className={ `${classes.assetName} ${classes.maxCellHeight}` }>
                 <div className={ classes.assetSelectIcon }>
                   <img
                     alt=""
@@ -333,9 +337,9 @@ class NewCover extends Component {
                   <Typography variant='h5' className={ classes.claimType }>No Claim Token</Typography>
                 </div>
               </TableCell>
-              <TableCell align="right"><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
-              <TableCell align="right"><Typography variant='h4'>${ asset.noClaimAsset && asset.noClaimAsset.balance ? (asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
-              <TableCell align="right">
+              <TableCell className={classes.maxCellHeight} align="right" ><Typography variant='h4'>{ asset.expires ? moment(asset.expires*1e3).format("YYYY/MM/DD") : '' }</Typography></TableCell>
+              <TableCell className={classes.maxCellHeight} align="right"><Typography variant='h4'>${ asset.noClaimAsset && asset.noClaimAsset.balance ? (asset.noClaimAsset.balance).toFixed(2) : '0' }</Typography></TableCell>
+              <TableCell className={classes.maxCellHeight} align="right">
                 <Tooltip title="Redemptions are handled on Cover Protocol's app">
                   <Button
                     className={ classes.actionButton }
