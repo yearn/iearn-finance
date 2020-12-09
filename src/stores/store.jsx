@@ -4149,6 +4149,9 @@ class Store {
         const bnDecimals = new BigNumber(10)
           .pow(asset.decimals)
 
+        const bnVaultDecimals = new BigNumber(10)
+          .pow(asset.vaultDecimals)
+
         if(asset.vaultSymbol !== 'crETH') {
           const erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
           balance = await erc20Contract.methods.balanceOf(account.address).call()
@@ -4165,14 +4168,16 @@ class Store {
         const exchangeRate = await marketContract.methods.exchangeRateStored().call()
         let supplyBalance = await marketContract.methods.balanceOf(account.address).call()
         let borrowBalance = await marketContract.methods.borrowBalanceStored(account.address).call()
+        let cash = await marketContract.methods.getCash().call()
         const borrowRatePerBlock = await marketContract.methods.borrowRatePerBlock().call()
         const supplyRatePerBlock = await marketContract.methods.supplyRatePerBlock().call()
         const ethPerAsset = await creamPriceOracleContract.methods.getUnderlyingPrice(asset.address).call() //no longer eth per asset it's now dollars per asset
 
         const exchangeRateReal = exchangeRate/10**28
 
-        supplyBalance = supplyBalance*exchangeRateReal/10**asset.vaultDecimals
-        borrowBalance = borrowBalance/10**asset.decimals
+        supplyBalance = new BigNumber(supplyBalance).times(exchangeRateReal).div(bnVaultDecimals).toFixed(asset.vaultDecimals, BigNumber.ROUND_DOWN)
+        borrowBalance = new BigNumber(borrowBalance).div(bnDecimals).toFixed(asset.decimals, BigNumber.ROUND_DOWN)
+        cash = new BigNumber(cash).div(bnDecimals).toFixed(asset.decimals, BigNumber.ROUND_DOWN)
 
         const borrowRatePerYear = (borrowRatePerBlock) * blocksPeryear / 1e16
         const supplyRatePerYear = (supplyRatePerBlock) * blocksPeryear / 1e16
@@ -4185,7 +4190,7 @@ class Store {
           symbol: asset.symbol,
           vaultDecimals: asset.vaultDecimals,
           decimals: asset.decimals,
-          liquidity: asset.liquidity,
+          liquidity: cash,
           collateralEnabled: assetsIn.includes(asset.address),
           balance: balance,
           supplyBalance: supplyBalance,
@@ -4308,6 +4313,9 @@ class Store {
         const bnDecimals = new BigNumber(10)
           .pow(decimals)
 
+        const bnVaultDecimals = new BigNumber(10)
+          .pow(vaultDecimals)
+
         let balance = 0
 
         if(vaultSymbol !== 'crETH') {
@@ -4335,9 +4343,9 @@ class Store {
 
         const exchangeRateReal = exchangeRate/10**28
 
-        supplyBalance = supplyBalance*exchangeRateReal/10**vaultDecimals
-        borrowBalance = borrowBalance/10**decimals
-        cash = cash/10**decimals
+        supplyBalance = new BigNumber(supplyBalance).times(exchangeRateReal).div(bnVaultDecimals).toFixed(decimals, BigNumber.ROUND_DOWN)
+        borrowBalance = new BigNumber(borrowBalance).div(bnDecimals).toFixed(decimals, BigNumber.ROUND_DOWN)
+        cash = new BigNumber(cash).div(bnDecimals).toFixed(decimals, BigNumber.ROUND_DOWN)
 
         const borrowRatePerYear = (borrowRatePerBlock) * blocksPeryear / 1e16
         const supplyRatePerYear = (supplyRatePerBlock) * blocksPeryear / 1e16
@@ -4887,8 +4895,8 @@ class Store {
             liquidity: data[1].poolId.liquidity,
             daiInPool: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
             covTokenBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === claimAddress.toLowerCase()).balance),
-            covTokenWeight: 
-              parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === claimAddress.toLowerCase()).denormWeight) / 
+            covTokenWeight:
+              parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === claimAddress.toLowerCase()).denormWeight) /
               parseFloat(data[1].poolId.totalWeight)
           }
         })
@@ -4922,8 +4930,8 @@ class Store {
             liquidity: data[1].poolId.liquidity,
             daiInPool: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === daiAddress.toLowerCase()).balance),
             covTokenBalance: parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === noClaimAddress.toLowerCase()).balance),
-            covTokenWeight: 
-              parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === noClaimAddress.toLowerCase()).denormWeight) / 
+            covTokenWeight:
+              parseFloat(data[1].poolId.tokens.find((token) => token.address.toLowerCase() === noClaimAddress.toLowerCase()).denormWeight) /
               parseFloat(data[1].poolId.totalWeight)
           }
         })
