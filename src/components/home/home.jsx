@@ -12,7 +12,6 @@ import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import PieChartIcon from '@material-ui/icons/PieChart';
 import WarningIcon from '@material-ui/icons/Warning';
-import SecurityIcon from '@material-ui/icons/Security';
 
 const styles = theme => ({
   root: {
@@ -185,16 +184,17 @@ const styles = theme => ({
   lending: {
     backgroundColor: colors.white,
     '&:hover': {
-      backgroundColor: colors.creamPurple,
+      backgroundColor: colors.creamBlue,
       '& .title': {
-        color: colors.creamBlue,
+        color: colors.white,
       },
       '& .icon': {
-        color: colors.creamBlue
+        color: colors.creamBlue,
+        backgroundImage: `url(${require('../../assets/cream-icon-hover.svg')})`,
       },
       '& .description': {
         display: 'block',
-        color: colors.creamBlue,
+        color: colors.white,
         padding: '48px',
         textAlign: 'center'
       }
@@ -203,7 +203,11 @@ const styles = theme => ({
       color: colors.creamBlue,
     },
     '& .icon': {
-      color: colors.creamBlue
+      color: colors.creamBlue,
+      backgroundImage: `url(${require('../../assets/cream-icon.svg')})`,
+      backgroundSize: '100px 100px',
+      height: '100px',
+      width: '100px'      
     },
     '& .description': {
       display: 'none'
@@ -217,7 +221,7 @@ const styles = theme => ({
         color: colors.white,
       },
       '& .icon': {
-        color: colors.white
+        backgroundImage: `url(${require('../../assets/cover-icon-hover.png')})`
       },
       '& .description': {
         display: 'block',
@@ -230,7 +234,11 @@ const styles = theme => ({
       color: colors.coverPurple,
     },
     '& .icon': {
-      color: colors.coverPurple
+      color: colors.coverPurple,
+      height: '100px',
+      width: '100px',
+      backgroundImage: `url(${require('../../assets/cover-icon.png')})`,
+      backgroundSize: '100px 100px'
     },
     '& .description': {
       display: 'none'
@@ -294,14 +302,14 @@ class Home extends Component {
           <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Home for experimental vaults." }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.lending}` } onClick={ () => { this.nav('lending') } }>
-          <img alt='' src={ require('../../assets/cream-logo.png') } width='100px' height='100px' className={ `${classes.icon} icon` } />
+          <div alt='' className={ `${classes.icon} icon cream` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Lending") }</Typography>
           <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Lending, provided by cream." }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.cover}` } onClick={ () => { this.nav('cover') } }>
-          <SecurityIcon className={ `${classes.icon} icon` } />
+          <div alt='' className={ `${classes.icon} icon cover` } />
           <Typography variant={'h3'} className={ `${classes.title} title` }>{ t("Home.Cover") }</Typography>
-          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Coverage, provided by Cover Protocol." }</Typography>
+          <Typography variant={'h4'} className={ `${classes.description} description` }>{ "Cover provided by Cover Protocol." }</Typography>
         </Card>
         <Card className={ `${classes.card} ${classes.apr}` } onClick={ () => { this.nav('stats') } }>
           <BarChartIcon className={ `${classes.icon} icon` } />
