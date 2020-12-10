@@ -388,11 +388,11 @@ class NewCover extends Component {
   }
 
   onClaim = (asset) => {
-    window.open('https://app.coverprotocol.com/app/claims/new', '_blank')
+    window.open(`https://app.coverprotocol.com/app/claims/new?protocol=${asset.name}`, '_blank')
   }
 
   onRedeem = (asset) => {
-    window.open('https://app.coverprotocol.com/app/redeem?redeemType=active', '_blank')
+    window.open(`https://app.coverprotocol.com/app/dashboard`, '_blank')
   }
 }
 
