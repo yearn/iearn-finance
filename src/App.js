@@ -24,6 +24,7 @@ import Dashboard from './components/dashboard';
 import Experimental from './components/experimental';
 import Lending from './components/lending';
 import Cover from './components/cover';
+import SEO from './components/seo';
 
 import { injected } from "./stores/connectors";
 
@@ -84,6 +85,7 @@ class App extends Component {
             alignItems: 'center',
             background: "#f9fafb"
           }}>
+            <SEO />
             <Switch>
               <Route path="/stats">
                 <Header />
