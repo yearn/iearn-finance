@@ -1026,7 +1026,7 @@ class Store {
           depositAll: true,
           withdraw: true,
           withdrawAll: true,
-          lastMeasurement: 11391849,
+          lastMeasurement: 11391850,
           measurement: 1e18,
           depositDisabled: false,
           price_id: 'lp-musd3CRV-curve', // TODO: Update this when Coingecko adds token
@@ -1047,7 +1047,7 @@ class Store {
           depositAll: true,
           withdraw: true,
           withdrawAll: true,
-          lastMeasurement: 11397633,
+          lastMeasurement: 11397634,
           measurement: 1e18,
           depositDisabled: false,
           price_id: 'lp-gusd3CRV-curve', // TODO: Update this when Coingecko adds token
