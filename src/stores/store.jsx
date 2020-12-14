@@ -1012,9 +1012,9 @@ class Store {
         },
         {
           id: 'musd3CRV',
-          name: 'Curve.fi MUSD/3Crv',
+          name: 'curve.fi/mUSD LP',
           symbol: 'musd3CRV',
-          description: 'MUSD/3Crv',
+          description: 'mUSD/3Crv',
           vaultSymbol: 'yvmusd3CRV',
           erc20address: '0x1AEf73d49Dedc4b1778d0706583995958Dc862e6',
           vaultContractAddress: '0x0FCDAeDFb8A7DfDa2e9838564c5A1665d856AFDF',
@@ -1033,7 +1033,7 @@ class Store {
         },
         {
           id: 'gusd3CRV',
-          name: 'Curve.fi GUSD/3Crv',
+          name: 'curve.fi/GUSD LP',
           symbol: 'gusd3CRV',
           description: 'GUSD/3Crv',
           vaultSymbol: 'yvgusd3CRV',
