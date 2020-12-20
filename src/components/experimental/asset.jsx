@@ -116,7 +116,8 @@ const styles = theme => ({
   zapButton: {
     display: 'flex',
     width: '100%',
-    marginTop: '12px'
+    marginTop: '12px',
+    marginBottom: '24px'
   },
   disabledContainer: {
     width: '100%',
@@ -355,6 +356,9 @@ class Asset extends Component {
                 </Button>
               }
             </div>
+          </div>
+          <div className={ classes.sepperator }></div>
+          <div className={classes.tradeContainer}>
             <div className={ classes.zapButton }>
               <Button
                 className={ classes.actionButton }
@@ -367,22 +371,12 @@ class Asset extends Component {
                 <Typography className={ classes.buttonText } variant={ 'h5'}>Zap All (Wallet/Vested/Gauge)</Typography>
               </Button>
             </div>
-          </div>
-          <div className={ classes.sepperator }></div>
-          <div className={classes.tradeContainer}>
-            <div className={ classes.claimableSummary }>
-              <Typography variant={ 'h4' } color='primary' noWrap>Claimable Admin Rewards</Typography>
-              <div className={ classes.claimableAmount }>
-                <Typography variant={ 'h1' } className={ classes.claimableAmountValue }>{ asset.claimable ? asset.claimable.toFixed(4) : '0.00' }</Typography>
-                <Typography variant={ 'h3' } className={ classes.claimableAmountSymbol }>{ asset.cliamableAssetSymbol }</Typography>
-              </div>
-            </div>
             <div className={ classes.buttons }>
               <Button
                 className={ classes.actionButton }
                 variant="contained"
                 color="primary"
-                disabled={ loading || asset.claimable <= 0 }
+                disabled={ loading }
                 onClick={ this.onClaim }
                 fullWidth
                 >
