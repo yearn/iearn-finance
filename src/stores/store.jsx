@@ -4906,10 +4906,10 @@ class Store {
       const claimAssets = protocolsJSON.protocols.map((protocol) => {
         if (protocol.protocolActive) {
           const name = protocol.protocolName
-          const expires = protocol.expirationTimestamps
-          const claimAddress = protocol.coverObjects[protocol.claimNonce].tokens.claimAddress
-          const noClaimAddress = protocol.coverObjects[protocol.claimNonce].tokens.noClaimAddress
-          const collateralAddress = protocol.coverObjects[protocol.claimNonce].collateralAddress
+          const expiries = protocol.expirationTimestamps
+          const claimAddress = protocol.coverObjects[protocol.coverObjects.length - 1].tokens.claimAddress
+          const noClaimAddress = protocol.coverObjects[protocol.coverObjects.length - 1].tokens.noClaimAddress
+          const collateralAddress = protocol.coverObjects[protocol.coverObjects.length - 1].collateralAddress
           let collateralName;
           // currently supported collateral types are DAI and yDAI, however, purchasing coverage always uses DAI through Balancer
           const daiAddress = '0x6B175474E89094C44Da98b954EedeAC495271d0F'
@@ -5029,7 +5029,7 @@ class Store {
 
           return {
             name,
-            expires,
+            expires: expiries,
             claimAddress,
             noClaimAddress,
             purchaseCurrency: daiAddress,
