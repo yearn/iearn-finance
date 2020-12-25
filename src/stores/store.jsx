@@ -4906,7 +4906,7 @@ class Store {
       const claimAssets = protocolsJSON.protocols.map((protocol) => {
         if (protocol.protocolActive) {
           const name = protocol.protocolName
-          const expiries = protocol.expirationTimestamps
+          const latestExpiry = protocol.expirationTimestamps[protocol.expirationTimestamps.length - 1]
           const claimAddress = protocol.coverObjects[protocol.coverObjects.length - 1].tokens.claimAddress
           const noClaimAddress = protocol.coverObjects[protocol.coverObjects.length - 1].tokens.noClaimAddress
           const collateralAddress = protocol.coverObjects[protocol.coverObjects.length - 1].collateralAddress
@@ -5029,7 +5029,7 @@ class Store {
 
           return {
             name,
-            expires: expiries,
+            expires: latestExpiry,
             claimAddress,
             noClaimAddress,
             purchaseCurrency: daiAddress,
@@ -5038,6 +5038,8 @@ class Store {
             claimPoolData: claimPoolData,
             noClaimPoolData: noClaimPoolData,
           }
+        } else {
+          return;
         }
       })
       claimAssets.sort((a, b) => {
