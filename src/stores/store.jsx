@@ -5038,6 +5038,8 @@ class Store {
             claimPoolData: claimPoolData,
             noClaimPoolData: noClaimPoolData,
           }
+        } else {
+          return;
         }
       })
       claimAssets.sort((a, b) => {
