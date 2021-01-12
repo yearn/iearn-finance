@@ -1234,6 +1234,7 @@ class Store {
           depositAll: true,
           withdraw: true,
           withdrawAll: true,
+          depositDisabled: true,
           lastMeasurement: 11065127,
           measurement: 1e18,
           price_id: 'gemini-dollar',
