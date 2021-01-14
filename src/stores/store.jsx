@@ -1117,6 +1117,27 @@ class Store {
         },
 
         {
+          id: 'eursCRV',
+          name: 'curve.fi/eurs LP',
+          symbol: 'eursCRV',
+          description: 'EURS/sEUR',
+          vaultSymbol: 'yveursCRV',
+          erc20address: '0x194eBd173F6cDacE046C53eACcE9B953F28411d1',
+          vaultContractAddress: '0x98b058b2cbacf5e99bc7012df757ea7cfebd35bc',
+          vaultContractABI: config.vaultContractV5ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 11210773,
+          measurement: 1e18,
+          depositDisabled: false,
+          price_id: "lp-eurs-curve", // TODO: Update this when Coingecko adds token
+        },
+        {
           id: 'YFI',
           name: 'yearn.finance',
           symbol: 'YFI',
