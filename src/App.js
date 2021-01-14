@@ -24,6 +24,7 @@ import Dashboard from './components/dashboard';
 import Experimental from './components/experimental';
 import Lending from './components/lending';
 import Cover from './components/cover';
+import Firehose from './components/firehose';
 import SEO from './components/seo';
 
 import { injected } from "./stores/connectors";
@@ -129,6 +130,10 @@ class App extends Component {
               <Route path='/cover'>
                 <Header />
                 <Cover />
+              </Route>
+              <Route path='/firehose'>
+                <Header />
+                <Firehose />
               </Route>
               <Route path="/">
                 <Home />

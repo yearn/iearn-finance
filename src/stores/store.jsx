@@ -80,6 +80,7 @@ import {
   COVER_BALANCES_RETURNED,
   COVER_PURCHASE,
   COVER_PURCHASE_RETURNED,
+  FIREHOSE_STATE_UPDATED,
 } from '../constants';
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js'
@@ -447,6 +448,125 @@ class Store {
         }
       }.bind(this)
     );
+
+    this.connectToFirehose();
+  }
+
+  /**
+   * Firehose load limit testing:
+   * 
+   * Subscribe to:
+   *   .Sushiswap LP reserve states
+   *   .Cream oracle pricing
+   */
+  connectToFirehose() {
+    const address = "wss://stream.firehose.finance";
+    const socket = new WebSocket(address);
+
+    socket.onopen = function (e) {
+      console.log('Websocket connected (0.0.1)');
+      socket.send(JSON.stringify(subscription));
+    };
+
+    socket.onmessage = (event) => {
+      const payload = JSON.parse(event.data).payload;
+      return emitter.emit(FIREHOSE_STATE_UPDATED, payload)
+    };
+
+    socket.onclose = function (event) {
+      console.log('Websocket disconnected');
+    };
+
+    socket.onerror = function (error) {
+      console.log('Websocket error', error)
+    };
+    const subscription = {
+      action: "subscribe",
+      topic: "contractState",
+      data: [
+        {
+          address: "0xE4C1E5d96360847De7DFF72D2bD1c4B3d4284E97",
+          method: "getUnderlyingPrice",
+          args: ["0x7589C9E17BCFcE1Ccaa1f921196FDa177F0207Fc"],
+        },
+        {
+          address: "0x397FF1542f962076d0BFE58eA045FfA2d347ACa0",
+          method: "getReserves",
+        },
+        {
+          address: "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+          method: "getReserves",
+        },
+        {
+          address: "0xBb2b8038a1640196FbE3e38816F3e67Cba72D940",
+          method: "getReserves",
+        },
+        {
+          address: "0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11",
+          method: "getReserves",
+        },
+        {
+          address: "0xF52f433B79d21023af94251958BEd3b64a2b7930",
+          method: "getReserves",
+        },
+        {
+          address: "0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852",
+          method: "getReserves",
+        },
+        {
+          address: "0xd4405F0704621DBe9d4dEA60E128E0C3b26bddbD",
+          method: "getReserves",
+        },
+        {
+          address: "0xd3d2E2692501A5c9Ca623199D38826e513033a17",
+          method: "getReserves",
+        },
+        {
+          address: "0xc5be99A02C6857f9Eac67BbCE58DF5572498F40c",
+          method: "getReserves",
+        },
+        {
+          address: "0x8878Df9E1A7c87dcBf6d3999D997f262C05D8C70",
+          method: "getReserves",
+        },
+        {
+          address: "0x23d15EDceb5B5B3A23347Fa425846DE80a2E8e5C",
+          method: "getReserves",
+        },
+        {
+          address: "0xeC6a6b7dB761A5c9910bA8fcaB98116d384b1B85",
+          method: "getReserves",
+        },
+        {
+          address: "0xFD0A40Bc83C5faE4203DEc7e5929B446b07d1C76",
+          method: "getReserves",
+        },
+        {
+          address: "0x85609C626b532ca8BEA6c36Be53afdcB15Dd4A48",
+          method: "getReserves",
+        },
+        {
+          address: "0xc50Ef7861153C51D383d9a7d48e6C9467fB90c38",
+          method: "getReserves",
+        },
+        {
+          address: "0xAC08f19b13548d55294BCEfCf751d81EA65845d5",
+          method: "getReserves",
+        },
+        {
+          address: "0xDFC14d2Af169B0D36C4EFF567Ada9b2E0CAE044f",
+          method: "getReserves",
+        },
+        {
+          address: "0x88ff79eB2Bc5850F27315415da8685282C7610F9",
+          method: "getReserves",
+        },
+        {
+          address: "0x32Ce7e48debdccbFE0CD037Cc89526E4382cb81b",
+          method: "getReserves",
+        },
+      ],
+    };
   }
 
   getStore(index) {
