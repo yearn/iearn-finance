@@ -38,6 +38,11 @@ const styles = (theme) => ({
   item: {
     display: "block",
   },
+  column: {
+    maxWidth: "200px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
   timer: {
     whiteSpace: "nowrap",
   },
@@ -80,7 +85,7 @@ class Firehose extends Component {
 
     const renderItem = (item, idx) => {
       const { classes } = this.props;
-      const { address, updated, value } = item;
+      const { address, method, args, updated, value } = item;
       return (
         <tr key={idx}>
           <td>{address}</td>
@@ -89,7 +94,13 @@ class Firehose extends Component {
               {moment(updated * 1000).from(this.currentDate)}
             </div>
           </td>
-          <td>{JSON.stringify(value)}</td>
+          <td>{method}</td>
+          <td>
+            <div className={classes.column}>{args}</div>
+          </td>
+          <td>
+            <div className={classes.column}>{JSON.stringify(value)}</div>
+          </td>
         </tr>
       );
     };
@@ -110,6 +121,8 @@ class Firehose extends Component {
                 <tr>
                   <th>Address</th>
                   <th>Updated</th>
+                  <th>Method</th>
+                  <th>Args</th>
                   <th>Value</th>
                 </tr>
               </thead>
