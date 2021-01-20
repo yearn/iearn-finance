@@ -280,9 +280,9 @@ class BorrowAsset extends Component {
     }
 
 
-    console.log(BigNumber(repayAmount))
-    console.log(BigNumber(asset.borrowBalance))
-    console.log(BigNumber(repayAmount).gt(BigNumber(asset.borrowBalance)))
+    // console.log(BigNumber(repayAmount))
+    // console.log(BigNumber(asset.borrowBalance))
+    // console.log(BigNumber(repayAmount).gt(BigNumber(asset.borrowBalance)))
 
     return (
       <div className={ classes.assetActions }>
