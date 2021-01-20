@@ -119,7 +119,10 @@ const styles = theme => ({
   },
   assetIcon: {
     marginRight: '12px',
-    width: '40px'
+    width: '30px',
+    [theme.breakpoints.up('sm')]: {
+      width: '40px',
+    }
   },
   assetInfo: {
     display: 'flex',
@@ -212,7 +215,6 @@ class BorrowAsset extends Component {
       expanded
     } = this.state
 
-    const width = window.innerWidth
     return (
       <Accordion TransitionProps={{ unmountOnExit: true }} className={ classes.accordion } square key={ asset.symbol+"_expand" } expanded={ expanded === asset.symbol} onChange={ () => { this.handleChange(asset.symbol) } }>
         <AccordionSummary
