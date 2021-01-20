@@ -4444,6 +4444,7 @@ class Store {
         const bnVaultDecimals = new BigNumber(10)
           .pow(vaultDecimals)
 
+        decimals = parseInt(decimals, 10)
         let balance = 0
 
         if(vaultSymbol !== 'crETH') {
