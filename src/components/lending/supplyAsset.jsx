@@ -11,6 +11,7 @@ import {
   Switch
 } from '@material-ui/core';
 import BigNumber from 'bignumber.js'
+import ReactImageFallback from "react-image-fallback";
 
 import {
   ERROR,
@@ -124,7 +125,8 @@ const styles = theme => ({
     color: colors.darkGray
   },
   assetIcon: {
-    marginRight: '12px'
+    marginRight: '12px',
+    width: '40px'
   },
   assetInfo: {
     display: 'flex',
@@ -239,12 +241,11 @@ class SupplyAsset extends Component {
         >
           <div className={ classes.assetSummary }>
             <div className={ classes.headingName }>
-              <img
+              <ReactImageFallback
+                src={ this.getLogo(asset.erc20address) }
+                fallbackImage={ require('../../assets/unknown-logo.png') }
                 alt=""
-                src={ this.getLogo(asset.symbol) }
-                height={ width > 600 ? '40px' : '30px' }
-                className={ classes.assetIcon }
-              />
+                className={ classes.assetIcon } />
               <Typography variant={ 'h4' } className={ classes.assetName } noWrap>{ asset.symbol }</Typography>
             </div>
             <div className={classes.headingAPY }>
@@ -476,28 +477,7 @@ class SupplyAsset extends Component {
     )
   }
 
-  getLogo = (symbol) => {
-    let logo = null
-    try {
-      logo = require('../../assets/'+symbol+'-logo.png')
-    } catch(ex) {
-      try {
-        logo = require('../../assets/'+symbol+'-logo.jpg')
-      } catch(ex) {
-        try {
-          logo = require('../../assets/'+symbol+'-logo.jpeg')
-        } catch(ex) {
-          try {
-            logo = require('../../assets/'+symbol+'-logo.svg')
-          } catch(ex) {
-            logo = require('../../assets/unknown-logo.png')
-          }
-        }
-      }
-    }
-
-    return logo
-  }
+  getLogo = (address) => `https://raw.githubusercontent.com/iearn-finance/yearn-assets/master/icons/tokens/${address}/logo-128.png`
 
   onChange = (event) => {
     let val = []
