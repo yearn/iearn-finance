@@ -1219,8 +1219,28 @@ class Store {
           withdrawAll: true,
           lastMeasurement: 10774489,
           measurement: 1e18,
-          depositDisabled: false,
           price_id: 'ethereum',
+        },
+        {
+          id: 'ETH',
+          name: 'ETH',
+          symbol: 'ETH',
+          description: 'Ether',
+          vaultSymbol: 'yETH',
+          erc20address: 'Ethereum',
+          vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
+          vaultContractABI: config.vaultContractV4ABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: false,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10774489,
+          measurement: 1e18,
+          price_id: 'ethereum',
+          pureEthereum: true,
         },
         {
           id: 'DAI',
@@ -1385,27 +1405,6 @@ class Store {
           lastMeasurement: 11065127,
           measurement: 1e18,
           price_id: 'gemini-dollar',
-        },
-        {
-          id: 'ETH',
-          name: 'ETH',
-          symbol: 'ETH',
-          description: 'Ether',
-          vaultSymbol: 'yETH',
-          erc20address: 'Ethereum',
-          vaultContractAddress: '0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7',
-          vaultContractABI: config.vaultContractV4ABI,
-          balance: 0,
-          vaultBalance: 0,
-          decimals: 18,
-          deposit: true,
-          depositAll: false,
-          withdraw: true,
-          withdrawAll: true,
-          lastMeasurement: 10774489,
-          measurement: 1e18,
-          depositDisabled: true,
-          price_id: 'ethereum',
         },
       ],
       experimentalVaultAssets: [
@@ -1602,7 +1601,7 @@ class Store {
     const account = store.getStore('account')
     const { asset, amount } = payload.content
 
-    if(asset.erc20address !== 'Ethereum') {
+    if(!asset.pureEthereum) {
       this._checkApproval(asset, account, amount, asset.iEarnContract, (err) => {
         if(err) {
           return emitter.emit(ERROR, err);
@@ -1674,8 +1673,7 @@ class Store {
   }
 
   _checkApproval = async (asset, account, amount, contract, callback) => {
-
-    if(asset.erc20address === 'Ethereum') {
+    if(asset.pureEthereum) {
       return callback()
     }
 
@@ -1768,7 +1766,7 @@ class Store {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
-    if(asset.erc20address === 'Ethereum') {
+    if(asset.pureEthereum) {
       iEarnContract.methods[asset.invest]().send({ from: account.address, value: web3.utils.toWei(amount, "ether"), gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
@@ -2045,7 +2043,7 @@ class Store {
 
   _getERC20Balance = async (web3, asset, account, callback) => {
 
-    if(asset.erc20address === 'Ethereum') {
+    if(asset.pureEthereum) {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(account.address), "ether");
         callback(null, parseFloat(eth_balance))
@@ -2073,7 +2071,7 @@ class Store {
       return callback(null, 0)
     }
 
-    if(asset.erc20address === 'Ethereum') {
+    if(asset.pureEthereum) {
       try {
         const eth_balance = web3.utils.fromWei(await web3.eth.getBalance(asset.iEarnContract), "ether");
         callback(null, parseFloat(eth_balance))
@@ -2130,7 +2128,7 @@ class Store {
       let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
       let value = 0
 
-      if(asset.erc20address === 'Ethereum' || asset.id === 'CRVv1') {
+      if(asset.pureEthereum || asset.id === 'CRVv1') {
         value = 0;
       } else {
         value = await iEarnContract.methods.provider().call({ from: account.address });
@@ -2151,7 +2149,7 @@ class Store {
       let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
       let value = 0
 
-      if(asset.erc20address === 'Ethereum' || asset.id === 'CRVv1') {
+      if(asset.pureEthereum || asset.id === 'CRVv1') {
         value = 0;
       } else {
         value = await iEarnContract.methods.recommend().call({ from: account.address });
@@ -2174,7 +2172,7 @@ class Store {
       let iEarnContract = new web3.eth.Contract(asset.abi, asset.iEarnContract)
       let value = 0
 
-      if(asset.erc20address === 'Ethereum') {
+      if(asset.pureEthereum) {
         value = web3.utils.fromWei(await iEarnContract.methods.calcPoolValueInETH().call({ from: account.address }), 'ether');
       } else {
         value = await iEarnContract.methods.calcPoolValueInToken().call({ from: account.address });
@@ -2232,7 +2230,7 @@ class Store {
     var call = 'getAPROptions';//+asset.symbol
     var address = asset.erc20address
     var aprs = 0;
-    if (asset.erc20address === 'Ethereum') {
+    if (asset.pureEthereum) {
       call = 'getETH';
       aprs = await aprContract.methods[call]().call();
     } else {
@@ -2968,7 +2966,7 @@ class Store {
   _getStatsAPY = (vaultStatistics, asset, callback) => {
     try {
 
-      if(asset.erc20address === 'Ethereum') {
+      if(asset.pureEthereum) {
         asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
       }
 
@@ -2988,7 +2986,7 @@ class Store {
 
   _getAddressStats = (addressStatistics, asset, callback) => {
     try {
-      if(asset.erc20address === 'Ethereum') {
+      if(asset.pureEthereum) {
         asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
       }
 
@@ -3009,7 +3007,7 @@ class Store {
   _getAddressTransactions = (addressTXHitory, asset, callback) => {
     try {
 
-      if(asset.erc20address === 'Ethereum') {
+      if(asset.pureEthereum) {
         asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
       }
 
@@ -3218,7 +3216,7 @@ class Store {
       amountToSend = amount*10**asset.decimals;
     }
 
-    if(asset.erc20address === 'Ethereum') {
+    if(asset.pureEthereum) {
       vaultContract.methods.depositETH().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
         .on('transactionHash', function(hash){
           console.log(hash)
@@ -3402,7 +3400,7 @@ class Store {
     }
 
     let functionCall = vaultContract.methods.withdraw(amountSend)
-    if(asset.erc20address === 'Ethereum') {
+    if(asset.pureEthereum) {
       functionCall = vaultContract.methods.withdrawETH(amountSend)
     }
 
@@ -3489,7 +3487,7 @@ class Store {
     let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
 
     let functionCall = vaultContract.methods.withdrawAll()
-    if(asset.erc20address === 'Ethereum') {
+    if(asset.pureEthereum) {
       functionCall = vaultContract.methods.withdrawAllETH()
     }
 
@@ -4604,7 +4602,7 @@ class Store {
         .toFixed(0);
     }
 
-    if(asset.erc20address === 'Ethereum') {
+    if(asset.pureEthereum) {
       lendContract = new web3.eth.Contract(config.cEtherABI, asset.address)
 
       lendContract.methods.mint().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
@@ -4911,7 +4909,7 @@ class Store {
         .toFixed(0);
     }
 
-    if(asset.erc20address === 'Ethereum') {
+    if(asset.pureEthereum) {
       lendContract = new web3.eth.Contract(config.cEtherABI, asset.address)
 
       lendContract.methods.repayBorrow().send({ from: account.address, value: amountToSend, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
