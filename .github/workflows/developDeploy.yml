@@ -1,4 +1,4 @@
-name: Production Build Deployment
+name: Develop Build Deployment
 on:
   push:
     branches:
@@ -18,7 +18,7 @@ jobs:
       - name: Run unit tests
         run: |
           CI=true npm test --watch=all
-      - name: Create a production bundle.
+      - name: Create a develop bundle.
         run: |
           npm run-script build
 
