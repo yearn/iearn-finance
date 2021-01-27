@@ -85,7 +85,7 @@ class App extends Component {
             flexDirection: 'column',
             minHeight: '100vh',
             alignItems: 'center',
-            background: "#f9fafb"
+            background: "red"
           }}>
             <SEO />
             <Switch>
