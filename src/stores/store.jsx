@@ -454,7 +454,7 @@ class Store {
 
   /**
    * Firehose load limit testing:
-   * 
+   *
    * Subscribe to:
    *   .Sushiswap LP reserve states
    *   .Cream oracle pricing
@@ -991,6 +991,7 @@ class Store {
           invest: 'invest',
           redeem: 'redeem',
           price_id: 'ethereum',
+          pureEthereum: true,
         },
         {
           id: 'iDAIv1',
@@ -4250,7 +4251,7 @@ class Store {
         let balance = 0
 
         const bnDecimals = new BigNumber(10)
-          .pow(asset.decimals)
+          .pow(parseInt(asset.decimals))
 
         const bnVaultDecimals = new BigNumber(10)
           .pow(asset.vaultDecimals)
@@ -4258,33 +4259,34 @@ class Store {
         if(asset.vaultSymbol !== 'crETH') {
           const erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
           balance = await erc20Contract.methods.balanceOf(account.address).call()
-          balance = new BigNumber(balance).div(bnDecimals).toFixed(asset.decimals, BigNumber.ROUND_DOWN)
+          balance = new BigNumber(balance).div(bnDecimals).toFixed(parseInt(asset.decimals), BigNumber.ROUND_DOWN)
 
           marketContract = new web3.eth.Contract(config.cErc20DelegatorABI, asset.address)
         } else {
           balance = await web3.eth.getBalance(account.address)
-          balance = new BigNumber(balance).div(bnDecimals).toFixed(asset.decimals, BigNumber.ROUND_DOWN)
+          balance = new BigNumber(balance).div(bnDecimals).toFixed(parseInt(asset.decimals), BigNumber.ROUND_DOWN)
 
           marketContract = new web3.eth.Contract(config.cEtherABI, asset.address)
         }
 
         const exchangeRate = await marketContract.methods.exchangeRateStored().call()
         let supplyBalance = await marketContract.methods.balanceOf(account.address).call()
+
         let borrowBalance = await marketContract.methods.borrowBalanceStored(account.address).call()
         let cash = await marketContract.methods.getCash().call()
         const borrowRatePerBlock = await marketContract.methods.borrowRatePerBlock().call()
         const supplyRatePerBlock = await marketContract.methods.supplyRatePerBlock().call()
         const ethPerAsset = await creamPriceOracleContract.methods.getUnderlyingPrice(asset.address).call() //no longer eth per asset it's now dollars per asset
 
-        const exchangeRateReal = exchangeRate/10**28
+        const exchangeRateReal = exchangeRate/10**parseInt(asset.decimals)
 
-        supplyBalance = new BigNumber(supplyBalance).times(exchangeRateReal).div(bnVaultDecimals).toFixed(asset.vaultDecimals, BigNumber.ROUND_DOWN)
-        borrowBalance = new BigNumber(borrowBalance).div(bnDecimals).toFixed(asset.decimals, BigNumber.ROUND_DOWN)
-        cash = new BigNumber(cash).div(bnDecimals).toFixed(asset.decimals, BigNumber.ROUND_DOWN)
+        supplyBalance = new BigNumber(supplyBalance).times(exchangeRateReal).div(10**18).toFixed(asset.vaultDecimals, BigNumber.ROUND_DOWN)
+        borrowBalance = new BigNumber(borrowBalance).div(bnDecimals).toFixed(parseInt(asset.decimals), BigNumber.ROUND_DOWN)
+        cash = new BigNumber(cash).div(bnDecimals).toFixed(parseInt(asset.decimals), BigNumber.ROUND_DOWN)
 
         const borrowRatePerYear = (borrowRatePerBlock) * blocksPeryear / 1e16
         const supplyRatePerYear = (supplyRatePerBlock) * blocksPeryear / 1e16
-        const dollarPerAsset = ethPerAsset/10**asset.decimals
+        const dollarPerAsset = ethPerAsset/(10**(36-parseInt(asset.decimals)))
 
         const lendingAsset = {
           address: asset.address,
@@ -4371,7 +4373,6 @@ class Store {
         let marketContract = new web3.eth.Contract(config.cErc20DelegatorABI, market)
         const creamPriceOracleContract = new web3.eth.Contract(config.creamPriceOracleABI, config.creamPriceOracleAddress)
 
-
         //set static values to avoid doing tons more calls.
         let defaultMarket = defaultValues.filter((val) => {
           return val.address === market
@@ -4436,24 +4437,24 @@ class Store {
           marketContract = new web3.eth.Contract(config.cEtherABI, market)
         }
 
-
         const exchangeRate = await marketContract.methods.exchangeRateStored().call()
         let supplyBalance = await marketContract.methods.balanceOf(account.address).call()
+
         let borrowBalance = await marketContract.methods.borrowBalanceStored(account.address).call()
         let cash = await marketContract.methods.getCash().call()
         const borrowRatePerBlock = await marketContract.methods.borrowRatePerBlock().call()
         const supplyRatePerBlock = await marketContract.methods.supplyRatePerBlock().call()
         const ethPerAsset = await creamPriceOracleContract.methods.getUnderlyingPrice(market).call() //no longer eth per asset it's now dollars per asset
 
-        const exchangeRateReal = exchangeRate/10**28
+        const exchangeRateReal = exchangeRate/10**decimals
 
-        supplyBalance = new BigNumber(supplyBalance).times(exchangeRateReal).div(bnVaultDecimals).toFixed(decimals, BigNumber.ROUND_DOWN)
+        supplyBalance = new BigNumber(supplyBalance).times(exchangeRateReal).div(10**18).toFixed(decimals, BigNumber.ROUND_DOWN)
         borrowBalance = new BigNumber(borrowBalance).div(bnDecimals).toFixed(decimals, BigNumber.ROUND_DOWN)
         cash = new BigNumber(cash).div(bnDecimals).toFixed(decimals, BigNumber.ROUND_DOWN)
 
         const borrowRatePerYear = (borrowRatePerBlock) * blocksPeryear / 1e16
         const supplyRatePerYear = (supplyRatePerBlock) * blocksPeryear / 1e16
-        const dollarPerAsset = ethPerAsset/10**decimals
+        const dollarPerAsset = ethPerAsset/(10**(36-decimals))
 
         const lendingAsset = {
           address: market,
