@@ -4253,9 +4253,6 @@ class Store {
         const bnDecimals = new BigNumber(10)
           .pow(parseInt(asset.decimals))
 
-        const bnVaultDecimals = new BigNumber(10)
-          .pow(asset.vaultDecimals)
-
         if(asset.vaultSymbol !== 'crETH') {
           const erc20Contract = new web3.eth.Contract(config.erc20ABI, asset.erc20address)
           balance = await erc20Contract.methods.balanceOf(account.address).call()
@@ -4416,9 +4413,6 @@ class Store {
 
         const bnDecimals = new BigNumber(10)
           .pow(decimals)
-
-        const bnVaultDecimals = new BigNumber(10)
-          .pow(vaultDecimals)
 
         decimals = parseInt(decimals, 10)
         let balance = 0
