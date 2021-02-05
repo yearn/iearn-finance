@@ -439,7 +439,7 @@ class Asset extends Component {
               <div className={classes.disabledContainer}>
                 <Typography variant='h4'>
                   <WarningIcon fontSize="small" style={{ marginBottom: '-5px' }} />
-                  Withdrawals might be subject to high slippage due to recent large <a className={classes.link} href="https://etherscan.io/tx/0x7207d444430344d4d8384d4dd8c12a8a343c9c01ccdb17c8962b84f40955c59f" target="_blank" rel="noopener noreferrer">withdrawal</a>
+                  Due to recent hack, do not withdraw from DAI V1 vault if you do not want to realize losses.
                 </Typography>
               </div>
             }
