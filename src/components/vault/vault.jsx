@@ -503,7 +503,7 @@ class Vault extends Component {
                 </div>
               </div>
               {
-                (!['LINK'].includes(asset.id) && !['GUSD'].includes(asset.id) && asset.vaultBalance > 0) &&
+                (!['LINK', 'GUSD', 'DAI', 'ETH', 'WETH'].includes(asset.id) && asset.vaultBalance > 0) &&
                 <div className={classes.headingEarning}>
                   <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
                   <div className={ classes.flexy }>
@@ -514,7 +514,7 @@ class Vault extends Component {
                 </div>
               }
               {
-                (!['LINK'].includes(asset.id) && !['GUSD'].includes(asset.id) && asset.vaultBalance === 0) &&
+                (!['LINK', 'GUSD', 'DAI', 'ETH', 'WETH'].includes(asset.id) && asset.vaultBalance === 0) &&
                 <div className={classes.headingEarning}>
                   <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
                   <div className={ classes.flexy }>
@@ -523,7 +523,7 @@ class Vault extends Component {
                 </div>
               }
               {
-                ['LINK'].includes(asset.id) &&
+                ['LINK', 'DAI', 'ETH', 'WETH'].includes(asset.id) &&
                 <div className={classes.headingEarning}>
                   <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
                   <Typography variant={ 'h3' } noWrap>Not Available</Typography>

@@ -225,19 +225,34 @@ class Asset extends Component {
           <div className={classes.headingEarning}>
             <Typography variant={ 'h5' } className={ classes.grey }>Yearly Growth:</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/1).toFixed(2) }% </Typography>
+              <Typography variant={ 'h4' } noWrap>
+                { ['LINK', 'DAI', 'ETH', 'WETH'].includes(asset.id) 
+                  ? "Not Available" 
+                  : `${(this._getAPY(asset)/1).toFixed(2)}%`
+                }
+              </Typography>
             </div>
           </div>
           <div className={classes.headingEarning}>
             <Typography variant={ 'h5' } className={ classes.grey }>Monthly Growth:</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/12).toFixed(2) }% </Typography>
+              <Typography variant={ 'h4' } noWrap>
+                { ['LINK', 'DAI', 'ETH', 'WETH'].includes(asset.id) 
+                  ? "Not Available" 
+                  : `${(this._getAPY(asset)/12).toFixed(2)}%`
+                }
+              </Typography>
             </div>
           </div>
           <div className={classes.headingEarning}>
             <Typography variant={ 'h5' } className={ classes.grey }>Weekly Growth:</Typography>
             <div className={ classes.flexy }>
-              <Typography variant={ 'h4' } noWrap>{ (this._getAPY(asset)/52).toFixed(2) }% </Typography>
+              <Typography variant={ 'h4' } noWrap>
+                { ['LINK', 'DAI', 'ETH', 'WETH'].includes(asset.id) 
+                  ? "Not Available" 
+                  : `${(this._getAPY(asset)/52).toFixed(2)}%`
+                }
+              </Typography>
             </div>
           </div>
           <div className={ classes.fullWidth }></div>
