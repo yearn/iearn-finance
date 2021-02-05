@@ -435,7 +435,7 @@ class Asset extends Component {
                 </Button>
               }
             </div>
-            { asset.symbol === 'DAI' &&
+            { ['DAI', 'ETH', 'WETH'].includes(asset.symbol) &&
               <div className={classes.disabledContainer}>
                 <Typography variant='h4'>
                   <WarningIcon fontSize="small" style={{ marginBottom: '-5px' }} />
