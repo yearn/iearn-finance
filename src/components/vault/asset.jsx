@@ -454,7 +454,7 @@ class Asset extends Component {
               <div className={classes.disabledContainer}>
                 <Typography variant='h4'>
                   <WarningIcon fontSize="small" style={{ marginBottom: '-5px' }} />
-                  Due to recent hack, do not withdraw from DAI V1 vault if you do not want to realize losses.
+                  Your tokens can be safely withdrawn, now
                 </Typography>
               </div>
             }
