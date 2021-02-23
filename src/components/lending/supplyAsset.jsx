@@ -466,9 +466,9 @@ class SupplyAsset extends Component {
                 fullWidth
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'} >
-                  { asset.supplyBalance === 0 && 'No Balance to Withdraw' }
-                  { asset.supplyBalance > 0 && BigNumber(withdrawAmount).gt(BigNumber(asset.supplyBalance)) && 'Insufficient Balance' }
-                  { asset.supplyBalance > 0 && (!withdrawAmount || BigNumber(withdrawAmount).lte(BigNumber(asset.supplyBalance))) && 'Withdraw' }
+                  { Number(asset.supplyBalance) === 0 && 'No Balance to Withdraw' }
+                  { Number(asset.supplyBalance) > 0 && BigNumber(withdrawAmount).gt(BigNumber(asset.supplyBalance)) && 'Insufficient Balance' }
+                  { Number(asset.supplyBalance) > 0 && (!withdrawAmount || BigNumber(withdrawAmount).lte(BigNumber(asset.supplyBalance))) && 'Withdraw' }
                 </Typography>
               </Button>
             </div>
