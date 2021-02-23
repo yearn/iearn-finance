@@ -401,10 +401,10 @@ class BorrowAsset extends Component {
                 fullWidth
                 >
                 <Typography className={ classes.buttonText } variant={ 'h5'} >
-                  { asset.borrowBalance === 0 && 'No Balance to Repay' }
-                  { asset.borrowBalance > 0 && BigNumber(repayAmount).gt(BigNumber(asset.balance)) && 'Insufficient Balance' }
-                  { asset.borrowBalance > 0 && BigNumber(repayAmount).gt(BigNumber(asset.borrowBalance)) && 'Insufficient Borrowed' }
-                  { asset.borrowBalance > 0 && (!repayAmount || (BigNumber(repayAmount).lte(BigNumber(asset.balance)) && BigNumber(repayAmount).lte(BigNumber(asset.borrowBalance)))) && 'Repay' }
+                  { Number(asset.borrowBalance) === 0 && 'No Balance to Repay' }
+                  { Number(asset.borrowBalance) > 0 && BigNumber(repayAmount).gt(BigNumber(asset.balance)) && 'Insufficient Balance' }
+                  { Number(asset.borrowBalance) > 0 && BigNumber(repayAmount).gt(BigNumber(asset.borrowBalance)) && 'Insufficient Borrowed' }
+                  { Number(asset.borrowBalance) > 0 && (!repayAmount || (BigNumber(repayAmount).lte(BigNumber(asset.balance)) && BigNumber(repayAmount).lte(BigNumber(asset.borrowBalance)))) && 'Repay' }
                 </Typography>
               </Button>
             </div>
