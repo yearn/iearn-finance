@@ -4360,7 +4360,8 @@ class Store {
     const blocksPeryear = 2102400
 
     const removedDeadMarket = allMarkets.filter((market) => {
-      return market.toLowerCase() !== '0xBdf447B39D152d6A234B4c02772B8ab5D1783F72'.toLowerCase()
+      return market.toLowerCase() !== '0xBdf447B39D152d6A234B4c02772B8ab5D1783F72'.toLowerCase() &&
+      market.toLowerCase() !== '0x4e3a36A633f63aee0aB57b5054EC78867CB3C0b8'.toLowerCase()
     })
 
     const defaultValues = this._getDefaultValues().lendingAssets
