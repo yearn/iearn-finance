@@ -11,7 +11,6 @@ import {
 import { colors, drawerWidth } from '../../theme'
 
 import Loader from '../loader'
-import InfoIcon from '@material-ui/icons/Info';
 
 import {
   ERROR,

@@ -395,6 +395,7 @@ const styles = theme => ({
     border: '1px solid #d9d9d9',
     borderRadius: '10px',
     padding: '1rem',
+    marginBottom: '20px',
     [theme.breakpoints.down('sm')]: {
       width: '95%',
       margin: 'auto'
@@ -502,14 +503,14 @@ class Vault extends Component {
   };
 
   balancesReturned = (balances) => {
+    console.log(store.getStore('vaultAssets'));
     this.setState({
-      assets: store.getStore('vaultAssets') ,
+      assets: store.getStore('vaultAssets'),
       loading: false
     })
   };
 
   historicalPriceReturned = (historicalPrices) => {
-    console.log(historicalPrices)
     this.setState({
       historicalPrice: historicalPrices
     })
@@ -524,7 +525,6 @@ class Vault extends Component {
       account: account,
       address: account.address ? account.address.substring(0,6)+'...'+account.address.substring(account.address.length-4,account.address.length) : null
     })
-
 
     dispatcher.dispatch({ type: GET_STRATEGY_BALANCES_FULL, content: { interval: '30d' } })
 
@@ -828,7 +828,6 @@ class Vault extends Component {
 
   _getAPY = (asset) => {
     const { basedOn } = this.state
-    console.log('asset', asset);
     // To calculate APY (Vault + Earn divide by 2 : Estimated)
     if(asset && asset.stats) {
       switch (basedOn) {
