@@ -583,13 +583,10 @@ class Asset extends Component {
           </div>
           <div className={ classes.sepperator }></div>
           <div className={classes.tradeContainer}>
-            <div className={ classes.balances }>
-              {/* <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.vaultBalance ? (Math.floor(asset.vaultBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography> */}
-            </div>
             <div className={ classes.withdrawContainer }>
               <div className={ classes.tradeContainer }>
                 <Typography variant='h5' style={{color: '#044b7b'}} className={ classes.withdrawalText }>Earn</Typography>
-                <Typography variant='h4' onClick={ () => { this.setRedeemEarnAmount(100) } }  className={ classes.value } noWrap>{ (asset.earnBalance ? (Math.floor(asset.earnBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.earnBalance ? (Math.floor(asset.earnBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography>
+                <Typography variant='h4' onClick={ () => { this.setRedeemEarnAmount(100) } }  className={ classes.value } noWrap>{ (asset.earnBalance ? (Math.floor(asset.earnBalance*asset.earnPricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.earnBalance ? (Math.floor(asset.earnBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography>
                 <TextField
                   style={{width: '95%'}}
                   className={ classes.actionInput }
@@ -639,7 +636,7 @@ class Asset extends Component {
               </div>
               <div className={ classes.tradeContainer }>
                 <Typography variant='h5' style={{color: '#2962ef'}} className={ classes.withdrawalText }>Vault</Typography>
-                <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.pricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.vaultBalance ? (Math.floor(asset.vaultBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography>
+                <Typography variant='h4' onClick={ () => { this.setRedeemAmount(100) } }  className={ classes.value } noWrap>{ (asset.vaultBalance ? (Math.floor(asset.vaultBalance*asset.vaultPricePerFullShare*10000)/10000).toFixed(4) : '0.0000') } { asset.symbol } ({ asset.vaultBalance ? (Math.floor(asset.vaultBalance*10000)/10000).toFixed(4) : '0.0000' } { asset.vaultSymbol }) </Typography>
                 <TextField
                   fullWidth
                   className={ classes.actionInput }
@@ -751,7 +748,7 @@ class Asset extends Component {
           vaultAPY.push([date, parseFloat(groups[date][0].apyInceptionSample.toFixed(4))]);
 
           // second attempt
-          var halfCount = Number(groups[date].length / 2)
+          var halfCount = Math.round(Number(groups[date].length / 2))
           if (halfCount !== 1) {
             labels.push(date);
             earnAPY.push([date, parseFloat((parseFloat(groups[date][halfCount].aprs) * 100).toFixed(4))]);
@@ -945,7 +942,6 @@ class Asset extends Component {
       return
     }
 
-    // const balance = this.props.asset.vaultBalance*this.props.asset.pricePerFullShare
     const balance = this.props.asset.vaultBalance
     let amount = balance*percent/100
     amount = Math.floor(amount*10000)/10000;
@@ -958,7 +954,6 @@ class Asset extends Component {
       return
     }
 
-    // const balance = this.props.asset.earnBalance*this.props.asset.pricePerFullShare
     const balance = this.props.asset.earnBalance
     let amount = balance*percent/100
     amount = Math.floor(amount*10000)/10000;
