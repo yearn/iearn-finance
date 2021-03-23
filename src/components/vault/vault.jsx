@@ -503,7 +503,6 @@ class Vault extends Component {
   };
 
   balancesReturned = (balances) => {
-    console.log(store.getStore('vaultAssets'));
     this.setState({
       assets: store.getStore('vaultAssets'),
       loading: false
