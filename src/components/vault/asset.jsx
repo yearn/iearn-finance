@@ -829,9 +829,9 @@ class Asset extends Component {
       vaultRatio
     } = this.state;
 
-    const earnAPY = asset.earnApr ? asset.earnApr : 0;
+    const earnAPY = asset.earnApr ? parseFloat(asset.earnApr) * 100 : 0;
     const vaultAPY = asset && asset.stats ? asset.stats.apyOneWeekSample : 0
-    return ((earnAPY * earnRatio / 100) + (vaultAPY * vaultRatio / 100)).toFixed(2)
+    return ((earnAPY * earnRatio / 100) + (vaultAPY * vaultRatio / 100) / 2).toFixed(2)
   }
 
   handleSliderChange = (event, newValue) => {
