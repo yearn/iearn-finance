@@ -826,7 +826,10 @@ class Store {
           strategy: 'Yearn Vault',
           strategyContractABI: config.strategyUSDTContractABI,
           vaultABI: config.vaultContractV3ABI,
-          historicalPriceId: 'yUSDT_price'
+          historicalPriceId: 'yUSDT_price',
+          logoFormat: 'png',
+          risk: 'Medium',
+          strategyType: 'yearn'
         },
         {
           id: 'DAI',
@@ -852,7 +855,10 @@ class Store {
           strategy: 'Yearn Vault',
           strategyContractABI: config.strategyDAIContractABI,
           vaultABI: config.vaultContractV3ABI,
-          historicalPriceId: 'yDAI_price'
+          historicalPriceId: 'yDAI_price',
+          logoFormat: 'png',
+          risk: 'Medium',
+          strategyType: 'yearn'
         },
         {
           id: 'TUSD',
@@ -877,7 +883,10 @@ class Store {
           strategy: 'Yearn Vault',
           strategyContractABI: config.strategyTUSDContractABI,
           vaultABI: config.vaultContractV3ABI,
-          historicalPriceId: 'yTUSD_price'
+          historicalPriceId: 'yTUSD_price',
+          logoFormat: 'png',
+          risk: 'Medium',
+          strategyType: 'yearn'
         },
         {
           id: 'USDC',
@@ -892,9 +901,9 @@ class Store {
           vaultBalance: 0,
           decimals: 6,
           deposit: true,
-          depositAll: false,
+          depositAll: true,
           withdraw: true,
-          withdrawAll: false,
+          withdrawAll: true,
           lastMeasurement: 10532708,
           measurement: 1e18,
           price_id: 'usd-coin',
@@ -902,7 +911,97 @@ class Store {
           strategy: 'Yearn Vault',
           strategyContractABI: config.strategyUSDCContractABI,
           vaultABI: config.vaultContractABI,
-          historicalPriceId: 'yUSDC_price'
+          historicalPriceId: 'yUSDC_price',
+          logoFormat: 'png',
+          risk: 'Medium',
+          strategyType: 'yearn'
+        },
+        {
+          id: 'cUSDT',
+          name: 'cUSDT',
+          symbol: 'cUSDT',
+          description: 'cUSDT',
+          vaultSymbol: 'dvlUSDT',
+          erc20address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+          vaultContractAddress: '0xEeCe6AD323a93d4B021BDAaC587DCC04b5cf0a78',
+          vaultContractABI: config.compoundVaultContractABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 6,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10651402,
+          measurement: 1e18,
+          price_id: 'compound-usdt',
+          strategyName: 'Yearn-Farmer: Compound USDT',
+          strategy: 'Compount USDT',
+          strategyContractABI: config.compundStrategyCompundABI,
+          historicalPriceId: 'cUSDT_price',
+          logoFormat: 'svg',
+          risk: 'Low',
+          strategyType: 'compound',
+          cTokenAddress: '0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9',
+          cAbi: config.cUSDTContract,
+        },
+        {
+          id: 'cUSDC',
+          name: 'cUSDC',
+          symbol: 'cUSDC',
+          description: 'cUSDC',
+          vaultSymbol: 'dvlUSDC',
+          erc20address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          vaultContractAddress: '0xd1D7f950899C0269a7F2aad5E854cdc3a1350ba9',
+          vaultContractABI: config.compoundVaultContractABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 6,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10532708,
+          measurement: 1e18,
+          price_id: 'compound-usd-coin',
+          strategyName: 'Yearn-Farmer: Compound USDC',
+          strategy: 'Compound USDC',
+          strategyContractABI: config.compundStrategyCompundABI,
+          historicalPriceId: 'cUSDC_price',
+          logoFormat: 'svg',
+          risk: 'Low',
+          strategyType: 'compound',
+          cTokenAddress: '0x39aa39c021dfbae8fac545936693ac917d5e7563',
+          cAbi: config.cUSDCContract,
+        },
+        {
+          id: 'cDAI',
+          name: 'cDAI',
+          symbol: 'cDAI',
+          description: 'Compound DAI',
+          vaultSymbol: 'dvlDAI',
+          erc20address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+          vaultContractAddress: '0x43C20638C3914Eca3c96e9cAc8ebE7d652Be45c6',
+          vaultContractABI: config.compoundVaultContractABI,
+          balance: 0,
+          vaultBalance: 0,
+          decimals: 18,
+          deposit: true,
+          depositAll: true,
+          withdraw: true,
+          withdrawAll: true,
+          lastMeasurement: 10650116,
+          measurement: 1e18,
+          price_id: 'cdai',
+          strategyName: 'Yearn-Farmer: Compound DAI',
+          strategy: 'Compound DAI',
+          strategyContractABI: config.compundStrategyCompundABI,
+          historicalPriceId: 'cDAI_price',
+          logoFormat: 'svg',
+          risk: 'Low',
+          strategyType: 'compound',
+          cTokenAddress: '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643',
+          cAbi: config.cDAIContract,
         },
       ],
       aprs: [{
@@ -1129,7 +1228,6 @@ class Store {
       const allowance = await erc20Contract.methods.allowance(account.address, contract).call({ from: account.address })
 
       const ethAllowance = web3.utils.fromWei(allowance, "ether")
-
       if(parseFloat(ethAllowance) < parseFloat(amount)) {
         /*
           code to accomodate for "assert _value == 0 or self.allowances[msg.sender][_spender] == 0" in contract
@@ -1668,31 +1766,35 @@ class Store {
         return callback(null, web3.utils.fromWei(parseFloat(aprs).toFixed(0), 'ether'))
       }
   
-      let aprContract = new web3.eth.Contract(config.aggregatedContractABI, config.aggregatedContractAddress)
+      if (asset.strategyType === 'yearn') {
+        let aprContract = new web3.eth.Contract(config.aggregatedContractABI, config.aggregatedContractAddress)
   
-      var call = 'getAPROptions';//+asset.symbol
-      var address = asset.erc20address
-      var aprs = 0;
-      if (asset.erc20address === 'Ethereum') {
-        call = 'getETH';
-        aprs = await aprContract.methods[call]().call();
-      } else {
-        aprs = await aprContract.methods[call](address).call();
-      }
-  
-  
-      const keys = Object.keys(aprs)
-      const workKeys = keys.filter((key) => {
-        return isNaN(key)
-      })
-      const maxApr = Math.max.apply(Math, workKeys.map(function(o) {
-        if(o === 'uniapr' || o === 'unicapr' || o === "iapr") {
-          return aprs[o]-100000000000000000000
+        var call = 'getAPROptions';//+asset.symbol
+        var address = asset.erc20address
+        var aprs = 0;
+        if (asset.erc20address === 'Ethereum') {
+          call = 'getETH';
+          aprs = await aprContract.methods[call]().call();
+        } else {
+          aprs = await aprContract.methods[call](address).call();
         }
-        return aprs[o];
-      }))
-  
-      callback(null, web3.utils.fromWei(maxApr.toFixed(0), 'ether'))
+    
+    
+        const keys = Object.keys(aprs)
+        const workKeys = keys.filter((key) => {
+          return isNaN(key)
+        })
+        const maxApr = Math.max.apply(Math, workKeys.map(function(o) {
+          if(o === 'uniapr' || o === 'unicapr' || o === "iapr") {
+            return aprs[o]-100000000000000000000
+          }
+          return aprs[o];
+        }))
+    
+        callback(null, web3.utils.fromWei(maxApr.toFixed(0), 'ether'))
+      } else {
+        return callback(null, 0);
+      }
     } catch (ex) {
       return callback(null, 0);
     }
@@ -2330,11 +2432,13 @@ class Store {
         asset.balance = data[0]
         asset.vaultBalance = data[1].vaultBalance
         asset.earnBalance = data[1].earnBalance
+        asset.strategyBalance = data[1].balance
         asset.stats = data[2]
         asset.vaultHoldings = data[3]
         asset.usdPrice = data[4].usdPrice
         asset.earnPricePerFullShare = data[5].earnPricePerFullShare
         asset.vaultPricePerFullShare = data[5].vaultPricePerFullShare
+        asset.compoundExchangeRate = data[5].compoundExchangeRate
         asset.apy = data[5].apy
         asset.addressStatistics = data[6]
         asset.addressTransactions = data[7]
@@ -2356,20 +2460,9 @@ class Store {
 
   _getAssetUSDPrices = async (web3, asset, account, usdPrices, callback) => {
     try {
-      const contract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
-      const earnContract = new web3.eth.Contract(config.yFarmerEarnABI, config.yFarmerEarnContract);
-      const vaultContract = new web3.eth.Contract(config.yFarmerVaultABI, config.yFarmerVaultContract);
-      const earnBalance = await earnContract.methods.balanceOf(asset.vaultContractAddress).call({ from: account.address })
-      const vaultBalance = await vaultContract.methods.balanceOf(asset.vaultContractAddress).call({ from: account.address })
-      const earnPricePerFullShare = await earnContract.methods.getPricePerFullShare().call({ from: account.address })
-      const vaultPricePerFullShare = await vaultContract.methods.getPricePerFullShare().call({ from: account.address })
-      const totalSupply = await contract.methods.totalSupply().call({ from: account.address })
-      const pricePerFullShare = (earnBalance * earnPricePerFullShare + vaultBalance * vaultPricePerFullShare) / totalSupply;
-
       const usdPrice = usdPrices[asset.price_id]
 
       const returnObj = {
-        pricePerFullShare: pricePerFullShare/1e18,
         usdPrice: usdPrice.usd
       }
 
@@ -2438,10 +2531,16 @@ class Store {
         asset.erc20address = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
       }
 
-      const vault = vaultStatistics.filter((stats) => {
-        return stats.tokenAddress.toLowerCase() === asset.erc20address.toLowerCase()
-      })
-
+      let vault = [];
+      if (asset.strategyType === 'compound') {
+        vault = vaultStatistics.filter((stats) => {
+          return stats.address.toLowerCase() === asset.vaultContractAddress.toLowerCase()
+        })
+      } else if (asset.strategyType === 'yearn') {
+        vault = vaultStatistics.filter((stats) => {
+          return stats.tokenAddress.toLowerCase() === asset.erc20address.toLowerCase()
+        })
+      }
       if(vault.length === 0) {
         return callback(null, {})
       }
@@ -2480,7 +2579,7 @@ class Store {
       }
 
       const vault = addressTXHitory.filter((stats) => {
-        return stats.vaultAddress.toLowerCase() === asset.vaultContractAddress.toLowerCase()
+        return stats.contractAddress.toLowerCase() === asset.vaultContractAddress.toLowerCase()
       })
 
       if(vault.length === 0) {
@@ -2581,20 +2680,36 @@ class Store {
       return callback(null, 0)
     }
 
-    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
-    let strategyAddress = await vaultContract.methods.strategy().call({ from: account.address });
-    let strategyContract = new web3.eth.Contract(asset.strategyContractABI, strategyAddress);
+    if (asset.strategyType === 'yearn') {
+      let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
+      let strategyAddress = await vaultContract.methods.strategy().call({ from: account.address });
+      let strategyContract = new web3.eth.Contract(asset.strategyContractABI, strategyAddress);
+  
+      let earnBalance = await strategyContract.methods.getEarnDepositBalance(account.address).call({ from: account.address });
+      earnBalance = parseFloat(earnBalance)/10**asset.decimals
+  
+      let vaultBalance = await strategyContract.methods.getVaultDepositBalance(account.address).call({ from: account.address });
+      vaultBalance = parseFloat(vaultBalance)/10**asset.decimals
+  
+      callback(null, {
+        earnBalance: parseFloat(earnBalance),
+        vaultBalance: parseFloat(vaultBalance),
+        balance: 0,
+      })
+    } else if (asset.strategyType === 'compound') {
+      let compoundContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
+      let strategyAddress = await compoundContract.methods.strategy().call({ from: account.address });
+      let strategyContract = new web3.eth.Contract(asset.strategyContractABI, strategyAddress);
 
-    let earnBalance = await strategyContract.methods.getEarnDepositBalance(account.address).call({ from: account.address });
-    earnBalance = parseFloat(earnBalance)/10**asset.decimals
+      let balance = await strategyContract.methods.getCurrentBalance(account.address).call({ from: account.address });
+      balance = parseFloat(balance)/10**asset.decimals
 
-    let vaultBalance = await strategyContract.methods.getVaultDepositBalance(account.address).call({ from: account.address });
-    vaultBalance = parseFloat(vaultBalance)/10**asset.decimals
-
-    callback(null, {
-      earnBalance: parseFloat(earnBalance),
-      vaultBalance: parseFloat(vaultBalance),
-    })
+      callback(null, {
+        earnBalance: 0,
+        vaultBalance: 0,
+        balance
+      })
+    }
   }
 
   _getVaultPricePerShare = async (web3, asset, account, callback) => {
@@ -2615,7 +2730,7 @@ class Store {
 
   depositContract = async (payload) => {
     const account = store.getStore('account')
-    const { asset, earnAmount, vaultAmount } = payload.content
+    const { asset, earnAmount, vaultAmount, amount } = payload.content
 
     const web3 = await this._getWeb3Provider()
     if(!web3) {
@@ -2624,19 +2739,35 @@ class Store {
 
     const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
     const strategyAddress = await vaultContract.methods.strategy().call({ from: account.address });
-    this._checkApproval(asset, account, earnAmount + vaultAmount, strategyAddress, (err) => {
-      if(err) {
-        return emitter.emit(ERROR, err);
-      }
-
-      this._callDepositContract(asset, account, earnAmount, vaultAmount, (err, depositResult) => {
+    if (asset.strategyType === 'yearn') {
+      this._checkApproval(asset, account, earnAmount + vaultAmount, strategyAddress, (err) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
-
-        return emitter.emit(DEPOSIT_CONTRACT_RETURNED, depositResult)
+  
+        this._callDepositContract(asset, account, earnAmount, vaultAmount, (err, depositResult) => {
+          if(err) {
+            return emitter.emit(ERROR, err);
+          }
+  
+          return emitter.emit(DEPOSIT_CONTRACT_RETURNED, depositResult)
+        })
       })
-    })
+    } else if (asset.strategyType === 'compound') {
+      this._checkApproval(asset, account, amount, strategyAddress, (err) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+  
+        this._callDepositAmountContract(asset, account, amount, (err, depositResult) => {
+          if(err) {
+            return emitter.emit(ERROR, err);
+          }
+  
+          return emitter.emit(DEPOSIT_CONTRACT_RETURNED, depositResult)
+        })
+      })
+    }
   }
 
   _checkIfApprovalIsNeeded = async (asset, account, amount, contract, callback) => {
@@ -2701,6 +2832,46 @@ class Store {
     }
   }
 
+  _callDepositAmountContract = async (asset, account, amount, callback) => {
+    const web3 = new Web3(store.getStore('web3context').library.provider);
+
+    let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
+
+    var amountToSend = web3.utils.toWei(amount, "ether")
+    if (asset.decimals !== 18) {
+      amountToSend = web3.utils.toBN(amount*10**asset.decimals).toString();
+    }
+
+    console.log(amountToSend);
+    vaultContract.methods.deposit(amountToSend).send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        callback(null, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+      .catch((error) => {
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return callback(error.message)
+          }
+          callback(error)
+        }
+      })
+  }
+
   _callDepositContract = async (asset, account, earnAmount, vaultAmount, callback) => {
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
@@ -2758,19 +2929,35 @@ class Store {
     const vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
     const strategyAddress = await vaultContract.methods.strategy().call({ from: account.address });
 
-    this._checkApproval(asset, account, asset.balance, strategyAddress, (err) => {
-      if(err) {
-        return emitter.emit(ERROR, err);
-      }
-
-      this._callDepositContract(asset, account, earnAmount, vaultAmount, (err, depositResult) => {
+    if (asset.strategyType === 'yearn') {
+      this._checkApproval(asset, account, asset.balance, strategyAddress, (err) => {
         if(err) {
           return emitter.emit(ERROR, err);
         }
-
-        return emitter.emit(DEPOSIT_ALL_CONTRACT_RETURNED, depositResult)
+  
+        this._callDepositContract(asset, account, earnAmount, vaultAmount, (err, depositResult) => {
+          if(err) {
+            return emitter.emit(ERROR, err);
+          }
+  
+          return emitter.emit(DEPOSIT_ALL_CONTRACT_RETURNED, depositResult)
+        })
       })
-    })
+    } else if (asset.strategyType === 'compound') {
+      this._checkApproval(asset, account, asset.balance.toString(), strategyAddress, (err) => {
+        if(err) {
+          return emitter.emit(ERROR, err);
+        }
+  
+        this._callDepositAmountContract(asset, account, asset.balance.toString(), (err, depositResult) => {
+          if(err) {
+            return emitter.emit(ERROR, err);
+          }
+  
+          return emitter.emit(DEPOSIT_CONTRACT_RETURNED, depositResult)
+        })
+      })
+    }
   }
 
   withdrawVault = (payload) => {
@@ -2961,42 +3148,63 @@ class Store {
     try {
       if(asset.vaultContractAddress === null) {
         return callback(null, {
-          pricePerFullShare: 0,
+          earnPricePerFullShare: 0,
+        vaultPricePerFullShare: 0,
+          compoundExchangeRate: 0,
           apy: 0
         })
       }
 
-      const block = await web3.eth.getBlockNumber();
-      const contract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
-      const strategyAddress = await contract.methods.strategy().call({ from: account.address });
-      const strategyContract = new web3.eth.Contract(asset.strategyContractABI, strategyAddress);
-      const earnAddress = await strategyContract.methods.earn().call({ from: account.address });
-      const vaultAddress = await strategyContract.methods.vault().call({ from: account.address });
-      const earnContract = new web3.eth.Contract(config.IEarnErc20ABIv2, earnAddress);
-      const vaultContract = new web3.eth.Contract(asset.vaultABI,vaultAddress);
-
-      // Calculate price per full share
-      const earnPricePerFullShare = await earnContract.methods.getPricePerFullShare().call({ from: account.address })
-      const vaultPricePerFullShare = await vaultContract.methods.getPricePerFullShare().call({ from: account.address })
-      let balance = vaultPricePerFullShare - asset.measurement;
-      balance = balance / 1e18;
-      let diff = block - asset.lastMeasurement;
-
-      balance = balance / diff;
-      balance = balance * 242584600;
-
-      const returnObj = {
-        earnPricePerFullShare: parseFloat(earnPricePerFullShare)/10**18,
-        vaultPricePerFullShare: parseFloat(vaultPricePerFullShare)/10**18,
-        apy: parseFloat(balance)
+      if (asset.strategyType === 'yearn') {
+        const block = await web3.eth.getBlockNumber();
+        const contract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
+        const strategyAddress = await contract.methods.strategy().call({ from: account.address });
+        const strategyContract = new web3.eth.Contract(asset.strategyContractABI, strategyAddress);
+        const earnAddress = await strategyContract.methods.earn().call({ from: account.address });
+        const vaultAddress = await strategyContract.methods.vault().call({ from: account.address });
+        const earnContract = new web3.eth.Contract(config.IEarnErc20ABIv2, earnAddress);
+        const vaultContract = new web3.eth.Contract(asset.vaultABI,vaultAddress);
+  
+        // Calculate price per full share
+        const earnPricePerFullShare = await earnContract.methods.getPricePerFullShare().call({ from: account.address })
+        const vaultPricePerFullShare = await vaultContract.methods.getPricePerFullShare().call({ from: account.address })
+        let balance = vaultPricePerFullShare - asset.measurement;
+        balance = balance / 1e18;
+        let diff = block - asset.lastMeasurement;
+  
+        balance = balance / diff;
+        balance = balance * 242584600;
+  
+        const returnObj = {
+          earnPricePerFullShare: parseFloat(earnPricePerFullShare)/10**18,
+          vaultPricePerFullShare: parseFloat(vaultPricePerFullShare)/10**18,
+          compoundExchangeRate: 0,
+          apy: parseFloat(balance)
+        }
+  
+        callback(null, returnObj)
+      } else if (asset.strategyType === 'compound') {
+        const compoundContract = new web3.eth.Contract(asset.cAbi, asset.cTokenAddress);
+        const getCash = await compoundContract.methods.getCash().call({ from: account.address });
+        const totalBorrows = await compoundContract.methods.totalBorrows().call({ from: account.address });
+        const totalReserves = await compoundContract.methods.totalReserves().call({ from: account.address });
+        const totalSupply = await compoundContract.methods.totalSupply().call({ from: account.address });
+        const exchangeRate = (getCash + totalBorrows - totalReserves) / totalSupply;
+        const returnObj = {
+          earnPricePerFullShare: 0,
+          vaultPricePerFullShare: 0,
+          compoundExchangeRate: parseFloat(exchangeRate)/10**asset.decimals,
+          apy: parseFloat(exchangeRate)
+        }
+  
+        callback(null, returnObj)
       }
-
-      callback(null, returnObj)
     } catch (e) {
       console.log(e)
       callback(null, {
         earnPricePerFullShare: 0,
         vaultPricePerFullShare: 0,
+        compoundExchangeRate: 0,
         apy: 0
       })
     }
@@ -3016,7 +3224,7 @@ class Store {
 
   _getUSDPrices = async () => {
     try {
-      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,usd-coin,chainlink,yearn-finance,binance-usd,wrapped-bitcoin,ethereum,nusd,chainlink,aave-link,lp-sbtc-curve,lp-bcurve,curve-fi-ydai-yusdc-yusdt-ytusd&vs_currencies=usd,eth'
+      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,dai,true-usd,tether,compound-usdt,compound-usd-coin,cdai&vs_currencies=usd,eth'
       const priceString = await rp(url);
       const priceJSON = JSON.parse(priceString)
 
@@ -3046,54 +3254,61 @@ class Store {
     const statistics = store.getStore('statistics')
 
     if(vaults && vaults.length > 0 && prices !== null && statistics && statistics.length > 0) {
-      console.log('vaults', vaults);
-      console.log('prices', prices);
-      console.log('statistics', statistics);
       let basedOn = localStorage.getItem('yearn.finance-dashboard-basedon')
 
       if(!basedOn) {
         basedOn = '3'
       }
-      // console.log('vaults', vaults);
-      // console.log('assets', assets);
-      // console.log('prices', prices);
-      // console.log('statistics', statistics);
       // FILTER USED VAULTS AND CALCULATE VAULT ASSET BALANCES
       const farmersInUse = vaults.filter((farmer) => {
         if(farmer.id === 'ETH') {
           return false
+        } else if (farmer.strategyType === 'compound') {
+          return farmer.strategyBalance > 0.0001
         }
         return farmer.earnBalance + farmer.vaultBalance > 0.0001
       }).map((farmer) => {
         let apy = 0
 
         const vaultStats = statistics.filter((stats) => {
-          return stats.tokenAddress.toLowerCase() === farmer.erc20address.toLowerCase()
+          if (farmer.strategyType === 'yearn') {
+            return stats.tokenAddress.toLowerCase() === farmer.erc20address.toLowerCase()
+          } else if (farmer.strategyType === 'compound') {
+            return stats.address.toLowerCase() === farmer.vaultContractAddress.toLowerCase()
+          }
+          return false;
         })
-
-        console.log(basedOn);
 
         if(vaultStats.length === 0) {
           apy = farmer.apy
         } else {
-          switch (basedOn) {
-            case '1':
-              apy = (vaultStats[0].apyOneWeekSample + farmer.earnApr) / 2
-              break;
-            case '2':
-              apy = (vaultStats[0].apyOneMonthSample + farmer.earnApr) / 2
-              break;
-            case '3':
-              apy = (vaultStats[0].apyInceptionSample + farmer.earnApr) / 2
-              break;
-            default:
-              apy = farmer.apy
+          if (farmer.strategyType === 'yearn') {
+            switch (basedOn) {
+              case '1':
+                apy = (vaultStats[0].apyOneWeekSample + farmer.earnApr) / 2
+                break;
+              case '2':
+                apy = (vaultStats[0].apyOneMonthSample + farmer.earnApr) / 2
+                break;
+              case '3':
+                apy = (vaultStats[0].apyInceptionSample + farmer.earnApr) / 2
+                break;
+              default:
+                apy = farmer.apy
+            }
+          } else if (farmer.strategyType === 'compound') {
+            apy = vaultStats[0].compoundApy
           }
         }
 
         const price = prices[farmer.price_id]
         farmer.prices = price
-        farmer.tokenBalance = farmer.vaultBalance * farmer.vaultPricePerFullShare + farmer.earnBalance * farmer.earnPricePerFullShare
+        if (farmer.strategyType === 'yearn') {
+          farmer.tokenBalance = farmer.vaultBalance * farmer.vaultPricePerFullShare + farmer.earnBalance * farmer.earnPricePerFullShare
+        } else if (farmer.strategyType === 'compound') {
+          farmer.tokenBalance = farmer.strategyBalance * farmer.compoundExchangeRate
+        }
+        
         farmer.usdBalance = farmer.tokenBalance * farmer.prices.usd
         farmer.vaultGrowth_daily_usd = farmer.tokenBalance * (apy/36500) * farmer.prices.usd
         farmer.vaultGrowth_weekly_usd = farmer.tokenBalance * (apy/5200) * farmer.prices.usd
@@ -3112,11 +3327,19 @@ class Store {
             return 0;
           }
 
-          farmer.historicalPrice
-          .sort(sortByTimestamp)
-          .forEach(price => {
-            farmer.portfolioBalance.push([price.timestamp, parseFloat(price.earnPrice)/10**18 * farmer.earnBalance + parseFloat(price.vaultPrice)/10**18 * farmer.vaultBalance])
-          })
+          if (farmer.strategyType === 'yearn') {
+            farmer.historicalPrice
+            .sort(sortByTimestamp)
+            .forEach(price => {
+              farmer.portfolioBalance.push([price.timestamp, parseFloat(price.earnPrice)/10**18 * farmer.earnBalance + parseFloat(price.vaultPrice)/10**18 * farmer.vaultBalance])
+            })
+          } else if (farmer.strategyType === 'compound') {
+            farmer.historicalPrice
+            .sort(sortByTimestamp)
+            .forEach(price => {
+              farmer.portfolioBalance.push([price.timestamp, parseFloat(price.compoundExchangeRate)/10**18 * farmer.strategyBalance])
+            })
+          }
         }
 
         return farmer;
@@ -3184,7 +3407,6 @@ class Store {
       const portfolioGrowthWeeklyPerc_eth = (vaultBalances.vaultGrowth_weekly_eth) * 100 / vaultBalances.vaultBalance_eth
       const portfolioGrowthYearlyPerc_eth = (vaultBalances.vaultGrowth_yearly_eth) * 100 / vaultBalances.vaultBalance_eth
 
-      console.log('vaultBalances', vaultBalances);
       let dashboard = {
         vault_balance_usd: vaultBalances.vaultBalance_usd,
         vault_growth_usd_daily: vaultBalances.vaultGrowth_daily_usd,
@@ -3267,15 +3489,20 @@ class Store {
 
   _getHistoricalAPY = async (web3, asset, account, interval, callback) => {
     try {
-      let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
-      let strategyAddress = await vaultContract.methods.strategy().call({ from: account.address });
-      let strategyContract = new web3.eth.Contract(asset.strategyContractABI, strategyAddress);
-      let vaultAddress = await strategyContract.methods.vault().call({ from: account.address });
+      let vaultAddress = '';
+      if (asset.strategyType === 'yearn') {
+        let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress);
+        let strategyAddress = await vaultContract.methods.strategy().call({ from: account.address });
+        let strategyContract = new web3.eth.Contract(asset.strategyContractABI, strategyAddress);
+        vaultAddress = await strategyContract.methods.vault().call({ from: account.address });
+      } else if (asset.strategyType === 'compound') {
+        vaultAddress = asset.vaultContractAddress;
+      }
 
       const url = `${config.statsProvider}vaults/historical-apy/${vaultAddress}/${interval}`
-      const resultString = await rp(url);
-      const result = JSON.parse(resultString)
-      callback(null, result.body)
+        const resultString = await rp(url);
+        const result = JSON.parse(resultString)
+        callback(null, result.body)
     } catch(e) {
       console.log(e)
       callback(null, [])
@@ -3352,49 +3579,79 @@ class Store {
       content: {
         earnAmount: asset.earnBalance.toString(),
         vaultAmount: asset.vaultBalance.toString(),
+        amount: asset.strategyBalance.toString(),
         asset,
       }
     });
   };
 
   withdrawBoth = async (payload) => {
-    const { earnAmount, vaultAmount, asset } = payload.content;
+    const { earnAmount, vaultAmount, asset, amount } = payload.content;
     const account = store.getStore('account')
     const web3 = new Web3(store.getStore('web3context').library.provider);
 
     let vaultContract = new web3.eth.Contract(asset.vaultContractABI, asset.vaultContractAddress)
 
-    var earnAmountSend = web3.utils.toWei(earnAmount, "ether")
-    if (asset.decimals !== 18) {
-      earnAmountSend = web3.utils.toBN(earnAmount*10**asset.decimals).toString();
-    }
-
-    var vaultAmountSend = web3.utils.toWei(vaultAmount, "ether")
-    if (asset.decimals !== 18) {
-      vaultAmountSend = web3.utils.toBN(vaultAmount*10**asset.decimals).toString();
-    }
-
-    const functionCall = vaultContract.methods.withdraw([earnAmountSend, vaultAmountSend]);
-    functionCall.send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
-    .on('transactionHash', function(hash){
-      console.log(hash)
-      return emitter.emit(WITHDRAW_VAULT_RETURNED, hash)
-    })
-    .on('confirmation', function(confirmationNumber, receipt){
-      console.log(confirmationNumber, receipt);
-    })
-    .on('receipt', function(receipt){
-      console.log(receipt);
-    })
-    .on('error', function(error) {
-      console.log(error);
-      if (!error.toString().includes("-32601")) {
-        if(error.message) {
-          return emitter.emit(ERROR, error.message);
-        }
-        return emitter.emit(ERROR, error);
+    if (asset.strategyType === 'yearn') {
+      var earnAmountSend = web3.utils.toWei(earnAmount, "ether")
+      if (asset.decimals !== 18) {
+        earnAmountSend = web3.utils.toBN(earnAmount*10**asset.decimals).toString();
       }
-    })
+  
+      var vaultAmountSend = web3.utils.toWei(vaultAmount, "ether")
+      if (asset.decimals !== 18) {
+        vaultAmountSend = web3.utils.toBN(vaultAmount*10**asset.decimals).toString();
+      }
+  
+      const functionCall = vaultContract.methods.withdraw([earnAmountSend, vaultAmountSend]);
+      functionCall.send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        return emitter.emit(WITHDRAW_VAULT_RETURNED, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        console.log(error);
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return emitter.emit(ERROR, error.message);
+          }
+          return emitter.emit(ERROR, error);
+        }
+      })
+    } else if (asset.strategyType === 'compound') {
+      var amountSend = web3.utils.toWei(amount, "ether")
+      if (asset.decimals !== 18) {
+        amountSend = web3.utils.toBN(amount*10**asset.decimals).toString();
+      }
+  
+      const functionCall = vaultContract.methods.withdraw(amountSend);
+      functionCall.send({ from: account.address, gasPrice: web3.utils.toWei(await this._getGasPrice(), 'gwei') })
+      .on('transactionHash', function(hash){
+        console.log(hash)
+        return emitter.emit(WITHDRAW_VAULT_RETURNED, hash)
+      })
+      .on('confirmation', function(confirmationNumber, receipt){
+        console.log(confirmationNumber, receipt);
+      })
+      .on('receipt', function(receipt){
+        console.log(receipt);
+      })
+      .on('error', function(error) {
+        console.log(error);
+        if (!error.toString().includes("-32601")) {
+          if(error.message) {
+            return emitter.emit(ERROR, error.message);
+          }
+          return emitter.emit(ERROR, error);
+        }
+      })
+    }
   };
 
   getStrategyBalancesFull = async (payload) => {
@@ -3436,6 +3693,7 @@ class Store {
         }
 
         asset.balance = data[0]
+        asset.strategyBalance = data[1].balance
         asset.vaultBalance = data[1].vaultBalance
         asset.earnBalance = data[1].earnBalance
         asset.stats = data[2]
@@ -3443,6 +3701,7 @@ class Store {
         asset.usdPrice = data[3].usdPrice
         asset.earnPricePerFullShare = data[4].earnPricePerFullShare
         asset.vaultPricePerFullShare = data[4].vaultPricePerFullShare
+        asset.compoundExchangeRate = data[4].compoundExchangeRate
         asset.apy = data[4].apy // Vault APY
         asset.addressStatistics = data[5]
         // asset.addressTransactions = data[7]

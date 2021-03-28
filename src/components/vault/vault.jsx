@@ -398,16 +398,26 @@ const styles = theme => ({
     marginBottom: '20px',
     [theme.breakpoints.down('sm')]: {
       width: '95%',
-      margin: 'auto'
+      margin: 'auto',
+      marginBottom: '20px',
     }
   },
-  riskLabel: {
+  riskLowLabel: {
     background: '#72C6AE',
     borderRadius: '5px',
     color: '#ffffff',
     padding: '5px 10px',
     textAlign: 'center',
     width: '5rem',
+    marginLeft: 'auto'
+  },
+  riskMediumLabel: {
+    background: '#EC9956',
+    borderRadius: '5px',
+    color: '#ffffff',
+    padding: '5px 10px',
+    textAlign: 'center',
+    width: '7rem',
     marginLeft: 'auto'
   },
   assetName: {
@@ -508,12 +518,6 @@ class Vault extends Component {
       loading: false
     })
   };
-
-  historicalPriceReturned = (historicalPrices) => {
-    this.setState({
-      historicalPrice: historicalPrices
-    })
-  }
 
   connectionConnected = () => {
     const { t } = this.props
@@ -670,7 +674,7 @@ class Vault extends Component {
               <Typography variant='h4'>Strategy {index+1}: {asset.strategyName}</Typography>
             </Grid>
             <Grid item sm={6} xs={6}>
-              {this.renderRiskLabel()}
+              {this.renderRiskLabel(asset)}
             </Grid>
           </Grid>
           <Accordion className={ classes.expansionPanel } square key={ asset.id+"_expand" } expanded={ expanded === asset.id} onChange={ () => { this.handleChange(asset.id, asset) } }>
@@ -685,7 +689,7 @@ class Vault extends Component {
                     <div className={classes.assetIcon}>
                       <img
                           alt=""
-                          src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                          src={ require('../../assets/'+asset.symbol+'-logo.'+asset.logoFormat) }
                           height={ '32px' }
                           style={asset.disabled?{filter:'grayscale(100%)'}:{}}
                         />
@@ -795,11 +799,11 @@ class Vault extends Component {
     )
   }
 
-  renderRiskLabel = () => {
+  renderRiskLabel = (asset) => {
     const { classes } = this.props;
     return (
-      <div className={classes.riskLabel}>
-        <Typography variant='caption'>Risk: Low</Typography>
+      <div className={asset.risk === 'Low' ? classes.riskLowLabel : asset.risk === 'Medium' ? classes.riskMediumLabel : '' }>
+        <Typography variant='caption'>Risk: {asset.risk}</Typography>
       </div>
     );
   }
@@ -827,20 +831,28 @@ class Vault extends Component {
 
   _getAPY = (asset) => {
     const { basedOn } = this.state
+
     // To calculate APY (Vault + Earn divide by 2 : Estimated)
+    // Compound APY is using compoundApy
     if(asset && asset.stats) {
-      switch (basedOn) {
-        case 1:
-          return (asset.stats.apyOneWeekSample + parseFloat(asset.earnApr) * 100) / 2
-        case 2:
-          return (asset.stats.apyOneMonthSample + parseFloat(asset.earnApr) * 100) / 2
-        case 3:
-          return (asset.stats.apyInceptionSample + parseFloat(asset.earnApr) * 100) / 2
-        default:
-          return (asset.apy + asset.earnApr) / 2
+      if (asset.strategyType === 'compound') {
+        if (asset.stats.compoundApy) {
+          return asset.stats.compoundApy;
+        } else {
+          return '0.00'
+        }
+      } else if (asset.strategyType === 'yearn') {
+        switch (basedOn) {
+          case 1:
+            return (asset.stats.apyOneWeekSample + parseFloat(asset.earnApr) * 100) / 2
+          case 2:
+            return (asset.stats.apyOneMonthSample + parseFloat(asset.earnApr) * 100) / 2
+          case 3:
+            return (asset.stats.apyInceptionSample + parseFloat(asset.earnApr) * 100) / 2
+          default:
+            return (asset.apy + parseFloat(asset.earnApr) * 100) / 2
+        }
       }
-    } else if (asset.apy) {
-      return (asset.apy + parseFloat(asset.earnApr) * 100) / 2
     } else {
       return '0.00'
     }

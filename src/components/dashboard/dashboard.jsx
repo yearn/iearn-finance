@@ -632,7 +632,7 @@ class Dashboard extends Component {
             <div className={ classes.assetIcon }>
               <img
                 alt=""
-                src={ require('../../assets/'+asset.symbol+'-logo.png') }
+                src={ require('../../assets/'+asset.symbol+'-logo.'+asset.logoFormat) }
                 height={ '30px'}
               />
             </div>
