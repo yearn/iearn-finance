@@ -187,6 +187,10 @@ class SideDrawer extends Component {
     return (
       <div className={classes.footerMenu}>
           <List>
+            <ListItem button key={'Your Feedback'} className={ (this.linkSelected('/user-feedback'))?classes.selected:'' } onClick={ () => { this.nav('https://ido.daoventures.co/feedback-beta-product-v1?hs_preview=VtrXwMtE-44127250303') } }>
+              <ListItemText primary={'Your Feedback'} />
+            </ListItem>
+
             <ListItem button key={'FAQ'} className={ (this.linkSelected('/faq'))? classes.selected:'' } onClick={ () => { this.nav('https://daoventures.gitbook.io/daoventures/frequently-asked-question') } }>
               <ListItemText primary={'FAQ'} />
             </ListItem>
