@@ -78,7 +78,7 @@ class App extends Component {
             background: "#f9fafb"
           }}>
             <Switch>
-              <Route path="/stats">
+              {/* <Route path="/stats">
                 <Header />
                 <APR />
               </Route>
@@ -88,15 +88,15 @@ class App extends Component {
               </Route>
               <Route path="/idai">
                 <IDai />
-              </Route>
+              </Route> */}
               {/* <Route path="/performance">
                 <Header />
                 <Performance />
               </Route> */}
-              <Route path="/manage">
+              {/* <Route path="/manage">
                 <Header />
                 <Manage />
-              </Route>
+              </Route> */}
               {/* <Route path="/vaults">
                 <Header />
                 <Vaults />
@@ -107,12 +107,12 @@ class App extends Component {
                 <MainContainer />
                 <Dashboard />
               </Route>
-              <Route path="/earn">
+              {/* <Route path="/earn">
                 <Header />
                 <SideDrawer />
                 <MainContainer />
                 <InvestSimple />
-              </Route>
+              </Route> */}
               <Route path="/invest">
                 <Header />
                 <SideDrawer />
