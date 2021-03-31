@@ -51,6 +51,20 @@ const styles = theme => ({
       minWidth: 'calc(100% - '+ drawerWidth + 'px)',
     }
   },
+  connectWalletContainer: {
+    minWidth: '100%',
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    position: 'relative',
+    [theme.breakpoints.up('md')]: {
+      minWidth: 'calc(100% - '+ drawerWidth + 'px)',
+    },
+    [theme.breakpoints.down('md')]: {
+      paddingTop: '2rem'
+    }
+  },
   investedContainer: {
     display: 'flex',
     flex: 1,
@@ -233,9 +247,12 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'stretch',
     justifyContent: 'center',
-    width: '80%',
+    width: '50%',
     margin: 'auto',
     cursor: 'pointer',
+    [theme.breakpoints.down('sm')]: {
+      width: '80%'
+    }
   },
   buttonIconContainer: {
     width: '60px',
@@ -363,6 +380,22 @@ const styles = theme => ({
     background: 'rgba(24, 160, 251, 0.2)',
     borderRadius: '5px'
   },
+  titleDesc: {
+    textAlign: 'center',
+    [theme.breakpoints.down('sm')]: {
+      padding: '1rem 2rem'
+    }
+  },
+  alertDesc: {
+    textAlign: 'center',
+    width: '65%',
+    margin: 'auto',
+    whiteSpace: 'normal',
+    fontWeight: 'bold',
+    [theme.breakpoints.down('md')]: {
+      width: '85%'
+    }
+  },
 });
 
 class Dashboard extends Component {
@@ -442,10 +475,11 @@ class Dashboard extends Component {
     if(!account || !account.address) {
       return (
         <div className={ classes.root }>
-          <div className={classes.contentContainer}>
+          <div className={classes.connectWalletContainer}>
             <div>
               <Typography variant={'h2'} className={classes.welcomeText}>Welcome to DAOventures</Typography>
               <Typography className={classes.titleDesc} variant={'body1'}>Connect an Ethereum wallet to manage and invest your DeFi portfolio</Typography>
+              <Typography variant='body1' className={classes.alertDesc}>Alert: The deposit into any of investment strategies will incur high gas fees due to Ethereum network</Typography>
               <div className={classes.buttonContainer}>
                 <Grid container className={classes.buttonGroup} onClick={this.addressClicked}>
                   <Grid item sm={3} xs={3} className={classes.buttonIconContainer}>
