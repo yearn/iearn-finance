@@ -814,7 +814,7 @@ class Store {
           vaultContractABI: config.vaultUSDTContractABI,
           balance: 0,
           vaultBalance: 0,
-          decimals: 6,
+          decimals: 18,
           deposit: true,
           depositAll: true,
           withdraw: true,
