@@ -271,7 +271,7 @@ class Manage extends Component {
 
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: 'Wallet succesfully connected.', snackbarType: 'Info' }
+      const snackbarObj = { snackbarMessage: 'Wallet successfully connected.', snackbarType: 'Info' }
       that.setState(snackbarObj)
     })
   };
@@ -287,7 +287,7 @@ class Manage extends Component {
 
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: 'Metamask wallet succesfully connected.', snackbarType: 'Info' }
+      const snackbarObj = { snackbarMessage: 'Metamask wallet successfully connected.', snackbarType: 'Info' }
       that.setState(snackbarObj)
     })
   };
@@ -297,7 +297,7 @@ class Manage extends Component {
 
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: 'Ledger succesfully connected.', snackbarType: 'Info' }
+      const snackbarObj = { snackbarMessage: 'Ledger successfully connected.', snackbarType: 'Info' }
       that.setState(snackbarObj)
     })
   };

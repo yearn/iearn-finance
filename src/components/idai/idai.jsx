@@ -193,7 +193,7 @@ class IDai extends Component {
 
     const that = this
     setTimeout(() => {
-      const snackbarObj = { snackbarMessage: 'Wallet succesfully connected.', snackbarType: 'Info' }
+      const snackbarObj = { snackbarMessage: 'Wallet successfully connected.', snackbarType: 'Info' }
       that.setState(snackbarObj)
     })
   };
